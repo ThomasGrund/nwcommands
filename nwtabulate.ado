@@ -1,5 +1,6 @@
 capture program drop nwtabulate
 program nwtabulate
+	
 	syntax [anything] , [selfloop *]
 	_nwsyntax `anything'
 	
