@@ -1,0 +1,38 @@
+#include s2color
+color p white
+color p1 gold
+color p2 red
+color p3 green
+color p4 blue
+color p5 erose
+color p6 eltblue
+color p7 white
+
+symbol p circle
+symbol p1 circle
+symbol p2 diamond
+symbol p3 square
+symbol p4 triangle
+symbol p5 smcircle
+symbol p6 smdiamond
+symbol p7 smsquare
+symbol p8 smtriangle
+
+color pline gs12
+color p1line gs12
+color p2line red
+color p3line gold
+color p4line magenta
+
+color plabel white
+
+color label khaki
+
+color plotregion black
+color background black
+
+color legend black
+color legend_line white
+color key_label white
+
+

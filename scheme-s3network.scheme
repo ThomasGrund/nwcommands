@@ -1,0 +1,37 @@
+#include s2color
+color p white
+color p1 "230 205 180"
+color p2 "225 180 140"
+color p3 "220 150 85"
+color p4 "220 125 50"
+color p5 "200 100 25"
+color p6 "165 80 10"
+
+symbol p circle
+symbol p1 circle
+symbol p2 diamond
+symbol p3 square
+symbol p4 triangle
+symbol p5 smcircle
+symbol p6 smdiamond
+symbol p7 smsquare
+symbol p8 smtriangle
+
+color pline "245 175 50"
+color p1line red .7
+color p2line gold .3
+color p3line gold
+color p4line magenta
+
+color plabel white
+
+color label khaki
+
+color plotregion gs12
+color background gs12
+
+color legend black
+color legend_line black
+color key_label black
+
+
