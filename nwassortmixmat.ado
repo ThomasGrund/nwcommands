@@ -1,6 +1,6 @@
-capture program drop nwdyadprob
-program nwdyadprob
-	syntax anything(name=weightnet), density(string) [name(string) vars(string) xvars undirected]
+capture program drop nwassortmixmat
+program nwassortmixmat
+	syntax anything(name=weightnet), density(string) [undirected]
 	
 	// Install gsample if needed
 	capture which gsample
@@ -24,41 +24,27 @@ program nwdyadprob
 	
 	// Generate valid network name and valid varlist
 	if "`name'" == "" {
-		local name "dyadprob"
+		local name "homophily"
 	}
 	if "`stub'" == "" {
 		local stub "net"
 	}
 	nwvalidate `name'
+	nwvalidvars `nodes', stub(`stub')
 	local homoname = r(validname)
-	local varscount : word count `vars'
-	if (`varscount' != `nodes'){
-		nwvalidvars `nodes', stub(`stub')
-		local homovars "$validvars"
-	}
-	else {
-		local homovars "`vars'"
-	}
+	local homovars "$validvars"
 	
 	// Generate network from weight network
 	preserve
+	
 	nwtoedge `weightnet', full
-	
-	if "`undirected'" != "" {
-		replace `weightnet' = 0 if _toid <= _fromid
-	}
-	
 	gsample `ties' [aweight=`weightnet'], generate(link) wor
-	qui nwfromedge _fromid _toid link, name(_tempnetwork)
+
+	nwfromedge fromid toid link, name(_tempnetwork)
 	nwset net*, name(`homoname') vars(`homovars') `xvars'
 	nwdrop _tempnetwork	
 	restore
+	nwload `homoname', `xvars'
 	
-	if "`undirected'" != "" {
-		nwsym `homoname'
-	}
-	if "`xvars'" == "" {
-		nwload `homoname', `xvars'
-	}
 end
 
