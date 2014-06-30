@@ -20,4 +20,4 @@ return list
 // Plot network with components colored differently.
 nwplot, color(_component) legend(off)
 
-nwplot, color(_component) layout(circle) legend(off)
+nwplot, color(_component) layout(circle) legend(off) scheme(s2network)
