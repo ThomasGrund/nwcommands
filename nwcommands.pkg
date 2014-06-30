@@ -1,0 +1,75 @@
+v 3
+d nwcommands. Social Network Analysis using Stata
+d Thomas U. Grund, Linköping University
+d email: contact@nwcommands.org
+f nwaddnodes.ado
+f nwassortative.ado
+f nwclear.ado
+f nwcloseness.ado
+f nwcomponents.ado
+f nwcompressobs.ado
+f nwcorrelate.ado
+f nwcurrent.ado
+f nwdegree.ado
+f nwdrop.ado
+f nwdropnodes.ado
+f nwduplicate.ado
+f nwdyadprob.ado
+f nwdyads.ado
+f nwergm.ado
+f nwevcent.ado
+f nwexp.ado
+f nwexpand.ado
+f nwexport.ado
+f nwfromedge.ado
+f nwfrommatrix.ado
+f nwgenerate.ado
+f nwgeodesic.ado
+f nwimport.ado
+f nwinf.ado
+f nwinfo.ado
+f nwkeep.ado
+f nwkeepnodes.ado
+f nwload.ado
+f nwmovie.ado
+f nwname.ado
+f nwneighbor.ado
+f nwpermute.ado
+f nwplot.ado
+f nwqap.ado
+f nwrandom.ado
+f nwreach.ado
+f nwrecode.ado
+f nwrename.ado
+f nwreplace.ado
+f nwreplacemat.ado
+f nwsave.ado
+f nwset.ado
+f nwsummary.ado
+f nwsym.ado
+f nwsync.ado
+f nwtable.ado
+f nwtabulate.ado
+f nwtomata.ado
+f nwtostata.ado
+f nwtranspose.ado
+f nwtriads.ado
+f nwuse.ado
+f nwvalidate.ado
+f nwvalue.ado
+f _extract_valuelabels.ado
+f _nwevalnetexp.ado
+f _nwsyntax.ado
+f _nwsyntax_other.ado
+f _opts_oneof.ado
+f scheme-s1network.scheme
+f scheme-s2network.scheme
+f scheme-s3network.scheme
+f data/florentine.dta
+f data/gang.dta
+f data/glasgow.dta
+f data/glasgow_edge.dta
+f data/stockholm.dta
+
+
+

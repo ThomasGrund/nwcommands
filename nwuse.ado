@@ -30,15 +30,17 @@ program nwuse
 			}
 			if "`f'" == "matrix" {
 				forvalues j = 1/`s' {
-					confirm variable _net`i'_`j'
+					local nodevar `=_var`i'[`j']'
+					confirm variable `nodevar'
 				}
 			}
-			if "`f'" != "matrix" | "`f'" == "edelist" {
+			if "`f'" != "matrix" | "`f'" == "edgelist" {
 				di "{err}file {bf:`webname'.dta} has the wrong format."
 				error 6702	
 			}
 		}
 	}
+	
 	if _rc != 0 {
 		di "{err}file {bf:`webname'.dta} has the wrong format."
 		error 6702
@@ -79,7 +81,10 @@ program nwuse
 			qui nwfromedge _fromid _toid `nname' if `nname' != . , name(`name') vars(`vars') labs(`labs') `undirected' `directed'
 		}
 		if "`frmat'" == "matrix"{
-			nwset _net`i'_*, name(`name') vars(`vars') labs(`labs') `undirected'
+			local _netstub `=_var`i'[1]'	
+			local _netstublength = length("`_netstub'") - 1
+			local _netstub = substr("`_netstub'",1, `_netstublength')
+			nwset `_netstub'*, name(`name') vars(`vars') labs(`labs') `undirected'
 		}
 		restore
 	}
