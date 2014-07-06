@@ -1,7 +1,8 @@
 v 3
 d nwcommands. Social Network Analysis using Stata
-d Thomas U. Grund, Linköping University
+d Thomas U. Grund and Peter Hedström, Linköping University
 d email: contact@nwcommands.org
+d Distribution-Date: 20130630
 f nwaddnodes.ado
 f nwassortative.ado
 f nwclear.ado

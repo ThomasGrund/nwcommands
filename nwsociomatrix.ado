@@ -2,6 +2,7 @@
 // Do the whole thing from scratch and bypass plotmatrix...
 capture program drop nwsociomatrix	
 program nwsociomatrix
+	// Version test
 	capture which plotmatrix
 	if _rc {
 		ssc install plotmatrix

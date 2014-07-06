@@ -1,3 +1,3 @@
 v 3
-d Thomas U. Grund, Linköping University
+d Thomas U. Grund and Peter Hedström, Linköping University
 p nwcommands Social Network Analysis using Stata

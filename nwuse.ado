@@ -34,7 +34,7 @@ program nwuse
 					confirm variable `nodevar'
 				}
 			}
-			if "`f'" != "matrix" | "`f'" == "edgelist" {
+			if "`f'" != "matrix" & "`f'" != "edgelist" {
 				di "{err}file {bf:`webname'.dta} has the wrong format."
 				error 6702	
 			}
