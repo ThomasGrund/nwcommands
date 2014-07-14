@@ -4,7 +4,8 @@ program nwplot
 	set more off
 	syntax [anything(name=netname)],[ edgesize(string) ASPECTratio(string) components(string) arcstyle(string) arcbend(string) arcsplines(integer 10) nodexy(varlist numeric min=2 max=2) edgeforeground(string) GENerate(string) colorpalette(string) edgecolorpalette(string) edgepatternpalette(string) symbolpalette(string) lineopt(string) scatteropt(string) legendopt(string) size(string) color(string) symbol(string) edgecolor(string) label(varname) nodefactor(string) sizebin(string) edgefactor(string) arrowfactor(string) arrowgap(string) arrowbarbfactor(string) layout(string) arrows  iterations(integer 1000) scheme(string) * ]
 	_nwsyntax `netname', max(1)
-		
+	
+	ssc install labellist
 	local twowayopt `"`options'"'
 		
 	if "`aspectratio'" == "" {
