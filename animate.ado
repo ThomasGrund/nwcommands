@@ -1,7 +1,13 @@
 capture program drop animate
 program animate
-	syntax anything, graphs(string) [delay(string) noloop]
+	syntax anything, graphs(string) [imagickpath(string) delay(string) noloop showcommand keepeps]
 
+	if "`imagickpath'" != "" {
+		local ipend = substr("`imagickpath'",-1,.)
+		if "`ipend'" != "/" & "`ipend'" != "\" {
+			local imagickpath "`imagickpath'/"
+		}
+	}
 	if trim("`loop'") == "noloop"{
 		local dloop = 1
 	}
@@ -27,16 +33,48 @@ program animate
 	}
 	local epslist ""
 	local numgraphs : word count `graphs'
+	local i = 1
+	qui if "`graphs'" == "_all" {
+		graph dir
+		local graphs `r(list)'
+	}
 	foreach g in `graphs' {
-		graph display `g'
-		graph export `g'.eps, replace
-		local epslist "`epslist' `g'.eps"
+		local gl = length("`g'") - 4
+		
+		if (substr("`g'", -4, .) == ".gph") {
+			graph use `g'
+			local geps = substr("`g'",1, `gl')
+		}
+		else {
+			graph display `g'
+			local geps `g'
+		}
+		
+		graph export `geps'.eps, replace
+		local epslist "`epslist' `geps'.eps"
+	
+		if `i' == `numgraphs' {
+			local last "`geps'.eps"
+		}
+		local i = `i' + 1
 	}
 	
 	local lastname : word `numgraphs' of `graphs'
 	local lastdelay = `delay'
-	local shellcmd = "convert -delay `delay' `epslist' -delay `lastdelay' `last'.eps -loop `dloop' `anything'.gif"
+	local shellcmd = "`imagickpath'convert -delay `delay' `epslist' -delay `lastdelay' `last'.eps -loop `dloop' `anything'.gif"
 	shell `shellcmd'
+	
+	if "`showcommand'" != "" {
+		di "`shellcmd'"
+	}
+	if "`keepeps'" == "" {
+		if c(os) == "MaxOSX" {
+			shell rm `epslist'
+		}
+		else {
+			shell del `epslist'
+		}
+	}
 end
 
 
