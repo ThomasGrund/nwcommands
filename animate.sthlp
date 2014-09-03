@@ -1,6 +1,6 @@
 {smcl}
 {* *! version 1.0.0  11aug2014}{...}
-{cmd:help animate
+{cmd:help animate}
 {hline}
 
 {title:Title}
@@ -41,12 +41,6 @@
 {cmd:animate} produces .eps files for each graph and adds them together to an animated-gif {help filename}. Command requires {net "http://www.imagemagick.org/":ImageMagick} to be installed on the computer.
 
 
-{title:Remarks}
-
-{pstd}
-None. 
-
-
 {title:Examples}
 
 {cmd:. webuse uslifeexp}
@@ -56,4 +50,3 @@ None.
 {cmd:  {c )-}}
 {cmd:. animate lifemovie, graphs(_all)}
 
-{title:Also see}

@@ -1,21 +1,20 @@
+*! Date        : 24aug2014
+*! Version     : 1.0
+*! Author      : Thomas Grund, Linköping University
+*! Email	   : contact@nwcommands.org
+
 capture program drop nwtranspose
 program nwtranspose 
 	version 9
 	syntax [anything(name=netname)], [name(string) vars(string) xvars noreplace]
 	
-	qui nwset
-	if "`netname'" == "" {
-		nwcurrent
-		local netname = r(current)
-	}
-	nwname `netname'
-	local nodes = r(nodes)
+	_nwsyntax `netname', max(1)
 	local transname "`netname'"
 
 	if ("`replace'" != ""){
 		// generate valid network name and valid varlist
 		if "`name'" == "" {
-			local name "`netname'_trans"
+			local name "_transp_`netname'"
 		}
 		
 		// generate a new network
@@ -27,6 +26,6 @@ program nwtranspose
 	nwtomata `transname', mat(transnet)
 	mata: transnet = transnet'
 	
-	nwreplacemat `transnet', newmat(transnet)
+	nwreplacemat `transname', newmat(transnet)
 	mata: mata drop transnet
 end

@@ -1,7 +1,12 @@
+*! Date        : 24aug2014
+*! Version     : 1.0
+*! Author      : Thomas Grund, Linköping University
+*! Email	   : contact@nwcommands.org
+
 capture program drop nwdrop
 program nwdrop
 	version 9
-	syntax [anything(name=netname)] [if/], [id(string) netonly attributes(varlist) reverseif]
+	syntax [anything(name=netname)] [if/] [in/], [netonly ATTRibutes(varlist) reverseif]
 	_nwsyntax `netname', max(9999)
 
 	local nets `networks'
@@ -13,13 +18,19 @@ program nwdrop
 		local z = `z' + 1
 		
 		// only drop nodes 
-		if ("`if'" != ""){
+		if ("`if'" != "" | "`in'" != ""){
 			tempvar keepnode
 			gen `keepnode' = 1
-			replace `keepnode' = 0 if `if'
-			if ("`reverseif'"!= ""){
-				recode `keepnode' (0=1) (1=0)
+			if "`if'" != "" {
+				replace `keepnode' = 0 if `if'
+				if ("`reverseif'"!= ""){
+					recode `keepnode' (0=1) (1=0)
+				}
 			}
+			if "`in'" != "" {
+				replace `keepnode' = 0 in `in'
+			}
+			
 			mata: keepnode = st_data((1,`nodes'), st_varindex("`keepnode'"))
 			
 			// WHY DID I INCLUDE THIS? IT MESSES WITH NWPLOT (MDS)

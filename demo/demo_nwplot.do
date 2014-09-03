@@ -1,6 +1,4 @@
-cd "C:/Users/Thomas/Dropbox/STATA BOOK 2013/data/"
-
-webnwuse glasgow_w3
+nwuse glasgow
 
 // Simple plot
 nwplot
@@ -57,7 +55,7 @@ nwplot, size(alcohol) color(smoke) symbol(sport) scheme(economist)
 set scheme s1network
 
 // Change the size and color of edges 
-webnwuse gang
+nwuse gang
 nwplot
 nwplot gang, edgesize(gang) 
 nwgenerate blood = (gang==4)
@@ -68,10 +66,9 @@ nwplot gang, size(Arrests) color(Birthplace) edgesize(gang) edgecolor(blood) edg
 nwplot gang, size(Arrests, forcekeys(5 10 20)) color(Birthplace, legendoff) edgesize(gang, legendoff) edgecolor(blood) legendopt(on pos(3) cols(1)) 
 
 // Control title and labels - twowayoptions
-
-webnwuse florentine
-nwplot flobusiness, label(_label)
-nwplot flomarriage, label(_label) 
+nwuse florentine
+nwplot flobusiness, label(_label1)
+nwplot flomarriage, label(_label1) 
 nwplot flomarriage, edgecolor(flobusiness) title("Florentine Marriages", color(red) size(huge))
 
 // Control all plots - scatteropt() lineopt()
@@ -81,7 +78,7 @@ nwplot flomarriage, lineopt(lwidth(10) lcolor(green))
 
 
 // Make animations 
-webnwuse glasgow
+nwuse glasgow
 nwmovie _all, titles((time 1) (time 2) (time 3), color(red))
 
 

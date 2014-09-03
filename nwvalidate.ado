@@ -1,14 +1,8 @@
 *! Date        : 17 Dec 2013
 *! Version     : 1.0
-*! Author      : Thomas Grund
-*! Email       : thomas.grund@iffs.se
-*! Description : Validates a new network name
+*! Author      : Thomas Grund, Linköping University
+*! Email	   : contact@nwcommands.org
 
-/*
-GENERATES
-	$validname 		: checks if a network with a certain name already exists and if yes proposes a new network name
-		
-*/
 capture program drop nwvalidate
 program nwvalidate
 	syntax anything(name=netname)

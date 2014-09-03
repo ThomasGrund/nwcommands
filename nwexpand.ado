@@ -60,7 +60,6 @@ program nwexpand
 	}
 	if "`mode'" == "same" {
 		mata: expnet = simMat(attr)
-		mata: expnet
 		local undirected "undirected"
 	}
 	if "`mode'" == "sender" {

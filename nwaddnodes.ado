@@ -1,30 +1,13 @@
+*! Date        : 24aug2014
+*! Version     : 1.0
+*! Author      : Thomas Grund, Linköping University
+*! Email	   : contact@nwcommands.org
+
 capture program drop nwaddnodes
 program nwaddnodes
-	syntax [anything(name=something)], [vars(string)]
+	syntax [anything(name=netname)], newnodes(integer) [vars(string)]
 
-	qui nwset
-	
-	local something_count = wordcount("`something'")
-	if (`something_count' > 2) {
-		di "{err}Command wrongly specified."
-		err 6099
-	}
-	
-	local netname : word 1 of `something'
-	capture nwname `netname'
-	
-	if (_rc == 6001) {
-		nwcurrent
-		local netname = r(current)
-		local newnodes : word 1 of `something'
-	}
-	else {
-		local newnodes : word 2 of `something'
-	}
-	
-	nwname `netname'
-	local id = r(id)
-	local nodes = r(nodes)
+	_nwsyntax `netname', max(1)
 	
 	if "`stub'" == "" {
 		local stub = "new"
@@ -35,12 +18,13 @@ program nwaddnodes
 		local vars = "" 	
 		local invalid = 0
 		forvalues i=1/`newnodes' {
-			local vars "`varlist' `stub'`i'"
+			local vars "`vars' `stub'`i'"
 			capture confirm variable `stub'`i'
 			if !_rc {
 				local invalid = `invalid' + 1
 			}
 		}
+		
 		// Finds valid Stata variable names to store network.
 		if `invalid' > 0 { 
 			local stub_add = 0
@@ -65,7 +49,7 @@ program nwaddnodes
 		foreach onevar in `vars'  {
 			capture confirm variable `onevar'
 			if (_rc == 0) {
-				di "{err}Node variable `onevar' already in use for this network. Choose option vars() differently."
+				di "{err}Node variable `onevar' already in use. Choose option vars() differently."
 				error 6070
 			}
 		}
@@ -76,27 +60,26 @@ program nwaddnodes
 		}
 		restore
 	}
-	
+
 	local newnodes = `nodes' + `newnodes'
-	
-	local vecmat = "1"
-	forvalues i = 2/`nodes' {
-		local vecmat "`vecmat',`i'"
-	}
-	
 	nwtomata `netname', mat(oldmat)
 	mata: newmat = J(`newnodes',`newnodes', 0)
-	mata: newmat[(`vecmat'),(`vecmat')] = oldmat
+	mata: newmat[|1,1 \ `nodes',`nodes'|] = oldmat
 	
 	scalar onevars = "\$nw_`id'"
 	local oldvars `=onevars'
 	capture drop `oldvars'
 	
-	nwreplace `netname', newmat(newmat) nocheck nosync
+	scalar onelabs = "\$nwlabs_`id'"
+	local oldlabs `=onelabs'
+	
+    //mata: mata drop nw_mata`id'
+	mata: nw_mata`id' = newmat
 	global nwsize_`id' = `newnodes'
 	global nw_`id' "`oldvars' `vars'" 
+	global nwlabs_`id' "`oldlabs' `vars'"
 	nwload `netname'
-		
+
 	mata: mata drop newmat
 end
 

@@ -1,23 +1,26 @@
+*! Date        : 24aug2014
+*! Version     : 1.0
+*! Author      : Thomas Grund, Linköping University
+*! Email	   : contact@nwcommands.org
+
 capture program drop nwgeodesic
 program nwgeodesic
 	version 9
-	syntax [anything(name=geonet)], [ vars(string) noreplace id(string) name(string) xvars  unconnected(string) symoff]
-	
-	local geoname "`name'"	
-	_nwsyntax `geonet', name(geonet) id(geoid)
-	local id = `geoid'
-	
-	if "`name'" == "" {
-		local name = "geodesic"
-	}
-	
-	set more off
+	syntax [anything(name=netname)], [ vars(string) noreplace id(string) name(string) xvars  unconnected(string) nosym]
 
+	_nwsyntax `netname', max(1)
 	mata: nw_geo = nw_mata`id'
 	
-	if "`symoff'" == "" {
+	mata: nw_geo = nw_geo /: nw_geo
+	mata: _editmissing(nw_geo, 0)
+	
+	if "`sym'" == "" {
 		di "{txt}Geodesics calculated on the symmetrized network (lower triangle)."
 		mata: _makesymmetric(nw_geo)
+	}
+	
+	if "`name'" == "" {
+		local name "geodesic"
 	}
 	
 	mata: distances = getgeodesic(nw_geo)
@@ -48,7 +51,7 @@ program nwgeodesic
 		capture drop `v'
 	}
 
-	nwset, name(`geoname') mat(distances) vars(`vars')	
+	nwset, name(`name') mat(distances) vars(`vars')	
 	
 	if "`xvars'" == "" {
 		capture drop `vars'

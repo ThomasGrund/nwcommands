@@ -5,7 +5,7 @@
 
 {title:Title}
 
-{p2colset 5 20 22 2}{...}
+{p2colset 5 18 22 2}{...}
 {p2col :nwrandom {hline 2}}Generate a random Erdos-Renyi network{p_end}
 {p2colreset}{...}
 
@@ -13,44 +13,44 @@
 {title:Syntax}
 
 {p 8 17 2}
-{cmdab: nwrand:om} 
+{cmdab: nwrandom} 
 {it: nodes}
 {cmd:,}
-{opt prob(p)}
+{opt prob(float)} | {opt density(float)}
+[{opt undirected}
+{opt ntimes(integer)}
+{opt name}({it:new}{it:{help netname}})
+{opt vars}({it:{help newvarlist}})
+{opt xvars}]
 
 {synoptset 20 tabbed}{...}
 {synopthdr}
 {synoptline}
-{syntab:Main}
-{synopt:{opt p:rob(p)}}probability for a tie to exist{p_end}
-{synoptline}
-{p2colreset}{...}
+{synopt:{it:nodes}}number of nodes{p_end}
+{synopt:{opt prob}({it:float})}probability for a tie to exist{p_end}
+{synopt:{opt density}({it:float})}exact density of the whole network{p_end}
+{synopt:{opt undirected}}generate an undirected network; default = directed{p_end}
+{synopt:{opt ntimes}({it:integer})}number of random networks to be generated; default = 1{p_end}
+{synopt:{opt name}({it:new}{it:{help netname}})}name of the new random network{p_end}
+{synopt:{opt vars}({it:{help newvarlist}})}new variables that are used for the network{p_end}
+{synopt:{opt xvars}}do not generate Stata variables{p_end}
 
 
 {title:Description}
 
 {pstd}
-{cmd:nwrandom} Generates a directed random Erdos-Renyi network with {it: nodes} number of nodes. Each
-potential tie in the network has the same probability to exist, which is defined by {it: p}.  
-
-
-{title:Options}
-
-{dlgtab:Main}
-
-{phang}
-{opt p:rob(p)} Defines the probability for a tie to exist. For all dyads in the network this
-probability is the same, regardless of already existing ties.
-
-{title:Remarks}
-
-{pstd}
-None. 
+{cmd:nwrandom} generates a directed Erdos-Renyi network with {it: nodes} number of nodes. Each
+potential tie in the network has the same probability to exist, which is defined 
+by {it:prob(float)}. Alternatively, the overall density of the network can be specified with {it:density(float)}. The 
+difference between the two is that the latter generates the same number of ties when the command
+is repeated, while the former does not.  
 
 
 {title:Examples}
-
-{phang}{cmd:. nwrandom 50, prob(.1)}
-
-
-{title:Also see}
+	
+	{cmd:. nwclear}
+	{cmd:. nwrandom 50, prob(.1)}
+	{cmd:. nwrandom 15, density(0.5)}
+	{cmd:. nwrandom 20, prob(.3) ntimes(5)}
+	{cmd:. nwrandom 10, prob(.2) undirected}
+	{cmd:. nwinfo _all}

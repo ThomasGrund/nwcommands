@@ -1,65 +1,48 @@
 {smcl}
-{* *! version 1.0.1  16may2012 author: Thomas Grund}{...}
-{cmd:help nwcomponents
+{* *! version 1.0.6  23aug2014 author: Thomas Grund}{...}
+{cmd:help nwcomponents}
 {hline}
 
 {title:Title}
 
-{p2colset 5 20 22 2}{...}
-{p2col :nwcomponents {hline 2}}Connected components in the network{p_end}
+{p2colset 5 22 22 2}{...}
+{p2col :nwcomponents {hline 2}}Calculates the number of network components{p_end}
 {p2colreset}{...}
-
 
 {title:Syntax}
 
 {p 8 17 2}
 {cmdab: nwcomponents} 
-[{it: varlist}
-{cmd:, }
-{opt gen(newvarname)}]
+[{it:{help netname}}]
+[, {cmdab:gen:erate}({it:{help newvar}})]
 
-{synoptset 20 tabbed}{...}
-{synopthdr}
-{synoptline}
-{syntab:Main}
-{synopt:{opt gen(newvarname)}}name of variable to store component membership{p_end}
 {synoptline}
 {p2colreset}{...}
-
-
+	
 {title:Description}
 
 {pstd}
-{cmd: nwcomponents} calculates the number of components of the network specified by {it: varlist}. By default, 
-{it: varlist} is assumed to be {it: var*}. A component is 
-a subset of nodes, which are all connected with each other. Returns the scalar {it: r(compnum)},
-which indicates the number of connected components found in the network. Returns the matrix 
-{it: r(compmemb)}, which gives the component membership for each node.  
+Calculates the components of the network. A component is a set of nodes that are
+only connected among each other. Nodes can only belong to one component. The 
+number of distinct components is returned in {it:r(components)}. Furthermore, 
+additional information about the size of each component is returned in {it:r(comp_sizeid)}. 
+By default, {cmd:nwcomponents} generates 
+a new variable {it:_components} which stores the component membership of each node. 
+
 
 {title:Options}
 
-
-{dlgtab:Main}
-
 {phang}
-
-{phang}
-{opt gen(newvarlist)} Specifies the name of a new variable, where the component membership of each node is stored.
+{opt generate}({help newvar}) New Stata variable where component membership of each node is stored.
 
 {title:Remarks}
+  
+    All ties are treated as undirected for the calculation of components.
+  
 
-{pstd}
-All ties are treated as undirected. Runs with BFS algorithm.  
+  {title:Examples}
 
-
-{title:Examples}
-{cmd:. nwrandom 200, prob(.01)}
-{cmd:. nwcomponents, gen(comp)}
-{cmd:. tab comp}
-{cmd:. return list}
-
-{title:Also see}
-
-{psee}
-Online: 
-{p_end}
+  {cmd:. nwuse glasgow}
+  {cmd:. nwcomponents}
+  {cmd:. di r(components)}
+  {cmd:. matrix list r(comp_sizeid)}

@@ -1,10 +1,15 @@
+*! Date        : 24aug2014
+*! Version     : 1.0
+*! Author      : Thomas Grund, Linköping University
+*! Email	   : contact@nwcommands.org
+
 capture program drop nwassortmix
 program def nwassortmix
 	syntax varlist(min=1), homophily(string) density(real) [mode(string) nodes(string) name(string) stub(string) xvars undirected]
 	
 	local vc = wordcount("`varlist'")
 	local hc = wordcount("`homophily'")
-	local mc = wordcount("`mode'")
+	local mc = wordcount("`'")
 	
 	if (`vc' != `hc') {
 		di "{err}option {it:homophily} needs to have as many entries {it:varlist}."
@@ -33,7 +38,7 @@ program def nwassortmix
 		local stub "net"
 	}
 	nwvalidate `name'
-	local assortname = r(validname)
+	local assortnam= r(validname)
 	
 	local gencmd "nwgenerate _tempassort ="
 	

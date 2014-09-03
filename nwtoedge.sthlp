@@ -5,8 +5,8 @@
 
 {title:Title}
 
-{p2colset 5 20 22 2}{...}
-{p2col :nwtoedge {hline 2}}Converts an adjacency matrix in an edgelist{p_end}
+{p2colset 5 18 22 2}{...}
+{p2col :nwtoedge {hline 2}}Converts a network (or a list of networks) in an edgelist{p_end}
 {p2colreset}{...}
 
 
@@ -14,45 +14,44 @@
 
 {p 8 17 2}
 {cmdab: nwtoedge} 
+[{help netlist}]
 [{cmd:,}
-{opt fromvars(varlist)}
-{opt tovars(varlist)}
-{opt fromid(varname)}
-{opt toid(varname)}
-{opt link(varname)}
-{opt nofromvars}
-{{opt compact| nozeros | keeptonodes | keepego | full}
-}]
+{opt fromvars}({help varlist})
+{opt tovars}({help varlist})
+{opt fromid}({help newvar})
+{opt toid}({help newvar})
+{opt link}({help newvar})
+{opt forceundirected}
+{opt forcedirected}
+{opt type}({help nwtoedge##compact_mode:compact_mode})]
 
+{synoptset 20 tabbed}{...}
+{marker compact_mode}{...}
+{p2col:{it:compact_mode}}Description{p_end}
+{p2line}
+{p2col:{cmd: compact}}only generate entries for ties (and for isolates); default
+		{p_end}
+{p2col:{cmd: full}}generate entries for all dyads
+		{p_end}
+		
 {synoptset 20 tabbed}{...}
 {synopthdr}
 {synoptline}
 {syntab:Main}
-{synopt:{opt fr:omvars(varlist)}}specifies which variables shall be kept to describe the sending nodes{p_end}
-{synopt:{opt to:vars(varlist)}}specifies which variables shall be kept to describe the receiving nodes {p_end}
-{synopt:{opt fromid(varname)}}variable name specifying {it: fromid}.{p_end}
-{synopt:{opt toid(varname)}}variable name specifying {it: toid}.{p_end}
-{synopt:{opt link(varname)}}variable name specifying link. {p_end}
-{synopt:{opt nofr:omvars}}disregard attribute values{p_end}
-{synoptline}
-{syntab:Compactness}
-{synopt:{opt c:ompact}}default{p_end}
-{synopt:{opt noz:eros}}only keep non-zero and non-missing links{p_end}
-{synopt:{opt keepto:nodes}}keep at least one observation per receiving node{p_end}
-{synopt:{opt keepe:go}}keep self-links{p_end}
-{synopt:{opt f:ull}}keep all dyads{p_end}
-{synoptline}
+{synopt:{opt fr:omvars}({help varlist})}specifies which variables shall be kept to describe the sending nodes{p_end}
+{synopt:{opt to:vars}({help varlist})}specifies which variables shall be kept to describe the receiving nodes {p_end}
+{synopt:{opt fromid}({help newvar})}new variable name specifying {it: fromid}.{p_end}
+{synopt:{opt toid}({help newvar})}new variable name specifying {it: toid}.{p_end}
+{synopt:{opt link}({help newvar})}new variable name specifying link. {p_end}
+
 {p2colreset}{...}
 
 
 {title:Description}
 
 {pstd}
-{cmd:nwtoedge} Takes an adjacency matrix represented by var1, var2, etc and
-produces the corresponding edgelist. By default all attribute variables in the dataset will be
- expanded and included in the edgelist to
-describe the sending nodes but not the receiving nodes. These variables are renamed to include
-the prefix {it: from_} in front of the variable names.
+{cmd:nwtoedge} makes an edgelist out of a network (or a list of networks). One can specify which 
+attribute variables should be included in the new dataset as well. 
 
 {title:Options}
 
@@ -67,11 +66,9 @@ of the sending node shall be included in the new dataset.
 {opt to:vars(varlist)}Needs to be specified if the user prefers to choose which attribute variables
 of the receiving node shall be included in the new dataset.
 
-{phang}
-{opt nofr:omvars}Needs to be specified if no attribute variables shall be included in the adjacency
-matrix dataset.
 
-{dlgtab:Compactness}
+
+{dlgtab:compact_mode}
 
 {phang}
 {opt c:ompact} Is the default option. It is used to reduce the size of the dataset without losing any
@@ -84,33 +81,18 @@ it is easy to convert the network back into adjacency matrix format and keep any
 variables for each node that may exist in the data. 
 
 {phang}
-{opt noz:eros} Produces an edgelist which takes up the least amount of memory. It only keeps the
-links that have non-zero and non-missing values. Any information about attributes of nodes
-with no outgoing links will be lost.
-
-{phang}
-{opt keepto:nodes} Is similar to the compact format, but in addition to keeping at least one
-observation per sending node, it also keeps at least one observation per receiving node. This
-can be useful when variables describing the receiving nodes are included in the edgelist, see
-the option {cmd:tovars(varlist)} above.
-
-{phang}
-{opt keepe:go} Includes all observations where the sending node is the same as the receiving node,
-in addition to the pairs of nodes that are directly linked to one another. These observations
-correspond to the cells in the diagonal of the adjacency matrix. This may be convenient
-because it is easy to access information about the nodes with the if-statement if fromid ==
-toid.
-
-{phang}
 {opt f:ull} Produces an edgelist with all dyads.
 
-{title:Remarks}
-
-{pstd}
-None. 
-
-
 {title:Examples}
-To be written.
+
+	{cmd:. nwuse glasgow}
+	{cmd:. nwtoedge glasgow1, fromvars(smoke1) tovars(smoke1)}
+	
+	{cmd:. nwclear}
+	{cmd:. nwuse glasgow}
+	{cmd:. nwtoedge _all}
+	
 
 {title:Also see}
+	
+	{help nwfromedge}

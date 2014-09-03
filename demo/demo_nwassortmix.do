@@ -1,7 +1,7 @@
 nwclear
 
 set obs 20
-gen gender = (_n >= 6) + 2
+gen gender = (_n > 10) + 2
 gen genderlabel = "Name"
 label define genderlabel 2 "male" 3 "female"
 label values gender genderlabel

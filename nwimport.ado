@@ -68,6 +68,9 @@ program nwimport
 	}
 	qui nwset
 	if r(networks) > `nets_before'{
+		if "`name'" != "" {
+			nwname, newname(`name')
+		}
 		di 
 		di "{txt}{it:Loading successfull}"
 		nwsummary
@@ -375,6 +378,7 @@ program _nwimport_matrix
 	qui if (strpos("`ending'", "xls") != 0 ){
 		local excel = 1
 		import excel "`anything'", sheet("Sheet1") clear
+		
 		if c(k) != `=`_N'' {
 			local success = 0
 		}
@@ -384,6 +388,7 @@ program _nwimport_matrix
 	}
 	
 	local i = 1
+
 	qui while (`excel' == 0 & "`delimiter'" == "" & `success' == 0 & `i' <= `pot_delimiters_length'){
 		local use_delimiter : word `i' of `pot_delimiters'
 		local i = `i' + 1
@@ -406,10 +411,9 @@ program _nwimport_matrix
 			local success = 1
 		}
 	}
-	
-	
+
 	// Try other delimiters
-	if ("`delimiter'" != ""){
+	qui if ("`delimiter'" != ""){
 		insheet using `"`anything'"', delimiter("`delimiter'") clear
 		// Check for failure
 		if c(k) != `=`_N' + `sub_col''  {
@@ -462,15 +466,12 @@ program _nwimport_matrix
 	local labs "`r(varlist)'"
 	qui nwset _all, name("`name'") vars(_all) labs(`labs')
 	restore
-	if "`directed'" == "" {
+	qui if "`directed'" == "" {
 		nwsym, check 
 		if "`r(is_symmetric)'" == "true" {
 			nwsym
 		}
 	}
-	di 
-	di "{txt}{it:Loading successful}"
-	nwsummary
 end
 
 
@@ -631,15 +632,18 @@ program _nwimport_edgelist
 	
 	gettoken fname ending : anything, parse(".")
 
+	di "h1"
 	local success = 0
 	local excel = 0
 	local pot_delimiters = `""tab" ";" "," " ""'
 	local pot_delimiters_length : word count `pot_delimiters'
 	
 	// Excel file detected
-	qui if (strpos("`ending'", "xls") != 0 ){
+	if (strpos("`ending'", "xls") != 0 ){
 		local excel = 1
+		di "h2"
 		import excel "`anything'", sheet("Sheet1") clear
+		di "h3"
 		if c(k) == 1 | _rc != 0 {
 			local success = 0
 		}
@@ -649,10 +653,11 @@ program _nwimport_edgelist
 	}
 
 	local i = 1
-	qui while (`excel' == 0 & "`delimiter'" == "" & `success' == 0 & `i' <= `pot_delimiters_length'){
+	while (`excel' == 0 & "`delimiter'" == "" & `success' == 0 & `i' <= `pot_delimiters_length'){
 		local use_delimiter : word `i' of `pot_delimiters'
 		local i = `i' + 1
 		
+		di "h4"
 		if "`use_delimiter'" == "tab" {
 			local insheet_opt = ", tab clear"
 		}
@@ -695,7 +700,6 @@ program _nwimport_edgelist
 		restore
 		error 6704
 	}
-	
 	nwfromedge _all, name(`name') `directed' `undirected' `xvars'
 	restore
 end

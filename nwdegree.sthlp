@@ -1,12 +1,12 @@
 {smcl}
 {* *! version 1.0.1  16may2012 author: Thomas Grund}{...}
-{cmd:help nwdegree
+{cmd: help nwdegree}
 {hline}
 
 {title:Title}
 
-{p2colset 5 20 22 2}{...}
-{p2col :nwdegree {hline 2}}Calculates in- and outdegree of each node{p_end}
+{p2colset 5 18 22 2}{...}
+{p2col :nwdegree {hline 2}}Calculates the network degree of each node{p_end}
 {p2colreset}{...}
 
 
@@ -14,18 +14,17 @@
 
 {p 8 17 2}
 {cmdab: nwdegree} 
-{cmd:,}
-[{opt outdegree(newvar)}
-{opt indegree(newvar)}
-unweighted]
+[{it:{help netname}}]
+[{cmd:,}
+{opt isolates}
+{opt unweighted}]
 
 {synoptset 20 tabbed}{...}
 {synopthdr}
 {synoptline}
 {syntab:Main}
-{synopt:{opt outdegree(newvar)}}name of outdegree variable{p_end}
-{synopt:{opt indegree(newvar)}}name of indegree variable{p_end}
-{synopt:{opt unw:eighted}}disregard tie weights/values{p_end}
+{synopt:{opt isolates}}Generate variable for network isolates{p_end}
+{synopt:{opt unweighted}}Ignore tie weights/values{p_end}
 {synoptline}
 {p2colreset}{...}
 
@@ -34,30 +33,24 @@ unweighted]
 
 {pstd}
 {cmd:nwdegree} Calculates the in- and outdegree of each node, i.e., the sum of the links received
-from other nodes and the sum of the links sent to other nodes. By default results are saved in 
-{it: r(oudegree)} and {it: r(indegree)} as return value. Alternatively, the variables {it: outdegree} 
-and {it: indegree} can specified where the information is stored as variables. 
+from other nodes (indegree) and the sum of the links sent to other nodes (outdegree). Generates the 
+variables {it:_indegree} and {it:_outdegree}. When a network is undirected only degree is calculated. When a network
+is valued the sum of incoming tie values and the sum of outgoing tie values is calculated for 
+each node. The command can also be used to identify network isolates, i.e. nodes that are not connected to
+any other node.
 
 {title:Options}
 
-{dlgtab:Main}
+{phang}
+{opt isolates} Generate the variable {it:_isolates} that indicates whether a node is an isolate or not.
 
 {phang}
-{opt outdegree(newvar)} Name of the variable where outdegree of nodes is saved.
-
-{phang}
-{opt indegree(newvar)} Name of the variable where indegree of nodes is saved.
-
-{phang}
-{opt unw:eighted} Specifies that weights in the adjacency matrix shall be disregarded
-so that it is treated as if it were binary.
-
+{opt unweighted} Ignores all tie values.
 
 {title:Remarks}
 
 {pstd}
-None. 
-
+The command overwrites the Stata variables {it:_degree}, {it:_indegree}, {it:_outdegree}, and {it:_isolates}
 
 {title:Examples}
 
@@ -65,5 +58,3 @@ None.
 {cmd:. nwdegree} 
 {cmd:. return matrix r(outdegree)} 
 {cmd:. nwdegree, outdegree(out)} 
-
-{title:Also see}

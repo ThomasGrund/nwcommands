@@ -1,12 +1,12 @@
 {smcl}
 {* *! version 1.0.1  17may2012 author: Thomas Grund}{...}
-{cmd:help nwneighbo}r
+{cmd:help nwneighbor}
 {hline}
 
 {title:Title}
 
 {p2colset 5 20 22 2}{...}
-{p2col :nwneighbor {hline 2}}Gets one ore more network neighbors{p_end}
+{p2col :nwneighbor {hline 2}}Extracts the id of one or more network neighbors of node i{p_end}
 {p2colreset}{...}
 
 
@@ -14,32 +14,45 @@
 
 {p 8 17 2}
 {cmdab: nwneighbor} 
-{cmd:, }
-{opt id(nodeid)}
-[{opt stub(stub)}
-{opt outgoing}]
-
+[{it:{help netname}}],
+{opt ego}({help nwneighbor##nodeid:nodeid})
+[{opt mode}({help nwneighbor##context:context})]
 
 {synoptset 20 tabbed}{...}
 {synopthdr}
 {synoptline}
 {syntab:Main}
-{synopt:{opt id(nodeid)}}id of network node{p_end}
-{synopt:{opt stub(stub)}}specfies the network stub{p_end}
-{synopt:{opt outgoing}}draws neighbors from outgoing ties{p_end}
+{synopt:{opt ego}({help nwneighbor##nodeid:nodeid})}{it:nodeid} of network node i{p_end}
+{synopt:{opt mode}({help nwneighbor##context:context})}defines network neighbors of node i as either nodes j who receive ties from i, send ties to j or both{p_end}
 {synoptline}
 {p2colreset}{...}
 
+{synoptset 20 tabbed}{...}
+{marker nodeid}{...}
+{p2col:{it:nodeid}}{p_end}
+{p2line}
+{p2col:{cmd: #}}number between 1 and {it:size} of the network
+		{p_end}
+		
+{synoptset 20 tabbed}{...}
+{marker context}{...}
+{p2col:{it:context}}{p_end}
+{p2line}
+{p2col:{cmd: outgoing}}network neighbors of node i are all nodes j who receive a tie from i; default
+		{p_end}
+{p2col:{cmd: incoming}}network neighbors of node i are all nodes j who send a tie to i; default
+		{p_end}
+{p2col:{cmd: both}}network neighbors of node i are all nodes j who either send a tie to i or receive a tie from i
+		{p_end}
 
+		
 {title:Description}
 
 {pstd}
-{cmd: nwneighbor} retrieves one or more network neighbors for node with id {it: nodeid}. By default
-neighbors of  node i are drawn from incoming ties, i.e. all nodes j with a tie (j,i). Returns the scalar {it: r(oneneighbor)}, which
+{cmd: nwneighbor} retrieves one or more network neighbors for node with id {it: nodeid}. By default,
+neighbors of  node i are drawn from outgoing ties, i.e. all nodes j with a tie (i,j). Returns the scalar {it: r(oneneighbor)}, which
 stores the id of one randomly selected network neighbor. If node {it: nodeid} does not have any neighbors at all,
-{it: r(oneneighbor)} stores the id of one randomly selected other node. It can be useful to get such a randomly selected
-node in some situations. Returns the scalar {it: r(total)} which stores the total number of network neighbors of node {it: nodeid}. 
-This can be used to determine whether {it: nodid} has any network neighbors. Returns the matrix 
+{it: r(oneneighbor)} stores a missing value. Also returns the Stata matrix 
 {it: r(neighbors)} with a complete (shuffled) list of all network neighbors of node {it: nodeid}.   
 
 {title:Options}
@@ -47,27 +60,25 @@ This can be used to determine whether {it: nodid} has any network neighbors. Ret
 {dlgtab:Main}
 
 {phang}
-{opt id(nodeid)} Must be specified and indicates the node for whom network neighbors should be retrieved.
+{opt ego}({help nwneighbor##nodeid:nodeid}) Must be specified and indicates the node for whom network neighbors should be retrieved.
 
 {phang}
-{opt stub(stub)} Specifies the network. By default stub is set to {it: var*}.
+{opt mode}({help nwneighbor##context:context}) Defines which nodes j should belong to the network neighborhood of node i. The default option is 
+{it: outgoing}, i.e. all nodes j to whom node i has an outgoing tie. Alternatively, one can choose options 
+{it: incoming} or {it:both}. Notice that in the latter case, nodes j will appear twice in the calculation when 
+they both receive and send a tie from/to node i. 
 
-{phang}
-{opt outgoing} Uses outgoing ties to retrieve network neighbors.
 
 {title:Remarks}
 
 {pstd}
-By default incominng ties are used. Tie values are disregarded. 
+Tie values are ignored. 
 
 
 {title:Examples}
-{cmd:. nwrandom 20, prob(.1)}
-{cmd:. nwneighor, id(1)}
-{cmd:. return list} 
+{cmd: nwrandom 20, prob(.1)}
+{cmd: nwneighor, ego(1)}
+{cmd: return list} 
 
 {title:Also see}
-
-{psee}
-Online: 
-{p_end}
+{help nwcontext}, {help nwname}, {help nwinfo}

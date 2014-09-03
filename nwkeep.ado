@@ -1,6 +1,11 @@
+*! Date        : 24aug2014
+*! Version     : 1.0
+*! Author      : Thomas Grund, Linköping University
+*! Email	   : contact@nwcommands.org
+
 capture program drop nwkeep 
 program nwkeep
-	syntax [anything(name=netname)][if],[ attributes(string)]
+	syntax [anything(name=netname)][if] [in],[ attributes(string)]
 	_nwsyntax `netname', max(9999)
 	
 	local netdrop ""
@@ -21,7 +26,7 @@ program nwkeep
 			local netdrop "`netdrop' `onename'"
 		}
 	}
-	nwdrop `netdrop' `if', attributes(`attributes') reverseif
+	nwdrop `netdrop' `if' `in', attributes(`attributes') reverseif
 	nwcompressobs
 end
 	

@@ -1,3 +1,8 @@
+*! Date        : 24aug2014
+*! Version     : 1.0
+*! Author      : Thomas Grund, Linköping University
+*! Email	   : contact@nwcommands.org
+
 capture program drop nwrandom
 program nwrandom
 	syntax anything(name=nodes), [ntimes(integer 1) Density(string) Prob(string) vars(string) stub(string) name(string) undirected xvars noreplace * ]

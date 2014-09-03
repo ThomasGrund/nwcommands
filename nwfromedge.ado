@@ -1,3 +1,8 @@
+*! Date        : 3sept2014
+*! Version     : 1.0.1
+*! Author      : Thomas Grund, Linköping University
+*! Email	   : contact@nwcommands.org
+
 capture program drop nwfromedge
 program nwfromedge
 	syntax varlist(min=2 max=3) [if] [, xvars name(string) vars(string) labs(string asis) edgelabs(string) stub(string) directed undirected]

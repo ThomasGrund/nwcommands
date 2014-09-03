@@ -1,19 +1,14 @@
+*! Date        : 3sept2014
+*! Version     : 1.0.1
+*! Author      : Thomas Grund, Linköping University
+*! Email	   : contact@nwcommands.org
+
 capture program drop nwpermute	
 program nwpermute
 	version 9.0
 	syntax [anything(name=netname)], [ id(string) xvars name(string) vars(string) stub(string) noreplace ]
 	
-	nwset, nooutput
-	if ("`netname'" == "") {
-		nwcurrent
-		local netname=r(current)
-	}
-
-	// get parameters
-	nwname `netname'
-	local nodes = r(nodes)
-	local id = r(id)
-	local directed = r(directed)
+	_nwsyntax `netname', max(1)
 	scalar onevars = "\$nw_`id'"
 	local vars `=onevars'
 	
@@ -43,7 +38,7 @@ program nwpermute
 		local undirected = "undirected"
 	}
 	nwrandom `nodes', prob(0) name(`name') vars(`vars') `undirected' `xvars'
-	nwreplacemat `netname', newmat(perm)
+	nwreplacemat `name', newmat(perm)
 end
 
 capture mata mata drop permutenet()

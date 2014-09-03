@@ -1,52 +1,68 @@
+*! Date        : 3sept2014
+*! Version     : 1.0.1
+*! Author      : Thomas Grund, Linköping University
+*! Email	   : contact@nwcommands.org
+
 capture program drop nwexport
 program nwexport
 	version 9
-	syntax [anything(name=expname)][, session(string) path(string) replace]	
+	syntax [anything(name=netname)],[FName(string asis) replace]	
 	
-	nwset, nooutput
-	if "`expname'" == "" {
-		nwcurrent
-		local expname = r(current)
+	_nwsyntax `netname', max(1)
+	
+	if ("`path'" != ""){
+		local last = substr("`path'", -1, .)
+		if ("`last'" != "/" | "`last'" != "\"){
+			local path = "`path'/"
+		}
 	}
 	
-	// export all networks
-	if ("`expname'" == "_all"){
-		local nets = ""
-		forvalues i = 1/$nwtotal {
-			scalar onename = "\$nwname_`i'"
-			local localname `=onename'
-			local nets "`nets' `localname'"
-		}	
-	}
-	else {
-		local nets "`expname'"
-	}
+	di `"`fname'"'
 	
-	if ("`expname'" == ""){
-		nwexp, path("`path'") `replace'
+	scalar onevars = "\$nw_`id'"
+	local vars `=onevars'
+	
+	if (`"`fname'"' == "") {
+		local fname "`name'.net"
 	}
 
-	local netcount = wordcount("`nets'")
-	foreach onenet in `nets'{
-		nwexp `onenet', path("`path'") `replace'
+	di `"{txt}Exporting network: `fname'"'
+	di `"file open expfile using `path'`fname', write `replace'"'
+	
+	file open expfile using `"`path'`fname'"', write `replace'
+	file write expfile "*Vertices `nodes'" _newline
+	forvalues i = 1/`nodes' {
+		file write expfile (`i')
+		file write expfile (" ")
+		file write expfile (char(34))
+		local onevar : word `i' of `vars'
+		file write expfile ("`onevar'")
+		file write expfile (char(34)) _newline	
+	}
+	if ("`directed'" == "true"){
+		file write expfile "*Arcs"
+	}
+	else {
+		file write expfile "*Edges"
 	}
 	
-	// save a session file
-	if ("`session'" != ""){
-		di "{txt}Creating session file: `session'.nws"
-		if "`path'" != "" {
-			local sessionfile "`path'/`session'"
+	preserve
+	nwtoedge `netname'
+	local ties = _N
+	forvalues i = 1/`ties' {
+		if `netname'[`i'] != 0 {
+			local value = `netname'[`i']
+			local k = _fromid[`i']
+			local l = _toid[`i']
+			file write expfile _newline
+			file write expfile (`k')
+			file write expfile " "
+			file write expfile (`l')
+			file write expfile " `value'" 	
 		}
-		else {
-			local sessionfile "`session'"
-		}
-		file open sessfile using "`sessionfile'.nws", write `replace'
-		foreach onenet in `nets' { 
-			file write sessfile  "`onenet'" _newline
-		}
-		if ("`expname'" == "_all" | "`expname'" == ""){
-			file write sessfile "$nwname"
-		}
-		file close sessfile
+	
 	}
+	file write expfile "" _n
+	file close expfile	
+	restore
 end

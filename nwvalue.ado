@@ -1,8 +1,13 @@
+*! Date        : 24aug2014
+*! Version     : 1.0
+*! Author      : Thomas Grund, Linköping University
+*! Email	   : contact@nwcommands.org
+
 capture program drop nwvalue	
 program nwvalue
 	local netname ="`0'"
 	
-	// a specific enrtries are given
+	// a specific entries are given
 	local ego = strpos("`netname'","[") 
 	local alter = strpos("`netname'","]") 
 	local sep = strpos("`netname'",",")

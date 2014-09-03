@@ -1,3 +1,8 @@
+*! Date        : 3sept2014
+*! Version     : 1.0
+*! Author      : Thomas Grund, Linköping University
+*! Email	   : contact@nwcommands.org
+
 capture program drop nwsave
 program nwsave
 	syntax anything [, old * format(string)]
@@ -94,8 +99,14 @@ program nwsave
 	forvalues i = 1/`nets' {
 		rename _newlabel`i' _label`i'
 		rename _newvar`i' _var`i'
+		gen _runningnumber = _n
+		tostring _runningnumber, replace
+		replace _var`i' = "_net`i'_" + _runningnumber
+		drop _runningnumber
 	}
 
+	
+	
 	if "`format'" == "matrix" {
 		replace _format = "matrix" in 1
 		

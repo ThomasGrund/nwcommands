@@ -12,6 +12,7 @@ syntax [varlist (default=none)][, nooutput name(string) vars(string) labs(string
 	local numnets = 0
 	mata: st_rclear()
 	local max_nodes = 0
+	local allnames ""
 	
 	// display information about network
 	if ("`varlist'" == "" & "`mat'" == "") {
@@ -30,6 +31,7 @@ syntax [varlist (default=none)][, nooutput name(string) vars(string) labs(string
 					local thissize `=onesize'
 					local max_nodes = max(`max_nodes', `thissize')
 					scalar onename = "\$nwname_`i'"
+					local allnames "`allnames' `=onename'"
 					scalar onenw = "\$nw_`i'"
 					scalar onelabs = "\$nwlabs_`i'"
 					local l `"`=onelabs'"'
@@ -65,7 +67,7 @@ syntax [varlist (default=none)][, nooutput name(string) vars(string) labs(string
 			local size :word count `varlist'
 			local varscount : word count `vars'
 			local labscount : word count `labs'
-			qui nwtomata `varlist', copy mat(onenet)
+			qui nwtomata `varlist', mat(onenet)
 			local mat = "onenet"
 			if (`varscount' != `size') unab vars: `varlist'
 			if (`labscount' != `size') local labs "`vars'"
@@ -137,5 +139,6 @@ syntax [varlist (default=none)][, nooutput name(string) vars(string) labs(string
 	mata: st_rclear()
 	mata: st_numscalar("r(networks)", $nwtotal)
 	mata: st_numscalar("r(max_nodes)", `max_nodes')
+	mata: st_global("r(names)", "`allnames'")
 
 end

@@ -1,3 +1,8 @@
+*! Date        : 3sept2014
+*! Version     : 1.0.1
+*! Author      : Thomas Grund, Linköping University
+*! Email	   : contact@nwcommands.org
+
 capture program drop nwtable
 program nwtable
 	syntax anything(name=something) [, unvalued plot plotoptions(string) *]
@@ -44,8 +49,8 @@ program nwtable
 	
 	preserve
 	if "`nwtabletype'" == "variable" {
-		nwtoedge `netname1', fromvars(`arg2') tovars(`arg2') type(full)
-		keep if `netname1' > 0 
+		qui nwtoedge `netname1', fromvars(`arg2') tovars(`arg2') type(full)
+		qui keep if `netname1' > 0 
 		local tabn1 = "from_`arg2'"
 		local tabn2 = "to_`arg2'"
 		di
@@ -57,7 +62,7 @@ program nwtable
 		if "`undirected_all'" == "false" {
 			local undirected = "forcedirected"
 		}
-		nwtoedge `netname1' `netname2', type(full) `undirected'
+		qui nwtoedge `netname1' `netname2', type(full) `undirected'
 	
 		local tabn1 = "`netname1'"
 		local tabn2 = "`netname2'"

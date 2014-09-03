@@ -1,11 +1,19 @@
+*! Date        : 24aug2014
+*! Version     : 1.0
+*! Author      : Thomas Grund, Linköping University
+*! Email	   : contact@nwcommands.org
+
 capture program drop nwplot
 program nwplot
 	version 9.0
 	set more off
-	syntax [anything(name=netname)],[ edgesize(string) ASPECTratio(string) components(string) arcstyle(string) arcbend(string) arcsplines(integer 10) nodexy(varlist numeric min=2 max=2) edgeforeground(string) GENerate(string) colorpalette(string) edgecolorpalette(string) edgepatternpalette(string) symbolpalette(string) lineopt(string) scatteropt(string) legendopt(string) size(string) color(string) symbol(string) edgecolor(string) label(varname) nodefactor(string) sizebin(string) edgefactor(string) arrowfactor(string) arrowgap(string) arrowbarbfactor(string) layout(string) arrows  iterations(integer 1000) scheme(string) * ]
+	syntax [anything(name=netname)],[ arrows edgesize(string) ASPECTratio(string) components(string) arcstyle(string) arcbend(string) arcsplines(integer 10) nodexy(varlist numeric min=2 max=2) edgeforeground(string) GENerate(string) colorpalette(string) edgecolorpalette(string) edgepatternpalette(string) symbolpalette(string) lineopt(string) scatteropt(string) legendopt(string) size(string) color(string) symbol(string) edgecolor(string) label(varname) nodefactor(string) sizebin(string) edgefactor(string) arrowfactor(string) arrowgap(string) arrowbarbfactor(string) layout(string) iterations(integer 1000) scheme(string) * ]
 	_nwsyntax `netname', max(1)
 	
-	ssc install labellist
+	capture which labellist
+	if _rc != 0 {
+		ssc install labellist
+	}
 	local twowayopt `"`options'"'
 		
 	if "`aspectratio'" == "" {
@@ -858,16 +866,25 @@ program nwplot
 	
 	if "`generate'" != "" {
 		di "{text:Export coordinates...}"
-		capture drop `generate'_x
-		capture drop `generate'_y
+		if (wordcount("`generate'") >= 2){
+			local generate_x = word("`generate'", 1)
+			local generate_y = word("`generate'", 2)
+		}
+		else {
+			local generate_x = "_x_coord"
+			local generate_y = "_y_coord"
+		}
+		
+		capture drop `generate_x'
+		capture drop `generate_y'
 		if _N < `nodes' {
 			set obs `nodes'
 		}
-		qui gen `generate'_x = .
-		qui gen `generate'_y = .
-		mata: st_store((1::rows(Coord)),("`generate'_x","`generate'_y"), (Coord[.,.]:/100))
-		qui replace `generate'_x = (`generate'_x - 0.05) / 0.9
-		qui replace `generate'_y = (`generate'_y - 0.05) / 0.9
+		qui gen `generate_x' = .
+		qui gen `generate_y' = .
+		mata: st_store((1::rows(Coord)),("`generate_x'","`generate_y'"), (Coord[.,.]:/100))
+		qui replace `generate_x' = (`generate_x' - 0.05) / 0.9
+		qui replace `generate_y' = (`generate_y' - 0.05) / 0.9
 	}
 	mata: mata drop plotmat nsize ncolor nlabel Coord edgesizemat edgecolormat
 	capture mata: mata drop Coord_comp compM comp_freq comp_id comp_freqid compmat comp_share comp_nonisol

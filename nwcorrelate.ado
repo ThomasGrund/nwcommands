@@ -1,3 +1,8 @@
+*! Date        : 3sept2014
+*! Version     : 1.0.1
+*! Author      : Thomas Grund, Linköping University
+*! Email	   : contact@nwcommands.org
+
 capture program drop nwcorrelate	
 program nwcorrelate
 syntax [anything(name=netnames)] [,  mode(string) ATTRibute(string) PERMutations(integer 1) SAVing *]
@@ -125,6 +130,7 @@ syntax [anything(name=netnames)] [,  mode(string) ATTRibute(string) PERMutations
 		mata: st_numscalar("r(pvalue)", pvalue)
 		mata: st_numscalar("r(corr)", corr)
 	}
+	di "{res}`r(corr)'"
 end
 
 capture mata mata drop correlate_nets_rep()

@@ -1,3 +1,8 @@
+*! Date        : 3sept2014
+*! Version     : 1.0.1
+*! Author      : Thomas Grund, Linköping University
+*! Email	   : contact@nwcommands.org
+
 capture program drop nwuse
 program nwuse
 	syntax anything [, nwclear clear *]
@@ -6,7 +11,7 @@ program nwuse
 	`clear'
 	`nwclear'
 
-	qui if c(k) > 0 & _N > 0{
+	if c(k) > 0 & _N > 0{
 		local reloadExisting = "yes"
 		gen _running = _n
 		tempfile existing 
@@ -14,10 +19,9 @@ program nwuse
 	}
 	
 	qui use `webname', `options'
-	capture {
-		foreach v in "_format _nets _name _size _directed _edgelabs" {
-			confirm variable `v'
-		}
+	
+	//capture {
+		confirm variable _format _nets _name _size _directed _edgelabs
 		local f = _format[1]
 		local nets = _nets[1]
 		forvalues i = 1/`nets' {
@@ -34,25 +38,27 @@ program nwuse
 					confirm variable `nodevar'
 				}
 			}
+
 			if "`f'" != "matrix" & "`f'" != "edgelist" {
 				di "{err}file {bf:`webname'.dta} has the wrong format."
 				error 6702	
 			}
 		}
-	}
+	//}
 	
 	if _rc != 0 {
 		di "{err}file {bf:`webname'.dta} has the wrong format."
 		error 6702
 	}
 
-
 	local frmat = _format[1]
 	local nets = _nets[1]
 	local allnets ""
+	local allnames ""
 	forvalues i = 1 / `nets' {
 		local name = trim(_name[`i'])
 		local allnets "`allnets' _`name'"
+		local allnames "`allnames' `name'"
 		local size = _size[`i']
 		local directed = _directed[`i']
 		local edgelabs = _edgelabs[`i']
@@ -81,15 +87,21 @@ program nwuse
 			qui nwfromedge _fromid _toid `nname' if `nname' != . , name(`name') vars(`vars') labs(`labs') `undirected' `directed'
 		}
 		if "`frmat'" == "matrix"{
-			local _netstub `=_var`i'[1]'	
-			local _netstublength = length("`_netstub'") - 1
-			local _netstub = substr("`_netstub'",1, `_netstublength')
-			nwset `_netstub'*, name(`name') vars(`vars') labs(`labs') `undirected'
+			local _netstub `vars'
+			//Error:
+			//local _netstublength = length("`_netstub'") - 1
+			//local _netstub = substr("`_netstub'",1, `_netstublength')
+			nwset `_netstub', name(`name') vars(`vars') labs(`labs') `undirected'
 		}
 		restore
 	}
+	
 	capture drop _*
 	capture drop `allnets'
+	foreach onenet in `allnames' {
+		nwload `onenet'
+	}
+
 	di 
 	di "{txt}{it:Loading successful}"
 	nwset

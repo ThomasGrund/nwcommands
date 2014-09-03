@@ -1,24 +1,18 @@
+*! Date        : 24aug2014
+*! Version     : 1.0
+*! Author      : Thomas Grund, Linköping University
+*! Email	   : contact@nwcommands.org
+
 capture program drop nwcomponents
-program nwcomponents
+program nwcomponents, rclass
 	version 9
 	syntax [anything(name=netname)][, GENerate(string) undirected]
 	set more off
 
-	nwset, nooutput
-	if "`netname'" == "" {
-		nwcurrent
-		local netname = r(current)
-	}
-
-	nwname `netname'
-	local nodes = r(nodes)
-	
+	_nwsyntax `netname', max(1)
 	nwtomata `netname', mat(onenet)
-	local compUndirected = 0
-	if "`undirected'" != "" {
-		local compUndirected = 1
-	}
-	mata: comp = components(onenet, `compUndirected')
+	
+	mata: comp = components(onenet, 1)
 	mata: numcomp = max(comp)
 	
 	capture drop _component
@@ -36,8 +30,18 @@ program nwcomponents
 	mata: comp_sizeid[.,2] = comp_id
 	mata: comp_sizeid[.,3] = comp_share
 	mata: comp_sizeid = sort(comp_sizeid, -1)
-	mata: st_numscalar("r(components)", numcomp)
-	mata: st_matrix("r(comp_sizeid)", comp_sizeid)
+	mata: st_numscalar("components", numcomp)
+	mata: st_matrix("comp_sizeid", comp_sizeid)
+	
+	matrix colnames comp_sizeid = size compid share
+	
+	local rowlabs ""
+	return scalar components = components
+	forvalues i = 1/`=components'{
+		local rowlabs "`rowlabs' comp`i'"
+	}
+	matrix rownames comp_sizeid = `rowlabs'
+	return matrix comp_sizeid = comp_sizeid
 	mata: mata drop comp numcomp comp_id comp_size comp_sizeid
 end
 

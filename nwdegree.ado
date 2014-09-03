@@ -1,18 +1,19 @@
 capture program drop nwdegree
 program nwdegree
 	version 9
-	syntax [anything(name=netname)],[ isolates]
+	syntax [anything(name=netname)],[ isolates unweighted]
 	
-	if ("`netname'" == ""){
-		nwcurrent
-		local netname = r(current)
-	}
-	
-	nwname `netname'
+	_nwsyntax `netname', max(1)
 	local directed = r(directed)
 	local nodes = r(nodes)
 	
 	nwtomata `netname', mat(degreeNet)
+	
+	if "`unweighted'" != "" {
+		mata: degreeNet = degreeNet :/ degreeNet
+		mata: _editmissing(degreeNet,0)
+	}
+	
 	mata: outdegree = (colsum(degreeNet))'
 	mata: indegree = rowsum(degreeNet)
 	
@@ -45,6 +46,5 @@ program nwdegree
 	}
 	
 	mata: st_rclear()
-	nwname `netname'
 	mata: mata drop outdegree indegree degreeNet
 end	

@@ -1,3 +1,8 @@
+*! Date        : 24aug2014
+*! Version     : 1.0
+*! Author      : Thomas Grund, Linköping University
+*! Email	   : contact@nwcommands.org
+
 capture program drop nwsym
 program nwsym
 	version 9.0
@@ -29,7 +34,7 @@ program nwsym
 	if ("`replace'" != ""){
 		// generate valid network name and valid varlist
 		if "`name'" == "" {
-			local name "`netname'_sym"
+			local name "_sym_`netname'"
 		}
 		
 		// generate a new network
@@ -70,5 +75,6 @@ program nwsym
 	mata: _diag(symnet,0)
 	nwreplacemat `symname', newmat(symnet)
 	nwname `symname', newdirected(false)
+	mata: st_rclear()
 	mata: mata drop symnet
 end
