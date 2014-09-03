@@ -8,7 +8,6 @@ program nwrandom
 	syntax anything(name=nodes), [ntimes(integer 1) Density(string) Prob(string) vars(string) stub(string) name(string) undirected xvars noreplace * ]
 	version 9.0
 	set more off
-	
 	// Check if this is the first network in this Stata session
 	if "$nwtotal" == "" {
 		global nwtotal = 0

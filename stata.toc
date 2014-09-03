@@ -1,3 +1,4 @@
 v 3
 d Thomas U. Grund and Peter Hedström, Linköping University
-p nwcommands Social Network Analysis using Stata
+p nwcommands_p1 Social Network Analysis using Stata - Part 1
+p nwcommands_p2 Social Network Analysis using Stata - Part 2

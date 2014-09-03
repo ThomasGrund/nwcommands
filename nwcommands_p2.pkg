@@ -1,34 +1,8 @@
 v 3
-d nwcommands. Social Network Analysis using Stata
+d nwcommands_p2. Social Network Analysis using Stata
 d Thomas U. Grund and Peter Hedström, Linköping University
 d email: contact@nwcommands.org
-d Distribution-Date: 20130630
-f _extract_valuelabels.ado
-f _nwevalnetexp.ado
-f _nwsyntax.ado
-f _nwsyntax_other.ado
-f _opts_oneof.ado
-f animate.ado
-f animate.sthlp
-f netexampe.sthlp
-f netlist.sthlp
-f netname.sthlp
-f nw_alphabetical.sthlp
-f nw_intro.sthlp
-f nw_topical
-f nwaddnodes.ado
-f nwaddnodes.sthlp
-f nwassortmix.ado
-f nwassortmix.sthlp
-f nwclear.ado
-f nwclear.sthlp
-f nwcloseness.ado
-f nwcloseness.sthlp
-f nwcommnds.sthlp
-f nwcomponents.ado
-f nwcomponents.sthlp
-f nwcompressobs.ado
-f nwcompressobs.sthlp
+d Distribution-Date: 20140904 
 f nwcontext.ado
 f nwcontext.sthlp
 f nwcorrelate.ado
@@ -95,6 +69,7 @@ f nwtoedge.ado
 f nwtoedge.sthlp
 f nwtomata.ado
 f nwtomata.sthlp
+f nwtostata.ado
 f nwtranspose.ado
 f nwtranspose.sthlp
 f nwtriads.ado
@@ -106,7 +81,7 @@ f nwvalidate.sthlp
 f nwvalidvars.ado
 f nwvalue.ado
 f nwvalue.sthlp
-f webnwuse.sthlp
+f webnwuse.ado
 f scheme-s1network.scheme
 f scheme-s2network.scheme
 f scheme-s3network.scheme
@@ -115,7 +90,3 @@ f gang.dta
 f glasgow.dta
 f glasgow_edge.dta
 f stockholm.dta
-
-
-
-
