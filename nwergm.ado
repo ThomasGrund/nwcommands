@@ -10,7 +10,10 @@ syntax anything(name=netname), formula(string) [ ergmoptions(string) ergmdetail 
 	local netid = r(id)
 	local netsize = r(nodes)
 	local vars `"\$nw_`netid'"'
+	//nwkeep `netname'
 	nwload `netname'
+	
+	label drop _all
 	
 	if "`gofoptions'" == "" {
 		local gofoptions = "control=control.gof.ergm(nsim=30), verbose = TRUE "
@@ -56,7 +59,10 @@ syntax anything(name=netname), formula(string) [ ergmoptions(string) ergmdetail 
 					`"netsym <- all(netmat == t(netmat))"' _n ///
 					`"net<- network(netmat, directed = !netsym)"' _n ///
 					`"attrs <- dim(data)[2] - dim(data)[1]"' _n ///
-					`"for (i in 1:attrs){ net %v% colnames(data[netsize + i]) <- data[[netsize + i]] }"' _n _n ///
+					`"for (i in 1:attrs){ "' _n ///
+					`"	 att <- data[,i] "' _n ///
+					`"	 set.vertex.attribute(net, colnames(data[i]),att) "' _n ///
+					`"} "' _n _n ///   
 
 	// run ergm
 	file write `r_ergm' "# run ERGM" _n ///

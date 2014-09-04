@@ -38,7 +38,7 @@ program def nwassortmix
 		local stub "net"
 	}
 	nwvalidate `name'
-	local assortnam= r(validname)
+	local assortname= r(validname)
 	
 	local gencmd "nwgenerate _tempassort ="
 	

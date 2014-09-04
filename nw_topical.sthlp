@@ -85,6 +85,8 @@ categories:
 {p2col:{bf:{help nwinfo}}}display some network information{p_end}
 {p2col:{bf:{help nwname}}}basic network information{p_end}
 {p2col:{bf:{help nwsummary}}}some summary information{p_end}
+{p2col:{bf:{help nwtable}}}two-way tabulate of two networks or network and attribute{p_end}
+{p2col:{bf:{help nwtabulate}}}one-way tabulates tie values of a network{p_end}
 {p2col:{bf:{help nwtriads}}}calculates triad census of network{p_end}
 
 {marker manipulation}{...}
@@ -117,8 +119,6 @@ categories:
 {p2col:{bf:{help nwneighbor}}}derives list of network neighbors{p_end}
 {p2col:{bf:{help nwqap}}}network quadratic assignment procedure{p_end}
 {p2col:{bf:{help nwreach}}}calculates reach of a network{p_end}
-{p2col:{bf:{help nwtable}}}two-way tabulate of two networks or network and attribute{p_end}
-{p2col:{bf:{help nwtabulate}}}one-way tabulates tie values of a network{p_end}
 {p2col:{bf:{help nwvalue}}}returns single tie value{p_end}
 
 {marker utilities}{...}

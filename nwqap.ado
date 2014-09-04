@@ -1,6 +1,6 @@
 capture program drop nwqap	
 program nwqap
-syntax [anything (name=formula)] [, detail type(string) mode(string) PERMutations(integer 500) scheme(string) save(string) ]
+syntax [anything (name=formula)] [, detail type(string) mode(string) PERMutations(integer 500) save(string) ]
     set more off
 
 	mata: st_rclear()
@@ -17,8 +17,7 @@ syntax [anything (name=formula)] [, detail type(string) mode(string) PERMutation
 	}
 	
 	local net = word("`formula'", 1)
-	quietly nwname `net'	
-	local nodes = r(nodes)
+	_nwsyntax `net', max(1)	
 	nwtomata `net', mat(dvnet)
 	
 	// Generate dataset in long format.
@@ -26,12 +25,15 @@ syntax [anything (name=formula)] [, detail type(string) mode(string) PERMutation
 	
 	local i = 1
 	local t = 1
-		
+	
+	local prefix ""
+	
 	foreach entry in `formula' {
 		nwvalidate `entry'
 		// DV or IV is network
 		if (r(exists) == "true") {
 			nwname `entry'
+			local nextname "`r(name)'"
 			if r(nodes) != `nodes' {
 				di "{err}Networks of different size."
 				error 6056
@@ -41,18 +43,27 @@ syntax [anything (name=formula)] [, detail type(string) mode(string) PERMutation
 			mata: temp = transformIntoLong(onenet)
 			mata: datalong[,`i'] = temp
 			local i = `i' + 1
+			local prefix "`prefix' `nextname'"
 		}
 		// Assume IV to be a variable.
 		else {
 			confirm variable `entry'
 			// Make network out of IV.
 			tokenize `mode'
-			nwexpand `entry', mode("``t''") mat(onenet) storeoff end(`nodes')
-			local t = `t' + 1
+			nwexpand `entry', name(_tempexpand) mode("``t''") nodes(`nodes')
+			nwtomata _tempexpand, mat(onenet)
 			mata: _diag(onenet, J(rows(onenet), 1, .))
 			mata: temp = transformIntoLong(onenet)
 			mata: datalong[,`i'] = temp
 			local i = `i' + 1
+			nwdrop _tempexpand
+			if "``t''" == "" {
+				local prefix "`prefix' same_`entry'"
+			}
+			else {
+				local prefix "`prefix' ``t''_`entry'"
+			}
+			local t = `t' + 1
 		}
 	}
 		
@@ -158,9 +169,9 @@ syntax [anything (name=formula)] [, detail type(string) mode(string) PERMutation
 	
 	//  Display results.
 	local max_l = 0
-	tokenize "`formula'"
-	if `max_l' < 10 {
-		local max_l = 10
+	tokenize "`prefix'"
+	if `max_l' < 20 {
+		local max_l = 20
 	}
 	di 
 	di 
@@ -184,6 +195,7 @@ syntax [anything (name=formula)] [, detail type(string) mode(string) PERMutation
 	di "{col 2}{ralign `=`max_l'+1':`net'}{col `=`max_l' + 4'}{c |}{col `=`max_l' + 11'}Coef.{col `=`max_l' + 20'}P-value"
 	di "{hline `=`max_l' + 3'}{c +}{hline 25}"
 	local constant = round(reg_results[1,`=`vars''], 0.000001)
+	
 	forvalues k=2/`vars'{
 		local coeff = `=round(float(reg_results[1,`=`k'-1']), 0.000001)'
 		local pvalue = `=round(float(pvalues[1,`=`k'-1']),0.001)'
@@ -197,6 +209,7 @@ syntax [anything (name=formula)] [, detail type(string) mode(string) PERMutation
 	mata: p = st_matrix("pvalues")
 	mata: st_matrix("e(pvalues)", p)
 	mata: mata drop datalong net_long perm_net onenet dvnet p
+
 end
 
 capture mata mata drop transformIntoLong()
