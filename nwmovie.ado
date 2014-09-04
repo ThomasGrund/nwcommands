@@ -127,21 +127,22 @@ program nwmovie
 					
 		noi di "{txt}Processing network {bf:`first'}"
 		if `i' == 1 {
-			qui nwplot `first', gen(_c1) size(`firstsize') symbol(`firstsymb', norescale forcekeys(`symbol_uniquevalues')) color(`firstcol', norescale forcekeys(`color_uniquevalues')) edgesize(`firstedgesize') edgecolor(`firstedgecol') title("`firsttitle'"`title_opt') `options'	
+			qui nwplot `first', generate(_c1_x _c1_y) size(`firstsize') symbol(`firstsymb', norescale forcekeys(`symbol_uniquevalues')) color(`firstcol', norescale forcekeys(`color_uniquevalues')) edgesize(`firstedgesize') edgecolor(`firstedgecol') title("`firsttitle'"`title_opt') `options'	
 			qui graph export first`st'.eps, replace mag(200) logo(on)
 		}
 		else {
-			qui nwplot `first', gen(_c1) size(`firstsize') symbol(`firstsymb', norescale forcekeys(`symbol_uniquevalues')) color(`firstcol', norescale forcekeys(`color_uniquevalues')) edgesize(`firstedgesize') edgecolor(`firstedgecol') title("`secondtitle'"`title_opt') `options'	
+			qui nwplot `first', generate(_c1_x _c1_y) size(`firstsize') symbol(`firstsymb', norescale forcekeys(`symbol_uniquevalues')) color(`firstcol', norescale forcekeys(`color_uniquevalues')) edgesize(`firstedgesize') edgecolor(`firstedgecol') title("`secondtitle'"`title_opt') `options'	
 			qui graph export frame`st'.eps, replace mag(200) logo(on)
 		}
 		local st = string(`z',"%05.0f")
 		qui graph export frame`st'.eps, replace mag(200) logo(on)
-		qui nwplot `second', gen(_c2) size(`secondsize') symbol(`secondsymb', norescale forcekeys(`symbol_uniquevalues')) color(`secondcol', norescale forcekeys(`color_uniquevalues')) edgesize(`secondedgesize') edgecolor(`secondedgecol') title("`secondtitle'"`title_opt') `options'	
+		qui nwplot `second', generate(_c2_x _c2_y) size(`secondsize') symbol(`secondsymb', norescale forcekeys(`symbol_uniquevalues')) color(`secondcol', norescale forcekeys(`color_uniquevalues')) edgesize(`secondedgesize') edgecolor(`secondedgecol') title("`secondtitle'"`title_opt') `options'	
 		local expnum = (`z' + `frames' + 2)
 		local st = string(`expnum',"%05.0f")
 		qui graph export frame`st'.eps, replace mag(200) logo(on)		
 		local z = `z' + 2
 		
+
 		forvalues j = 1/`frames' {
 			if (mod(`j',5) == 0) noi display "   ...frame `j'/`frames'"
 			local st = string(`z',"%05.0f")
@@ -151,14 +152,13 @@ program nwmovie
 				local steepness =  log( 1 + (`j'/`f' * `explosion')) / log(`explosion' + 1)
 			}
 
-			qui gen _frame_x = _c1_x - `steepness' * (_c1_x - _c2_x) 
-			qui gen _frame_y = _c1_y - `steepness' * (_c1_y - _c2_y)
+			gen _frame_x = _c1_x - `steepness' * (_c1_x - _c2_x) 
+			gen _frame_y = _c1_y - `steepness' * (_c1_y - _c2_y)
 			
 			local nx = "nodexy(_frame_x _frame_y)"
 			if "`nodexy'" != "" {
 				local nx = ""
 			}
-			
 			
 			local thirdtitle "`firsttitle'" 
 			local thirdcol "`firstcol'"

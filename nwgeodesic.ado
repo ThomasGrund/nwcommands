@@ -9,9 +9,8 @@ program nwgeodesic
 	syntax [anything(name=netname)], [ vars(string) noreplace id(string) name(string) xvars  unconnected(string) nosym]
 
 	_nwsyntax `netname', max(1)
-	mata: nw_geo = nw_mata`id'
-	
-	mata: nw_geo = nw_geo /: nw_geo
+	mata: nw_geo = nw_mata`id'	
+	mata: nw_geo = nw_geo :/ nw_geo
 	mata: _editmissing(nw_geo, 0)
 	
 	if "`sym'" == "" {
@@ -22,7 +21,7 @@ program nwgeodesic
 	if "`name'" == "" {
 		local name "geodesic"
 	}
-	
+
 	mata: distances = getgeodesic(nw_geo)
 	
 	if "`unconnected'" == "" {

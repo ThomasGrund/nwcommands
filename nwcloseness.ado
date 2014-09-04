@@ -9,7 +9,7 @@
 capture program drop nwcloseness
 program nwcloseness
 	version 9
-	syntax [anything(name=netname) *]	
+	syntax [anything(name=netname)]	
 	_nwsyntax `netname', max(1)
 	
 	if "`varlist'" == "" {
@@ -22,7 +22,6 @@ program nwcloseness
 	qui nwgeodesic `localname', name(_tempgeodesic) `options'
 	nwname _tempgeodesic
 	local gid = r(id)
-	
 	mata: far = rowsum(nw_mata`gid')
 	mata: nearness = J(`nodes', 1,1) :/ far
 	mata: closeness = nearness :* (`nodes' - 1)

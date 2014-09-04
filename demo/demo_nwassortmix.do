@@ -35,9 +35,9 @@ nwrandom 20, prob(1) name(dyadweight)
 nwreplace dyadweight = exp(5 * same_gender) * exp((-5) * same_race)
 
 nwdyadprob dyadweight, density(0.1) 
-nwplot, color(gender) layout(circle) title("gender, homophily = exp(5)") gen(coord)
+nwplot, color(gender) layout(circle) title("gender, homophily = exp(5)") 
 graph save g4, replace
-nwplot, color(race) nodexy(coord_x coord_y) title("race, homophily = exp(-5)")
+nwplot, color(race) colorpalette(yellow green) layout(circle) title("race, homophily = exp(-5)")
 graph save g5, replace
 graph combine g4.gph g5.gph 
 
