@@ -1,4 +1,7 @@
-// TODO: build in nwset
+*! Date        : 3sept2014
+*! Version     : 1.0.1
+*! Author      : Thomas Grund, Linköping University
+*! Email	   : contact@nwcommands.org
 
 capture program drop nwergm	
 program nwergm, sortpreserve
@@ -10,7 +13,6 @@ syntax anything(name=netname), formula(string) [ ergmoptions(string) ergmdetail 
 	local netid = r(id)
 	local netsize = r(nodes)
 	local vars `"\$nw_`netid'"'
-	//nwkeep `netname'
 	nwload `netname'
 	
 	label drop _all
@@ -131,40 +133,55 @@ syntax anything(name=netname), formula(string) [ ergmoptions(string) ergmdetail 
 	// close file handler
 	file close `r_ergm'
 	
-	di ="{txt}Running ERGM..."
-	if "$rpath" == "" {
-		global rpath = "R"
-	}
+	di ="{txt}Checking for R installation..."
+	
 	tempname rterm
 	
 	// Check for R installation
-	if ("`c(os)'" == "Windows") {
-		capture file open `rterm' using "$rpath", read
-		if _rc != 0 {
-			di "{err}Stata could not find R on your computer."
-			di "Please specify in the dialog box where R can be found."
-			di 
-			di "If you have not installed R you need to do this first:"
-			di "{browse www.cran.r-project.org:    Click here to install R}"
-			nwergmrtermdialog
-		}
-
-		scalar correctfile = length("$rpath") - 4
-		
-		if (lower(substr("$rpath", correctfile , .)) != "r.exe"){
-			di 
-			di "{err}Try again."
-			global rpath ""
-			exit
-		}
-	}
-	// Windows
 	
-	// Check for R installation
-	if ("`c(os)'" != "Windows"){
-		di "If you have not installed R you need to do this first:"
-		di "{browse www.cran.r-project.org:    Click here to install R}"
+	// Check for third party profile 
+	capture findfile nwprofile.do
+	local found_R = 0
+	capture if (_rc == 0) {
+		file open nwprofile_handle using _nwprofile.do, read
+		file read nwprofile_handle line
+		di "Line: `line'"
+		while r(eof)==0 {
+			gettoken thirdparty third: line, parse("----")
+			local thirdfile = substr("`third'", 5,.)
+			if (trim("`thirdparty'") == "R") {
+				global rpath `thirdfile'
+				local found_R = 1
+			}
+			file read nwprofile_handle line
+		}
+        file close nwprofile_handle
 	}
+	
+	// R not found in nwprofile.do
+	if (`found_R' == 0){
+		di "{err}Stata could not find R on your computer."
+		di "Please specify in the dialog box where R can be found."
+		di 
+		di "If you have not installed R you need to do this first:"
+		di "{browse www.cran.r-project.org:    Click here to install R}"		
+		
+		capture window fopen rpath "Locate R" "R.exe|R.exe" 
+		capture file open nwprofile_handle using _nwprofile.do, write append
+		capture file write nwprofile_handle "R ---- $rpath" _n
+		capture file close nwprofile_handle
+	}
+
+	scalar correctfile = length("$rpath") - 4
+	if (lower(substr("$rpath", correctfile , .)) != "r.exe"){
+		di 
+		di "{err}Try again."
+		global rpath ""
+		exit
+	}
+	
+		
+	di ="{txt}Running ERGM..."
 	
 	local rcode "ergrcode.r"
 	local rout "ergm.Rout"
@@ -350,11 +367,6 @@ syntax anything(name=netname), formula(string) [ ergmoptions(string) ergmdetail 
 			shell rm erggof.csv ergmodel.csv ergcoefs.csv ergdata.dta ergcontrol.csv ergstats.csv ergcov.csv ergrcode.r ergerror.txt Rplots.pdf
 		}
 	}
-end
-
-capture program drop nwergmrtermdialog
-program nwergmrtermdialog
-	capture window fopen rpath "Locate R" "R.exe|R.exe" 
 end
 
 capture program drop nwergmplotmcmc

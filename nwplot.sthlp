@@ -30,11 +30,11 @@
        nodes (color, size, symbol, etc.){p_end}
 {p2col:{it:{help nwplot##edge_options:edge_options}}}change look of 
        edges (color, size, pattern, etc.){p_end}
-{p2col:{it:{help scatter##arrow_options:arrow_options}}}change look of
+{p2col:{it:{help nwplot##arrow_options:arrow_options}}}change look of
        arrows{p_end}
-{p2col:{it:{help scatter##layout_options:layout_options}}}change the layout,
+{p2col:{it:{help nwplot##layout_options:layout_options}}}change the layout,
 	use existing coordinates, export coordinates{p_end}
-{p2col:{it:{help scatter##other_options:other_options}}}other network plot options
+{p2col:{it:{help nwplot##other_options:other_options}}}other network plot options
 		{p_end}
 {p2col:{it:{help twoway_options}}}normal twoway options for the whole plot
 		{p_end}

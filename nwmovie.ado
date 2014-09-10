@@ -1,3 +1,8 @@
+*! Date        : 7sept2014
+*! Version     : 1.0.1
+*! Author      : Thomas Grund, Linköping University
+*! Email	   : contact@nwcommands.org
+
 capture program drop nwmovie
 program nwmovie
 	syntax anything(name=netname), [z(integer 1) keepeps fname(string) explosion(string) titles(string) delay(string) size(varlist) color(varlist) symbol(varlist) edgecolor(string) edgesize(string) frames(integer 20)*]
@@ -10,6 +15,41 @@ program nwmovie
 	local othernetname = ""
 	_nwsyntax_other `edgecolor', exactly(`networks') nocurrent
 	local edgecolor_check "`othernetname'"
+	
+	
+	// check for ImageMagick
+		
+	// Check for third party profile 
+	capture findfile nwprofile.do
+	local found_IM = 0
+	capture if (_rc == 0) {
+		file open nwprofile_handle using _nwprofile.do, read
+		file read nwprofile_handle line
+		while r(eof)==0 {
+			gettoken thirdparty third: line, parse("----")
+			local thirdfile = substr("`third'", 5,.)
+			if (trim("`thirdparty'") == "ImageMagick") {
+				global rpath `thirdfile'
+				local found_IM = 1
+			}
+			file read nwprofile_handle line
+		}
+        file close nwprofile_handle
+	}
+	
+	// ImageMagick not found in nwprofile.do
+	if (`found_IM' == 0){
+		di "{err}Stata could not find ImageMagick on your computer."
+		di "Please specify in the dialog box where ImageMagick can be found."
+		di 
+		di "If you have not installed ImageMagick you need to do this first:"
+		di "{browse www.ixxxxx.org:    Click here to install ImageMagick}"		
+		
+		capture window fopen impath "Locate convert" "convert.exe|convert.exe" 
+		capture file open nwprofile_handle using _nwprofile.do, write append
+		capture file write nwprofile_handle "ImageMagick ---- $impath" _n
+		capture file close nwprofile_handle
+	}
 	
 	capture drop _c1_* 
 	capture drop _c2_*

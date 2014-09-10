@@ -1,3 +1,8 @@
+*! Date        : 10sept2014
+*! Version     : 1.0
+*! Author      : Thomas Grund, Linköping University
+*! Email	   : contact@nwcommands.org
+
 capture program drop nwdegree
 program nwdegree
 	version 9
@@ -5,8 +10,6 @@ program nwdegree
 	
 	_nwsyntax `netname', max(1)
 	local directed = r(directed)
-	local nodes = r(nodes)
-	
 	nwtomata `netname', mat(degreeNet)
 	
 	if "`unweighted'" != "" {
@@ -24,7 +27,7 @@ program nwdegree
 	capture drop _degree
 	capture drop _outdegree
 	capture drop _indegree
-		
+	
 	if ("`directed'" == "false"){
 		nwtostata, mat(outdegree) gen(_degree)
 	}

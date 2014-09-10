@@ -60,6 +60,7 @@ program nwplot
 		local layout "mds"
 	}
 	
+	
 	local gridcols = ceil(sqrt(`nodes'))
 	local 0 = "`layout'"
 	syntax anything [, columns(integer `gridcols') components(integer 2)]
@@ -484,8 +485,8 @@ program nwplot
 		di "{text:Calculating node coordinates...}"
 	}
 	
-	
 	if ("`layout'"=="mds"  ){
+		
 		// Coordinates matrix to be populated
 		mata: Coord = J(`nodes', 2, 0)
 		mata: Coord[.,1] = J(`nodes', 1, 1.5) 
@@ -495,9 +496,10 @@ program nwplot
 		qui count if _isolates == 1
 		local isol = `r(N)'
 		local nonisol = `nodes' - `isol'
-
+		
 		// Get number of components
 		nwcomponents `netname', undirected
+		
 		local compnum = r(components)		
 		local compnum_nonisol = `compnum' - `isol'
 		qui tab _component, matrow(comp_id) matcell(comp_freq)
@@ -528,6 +530,7 @@ program nwplot
 
 		// Go through all (non-isolates) components (that should be plotted in boxes) from large to small
 		forvalues i = 1/`components' {
+			
 			nwduplicate `netname', name(`netname'_comp`i')
 			capture drop _id
 			gen _id = _n
@@ -576,7 +579,6 @@ program nwplot
 	}
 	if ("`layout'"=="grid"){
 		if "`layout_gridcols'" == "" {
-			di "h1"
 			local layout_gridcols = ceil(sqrt(`nodes'))
 		}
 		mata: Coord = gridlayout(rows(M), `layout_gridcols')
@@ -862,6 +864,7 @@ program nwplot
 	//di `"`graphcmd'"'
 	`graphcmd'
 
+	di "h1"
 	restore
 	
 	if "`generate'" != "" {

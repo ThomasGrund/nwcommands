@@ -1,14 +1,13 @@
-*! Date        : 9 Nov 2013
-*! Version     : 1.0
-*! Author      : Thomas Grund
-*! Email       : thomas.grund@iffs.se
-*! Description : Set the network
+*! Date        : 3sept2014
+*! Version     : 1.0.1
+*! Author      : Thomas Grund, Linköping University
+*! Email	   : contact@nwcommands.org
 
 capture program drop nwset	
 program nwset
 syntax [varlist (default=none)][, nooutput name(string) vars(string) labs(string asis) edgelabs(string asis) detail mat(string) undirected directed]
 	set more off
-	
+
 	local numnets = 0
 	mata: st_rclear()
 	local max_nodes = 0
@@ -26,6 +25,9 @@ syntax [varlist (default=none)][, nooutput name(string) vars(string) labs(string
 				local networks = plural($nwtotal, "network")
 				di "{txt}($nwtotal `networks')"
 				// information about networks
+				if "`detail'" == "" {
+					di "{hline 20}"
+				}
 				forvalues i=1/`=$nwtotal'{		
 					scalar onesize = "\$nwsize_`i'"
 					local thissize `=onesize'
@@ -37,25 +39,30 @@ syntax [varlist (default=none)][, nooutput name(string) vars(string) labs(string
 					local l `"`=onelabs'"'
 					scalar onedirected = "\$nwdirected_`i'"
 					scalar oneedgelabs = "\$nwedgelabs_`i'"
-					di 
-					di "{hline 50}"
-					if (`i' == $nwtotal){
-						di "{txt} `i') Current Network"
-					}
-					else {
-						di "{txt} `i') Stored Network"
-					}
-					di "{hline 50}"
-					di "{txt}   Network name: {res}`=onename'"
-					di "{txt}   Directed: {res}`=onedirected'"
-					di "{txt}   Nodes: {res}`=onesize'"
-								
-					if ("`detail'" != ""){
+					if "`detail'" != "" {
+						di 
+						di "{hline 50}"
+						if (`i' == $nwtotal){
+							di "{txt} `i') Current Network"
+						}
+						else {
+							di "{txt} `i') Stored Network"
+						}
+						di "{hline 50}"
+						di "{txt}   Network name: {res}`=onename'"
+						di "{txt}   Directed: {res}`=onedirected'"
+						di "{txt}   Nodes: {res}`=onesize'"
 						di "{txt}   Network id: {res}`i'"
 						di "{txt}   Variables: {res}`=onenw'"
 						di `"{txt}   Labels: {res}`=onelabs'"'
 						di `"{txt}   Edgelabels: {res}`=oneedgelabs'"'
 					}
+					else {
+						di "      {res}`=onename'"
+					}
+					
+					
+					
 				}
 			}
 		}

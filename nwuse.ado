@@ -88,9 +88,6 @@ program nwuse
 		}
 		if "`frmat'" == "matrix"{
 			local _netstub `vars'
-			//Error:
-			//local _netstublength = length("`_netstub'") - 1
-			//local _netstub = substr("`_netstub'",1, `_netstublength')
 			nwset `_netstub', name(`name') vars(`vars') labs(`labs') `undirected'
 		}
 		restore
@@ -98,10 +95,7 @@ program nwuse
 	
 	capture drop _*
 	capture drop `allnets'
-	foreach onenet in `allnames' {
-		nwload `onenet'
-	}
-
+	
 	di 
 	di "{txt}{it:Loading successful}"
 	nwset
