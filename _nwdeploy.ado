@@ -13,7 +13,16 @@ program _nwdeploy
 	foreach file in `adofiles' {
 		file write deploy_ado "f `file'" _n
 	}
+	local dtafiles : dir "`c(pwd)'" files "*.dta"
+	foreach file in `dtafiles' {
+		file write deploy_ado "f `file'" _n
+	}
+	local netfiles : dir "`c(pwd)'" files "*.net"
+	foreach file in `netfiles' {
+		file write deploy_ado "f `file'" _n
+	}
 	file close deploy_ado
+	
 	
 	file open deploy_hlp using nwcommands-hlp.pkg, replace write
 	file write deploy_hlp "v 3" _n

@@ -68,3 +68,9 @@ f _nwevalnetexp.ado
 f _nwsyntax.ado
 f _nwsyntax_other.ado
 f _opts_oneof.ado
+f florentine.dta
+f gang.dta
+f glasgow.dta
+f glasgow_edge.dta
+f stockholm.dta
+f gang_pajek.net

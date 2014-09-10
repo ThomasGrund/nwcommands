@@ -1,4 +1,7 @@
-v 3
-d Thomas U. Grund and Peter Hedström, Linköping University
-p nwcommands-ado Social Network Analysis Using Stata - 
+v 1.0.2
+d nwcommands Social Network Analysis Using Stata
+d Program by Thomas Grund, Linköping University, IAS 
 p nwcommands-hlp Social Network Analysis Using Stata - Help Files
+
+p nwcommands-ado Social Network Analysis Using Stata - Core
+
