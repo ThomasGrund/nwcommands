@@ -6,7 +6,44 @@
 capture program drop nwfromedge
 program nwfromedge
 	syntax varlist(min=2 max=3) [if] [, xvars name(string) vars(string) labs(string asis) edgelabs(string) stub(string) directed undirected]
+
+	local v1 : word 1 of `varlist'
+	local v2 : word 2 of `varlist'
+	
+	// check for string variables
+	capture confirm string variable `v1' `v2'
+	local fromStrings = 0
+	tempfile dictionaryString
+	
+	qui if _rc == 0 {
+		local fromStrings = 1
+		preserve
 		
+		local v1 = "from"
+		local v2 = "to"
+		stack `v1' `v2', into(`v1') clear
+		egen _nodeid = group(`v1')
+		gen `v2' = `v1'
+		drop _stack	
+		save `dictionaryString', replace
+		restore
+
+		merge m:n `v1' using `dictionaryString'
+		rename _nodeid `v1'_id
+		drop if _merge != 3
+		drop _merge
+
+		merge m:n `v2' using `dictionaryString'
+		rename _nodeid `v2'_id
+		drop if _merge != 3
+		drop _merge
+		
+		drop `v1' `v2'
+		rename `v1'_id `v1'
+		rename `v2'_id `v2'
+	}
+	
+	
 	if "`if'" != ""{ 
 		keep `if'
 	}
@@ -113,6 +150,14 @@ program nwfromedge
 	}
 	if "`undirected'" != "" {
 		nwsym
+	}
+	
+	if "`fromStrings'" == "1" {
+		preserve
+		use `dictionaryString', clear
+		drop if `v1' == `v1'[_n-1]
+		nwname, newlabsfromvar(`v1')
+		restore
 	}
 	
 	di 

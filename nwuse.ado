@@ -1,4 +1,4 @@
-*! Date        : 3sept2014
+*! Date        : 11sept2014
 *! Version     : 1.0.1
 *! Author      : Thomas Grund, Linköping University
 *! Email	   : contact@nwcommands.org
@@ -20,7 +20,7 @@ program nwuse
 	
 	qui use `webname', `options'
 	
-	//capture {
+	capture {
 		confirm variable _format _nets _name _size _directed _edgelabs
 		local f = _format[1]
 		local nets = _nets[1]
@@ -40,13 +40,15 @@ program nwuse
 			}
 
 			if "`f'" != "matrix" & "`f'" != "edgelist" {
+				di "h1"
 				di "{err}file {bf:`webname'.dta} has the wrong format."
 				error 6702	
 			}
 		}
-	//}
+	}
 	
 	if _rc != 0 {
+		di "h2"
 		di "{err}file {bf:`webname'.dta} has the wrong format."
 		error 6702
 	}

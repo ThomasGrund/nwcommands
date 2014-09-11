@@ -1,7 +1,7 @@
 capture program drop nwname
 program nwname
 	version 9
-	syntax [anything(name=netname)], [id(string) newlabs(string) newvars(string) newname(string) newdirected(string) newtitle(string) newedgelabs(string asis) newdescription(string)]
+	syntax [anything(name=netname)], [id(string) newlabs(string) newlabsfromvar(varname) newvars(string) newname(string) newdirected(string) newtitle(string) newedgelabs(string asis) newdescription(string)]
 	
 	mata: st_rclear()
 	
@@ -48,6 +48,18 @@ program nwname
 	else {
 		local onesize = "\$nwsize_`id'"
 		local thissize = "`onesize'"
+		
+		if "`newlabsfromvar'" != "" {
+			if _N < `onesize' {
+				di "{err}variable {it:`newlabsfromvar'} invalid
+				error
+			}
+			local newlabs ""
+			forvalues i = 1/`onesize' {
+				local onelab = `newlabsfromvar'[`i']
+				local newlabs "`newlabs' `onelab'" 
+			}
+		}
 		
 		local cnewlabs : word count `newlabs'
 		local cnewvars : word count `newvars'
