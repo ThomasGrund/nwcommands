@@ -6,7 +6,7 @@
 {title:Title}
 
 {p2colset 5 20 22 2}{...}
-{p2col :nwneighbor {hline 2}}Extracts the id of one or more network neighbors of node i{p_end}
+{p2col :nwneighbor {hline 2}}Extracts the network neighbors of a node{p_end}
 {p2colreset}{...}
 
 
@@ -15,24 +15,25 @@
 {p 8 17 2}
 {cmdab: nwneighbor} 
 [{it:{help netname}}],
-{opt ego}({help nwneighbor##nodeid:nodeid})
+{opt ego}({help nodeid})
+[{opt mode}({help nodeid})]
+
+{p 8 17 2}
+{cmdab: nwneighbor} 
+[{it:{help netname}}],
+{opt ego}({help nodelab})
 [{opt mode}({help nwneighbor##context:context})]
+
 
 {synoptset 20 tabbed}{...}
 {synopthdr}
 {synoptline}
 {syntab:Main}
-{synopt:{opt ego}({help nwneighbor##nodeid:nodeid})}{it:nodeid} of network node i{p_end}
+{synopt:{opt ego}({help nodeid})}nodeid of network node i{p_end}
+{synopt:{opt ego}({help nodelab})}nodelab of network node i{p_end}
 {synopt:{opt mode}({help nwneighbor##context:context})}defines network neighbors of node i as either nodes j who receive ties from i, send ties to j or both{p_end}
 {synoptline}
 {p2colreset}{...}
-
-{synoptset 20 tabbed}{...}
-{marker nodeid}{...}
-{p2col:{it:nodeid}}{p_end}
-{p2line}
-{p2col:{cmd: #}}number between 1 and {it:size} of the network
-		{p_end}
 		
 {synoptset 20 tabbed}{...}
 {marker context}{...}
@@ -57,8 +58,6 @@ stores the id of one randomly selected network neighbor. If node {it: nodeid} do
 
 {title:Options}
 
-{dlgtab:Main}
-
 {phang}
 {opt ego}({help nwneighbor##nodeid:nodeid}) Must be specified and indicates the node for whom network neighbors should be retrieved.
 
@@ -76,9 +75,13 @@ Tie values are ignored.
 
 
 {title:Examples}
-{cmd: nwrandom 20, prob(.1)}
-{cmd: nwneighor, ego(1)}
-{cmd: return list} 
+     {cmd:. nwclear}
+     {cmd:. nwrandom 20, prob(.1)}
+     {cmd:. nwneighor, ego(1)}
+
+   or
+     {cmd:. nwneighbor, ego(net1)}
 
 {title:Also see}
-{help nwcontext}, {help nwname}, {help nwinfo}
+
+   {help nwcontext}, {help nwname}, {help nwinfo}

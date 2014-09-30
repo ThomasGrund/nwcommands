@@ -15,12 +15,12 @@
 {cmdab: nwcontext} 
 [{it:{help netname}}]
 [{cmd:,}
-attribute({help varname})
-stat({help nwcontext##statistic:statistic})
-mode({help nwcontext##context:context})
-generate({help newvar})
-mat(string)
-noweight]
+{opt attribute}({help varname})
+{opt stat}({help nwcontext##statistic:statistic})
+{opt mode}({help nwcontext##context:context})
+{opt generate}({help newvar})
+{opt mat}(string)
+{opt noweight}]
 
 {synoptset 20 tabbed}{...}
 {synopthdr}
@@ -105,10 +105,11 @@ In the case of undirected networks, no {it: mode} option needs to be specified.
 
 {title:Examples}
 
-{cmd: nwrandom 50, prob(.1)}
-{cmd: gen age = round(100 * (uniform())}
-{cmd: nwcontext, attribute(age)} 
-{cmd: sum _context_age}
+   {cmd:. nwrandom 50, prob(.1)}
+   {cmd:. gen age = round(100 * (uniform())}
+   {cmd:. nwcontext, attribute(age)} 
+   {cmd:. sum _context_age}
 
 {title:Also see}
+
    {help nwneighbor}

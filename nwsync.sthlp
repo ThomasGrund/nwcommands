@@ -5,8 +5,8 @@
 
 {title:Title}
 
-{p2colset 5 16 22 2}{...}
-{p2col :nwsync {hline 2}}Syncs Stata variables with a network{p_end}
+{p2colset 5 15 22 2}{...}
+{p2col :nwsync {hline 2}}Sync network with Stata variables{p_end}
 {p2colreset}{...}
 
 
@@ -16,12 +16,14 @@
 {cmdab: nwsync} 
 [{it:{help netname}}]
 [{cmd:,}
+{opt label}
 {opt fromstata}]
 
 {synoptset 20 tabbed}{...}
 {synopthdr}
 {synoptline}
-{synopt:{opt fromstata}}Changes the direction of the sync{p_end}
+{synopt:{opt label}}Sync the nodelabs{p_end}
+{synopt:{opt fromstata}}Change the direction of the sync{p_end}
 {synoptline}
 {p2colreset}{...}
 
@@ -43,8 +45,13 @@ network (that lives in Mata).
 {title:Options}
 
 {phang}
-{opt fromstata} Changes the direction of the sync, i.e. the network us updated based on the
+{opt fromstata} Change the direction of the sync, i.e. the network is updated based on the
 Stata variables that represent the network.
+{p_end}
+
+{phang}
+{opt label} Sync the labels of the nodes with the Stata variable _nodelab
+{p_end}
 
 {title:Remarks}
 
@@ -55,10 +62,20 @@ One can use {help nwload} and {help nwsync: nwsync, fromstata} to replace tie va
 	{cmd:. replace marriage_1 = 99 in 2}
 	{cmd:. nwsync flomarriage, fromstata}	
 
-    However, the preferred method to change the same tie value would be using {help nwreplace} instead:
- 	{cmd:. nwuse florentine, nwclear}
+{pstd}
+However, the preferred method to change the same tie value would be using {help nwreplace} instead:
+ 	
+	{cmd:. nwuse florentine, nwclear}
 	{cmd:. nwreplace flomarriage[1,2] = 99 }
 
+{pstd}
+The command can also be used to sync the node labels.
+
+	{cmd:. nwuse florentine, nwclear}
+	{cmd:. replace _nodelab = "Peter" in 9}
+	{cmd:. nwsync flomarriage, fromstata label}
+	
+	
 {title:See also}
 
 	{help nwload}, {help nwreplace}

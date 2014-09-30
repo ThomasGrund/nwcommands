@@ -26,21 +26,20 @@ program nwuse
 		local nets = _nets[1]
 		forvalues i = 1/`nets' {
 			local s = _size[`i']
-			confirm variable _var`i'
-			confirm variable _label`i'
+			confirm variable _nodevar`i'
+			confirm variable _nodelab`i'
 			if "`f'" == "edgelist"{
 				local nextname = _name[`i']
 				confirm variable _`nextname'
 			}
 			if "`f'" == "matrix" {
 				forvalues j = 1/`s' {
-					local nodevar `=_var`i'[`j']'
+					local nodevar `=_nodevar`i'[`j']'
 					confirm variable `nodevar'
 				}
 			}
 
 			if "`f'" != "matrix" & "`f'" != "edgelist" {
-				di "h1"
 				di "{err}file {bf:`webname'.dta} has the wrong format."
 				error 6702	
 			}
@@ -48,7 +47,6 @@ program nwuse
 	}
 	
 	if _rc != 0 {
-		di "h2"
 		di "{err}file {bf:`webname'.dta} has the wrong format."
 		error 6702
 	}
@@ -67,8 +65,8 @@ program nwuse
 		local vars ""
 		local labs ""
 		forvalues j = 1 / `size' {
-			local nextvar = _var`i'[`j'] 
-			local nextlab = _label`i'[`j']
+			local nextvar = _nodevar`i'[`j'] 
+			local nextlab = _nodelab`i'[`j']
 			local labs "`labs' `nextlab'"
 			local vars "`vars' `nextvar'"
 		}
@@ -108,6 +106,7 @@ program nwuse
 		drop _running
 		
 	}
+	nwload
 end
 
 

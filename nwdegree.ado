@@ -40,14 +40,16 @@ program nwdegree
 		capture drop _isolates
 		if ("`directed'" == "true"){
 			gen _isolates = (_outdegree == 0) * (_indegree==0)
-			drop _outdegree _indegree
+			//drop _outdegree _indegree
 		}
 		else{
 			gen _isolates = (_degree == 0)
-			drop _degree
+			//drop _degree
 		}
 	}
 	
 	mata: st_rclear()
 	mata: mata drop outdegree indegree degreeNet
+	
+	nwinfo `netname'
 end	

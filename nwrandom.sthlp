@@ -19,7 +19,7 @@
 {opt prob(float)} | {opt density(float)}
 [{opt undirected}
 {opt ntimes(integer)}
-{opt name}({it:new}{it:{help netname}})
+{opt name}({it:{help newnetname}})
 {opt vars}({it:{help newvarlist}})
 {opt xvars}]
 
@@ -31,7 +31,7 @@
 {synopt:{opt density}({it:float})}exact density of the whole network{p_end}
 {synopt:{opt undirected}}generate an undirected network; default = directed{p_end}
 {synopt:{opt ntimes}({it:integer})}number of random networks to be generated; default = 1{p_end}
-{synopt:{opt name}({it:new}{it:{help netname}})}name of the new random network{p_end}
+{synopt:{opt name}({it:{help newnetname}})}name of the new random network{p_end}
 {synopt:{opt vars}({it:{help newvarlist}})}new variables that are used for the network{p_end}
 {synopt:{opt xvars}}do not generate Stata variables{p_end}
 
@@ -43,7 +43,7 @@
 potential tie in the network has the same probability to exist, which is defined 
 by {it:prob(float)}. Alternatively, the overall density of the network can be specified with {it:density(float)}. The 
 difference between the two is that the latter generates the same number of ties when the command
-is repeated, while the former does not.  
+is repeated, while the former does not necessarily.  
 
 
 {title:Examples}

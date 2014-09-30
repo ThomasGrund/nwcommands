@@ -5,8 +5,8 @@
 
 {title:Title}
 
-{p2colset 5 18 22 2}{...}
-{p2col :nwdegree {hline 2}}Calculates the network degree of each node{p_end}
+{p2colset 5 17 22 2}{...}
+{p2col :nwdegree {hline 2}}Degree centrality{p_end}
 {p2colreset}{...}
 
 
@@ -22,7 +22,6 @@
 {synoptset 20 tabbed}{...}
 {synopthdr}
 {synoptline}
-{syntab:Main}
 {synopt:{opt isolates}}Generate variable for network isolates{p_end}
 {synopt:{opt unweighted}}Ignore tie weights/values{p_end}
 {synoptline}
@@ -32,12 +31,11 @@
 {title:Description}
 
 {pstd}
-{cmd:nwdegree} Calculates the in- and outdegree of each node, i.e., the sum of the links received
-from other nodes (indegree) and the sum of the links sent to other nodes (outdegree). Generates the 
-variables {it:_indegree} and {it:_outdegree}. When a network is undirected only degree is calculated. When a network
-is valued the sum of incoming tie values and the sum of outgoing tie values is calculated for 
-each node. The command can also be used to identify network isolates, i.e. nodes that are not connected to
-any other node.
+{cmd:nwdegree} calculates the degree centrality for each node. Generates the 
+Stata variables {it:_indegree} (the sum of the links received from other nodes) and {it:_outdegree} 
+(the sum of the links sent to other nodes). The rows in Stata correspond to the{help nodeid: nodeids} of nodes. When a network is undirected only {it:_degree} is calculated. 
+For weihgted networks the sum of incoming tie values and the sum of outgoing tie values are calculated. The command can also be used to identify network isolates, i.e. nodes that are not connected to
+any other node. Returns additional information about network density in the return vector.
 
 {title:Options}
 
@@ -54,7 +52,10 @@ The command overwrites the Stata variables {it:_degree}, {it:_indegree}, {it:_ou
 
 {title:Examples}
 
-{cmd:. nwrandom 50, prob(.1)}
-{cmd:. nwdegree} 
-{cmd:. return matrix r(outdegree)} 
-{cmd:. nwdegree, outdegree(out)} 
+  {cmd:. nwrandom 50, prob(.1)}
+  {cmd:. nwdegree} 
+  {cmd:. return list}
+  
+{title:See also}
+
+   {help nwbetween}, {help nwcloseness}, {help nwcluster}, {help nwevcent}

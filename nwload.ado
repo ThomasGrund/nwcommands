@@ -21,10 +21,10 @@ program nwload
 	local nodes = r(nodes)
 	
 	if (("`xvars'" == "") | ("`labelonly'" != "")){
-		capture drop _label
-		capture drop _var
-		qui mata: st_addvar("str20", "_label")
-		qui mata: st_addvar("str20", "_var")
+		capture drop _nodelab
+		capture drop _nodevar
+		qui mata: st_addvar("str20", "_nodelab")
+		qui mata: st_addvar("str20", "_nodevar")
 		
 		scalar onename = "\$nwname_`id'"
 		local localname `=onename'
@@ -40,14 +40,16 @@ program nwload
 		local i = 1
 		foreach var in `localvars' {
 			capture drop `var'
-			qui replace _var = "`var'" in `i'
+			qui replace _nodevar = "`var'" in `i'
 			local i = `i' + 1 
 		}
 		local j = 1
 		foreach lab in `locallabs' {
-			qui replace _label = `"`lab'"' in `j'
+			qui replace _nodelab = `"`lab'"' in `j'
 			local j = `j' + 1
 		}
+		capture drop _nodeid
+		gen _nodeid = _n if _n <= `nodes'
 		if ("`labelonly'" == "") nwtostata, mat(nw_mata`id') gen(`localvars')
 	}
 	

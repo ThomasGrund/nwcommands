@@ -6,7 +6,7 @@
 {title:Title}
 
 {p2colset 5 18 22 2}{...}
-{p2col :nwtomata {hline 2}}Returns a Mata matrix holding a network's adjacency matrix{p_end}
+{p2col :nwtomata {hline 2}}Returns a Mata matrix holding the adjacency matrix of a network{p_end}
 {p2colreset}{...}
 
 

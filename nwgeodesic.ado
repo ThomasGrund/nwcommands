@@ -58,6 +58,8 @@ program nwgeodesic
 	}
 	mata: mata drop nw_geo
 	mata: mata drop distances
+	mata: mata drop diagonal 
+	mata: mata drop maxdist
 end
 
 capture mata mata drop getgeodesic()

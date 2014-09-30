@@ -23,6 +23,5 @@ syntax [anything(name=netname)][, mat(string)]
 			mata: `mat' = st_data((1::`size'),tokens("`vars'"))
 		}
 	}
-	//mata: st_rclear()
  end
  

@@ -6,7 +6,7 @@
 capture program drop nwsync
 program def nwsync
 	version 9
-	syntax [anything(name=netname)],[fromstata]
+	syntax [anything(name=netname)],[fromstata label]
 	
 	_nwsyntax `netname', max(9999)
 
@@ -15,7 +15,22 @@ program def nwsync
 	local nodes = r(nodes)
 	scalar onevars = "\$nw_`id'"
 	local vars `=onevars'
+	local labs "`r(labs)'"
 
+	if "`label'" != "" {
+		if "`fromstata'" != "" {
+			capture confirm variable _nodelab
+			if _rc == 0 {
+				nwname `netname', newlabsfromvar(_nodelab)
+			}
+		}
+		else {
+			foreach lab in `labs' {
+				qui replace _nodelab = `"`lab'"' in `j'
+				local j = `j' + 1
+			}
+		}
+	}
 	capture confirm variable `vars'
 	qui if (_rc == 0){
 		// sync from Stata to network

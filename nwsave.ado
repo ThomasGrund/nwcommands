@@ -9,8 +9,9 @@ program nwsave
 	local webname = subinstr("`anything'", ".dta","",.)
 
 	_nwsyntax _all, max(99999)
-	local nets = `networks'
+	local nets : word count `netname'
 
+	
 	if "`format'" == "" {
 		local format = "matrix"
 	}
@@ -35,6 +36,9 @@ program nwsave
 		local varstodelete "`r(vars)'"
 		foreach onevar in `varstodelete' {
 			capture drop `onevar'
+			capture drop _nodelab
+			capture drop _nodevar
+			capture drop _nodeid
 		}
 	}
 	save`old' `attributes', replace
@@ -61,7 +65,7 @@ program nwsave
 			nwname `onenet'
 			local vars "`r(vars)'"
 			nwload `onenet'
-			capture drop _label _var
+			capture drop _nodelab _nodevar _nodeid
 			local j = 1
 			foreach v of varlist `vars' {
 				rename `v' _net`i'_`j'
@@ -91,21 +95,22 @@ program nwsave
 		replace _directed = "`r(directed)'" in `i'
 		replace _edgelabs = `"`r(edgelabs)'"' in `i'
 		nwload `onenet', labelonly
-		rename _label _newlabel`i'
-		rename _var _newvar`i'
+		rename _nodelab _newlabel`i'
+		rename _nodevar _newvar`i'
 		local i = `i' + 1
 	}
+	save att1, replace
 	
-	forvalues i = 1/`nets' {
-		rename _newlabel`i' _label`i'
-		rename _newvar`i' _var`i'
+	local i = 1
+	foreach onenet in `netname' {
+		rename _newlabel`i' _nodelab`i'
+		rename _newvar`i' _nodevar`i'
 		gen _runningnumber = _n
 		tostring _runningnumber, replace
-		replace _var`i' = "_net`i'_" + _runningnumber
+		replace _nodevar`i' = "_net`i'_" + _runningnumber
 		drop _runningnumber
-	}
-
-	
+		local i = `i' + 1
+	}	
 	
 	if "`format'" == "matrix" {
 		replace _format = "matrix" in 1
@@ -118,7 +123,7 @@ program nwsave
 	}
 	
 	replace _nets = `nets' in 1
-	order _format _nets _name _size _directed _edgelabs _var* _lab*
+	order _format _nets _name _size _directed _edgelabs _nodevar* _nodelab*
 	gen _running = _n
 	qui merge m:m _running using `attributes', nogenerate
 	drop _running

@@ -3,7 +3,7 @@
 {title:Title}
 
 {p2colset 5 15 22 2}{...}
-{p2col :nwclear} {hline 2}  Clear all networks and variables from memory{p_end}
+{p2col :nwclear {hline 2}} Clear all networks and variables from memory{p_end}
 {p2colreset}{...}
 
 

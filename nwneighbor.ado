@@ -5,9 +5,22 @@
 
 capture program drop nwneighbor
 program nwneighbor
-	syntax [anything(name=netname)], ego(integer) [ mode(string)]
+	syntax [anything(name=netname)], ego(string) [ mode(string)]
 	_nwsyntax `netname', max(1)
-	local nodes = r(nodes)
+	nwname `netname'
+	local labs "`r(labs)'"
+	local uselab = 0
+	local ego_out = "`ego'"
+	
+	capture confirm integer number `ego'
+	if _rc != 0 {
+		local uselab = 1
+	}
+	
+	_nwnodeid `netname', nodelab(`ego')
+	local ego = r(nodeid)
+	_nwnodelab `netname', nodeid(`ego')
+	local ego_lab = r(nodelab)
 	
 	if "`mode'" == "" {
 		local mode = "outgoing"
@@ -15,6 +28,7 @@ program nwneighbor
 	_opts_oneof "incoming outgoing both" "mode" "`mode'" 6810
 	
 	nwtomata `netname', mat(onenet)
+	_nwsyntax `netname', max(1)
 	
 	mata: vecin=onenet[.,`ego']
 	mata: vecout=onenet[`ego',.]
@@ -40,7 +54,38 @@ program nwneighbor
 	mata: st_rclear()
 	capture mata: neighbor=jumble(neighbors)[1]
 	capture mata: st_numscalar("r(oneneighbor)", neighbor)
-	capture mata: st_matrix("r(neighbors)", jumble(neighbors))
+	capture mata: st_matrix("r(neighbors)", neighbors)
+	
+	di ""
+	di "{hline 40}"
+	di "{txt}  Network: {res}`netname'"
+	di "{hline 40}"
+	di "{txt}    Ego        : {res}`ego_out'"
+	di "{txt}    Neighbors  : {res}" _continue
+	
+	matrix temp_mat = r(neighbors)
+	local temp_rows = rowsof(temp_mat)
+	if temp_mat[1,1] == . {
+		local temp_rows = 0
+	}
+	forvalues j = 1/`temp_rows' {
+		local temp =  temp_mat[`j',1]
+		local onelab : word `temp' of `labs'
+		if `uselab' == 1{
+			di "{res}`onelab'" _continue
+		}
+		else {
+			di "{res}`temp'" _continue
+		}
+		if `j' < `temp_rows' {
+			di "{txt} , " _continue
+		}
+	}
+	di ""
+	
+	di "{hline 40}"
+
+	
 	mata: mata drop vec vecin vecout onenet neighbors neighbor ids sel
 end
 
