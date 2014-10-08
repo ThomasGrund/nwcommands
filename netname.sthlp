@@ -1,15 +1,7 @@
 {smcl}
 {* *! version 1.0.6  16may2012 author: Thomas Grund}{...}
-{marker topical}
+{marker topic}
 {helpb nw_topical##concept:[NW-2.1] Concepts}
-{findalias asfrvarlists}{...}
-{vieweralsosee "" "--"}{...}
-{findalias asfrsyntax}{...}
-{findalias asfrvarabbrev}{...}
-{vieweralsosee "" "--"}{...}
-
-{viewerjumpto "Description" "varname##description"}{...}
-{viewerjumpto "Examples" "varname##examples"}{...}
 {title:Title}
 
     {hi:netname}

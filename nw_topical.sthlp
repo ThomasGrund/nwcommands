@@ -33,6 +33,17 @@ An alphabetical index of all {it:nwcommands} is available in
 {pstd}
 {bf:{help nw_topical##programming:[NW-2.9] Programming }}{p_end}
 
+{marker concept}{...}
+
+{col 8}   {c TLC}{hline 24}{c TRC}
+{col 8}{hline 3}{c RT}       {it:Concepts}{col 36}{c LT}{hline}
+{col 8}   {c BLC}{hline 24}{c BRC}
+{p2colset 12 35 36 2}
+{p2col:    {bf:{help netexample }}}{p_end}
+{p2col:    {bf:{help netlist }}}{p_end}
+{p2col:    {bf:{help netname }}}{p_end}
+{p2col:    {bf:{help newnetname }}}{p_end}
+{p2col:    {bf:{help nodeid }}}{p_end}
 {marker import}{...}
 
 {col 8}   {c TLC}{hline 24}{c TRC}

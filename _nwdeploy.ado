@@ -175,6 +175,7 @@ program getcmddesc, rclass
 		exit
 	}
 	else {
+		set more off
 		tempname cmdsthlp
 		file open `cmdsthlp' using `cmd'.sthlp, read		
 		file read `cmdsthlp' line
@@ -222,8 +223,7 @@ program getcmdtopic, rclass
 				local topiclink2= substr(`"`topiclink2'"', 8,.)	
             }
 			file read `cmdsthlp' line
-		}
-					
+		}			
 		return local cmdtopic = "`cmdtopic'"
 		return local topiclink = "`topiclink'"
 		if "`cmdtopic2'" != "" {
