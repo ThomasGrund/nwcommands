@@ -20,14 +20,13 @@ program nwname
 		local id = $nwtotal
 	}
 
+	  
 	if "`id'" == "" {
-		local id = -1
-		forvalues i = 1/$nwtotal {
-			scalar onename = "\$nwname_`i'"
-			local localname = onename
-			if "`localname'" == "`netname'" {
-				local id = `i'
-			}
+	    qui nwunab nets : _all	
+		local id : list posof "`netname'" in nets
+		mata: st_rclear()
+		if `id' == 0 {
+			local id = -1
 		}
 	}
 	else {

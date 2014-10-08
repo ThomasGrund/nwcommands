@@ -11,13 +11,15 @@
 {p2col:{bf:{help nwassortmix }}}Generate a homophilious network{p_end}
 {p2col:{bf:{help nwbetween }}}{err}no help file yet{txt}{p_end}
 {p2col:{bf:{help nwclear }}}Clear all networks and variables from memory{p_end}
+{p2col:{bf:{help nwclique }}}{err}no help file yet{txt}{p_end}
 {p2col:{bf:{help nwcloseness }}}Calculates the closeness centrality for each node{p_end}
-{p2col:{bf:{help nwcomponents }}}Calculates the number of network components{p_end}
+{p2col:{bf:{help nwclustering }}}Clustering coefficient{p_end}
+{p2col:{bf:{help nwcomponents }}}Calculates the largest component and the number of network components{p_end}
 {p2col:{bf:{help nwcompressobs }}}Compresses observations in Stata{p_end}
 {p2col:{bf:{help nwcontext }}}Creates a context variable from an attribute variable and a network{p_end}
 {p2col:{bf:{help nwcorrelate }}}Correlates either two networks or one network and an attribute{p_end}
 {p2col:{bf:{help nwcurrent }}}Sets the current network{p_end}
-{p2col:{bf:{help nwdegree }}}Degree centrality{p_end}
+{p2col:{bf:{help nwdegree }}}Degree centrality and distribution{p_end}
 {p2col:{bf:{help nwdrop }}}Eliminates a whole network or only some nodes from a network{p_end}
 {p2col:{bf:{help nwdropnodes }}}{err}no help file yet{txt}{p_end}
 {p2col:{bf:{help nwduplicate }}}{err}no help file yet{txt}{p_end}
@@ -28,6 +30,7 @@
 {p2col:{bf:{help nwexpand }}}{err}no help file yet{txt}{p_end}
 {p2col:{bf:{help nwexport }}}Export network as Pajek file{p_end}
 {p2col:{bf:{help nwfromedge }}}Imports a network from an edge-/arclist{p_end}
+{p2col:{bf:{help nwgen }}}Network extensions of generate{p_end}
 {p2col:{bf:{help nwgenerate }}}{err}no help file yet{txt}{p_end}
 {p2col:{bf:{help nwgeodesic }}}Calculates shortest paths between nodes{p_end}
 {p2col:{bf:{help nwimport }}}Import network from external source{p_end}
@@ -54,8 +57,11 @@
 {p2col:{bf:{help nwsummary }}}{err}no help file yet{txt}{p_end}
 {p2col:{bf:{help nwsym }}}Symmetrizes a network{p_end}
 {p2col:{bf:{help nwsync }}}Sync network with Stata variables{p_end}
-{p2col:{bf:{help nwtable }}}Two-way table of two networks or network and attribute{p_end}
-{p2col:{bf:{help nwtabulate }}}One-way table of edge / tie values of a network{p_end}
+{p2col:{bf:{help nwtab }}}{err}no help file yet{txt}{p_end}
+{p2col:{bf:{help nwtab1 }}}One-way table of edge / tie values of a network{p_end}
+{p2col:{bf:{help nwtab2 }}}Two-way tables of networks and attribute{p_end}
+{p2col:{bf:{help nwtable }}}Two-way tables of networks and attribute{p_end}
+{p2col:{bf:{help nwtabulate }}}{p_end}
 {p2col:{bf:{help nwtoedge }}}Converts a network (or a list of networks) in an edgelist{p_end}
 {p2col:{bf:{help nwtomata }}}Returns a Mata matrix holding the adjacency matrix of a network{p_end}
 {p2col:{bf:{help nwtostata }}}Converts network from Mata to Stata{p_end}

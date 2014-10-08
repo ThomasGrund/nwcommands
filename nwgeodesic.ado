@@ -1,5 +1,5 @@
-*! Date        : 24aug2014
-*! Version     : 1.0
+*! Date        : 3oct2014
+*! Version     : 1.1
 *! Author      : Thomas Grund, Linköping University
 *! Email	   : contact@nwcommands.org
 
@@ -13,9 +13,11 @@ program nwgeodesic
 	mata: nw_geo = nw_geo :/ nw_geo
 	mata: _editmissing(nw_geo, 0)
 	
+	local symmetrized = 0
 	if "`sym'" == "" {
-		di "{txt}Geodesics calculated on the symmetrized network (lower triangle)."
+		//di "{txt}Geodesics calculated on the symmetrized network (lower triangle)."
 		mata: _makesymmetric(nw_geo)
+		local symmetrized = 1
 	}
 	
 	if "`name'" == "" {
@@ -24,18 +26,31 @@ program nwgeodesic
 
 	mata: distances = getgeodesic(nw_geo)
 	
-	if "`unconnected'" == "" {
-		di "{txt}Non-existent paths are treated as: longest shortest path + 1"
-		mata: maxdist = max(distances) + 1
+	if "`unconnected'" != "" {
+		if "`unconnected'" == "max" {
+			mata: _editvalue(distances, -1, (max(distances) + 1))
+		}
+		
+		capture confirm number "`unconnected'"
+		if _rc == 0 {
+			mata: _editvalue(distance, -1, `unconnected')
+		}
+		mata: lgc = J(`nodes',1,1)
 	}
-	else {
-		di "{txt}Non-existent paths are treated as: "`unconnected'
-		mata: maxdist = `unconnected'
+	else qui {
+		tempvar comp
+		tempvar lgc
+		capture rename _components `comp'
+		capture rename _lgc `lgc'
+		nwcomponents `netname', lgc
+		putmata lgc = _lgc if _n <= `nodes'
+		capture replace _lgc `lgc'
+		capture replace _component `comp'
 	}
 	
-	mata: _editvalue (distances, -1, maxdist)
 	mata: diagonal = diagonal(distances)
 	mata: distances = distances - diag(diagonal)
+	mata: distances_lgc = select(select(distances,lgc), lgc')
 
 	if "`vars'" == "" {
 		local vars = "_geo1"
@@ -51,15 +66,43 @@ program nwgeodesic
 	}
 
 	nwset, name(`name') mat(distances) vars(`vars')	
+	nwcurrent
+	local geonet = r(current)
 	
 	if "`xvars'" == "" {
 		capture drop `vars'
 		nwtostata, mat(distances) gen(`vars')
 	}
+	
+	mata: st_rclear()
+	mata: st_numscalar("r(nodes)", `nodes')
+	mata: st_global("r(netname)","`netname'")
+	mata: st_numscalar("r(lgc_nodes)", sum(lgc))
+	mata: st_numscalar("r(symmetrized)", `symmetrized')
+	mata: st_numscalar("r(diameter)", max(distances_lgc))
+	mata: st_numscalar("r(avgpath)", sum(distances_lgc) / ( rows(distances_lgc)^2 - rows(distances_lgc)))
+	
 	mata: mata drop nw_geo
 	mata: mata drop distances
 	mata: mata drop diagonal 
-	mata: mata drop maxdist
+	mata: mata drop lgc
+	mata: mata drop distances_lgc
+
+	if "`unconnected'" == "" {
+		local unconnected = "largest component only"
+	}
+		
+	di "{hline 40}"
+	di "{txt}  Network name: {res}`netname'"
+	di "{txt}  Network of shortest paths: {res}`geonet'"
+	di "{hline 40}"
+	di "{txt}    Nodes (total): {res}`r(nodes)'"
+	di "{txt}    Nodes (largest component): {res}`r(nodes)'"
+	di "{txt}    Unconnnected : {res}`unconnected'"
+	di "{txt}    Symmetrized : {res}`symmetrized'"
+	di "    {hline 36}"
+	di "{txt}    Diameter: {res}`r(diameter)'"
+	di "{txt}    Average shortest path: {res}`r(avgpath)'"
 end
 
 capture mata mata drop getgeodesic()
@@ -93,7 +136,7 @@ real matrix distances(real matrix nw) {
 	power = nw
 	
 	i= 1	
-	while (i<=nodes & sum(found)< nodes*nodes - nodes ) {
+	while (i<= (nodes / 2) & sum(found)< nodes*nodes - nodes ) {
 		i = i+1
 		power = power * nw
 		power = power:/power

@@ -3,8 +3,8 @@
 *! Author      : Thomas Grund, Linköping University
 *! Email	   : contact@nwcommands.org
 
-capture program drop nwtable
-program nwtable
+capture program drop nwtab2
+program nwtab2
 	syntax anything(name=something) [, unvalued plot plotoptions(string) *]
 		
 	if "`plot'" != "" {
@@ -27,10 +27,10 @@ program nwtable
 	local undirected_all = ("`directed'" == "false")
 	local nodes1 = "`nodes'"
 	
-	nwname `netname1'
+	qui nwname `netname1'
 	local edgelabs1 `r(edgelabs)'
-	
 	local arg2 = word("`something'", `num')
+	
 	capture confirm variable `arg2'
 	if _rc == 0 {
 		local nwtabletype = "variable"
@@ -41,16 +41,20 @@ program nwtable
 		local directed2 = "`directed'"
 		local nwtabletype = "network"
 		if "`directed2'" == "true" {
-			local undirected_all = "false"
+			local undirected_all = 0
 		}
-		nwname `netname2'
+		qui nwname `netname2'
 		local edgelabs2 `r(edgelabs)'
 	}	
+	
+	if `undirected_all' == 1 {
+		local undirected = "forcedirected"
+	}
 	
 	preserve
 	if "`nwtabletype'" == "variable" {
 		local attrlab : value label `arg2'
-		qui nwtoedge `netname1', fromvars(`arg2') tovars(`arg2') type(full)
+		qui nwtoedge `netname1', fromvars(`arg2') tovars(`arg2') type(full) `undirected'
 		qui keep if `netname1' > 0 
 		local tabn1 = "from_`arg2'"
 		local tabn2 = "to_`arg2'"
@@ -61,11 +65,14 @@ program nwtable
 		local ident = max(length("`netname1'"), length("`arg2'")) + 20
 		di "{txt}   Network:  {res}`netname1'{txt}{col `ident'}Directed: {res}`directed1'{txt}"
 		di "{txt}   Attribute:  {res}`arg2'{txt}"
+		
+		if "`undirected'" != "" {
+			di
+			di"{txt}       The network is undirected."
+			di"{txt}       The table shows two entries for each edge."
+		}
 	}
 	if "`nwtabletype'" == "network" {
-		if "`undirected_all'" == "false" {
-			local undirected = "forcedirected"
-		}
 		qui nwtoedge `netname1' `netname2', type(full) `undirected'
 	
 		local tabn1 = "`netname1'"
@@ -111,14 +118,19 @@ program nwtable
 	mata: table = st_matrix("tableres")
 	mata: col = st_matrix("tablecol")
 	mata: row = st_matrix("tablerow")
+	mata: Internal = sum(diagonal(table))
+	mata: External = sum(table) - Internal
+	mata: EI_index = (External - Internal) / (External + Internal)
 	
+	mata: st_numscalar("r(EI_index)", EI_index)
 	mata: st_matrix("r(table)", table)
 	mata: st_matrix("r(col)", col)
 	mata: st_matrix("r(row)", row)
 	mata: st_global("r(tab1)", "`netname1'")
 	mata: st_global("r(tab2)", "`arg2'")
 	mata: st_global("r(directed)","`bothdirected'")
-	
+	di
+	di "{txt}   E-I Index: {res}`r(EI_index)'"
 	mata: mata drop table col row
 	restore
 end

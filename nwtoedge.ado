@@ -153,7 +153,7 @@ program nwtoedge
 		order `fromid' `toid'
 		sort `fromid' `toid'
 		local z = `z' + 1
-		keep if `onenet' != .
+		//keep if `onenet' != .
 	}
 	
 	qui if "`fromvars'"  != "" { 

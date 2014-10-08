@@ -5,8 +5,8 @@
 
 {title:Title}
 
-{p2colset 5 17 23 2}{...}
-{p2col :nwtable {hline 2}}Two-way tables of networks and attribute{p_end}
+{p2colset 5 20 23 2}{...}
+{p2col :nwtabulate {hline 2}}Two-way tables of networks and attribute{p_end}
 {p2colreset}{...}
 
 
@@ -137,4 +137,4 @@ in prison and one who has not been in prison before.
 	
 {title:See also}
 
-	{help nwtabulate}
+	{help nwtab1} {help tabulate}

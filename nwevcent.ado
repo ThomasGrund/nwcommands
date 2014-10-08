@@ -1,7 +1,7 @@
 capture program drop nwevcent
 program nwevcent
 	version 9
-	syntax [anything(name=netname)]
+	syntax [anything(name=netname)] , [GENerate(string)]
 	_nwsyntax `netname', max(1)
 	
 	if (_N < `nodes'){
@@ -9,17 +9,19 @@ program nwevcent
 	}
 	
 	nwtomata `netname', mat(evnet)
-	nwdegree `netname', isolates
-
-	capture drop _evcent
-	gen _evcent = .
+	tempvar _isol
+	qui nwdegree `netname', isolates generate(`_isol')
+	if "`generate'" == "" {
+		local generate = "evcent"
+	}
+	capture drop `generate'
+	gen `generate' = .
 	mata: evnet = (evnet + evnet')
 	mata: evnet = evnet:/ evnet
 	mata: _editmissing(evnet,0)
 	mata: e = evcentrality(evnet)
-	mata: st_store((1::`nodes'),"_evcent",e)
-	replace _evcent= . if _isolates==1
-	drop _isolates
+	mata: st_store((1::`nodes'),"`generate'",e)
+	replace `generate'= . if _isolates==1
 	mata: mata drop evnet e
 end
 

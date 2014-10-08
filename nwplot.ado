@@ -493,7 +493,7 @@ program nwplot
 		di "{text:Calculating node coordinates...}"
 	}
 	
-	if ("`layout'"=="mds"  ){
+	qui if ("`layout'"=="mds"  ){
 		
 		// Coordinates matrix to be populated
 		mata: Coord = J(`nodes', 2, 0)

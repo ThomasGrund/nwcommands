@@ -5,8 +5,8 @@
 
 {title:Title}
 
-{p2colset 5 22 22 2}{...}
-{p2col :nwcomponents {hline 2}}Calculates the number of network components{p_end}
+{p2colset 5 21 22 2}{...}
+{p2col :nwcomponents {hline 2}}Calculates the largest component and the number of network components{p_end}
 {p2colreset}{...}
 
 {title:Syntax}
@@ -14,7 +14,8 @@
 {p 8 17 2}
 {cmdab: nwcomponents} 
 [{it:{help netname}}]
-[, {cmdab:gen:erate}({it:{help newvar}})]
+[, {opt lgc}
+{opt generate}({help newvarname})]
 
 {synoptline}
 {p2colreset}{...}
@@ -23,17 +24,23 @@
 
 {pstd}
 Calculates the components of the network. A component is a set of nodes that are
-only connected among each other. Nodes can only belong to one component. The 
-number of distinct components is returned in {it:r(components)}. Furthermore, 
+only connected among each other. Nodes can only belong to one component. Furthermore, 
 additional information about the size of each component is returned in {it:r(comp_sizeid)}. 
+
+{pstd}
 By default, {cmd:nwcomponents} generates 
-a new variable {it:_components} which stores the component membership of each node. 
+a new variable {it:_components} which stores the component membership.
+When option {bf:lgc} is specified, the command generates a new variable 
+{it:_lgc} which stores information about membership to the largest component.
 
 
 {title:Options}
 
 {phang}
-{opt generate}({help newvar}) New Stata variable where component membership of each node is stored.
+{opt lgc} Calculate membership to the largest component.
+
+{phang}
+{opt generate}({help newvar}) Name of new variable for either _component or _lgc.
 
 {title:Remarks}
   
@@ -44,5 +51,7 @@ a new variable {it:_components} which stores the component membership of each no
 
   {cmd:. nwuse glasgow}
   {cmd:. nwcomponents}
-  {cmd:. di r(components)}
-  {cmd:. matrix list r(comp_sizeid)}
+  {cmd:. nwcomponents, generate(mycomponent)} 
+  {cmd:. nwcomponents, lgc} 
+  {cmd:. nwcomponents, lgc generate(mylgc)} 
+  

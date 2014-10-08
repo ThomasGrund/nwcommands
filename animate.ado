@@ -1,6 +1,6 @@
 capture program drop animate
 program animate
-	syntax anything, graphs(string) [imagickpath(string) delay(string) noloop showcommand keepeps]
+	syntax anything, graphs(string) [imagickpath(string) delay(string) noloop showcommand keepeps mag(integer 100)]
 
 	if "`imagickpath'" != "" {
 		local ipend = substr("`imagickpath'",-1,.)
@@ -50,7 +50,8 @@ program animate
 			local geps `g'
 		}
 		
-		graph export `geps'.eps, replace
+		graph export `geps'.eps, replace 
+		//mag(`mag')
 		local epslist "`epslist' `geps'.eps"
 	
 		if `i' == `numgraphs' {
@@ -61,7 +62,7 @@ program animate
 	
 	local lastname : word `numgraphs' of `graphs'
 	local lastdelay = `delay'
-	local shellcmd = "`imagickpath'convert -delay `delay' `epslist' -delay `lastdelay' `last'.eps -loop `dloop' `anything'.gif"
+	local shellcmd "`imagickpath'convert -delay `delay' `epslist' -delay `lastdelay' `last'.eps -loop `dloop' `anything'.gif"
 	shell `shellcmd'
 	
 	if "`showcommand'" != "" {

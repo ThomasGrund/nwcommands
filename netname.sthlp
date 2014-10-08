@@ -37,7 +37,7 @@ characters may be
 {pstd}
 When we use the term netname, we usually mean an existing netname -- a
 network that already exists in Stata, i.e. it has been setted by {it: {help nwset}}, loaded or created by a {it: {help nwgenerator}}. The alternative would be a
-{it:{help newnet}}.
+{it:{help newnetname}}.
 
 {pstd} 
 When referring to an existing netname, we can abbreviate. We can use a {it: {help netlist}} notation, which is similar to the {it:{help varlist}} notation, but 

@@ -6,7 +6,7 @@
 {title:Title}
 
 {p2colset 5 17 22 2}{...}
-{p2col :nwdegree {hline 2}}Degree centrality{p_end}
+{p2col :nwdegree {hline 2}}Degree centrality and distribution{p_end}
 {p2colreset}{...}
 
 

@@ -1,12 +1,12 @@
-*! Date        : 24aug2014
-*! Version     : 1.0
+*! Date        : 3oct2014
+*! Version     : 1.1
 *! Author      : Thomas Grund, Linköping University
 *! Email	   : contact@nwcommands.org
 
 capture program drop nwcomponents
 program nwcomponents, rclass
 	version 9
-	syntax [anything(name=netname)][, GENerate(string) undirected]
+	syntax [anything(name=netname)][, lgc GENerate(string)]
 	set more off
 
 	_nwsyntax `netname', max(1)
@@ -15,13 +15,25 @@ program nwcomponents, rclass
 	mata: comp = components(onenet, 1)
 	mata: numcomp = max(comp)
 	
-	capture drop _component
-	qui gen _component = .
+	if "`generate'" == "" {
+		if "`lgc'" == "" {
+			local generate = "_component"
+		}
+		else {
+			local generate = "_lgc"
+		}
+	}
 	
-
+	capture drop `generate'
+	gen `generate' = .
+	
 	mata: st_rclear()
-	mata: st_store((1::`nodes'),"_component", comp)
-	qui tab _component, matrow(comp_id) matcell(comp_size)
+	if _N < `nodes' {
+		set obs `nodes'
+	}
+	
+	mata: st_store((1::`nodes'),"`generate'", comp)
+	qui tab `generate', matrow(comp_id) matcell(comp_size)
 	mata: comp_id = st_matrix("comp_id")
 	mata: comp_size = st_matrix("comp_size")
 	mata: comp_share = comp_size :/ (sum(comp_size))
@@ -43,6 +55,18 @@ program nwcomponents, rclass
 	matrix rownames comp_sizeid = `rowlabs'
 	return matrix comp_sizeid = comp_sizeid
 	mata: mata drop comp numcomp comp_id comp_size comp_sizeid
+
+    qui if "`lgc'" != "" {
+		tempvar running
+		gen `running' = _n
+		tempvar compmemb
+		tempvar temp
+		gen `temp' = 1
+		bys `generate' : egen `compmemb' = total(`temp')
+		sum `compmemb'
+		replace `generate' = (`r(max)' == `compmemb'[_n])
+		sort `running'
+	}
 end
 
 capture mata mata drop components()

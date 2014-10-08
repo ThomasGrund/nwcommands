@@ -2,7 +2,7 @@ v 3
 d nwcommands-ado. Social Network Analysis Using Stata - Help Files
 d Thomas U. Grund and Peter Hedström, Linköping University, www.liu.se/ias
 d email: contact@nwcommands.org
-d Distribution-Date: 30sep2014
+d Distribution-Date: 8oct2014
 f animate.sthlp
 f netexample.sthlp
 f netlist.sthlp
@@ -13,6 +13,8 @@ f nwaddnodes.sthlp
 f nwassortmix.sthlp
 f nwclear.sthlp
 f nwcloseness.sthlp
+f nwcluster.sthlp
+f nwclustering.sthlp
 f nwcommands.sthlp
 f nwcomponents.sthlp
 f nwcompressobs.sthlp
@@ -25,6 +27,7 @@ f nwdyadprob.sthlp
 f nwdyads.sthlp
 f nwexport.sthlp
 f nwfromedge.sthlp
+f nwgen.sthlp
 f nwgeodesic.sthlp
 f nwimport.sthlp
 f nwkeep.sthlp
@@ -37,6 +40,8 @@ f nwrandom.sthlp
 f nwsave.sthlp
 f nwsym.sthlp
 f nwsync.sthlp
+f nwtab1.sthlp
+f nwtab2.sthlp
 f nwtable.sthlp
 f nwtabulate.sthlp
 f nwtoedge.sthlp
