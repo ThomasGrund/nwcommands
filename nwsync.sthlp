@@ -1,5 +1,7 @@
 {smcl}
 {* *! version 1.0.1  16may2012 author: Thomas Grund}{...}
+{marker topic}
+{helpb nw_topical##utilities:[NW-2.7] Utilities}
 {cmd: help nwsync}
 {hline}
 

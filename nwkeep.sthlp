@@ -1,5 +1,7 @@
 {smcl}
 {* *! version 1.0.6  23aug2014 author: Thomas Grund}{...}
+{marker topical}
+{helpb nw_topical##manipulation:[NW-2.5] Manipulation}
 {cmd:help nwkeep}
 {hline}
 

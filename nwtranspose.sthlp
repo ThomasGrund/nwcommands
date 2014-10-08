@@ -1,5 +1,7 @@
 {smcl}
 {* *! version 1.0.6  23aug2014 author: Thomas Grund}{...}
+{marker topic}
+{helpb nw_topical##generator:[NW-2.3] Generators}
 {cmd:help nwtranspose}
 {hline}
 

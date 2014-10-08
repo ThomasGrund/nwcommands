@@ -1,12 +1,14 @@
 {smcl}
 {* *! version 1.0.1  15sept2014 author: Thomas Grund}{...}
+{marker topic}
+{helpb nw_topical##programming:[NW-2.9] Programming}
 {cmd:help _nwnodeid}
 {hline}
 
 {title:Title}
 
 {p2colset 5 18 22 2}{...}
-{p2col :_nwnodeid {hline 2}}Returns the {it:nodeid} of a node given its node label{p_end}
+{p2col :_nwnodeid {hline 2}}Returns the nodeid of a node given its node label{p_end}
 {p2colreset}{...}
 
 {title:Syntax}

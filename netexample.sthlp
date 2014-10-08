@@ -1,5 +1,7 @@
 {smcl}
 {* *! version 1.0.2  17apr2009}
+{marker topical}
+{helpb nw_topical##concept:[NW-2.1] Concepts}
 {hline}{...}
 {bf:Example networks from http://nwcommands.org/data}
 {pstd}The datasets listed are hosted on the nwcommands.org server.

@@ -130,7 +130,20 @@ syntax [anything(name=netnames)] [,  mode(string) ATTRibute(string) PERMutations
 		mata: st_numscalar("r(pvalue)", pvalue)
 		mata: st_numscalar("r(corr)", corr)
 	}
-	di "{res}`r(corr)'"
+	
+	di "{hline 40}"
+	di "{txt}  Network name: {res}`r(name_1)'"
+	if "`attribute'" != "" {
+		di "{txt}  Attribute: {res}`r(name_2)'"
+	}
+	else {
+		di "{txt}  Network2 name: {res}`r(name_2)'"
+	}
+	di "{hline 40}"
+	di "{txt}    Correlation: {res}`r(corr)'"
+	_return hold r1
+	capture nwdrop `net2'
+	_return restore r1
 end
 
 capture mata mata drop correlate_nets_rep()

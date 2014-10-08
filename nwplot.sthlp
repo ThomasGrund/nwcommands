@@ -1,5 +1,8 @@
 {smcl}
 {* *! version 2.0.0  2april2014}{...}
+{marker topic}
+{helpb nw_topical##visualization:[NW-2.8] Visualization}
+{cmd:help nwassortmix}
 {cmd:help nwplot}
 {hline}
 

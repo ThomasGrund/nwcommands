@@ -1,5 +1,7 @@
 {smcl}
 {* *! version 1.0.0  9sept2014}{...}
+{marker topic}
+{helpb nw_topical##utilities:[NW-2.7] Utilities}
 {p2colset 5 15 19 2}{...}
 {p2col :{cmd:nwunab} {hline 2}}Unabbreviate network list{p_end}
 {p2colreset}{...}

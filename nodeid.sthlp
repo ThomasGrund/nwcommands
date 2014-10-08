@@ -1,4 +1,6 @@
 {smcl}
+{marker topical}
+{helpb nw_topical##concept:[NW-2.1] Concepts}
 {* *! version 1.0.6  17sept2014 author: Thomas Grund}{...}
 
 {title:Title}

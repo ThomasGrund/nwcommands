@@ -1,5 +1,7 @@
 {smcl}
 {* *! version 1.0.0  3sept2014}{...}
+{marker topical}
+{helpb nw_topical##information:[NW-2.4] Information}
 {cmd:help nwtriads}
 {hline}
 

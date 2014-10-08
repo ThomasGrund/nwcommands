@@ -57,7 +57,6 @@ f nwsync.ado
 f nwtab.ado
 f nwtab1.ado
 f nwtab2.ado
-f nwtable.ado
 f nwtabulate.ado
 f nwtoedge.ado
 f nwtomata.ado
@@ -78,13 +77,9 @@ f _nwnodelab.ado
 f _nwsyntax.ado
 f _nwsyntax_other.ado
 f _opts_oneof.ado
-f att1.dta
-f example.dta
 f florentine.dta
 f gang.dta
 f glasgow.dta
 f glasgow_edge.dta
 f stockholm.dta
-f test.dta
-f test2.dta
 f gang_pajek.net

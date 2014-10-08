@@ -1,5 +1,7 @@
 {smcl}
 {* *! version 1.0.6  6sept2014 author: Thomas Grund}{...}
+{marker topical}
+{helpb nw_topical##concept:[NW-2.1] Concepts}
 {cmd:help netlist}
 {hline}
 

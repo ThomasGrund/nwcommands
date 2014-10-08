@@ -60,7 +60,6 @@
 {p2col:{bf:{help nwtab }}}{err}no help file yet{txt}{p_end}
 {p2col:{bf:{help nwtab1 }}}One-way table of edge / tie values of a network{p_end}
 {p2col:{bf:{help nwtab2 }}}Two-way tables of networks and attribute{p_end}
-{p2col:{bf:{help nwtable }}}Two-way tables of networks and attribute{p_end}
 {p2col:{bf:{help nwtabulate }}}{p_end}
 {p2col:{bf:{help nwtoedge }}}Converts a network (or a list of networks) in an edgelist{p_end}
 {p2col:{bf:{help nwtomata }}}Returns a Mata matrix holding the adjacency matrix of a network{p_end}
@@ -76,7 +75,7 @@
 {p2col:{bf:{help _extract_valuelabels }}}{err}no help file yet{txt}{p_end}
 {p2col:{bf:{help _nwdeploy }}}{err}no help file yet{txt}{p_end}
 {p2col:{bf:{help _nwevalnetexp }}}{err}no help file yet{txt}{p_end}
-{p2col:{bf:{help _nwnodeid }}}Returns the {it:nodeid} of a node given its node label{p_end}
+{p2col:{bf:{help _nwnodeid }}}Returns the nodeid of a node given its node label{p_end}
 {p2col:{bf:{help _nwnodelab }}}Returns the nodelab of a node given its nodeid{p_end}
 {p2col:{bf:{help _nwsyntax }}}{err}no help file yet{txt}{p_end}
 {p2col:{bf:{help _nwsyntax_other }}}{err}no help file yet{txt}{p_end}

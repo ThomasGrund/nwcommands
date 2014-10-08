@@ -1,5 +1,7 @@
 {smcl}
 {* *! version 1.0.1  16may2012 author: Thomas Grund}{...}
+{marker topic}
+{helpb nw_topical##import:[NW-2.2] Import/Export}
 {cmd:help nwtoedge}
 {hline}
 

@@ -1,5 +1,7 @@
 {smcl}
 {* *! version 1.0.0  3sept2014}{...}
+{marker topic}
+{helpb nw_topical##generator:[NW-2.3] Generators}
 {cmd:help nwpermute}
 {hline}
 

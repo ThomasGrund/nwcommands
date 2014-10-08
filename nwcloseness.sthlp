@@ -1,5 +1,7 @@
 {smcl}
 {* *! version 1.0.0  3sept2014}{...}
+{marker topic}
+{helpb nw_topical##analysis:[NW-2.6] Analysis}
 {cmd:help nwcloseness}
 {hline}
 

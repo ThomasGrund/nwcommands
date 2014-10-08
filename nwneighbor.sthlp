@@ -1,5 +1,7 @@
 {smcl}
 {* *! version 1.0.1  17may2012 author: Thomas Grund}{...}
+{helpb nw_topical##analysis:[NW-2.6] Analysis}
+{cmd:help nwgeodesic}
 {cmd:help nwneighbor}
 {hline}
 

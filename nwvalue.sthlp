@@ -1,5 +1,7 @@
 {smcl}
 {* *! version 1.0.1  23aug2014 author: Thomas Grund}{...}
+{marker topical}
+{helpb nw_topical##analysis:[NW-2.6] Analysis}
 {cmd:help nwvalue}
 {hline}
 
