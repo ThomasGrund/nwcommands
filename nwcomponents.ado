@@ -6,12 +6,17 @@
 capture program drop nwcomponents
 program nwcomponents, rclass
 	version 9
-	syntax [anything(name=netname)][, lgc GENerate(string)]
+	syntax [anything(name=netname)][, lgc GENerate(string) undirected]
 	set more off
 
 	_nwsyntax `netname', max(1)
 	nwtomata `netname', mat(onenet)
 	
+	if "`undirected'" != "" {
+		mata: onenet = onenet + onenet'
+		mata: onenet = onenet :/ onenet
+		mata: _editmissing(onenet,0)
+	}
 	mata: comp = components(onenet, 1)
 	mata: numcomp = max(comp)
 	
