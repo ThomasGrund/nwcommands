@@ -2,7 +2,7 @@ v 3
 d nwcommands-hlp. Social Network Analysis Using Stata - Help Files
 d Thomas U. Grund and Peter Hedström, Linköping University, www.liu.se/ias
 d email: contact@nwcommands.org
-d Distribution-Date: 8oct2014
+d Distribution-Date: 9oct2014
 f animate.sthlp
 f netexample.sthlp
 f netlist.sthlp

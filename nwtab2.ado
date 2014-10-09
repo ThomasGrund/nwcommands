@@ -132,5 +132,8 @@ program nwtab2
 	di
 	di "{txt}   E-I Index: {res}`r(EI_index)'"
 	mata: mata drop table col row
+	mata: mata drop External
+	mata: mata drop Internal
+	mata: mata drop EI_index
 	restore
 end

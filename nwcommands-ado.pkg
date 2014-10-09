@@ -2,7 +2,7 @@ v 3
 d nwcommands-ado. Social Network Analysis Using Stata
 d Thomas U. Grund and Peter Hedström, Linköping University, www.liu.se/ias
 d email: contact@nwcommands.org
-d Distribution-Date: 8oct2014
+d Distribution-Date: 9oct2014
 f animate.ado
 f nwaddnodes.ado
 f nwassortmix.ado
