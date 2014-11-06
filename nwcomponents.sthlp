@@ -13,19 +13,20 @@
 
 {title:Syntax}
 
-{p 8 17 2}
+{p 5 17 2}
 {cmdab: nwcomponents} 
-[{it:{help netname}}]
+{it:{help netlist}}
 [, {opt lgc}
 {opt generate}({help newvarname})]
 
-{synoptline}
+{p 8 17 2}
+
 {p2colreset}{...}
 	
 {title:Description}
 
 {pstd}
-Calculates the components of the network. A component is a set of nodes that are
+Calculates the components of a network or a list of networks. A component is a set of nodes that are
 only connected among each other. Nodes can only belong to one component. Furthermore, 
 additional information about the size of each component is returned in {it:r(comp_sizeid)}. 
 
@@ -34,7 +35,6 @@ By default, {cmd:nwcomponents} generates
 a new variable {it:_components} which stores the component membership.
 When option {bf:lgc} is specified, the command generates a new variable 
 {it:_lgc} which stores information about membership to the largest component.
-
 
 {title:Options}
 
@@ -51,9 +51,9 @@ When option {bf:lgc} is specified, the command generates a new variable
 
   {title:Examples}
 
-  {cmd:. nwuse glasgow}
-  {cmd:. nwcomponents}
-  {cmd:. nwcomponents, generate(mycomponent)} 
-  {cmd:. nwcomponents, lgc} 
-  {cmd:. nwcomponents, lgc generate(mylgc)} 
+  {cmd:. webnwuse glasgow}
+  {cmd:. nwcomponents glasgow1}
+  {cmd:. nwcomponents glasgow1, generate(mycomponent)} 
+  {cmd:. nwcomponents _all, lgc} 
+  {cmd:. nwcomponents _all, lgc generate(mylgc)} 
   

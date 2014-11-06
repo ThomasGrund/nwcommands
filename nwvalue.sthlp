@@ -42,10 +42,9 @@ Nodes always have consecutive numbers.
 
 {title:Examples}
 
-{cmd: nwuse florentine}
-{cmd: nwvalue flobusiness[2,3]}
-{cmd: nwvalue flobusiness[(1::2),(1::2)]}
-{cmd: mata: subset
+{cmd:. webnwuse florentine}
+{cmd:. nwvalue flobusiness[2,3]}
+{cmd:. nwvalue flobusiness[(1::2),(1::2)]}
 
 
 {title:Also see}

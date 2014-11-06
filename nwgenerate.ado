@@ -64,7 +64,7 @@ program nwgenerate
 		
 		// nwclustering shortcuts
 		if "`whichjob'" == "clustering" {
-			nwclustering `subopt', gen(`netname')
+			nwclustering `subopt', gen(`netname') `options'
 		}
 		
 		// nwcloseness shortcuts

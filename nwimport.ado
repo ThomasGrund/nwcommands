@@ -33,6 +33,9 @@ program nwimport
 		if "`import_type'" == "ucinet" {
 			capture _nwimport_ucinet `fname', `options'
 		}
+		if _rc != 0 {
+			di "{err}Something went wrong. Import unsuccessful."
+		}
 	}
 	
 	// No type is given; try to find it out
@@ -102,11 +105,10 @@ program _nwimport_pajek
 		drop _all
 		
 		local anything = subinstr(`"`anything'"',".net","",.)
-		
 		file open importfile using `anything'.net, read
-
 		file read importfile line
 		qui while `"`line'"' != "" {
+			di `"`line'"'
 			// get first word
 			local f : word 1 of `line'
 			local f_star = strpos(`"`line'"', "*")
@@ -206,8 +208,14 @@ program _nwimport_pajek
 						capture gen _value = .
 					}
 					
-					local ego = word("`line'", 1)
+					local ego = word(`"`line'"', 1)
 					local ego_lab = word(`"`line'"', 2)
+					if substr(`"`ego_lab'"',1,1) == `"""' {
+						local s1 = strpos(`"`line'"', `"""')
+						local line2 = substr(`"`line'"', `=`s1'+1',.)
+						local s2 = strpos(`"`line2'"', `"""')
+						local ego_lab = strtoname(substr(`"`line'"', `=`s1' + 1', `=`s2'-1'))
+					}
 					if `"`ego_lab'"' != ""{
 						local labs `"`labs' `ego_lab'"'
 					}
@@ -250,7 +258,7 @@ program _nwimport_ucinet
 		
 		// read line
 		local matrix_loaded = 0
-		qui while `"`line'"' != "" & `matrix_loaded' == 0{
+		while `"`line'"' != "" & `matrix_loaded' == 0{
 			
 			local line = subinstr(`"`line'"', "="," = ",.)
 			local first : word 1 of `line'
@@ -632,7 +640,6 @@ program _nwimport_edgelist
 	
 	gettoken fname ending : anything, parse(".")
 
-	di "h1"
 	local success = 0
 	local excel = 0
 	local pot_delimiters = `""tab" ";" "," " ""'
@@ -641,9 +648,7 @@ program _nwimport_edgelist
 	// Excel file detected
 	if (strpos("`ending'", "xls") != 0 ){
 		local excel = 1
-		di "h2"
 		import excel "`anything'", sheet("Sheet1") clear
-		di "h3"
 		if c(k) == 1 | _rc != 0 {
 			local success = 0
 		}
@@ -657,7 +662,6 @@ program _nwimport_edgelist
 		local use_delimiter : word `i' of `pot_delimiters'
 		local i = `i' + 1
 		
-		di "h4"
 		if "`use_delimiter'" == "tab" {
 			local insheet_opt = ", tab clear"
 		}

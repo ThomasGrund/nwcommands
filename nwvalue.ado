@@ -7,6 +7,8 @@ capture program drop nwvalue
 program nwvalue
 	local netname ="`0'"
 	
+	gettoken netname exp : netname, parse("=")
+	
 	// a specific entries are given
 	local ego = strpos("`netname'","[") 
 	local alter = strpos("`netname'","]") 
@@ -22,6 +24,7 @@ program nwvalue
 		local alterid = substr("`netname'", `a1', `a2')
 		local netname = substr("`netname'", 1, `n1')
 	}
+
 	nwtomata `netname', mat(onenet)
 	capture mata: onenet`subset'
 	if _rc != 0 {
@@ -31,6 +34,12 @@ program nwvalue
 	
 	mata: st_rclear()
 	if (`ego'!= 0) {
+		/*
+		if "`exp'" != "" {
+			local exp : subinstr local exp "=" ""
+			mata: onenet[`egoid',`alterid'] = J(rows(onenet[`egoid',`alterid']), cols(onenet[`egoid',`alterid']), `=`exp'')
+		}
+		*/
 		mata: subnet = onenet[`egoid',`alterid']
 		mata: st_numscalar("r(rows)", rows(subnet))
 		mata: st_numscalar("r(cols)", cols(subnet))

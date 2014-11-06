@@ -15,9 +15,8 @@ program nwuse
 		local reloadExisting = "yes"
 		gen _running = _n
 		tempfile existing 
-		save `existing' 
+		qui save `existing' 
 	}
-	
 	qui use `webname', `options'
 	
 	capture {

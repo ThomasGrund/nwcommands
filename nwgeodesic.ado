@@ -44,7 +44,8 @@ program nwgeodesic
 		capture rename _lgc `lgc'
 		nwcomponents `netname', lgc
 		putmata lgc = _lgc if _n <= `nodes'
-		capture replace _lgc `lgc'
+		capture drop _lgc
+		capture gen _lgc = `lgc'
 		capture replace _component `comp'
 	}
 	
@@ -91,6 +92,8 @@ program nwgeodesic
 	if "`unconnected'" == "" {
 		local unconnected = "largest component only"
 	}
+	
+	capture drop _lgc
 		
 	di "{hline 40}"
 	di "{txt}  Network name: {res}`netname'"

@@ -4,7 +4,7 @@ program nwreplace
 	gettoken netname nonet: arg, parse("=")
 	local netname = trim("`netname'")
 
-	// a specific enrtries are given
+	// specific enrtries are given
 	local ego = strpos("`netname'","[") 
 	local alter = strpos("`netname'","]") 
 	local sep = strpos("`netname'",",")
@@ -35,6 +35,7 @@ program nwreplace
 	nwname `netname'
 	local nodes = r(nodes)
 	local directed = r(directed)
+	local id = r(id)
 	
 	// get rid of first equal sign
 	local nonet = substr(trim("`nonet'"),2,.)
@@ -102,12 +103,18 @@ program nwreplace
 	if (r(sym) == 1){
 		local undirected "undirected"
 	}
-	nwreplacemat `netname', newmat(_replacenet)
-	if "`undirected'" != "" {
-		nwname `netname', newdirected(false)
+	if "`subset'" == "" {
+		nwreplacemat `netname', newmat(_replacenet)
+		if "`undirected'" != "" {
+			nwname `netname', newdirected(false)
+		}
+		else {
+			nwname `netname', newdirected(true)
+		}
 	}
 	else {
-		nwname `netname', newdirected(true)
+		mata: nw_mata`id'`subset'= _replacenet`subset'
+		nwsync
 	}
 	mata: mata drop _replacenet _oldnet 
 	capture mata: mata drop onenet

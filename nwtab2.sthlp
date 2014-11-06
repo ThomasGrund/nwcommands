@@ -16,7 +16,7 @@
   
 {p 5 17 2}
 {cmdab: nwtab:ulate} 
-[{it:{help netname:netname1}}]
+{it:{help netname:netname1}}
 {it:{help netname:netname2}}
 [{cmd:,}
 {opt plot}
@@ -43,7 +43,7 @@
 {title:Description}
 
 {pstd}
-{cmd:nwtable} produces a two-way table of either 1) two networks or 2) one network and one attribute 
+{cmd:nwtabulate} produces a two-way table of either 1) two networks or 2) one network and one attribute 
 variable. In the case of two networks, it shows the overlap of two networks. In the case of one
 network and one attribute it shows the network ties by group membership of the nodes.
 
@@ -75,7 +75,7 @@ of ties in these two networks.
 For example:
 
 {cmd}. webnwuse glasgow
-{com}. nwtab glasgow1 glasgow2
+{com}. nwtabulatee glasgow1 glasgow2
 {res}
 {txt}   Network 1:  {res}glasgow1{txt}{col 28}Directed: {res}true{txt}
 {txt}   Network 2:  {res}glasgow2{txt}{col 28}Directed: {res}true{txt}
@@ -109,8 +109,9 @@ nodes).
 
 {pstd}
 For example:
+
 {cmd}. webnwuse gang
-{cmd}. nwtab gang Birthplace
+{cmd}. nwtabulate gang Birthplace
 
 {res}
 {txt}   Network:  {res}gang{txt}{col 26}Directed: {res}false{txt}
@@ -133,7 +134,12 @@ For example:
 This shows that out of 630 directed co-offending ties in the gang network, 170 ties
 are between two gang members who were both not in prison before, 150 are between two gang
 members who have both been in prison and 155 ties are between one gang member who has been
-in prison and one who has not been in prison before.  
+in prison and one who has not been in prison before. 
+
+{pstd}
+The option {it:plot} visualizes this table. For example:
+
+{cmd:.nwtabulate gang Prison, plot plotoptions(xtitle(Alter was in prison, size(huge)) ytitle(Ego was in prison, size(huge)))}
 	
 {title:See also}
 

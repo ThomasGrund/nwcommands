@@ -2,7 +2,6 @@
 {* *! version 2.0.0  2april2014}{...}
 {marker topic}
 {helpb nw_topical##visualization:[NW-2.8] Visualization}
-{cmd:help nwassortmix}
 {cmd:help nwplot}
 {hline}
 
@@ -58,10 +57,10 @@
 
 {synoptset 30 tabbed}{...}
 {p2col:{it:node_sub}}Description{p_end}
-{marker node_options}{...}
+{marker node_sub}{...}
 {p2line}
 {p2col:{opt norescale}}no automatic rescale{p_end}
-{p2col:{opt legendoff}}no legend for this element{p_end}
+{p2col:{opt legendoff}}no legend for this attribute{p_end}
 {p2col:{opt forcekeys}(integer...)}list of keys to be used in the legend{p_end}
 
 {synoptset 30 tabbed}{...}
@@ -89,7 +88,7 @@
 {p2col:{it:layout_options}}Description{p_end}
 {marker layout_options}{...}
 {p2line}
-{p2col:{cmd: layout}({help nwplot##layoutstyle:layoutstyle} [,{help nwplot##layout_sub:layout_sub}])}change the overall layout/arrangement of nodes{p_end}
+{p2col:{cmd: layout}([{help nwplot##layoutstyle:layoutstyle}] [,{help nwplot##layout_sub:layout_sub}])}change the overall layout/arrangement of nodes{p_end}
 {p2col:{opt nodexy}({help var:xvar} {help var:yvar})}use variables to force coordinates of nodes{p_end}
 {p2col:{opt generate}({help newvar:newxvar} {help newvar:newyvar})}export coordinates of nodes{p_end}
 
@@ -97,8 +96,9 @@
 {p2col:{it:layout_sub}}Description{p_end}
 {marker layout_sub}{...}
 {p2line}
-{p2col:{opt components(integer)}}number of components to be plotted; default = 3 {p_end}
-{p2col:{opt columns(integer)}}number of columns to be plotted in grid layout {p_end}
+{p2col:{opt lgc}}only plot largest component{p_end}
+{p2col:{opt iterations(integer)}}only relevant for layout = mds; maximum number of iterations in the multidimensional scaling procedure, default = 1000{p_end}
+{p2col:{opt columns(integer)}}only relevant for layout = grid; number of columns to be plotted in grid layout {p_end}
 
 {synoptset 30 tabbed}{...}
 {p2col:{it:other_options}}Description{p_end}
@@ -113,7 +113,8 @@
 {marker layoutstyle}{...}
 {p2col:{it:layoutstyle}}{p_end}
 {p2line}
-{p2col:{cmd: mds}}multidimensional scaling; default{p_end}
+{p2col:{cmd: mds}}modern multidimensional scaling; default when nodes < 50{p_end}
+{p2col:{cmd: mdsclassical}}classical multidimensional scaling; default when nodes > 50{p_end}
 {p2col:{cmd: circle}}circle layout
 		{p_end}
 {p2col:{cmd: grid}}grid layout
@@ -190,8 +191,13 @@ Plots a network.
 	{cmd:. nwplot, size(alcohol3) color(smoke3) symbol(sport3) scheme(economist)}
 	{cmd:. set scheme s2network}
 
+	// Display the shortest path between in nodes in different color
+	{cmd:. webnwuse florentine, nwclear}
+	{cmd:. nwpath flomarriage, ego(medici) alter(peruzzi) generate(sp)}
+	{cmd:. nwplot flomarriage, label(_nodelab) edgecolor(sp_1, legendoff) edgesize(sp_1, legendoff) edgefactor(5)}
+	
 	// Change the size and color of edges 
-	{cmd:. webnwuse gang}
+	{cmd:. webnwuse gang, nwclear}
 	{cmd:. nwplot}
 	{cmd:. nwplot gang, edgesize(gang)} 
 	{cmd:. nwgenerate blood = (gang==4)}
@@ -210,3 +216,12 @@ Plots a network.
 	{cmd:. nwplot flomarriage, scatteropt(mfcolor(green) msymbol(D))}
 	{cmd:. nwplot flomarriage, lineopt(lwidth(10) lcolor(green))}
 
+	// Display the largest component only
+	{cmd:. webnwuse glasgow, nwclear}
+	{cmd:. nwgen large = lgc(glasgow1)}
+	{cmd:. nwplot glasgow1 if large == 1}
+	
+	// Alternative to display the largest component only
+	{cmd:. webnsuse glasgow, nwclear}
+	{cmd:. nwplot glasgow1, layout(,lgc)}
+	

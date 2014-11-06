@@ -20,7 +20,7 @@ program nwmovie
 	// check for ImageMagick
 		
 	// Check for third party profile 
-	capture findfile nwprofile.do
+	capture findfile _nwprofile.do
 	local found_IM = 0
 	capture if (_rc == 0) {
 		file open nwprofile_handle using _nwprofile.do, read

@@ -16,7 +16,7 @@
 
 {p 8 17 2}
 {cmdab: nwcluster} 
-[{it:{help netname}}]
+[{it:{help netlist}}]
 [, {opt gen}({help newvarname})]
 
 {title:Description}

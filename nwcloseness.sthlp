@@ -16,7 +16,7 @@
 
 {p 8 17 2}
 {cmdab: nwcloseness} 
-[{help netname}]
+[{help netlist}]
 [{cmd:,}
 {opt unconnected(integer)}
 {opt nosym}]
@@ -31,7 +31,7 @@
 {title:Description}
 
 {pstd}
-Calculates the closeness centrality for each node i and saves the result in a new variable {it:_closeness}.
+Calculates the closeness centrality for each node i in a network or network list and saves the result in a new variable {it:_closeness}.
 The closeness centrality for node i is defined in the following way:
 	
 	farness_i = sum(geodesic_ik), over all k

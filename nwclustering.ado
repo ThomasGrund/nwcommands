@@ -9,24 +9,35 @@ program nwclustering
 	syntax [anything(name=netname)][, GENerate(string)]
 	set more off
 
-	_nwsyntax `netname', max(1)
-	nwtomata `netname', mat(onenet)
-	
-	if "`generate'" == "" {
-		local generate = "_clustering"
+	_nwsyntax `netname', max(9999)
+	if `networks' > 1 {
+		local k = 1
 	}
 	
-	capture drop `generate'
-	qui gen `generate' = .
-	mata: st_rclear()
-	mata: c = cluster(onenet)
-	mata: st_store((1::`nodes'),"`generate'", c[,1])
-	mata: st_numscalar("r(cluster_avg)", mean(c[,1]))
-	mata: st_numscalar("r(cluster_overall)",(sum(c[,2]) / sum(c[,3])))
-	mata: mata drop c
+	foreach netname_temp in `netname' {
+		_nwsyntax_other `netname_temp'
+		nwtomata `netname_temp', mat(onenet)
 	
+		if "`generate'" == "" {
+			local generate = "_clustering"
+		}
+	
+		capture drop `generate'`k'
+		qui gen `generate'`k' = .
+		if _N <= `othernodes' {
+			set obs `othernodes'
+		}
+		mata: st_rclear()
+		mata: c = cluster(onenet)		
+		mata: st_store((1::`othernodes'),"`generate'`k'", c[,1])
+		mata: st_numscalar("r(cluster_avg)", mean(c[,1]))
+		mata: st_numscalar("r(cluster_overall)",(sum(c[,2]) / sum(c[,3])))
+		mata: mata drop c
+		local k = `k' + 1
+	}
+
 	di "{hline 40}"
-	di "{txt}  Network name: {res}`netname'"
+	di "{txt}  Network name: {res}`othername'"
 	di "{hline 40}"
 	di "{txt}    Average clustering coefficient: {res}`r(cluster_avg)'"
 	di "{txt}    Overall clustering coefficient: {res}`r(cluster_overall)'"

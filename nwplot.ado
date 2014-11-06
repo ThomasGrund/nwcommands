@@ -7,8 +7,15 @@ capture program drop nwplot
 program nwplot
 	version 9.0
 	set more off
-	syntax [anything(name=netname)],[ arrows edgesize(string) ASPECTratio(string) components(string) arcstyle(string) arcbend(string) arcsplines(integer 10) nodexy(varlist numeric min=2 max=2) edgeforeground(string) GENerate(string) colorpalette(string) edgecolorpalette(string) edgepatternpalette(string) symbolpalette(string) lineopt(string) scatteropt(string) legendopt(string) size(string) color(string) symbol(string) edgecolor(string) label(varname) nodefactor(string) sizebin(string) edgefactor(string) arrowfactor(string) arrowgap(string) arrowbarbfactor(string) layout(string) iterations(integer 1000) scheme(string) * ]
+	syntax [anything(name=netname)][if/], [ arrows edgesize(string) ASPECTratio(string) components(string) arcstyle(string) arcbend(string) arcsplines(integer 10) nodexy(varlist numeric min=2 max=2) edgeforeground(string) GENerate(string) colorpalette(string) edgecolorpalette(string) edgepatternpalette(string) symbolpalette(string) lineopt(string) scatteropt(string) legendopt(string) size(string) color(string) symbol(string) edgecolor(string) label(varname) nodefactor(string) sizebin(string) edgefactor(string) arrowfactor(string) arrowgap(string) arrowbarbfactor(string) layout(string) iterations(integer 1000) scheme(string) * ]
 	_nwsyntax `netname', max(1)
+	
+	qui if "`if'"!="" {
+		nwgen _temp_if = `netname'
+		nwdrop _temp_if if (!(`if'))
+		local netname "_temp_if"
+		_nwsyntax `netname', max(1)
+	}
 	
 	capture which labellist
 	if _rc != 0 {
@@ -38,9 +45,8 @@ program nwplot
 		local edgefactor = 1
 	}
 	if "`arrowfactor'" == "" {
-		local arrowfactor = `edgefactor'
+		local arrowfactor = 1
 	}
-	local arrowfactor = `arrowfactor'
 	
 	if "`arrowgap'" == "" {
 		local arrowgap = 0
@@ -55,20 +61,37 @@ program nwplot
 	if "`arcbend'" == "" {
 		local arcbend = 2
 	}
-		
-	if("`layout'"=="") {
-		local layout "mds"
-	}
 	
+
 	
 	local gridcols = ceil(sqrt(`nodes'))
 	local 0 = "`layout'"
-	syntax anything [, columns(integer `gridcols') components(integer 2)]
+	syntax [anything][, lgc iterations(integer 1000) columns(integer `gridcols') ]
+	
+	if("`anything'"=="") {
+		if `nodes' < 50 {
+			local anything "mds"
+		}
+		else {
+			local anything "mdsclassical"
+		}
+	}
+	
 	local layout_gridcols = `columns'
 	local layout_components = `components'
 	local layout = "`anything'"
-	_opts_oneof "mds grid circle nodexy" "layout" "`layout'" 6556
+	_opts_oneof "mds mdsclassical grid circle nodexy" "layout" "`layout'" 6556
 
+	qui if "`lgc'" != "" {
+		tempvar _lgc
+		nwgen _temp_lgc = `netname'
+		nwgen `_lgc' = lgc(`temp_lgc')
+		nwdrop _temp_lgc if `_lgc' != 1
+		local netname "_temp_lgc"
+		_nwsyntax `netname', max(1)
+	}
+	
+	
 	// Check matsize (because mds requires STATA matrix)
 	if (c(matsize) <`nodes'& "`layout'" == "mds") {
 		if "`c(flavor)'" == "Small" {
@@ -437,7 +460,7 @@ program nwplot
 		local edgecolorkeys "`forcekeys'"
 
 		if "`forcekeys'" == "" {
-			qui nwtable `edgecolor'
+			qui nwtab2 `edgecolor'
 			matrix edgecolor_mat = r(col)
 			local edgecolor_matrows = colsof(edgecolor_mat)
 			forvalues i = 1/`edgecolor_matrows'{
@@ -493,24 +516,37 @@ program nwplot
 		di "{text:Calculating node coordinates...}"
 	}
 	
-	qui if ("`layout'"=="mds"  ){
+	if ("`layout'"== "mds"){
+		mata: Coord = netplotmds(M, `iterations')
+	}
+	
+    qui if ("`layout'"=="mdsclassical"  ){
 		
 		// Coordinates matrix to be populated
 		mata: Coord = J(`nodes', 2, 0)
 		mata: Coord[.,1] = J(`nodes', 1, 1.5) 
 		
 		// Deal with isolates
-		nwdegree `netname', isolates
-		qui count if _isolates == 1
+		tempvar _isolates
+		nwgen `_isolates' = isolates(`netname')
+		count if `_isolates' == 1
 		local isol = `r(N)'
 		local nonisol = `nodes' - `isol'
 		
 		// Get number of components
-		nwcomponents `netname', undirected
+		tempvar _component
+		nwgen `_component' = components(`netname')
+		
+		if "`lgc'" != "" {
+			nwgen `_component' = lgc(`netname')
+			replace `_component' = 1 - `_component'
+			local components = 1
+		}
 		
 		local compnum = r(components)		
 		local compnum_nonisol = `compnum' - `isol'
-		qui tab _component, matrow(comp_id) matcell(comp_freq)
+		tab `_component', matrow(comp_id) matcell(comp_freq)
+
 		mata: comp_id = st_matrix("comp_id")
 		mata: comp_freq = st_matrix("comp_freq")
 		mata: comp_freqid = J(rows(comp_id), 2,0)
@@ -522,6 +558,7 @@ program nwplot
 		local comp_nonisol = `r(comp_nonisol)'
 		mata: st_matrix("comp_freqid", comp_freqid)
 
+		
 		// Find overall layout
 		// Default = number of (non-isolates) components (undirected)
 		if "`components'" == "" {
@@ -536,6 +573,7 @@ program nwplot
 			local components = 5
 		}
 
+		
 		// Go through all (non-isolates) components (that should be plotted in boxes) from large to small
 		forvalues i = 1/`components' {
 			
@@ -544,7 +582,7 @@ program nwplot
 			gen _id = _n
 			
 			// Only keep the nodes in the i'th largest component as network i		
-			nwdrop `netname'_comp`i' if _component != comp_freqid[`i', 2], attributes(_id) netonly
+			nwdrop `netname'_comp`i' if `_component' != comp_freqid[`i', 2], attributes(_id) netonly
 			nwtomata `netname'_comp`i', mat(compmat)
 			
 			// Original id's of selected nodes
@@ -578,7 +616,7 @@ program nwplot
 			mata: mata drop original_id 
 			nwdrop `netname'_comp`i', netonly
 		}
-		capture drop _id
+		capture drop _id 
 	}
 	capture replace `label' = `_orig_label'
 	
@@ -899,6 +937,7 @@ program nwplot
 	mata: mata drop plotmat nsize ncolor nlabel Coord edgesizemat edgecolormat
 	capture mata: mata drop Coord_comp compM comp_freq comp_id comp_freqid compmat comp_share comp_nonisol
 	capture mata: mata drop TC M nsymbol
+	capture nwdrop _temp* 
 end
 	
 capture program drop _getvaluelabel
@@ -1225,7 +1264,7 @@ real matrix function mmdslayout(real matrix G)
 
 	st_matrix("dMat",D) 	    //Distance mat to stata under tempname
 	// compute MDS coordinates in stata
-	rc = _stata( "qui  mdsmat dMat,  noplot method(classical)", 1)
+	rc = _stata( "  mdsmat dMat,  noplot method(classical)", 1)
 				//" di `test_rc")
 	if (rc == 0) {
 		Coord = st_matrix("e(Y)") 
@@ -1243,6 +1282,72 @@ real matrix function mmdslayout(real matrix G)
 }
 end
 
+capture mata: mata drop netplotmds()
+mata:
+real matrix function netplotmds(real matrix G, real scalar MaxIt)
+{
+        real matrix     D, sCoord, Coord
+        string scalar   dMat, sMat
+        real scalar ScaleFactor, rc 
+        
+		G = (G + G') :/ (G + G')
+		_editmissing(G, 0)
+		_diag(G,0)
+		
+        Coord  =  J(rows(G),2,.)
+        sCoord = jumble(circlelayout(rows(G))) //circle coordinates as starting positions for mds
+	    maxSX = max(sCoord[,1])
+		maxSY = max(sCoord[,2])
+		
+        D = distance(G) //compute distances
+        _diag(D,0)
+		
+        st_matrix(dMat=st_tempname(),D)         //Distance mat to stata under tempname
+        st_matrix(sMat=st_tempname(),sCoord)    //Distance mat to stata under tempname
+
+        // compute MDS coordinates in stata
+        rc = _stata(  "qui mdsmat " + 
+                dMat + 
+                ", noplot method(modern) initialize(from(" + 
+                sMat + 
+                ")) iterate("+strofreal(MaxIt)+")" )
+        
+        if (rc!=0) {
+                errprintf("mds computation failed \n")
+                exit(rc)
+        }
+
+        Coord = st_matrix("e(Y)")       //pull coordinates back into mata
+        
+        // rescale coordinates to fit inside circle layout
+		
+		nonisolates = (rowsum(G):!= 0)
+		
+		maxX = max(select(Coord[.,1], nonisolates))
+		minX = min(select(Coord[.,1], nonisolates))
+		maxY = max(select(Coord[.,2], nonisolates))
+		minY = min(select(Coord[.,2], nonisolates))
+
+		Coord[,1] = (nonisolates :*(Coord[,1]:-minX) :* (1 / (maxX-minX)) :+ 0.25) :+ ((nonisolates:==0) :* Coord[,1])
+		Coord[,2] = (nonisolates :*(Coord[,2]:-minY) :* (1 / (maxY-minY))) :+ ((nonisolates:==0):*Coord[,2])
+		
+		num_isol = sum( nonisolates:==0)
+		maxYY = max(Coord[,2])
+		
+		k = 1
+		for ( i = 1; i <= rows(G); i++) {
+			if (nonisolates[i] == 0) {
+			   Coord[i,1]=1.5
+			   Coord[i,2]= (k / num_isol)
+			   k = k + 1
+			}
+		}
+		
+        return(Coord)
+}
+end
+
+
 //Calculates the distance matrix in a discrete graph
 //Distances between unconnecte nodes are indicated by "0"
 capture mata: mata drop distance()
@@ -1257,7 +1362,11 @@ real matrix function distance(real matrix Net, | real scalar MaxDist)
 	else 
 		maxcounter = rows(Net)-1
 	
-	N1 = Net + Net'
+	// Undirected network
+	Net = (Net + Net') :/ (Net + Net')
+	_editmissing(Net, 0)
+	
+	N1 = Net
 	Dist = Net	//Distance 1 matrix
 	counter = 1
 	ready = 0
@@ -1268,8 +1377,10 @@ real matrix function distance(real matrix Net, | real scalar MaxDist)
 		if (sum(Ntemp)==0) ready = 1
 		Dist = Dist:+Ntemp
 	}
-	Dist = (Dist:==0):* (runiform(rows(Dist), cols(Dist))) :+ Dist 
-	_diag(Dist, 1)
+	//Dist = (Dist:==0):* (runiform(rows(Dist), cols(Dist))) :+ Dist 
+	maxdist = max(Dist)
+	Dist = (Dist:==0):* (maxdist + 1) :+ Dist
+	_diag(Dist, 0)
 	return(Dist)
 }
 end
@@ -1294,7 +1405,7 @@ real matrix function circlelayout(real scalar N)
 	CoordMax2 = max(Coord[.,2])
 	Coord[.,1] = (((Coord[.,1] :/ CoordMax1)))
 	Coord[.,2] = (((Coord[.,2] :/ CoordMax2)))
-	Coord[.,1] = Coord[.,1] :+ .25
+	Coord[.,1] = Coord[.,1] :+0.25
 	return(Coord)
 }
 end

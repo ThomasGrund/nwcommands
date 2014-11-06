@@ -80,16 +80,16 @@ program nwrandom
 	nwset, mat(newmat) vars(`randomvars') name(`randomname') `undirected'
 	
 	// correct for ties on diagonal
-	if ("`undirected'" != "" & "`density'" != ""){
+	qui if ("`undirected'" != "" & "`density'" != ""){
 		forvalues i = 1/`tiesdiag' {
 			local found = 0
 			while (`found' == 0) {
 				local rrow =  ceil((`nodes'- 1)* uniform()) + 1
 				local rcol =  ceil((`rrow'- 1)* uniform())
-				nwvalue `randomname', ego(`rrow') alter(`rcol')
+				nwvalue `randomname'[`rrow', `rcol']
 				if r(value) == 0 {
 					local found = 1
-					nwvalue `randomname', ego(`rrow') alter(`rcol') newvalue(1)
+					nwreplace `randomname'[`rrow',`rcol']=1
 					continue, break
 				}
 			}

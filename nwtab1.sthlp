@@ -22,22 +22,17 @@
 {synopthdr}
 {synoptline}
 {synopt:{opt selfloop}}includes self-loops{p_end}
-{synopt:{opt oneway}}forces one-way table{p_end}
 
 
 {title:Description}
 
 {pstd}
-{cmd:nwtabulate} tabulates the edge / tie values of a network. When {help netname} is not 
-specified the command automatically produces a one-way table of the current network. When
-{help netname} is specified, the default is to produce a {help nwtab2:two-way table} of the 
-the current network (latest network) and {help netname}. The option {it:oneway}forces a one-way
-table. 
+{cmd:nwtabulate} tabulates the edge / tie values of a network. 
 
 {title:Example}
 	
    {cmd:. webnwuse gang}
-   {cmd:. nwtabulate gang, oneway}
+   {cmd:. nwtabulate gang}
 {res}
 {txt}   Network:  {res}gang{txt}{col 24}Directed: {res}false{txt}
 

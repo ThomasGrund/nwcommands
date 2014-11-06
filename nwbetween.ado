@@ -13,27 +13,35 @@
 capture program drop nwbetween
 program nwbetween
 	syntax [anything(name=netname)], [GENerate(string) sym]
-	_nwsyntax `netname'
-	nwtomata `netname', mat(betweennet)
-	if "`sym'" != "" {
-		mata: betweennet = betweennet :+ betweennet'
+	_nwsyntax `netname', max(9999)
+	if `networks' > 1 {
+		local k = 1
 	}
 	
-	mata: betweennet = betweennet :/ betweennet
-	mata: _editmissing(betweennet, 0)
+	foreach netname_temp in `netname' {
+		nwtomata `netname_temp', mat(betweennet)
+		if "`sym'" != "" {
+			mata: betweennet = betweennet :+ betweennet'
+		}
 	
-	mata: C = between(betweennet)
-	if "`sym'" != ""  {
-		mata: C = C:/2
+		mata: betweennet = betweennet :/ betweennet
+		mata: _editmissing(betweennet, 0)
+	
+		mata: C = between(betweennet)
+		if "`sym'" != ""  {
+			mata: C = C:/2
+		}
+	
+	
+		if "`generate'" == "" {
+			local generate "_between"
+		}
+		
+		capture drop `generate'`k'
+		nwtostata, mat(C) gen(`generate'`k')
+		mata: mata drop betweennet C
+		local k = `k' + 1
 	}
-	
-	
-	if "`generate'" == "" {
-		local generate "_between"
-	}
-	capture drop `generate'
-	nwtostata, mat(C) gen(`generate')
-	mata: mata drop betweennet C
 end
 
 

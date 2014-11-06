@@ -62,10 +62,10 @@ An alphabetical index of all {it:nwcommands} is available in
 {col 8}{hline 3}{c RT}       {it:Generators}{col 36}{c LT}{hline}
 {col 8}   {c BLC}{hline 24}{c BRC}
 {p2colset 12 35 36 2}
-{p2col:    {bf:{help nwassortmix }}}Generate a homophilious network{p_end}
 {p2col:    {bf:{help nwdyadprob }}}Generate a network based on tie probabilities{p_end}
 {p2col:    {bf:{help nwgen }}}Network extensions of generate{p_end}
 {p2col:    {bf:{help nwgeodesic }}}Calculates shortest paths between nodes{p_end}
+{p2col:    {bf:{help nwhomophily }}}Generate a homophilious network{p_end}
 {p2col:    {bf:{help nwpath }}}Calculate paths between node {it:ego} and node {it:alter}{p_end}
 {p2col:    {bf:{help nwpermute }}}Random permutation of the network{p_end}
 {p2col:    {bf:{help nwrandom }}}Generate a random Erdos-Renyi network{p_end}
@@ -93,13 +93,14 @@ An alphabetical index of all {it:nwcommands} is available in
 {p2col:    {bf:{help nwgen }}}Network extensions of generate{p_end}
 {p2col:    {bf:{help nwgeodesic }}}Calculates shortest paths between nodes{p_end}
 {p2col:    {bf:{help nwpath }}}Calculate paths between node {it:ego} and node {it:alter}{p_end}
+{p2col:    {bf:{help nwutility }}}Calculates utility scores according to Jackson and Wollinsky (1996){p_end}
 {marker utilities}{...}
 
 {col 8}   {c TLC}{hline 24}{c TRC}
 {col 8}{hline 3}{c RT}       {it:Utilities}{col 36}{c LT}{hline}
 {col 8}   {c BLC}{hline 24}{c BRC}
 {p2colset 12 35 36 2}
-{p2col:    {bf:{help nwclear }}}Clear all networks and variables from memory{p_end}
+{p2col:    {bf:{help nwclear }}} Clear all networks and variables from memory{p_end}
 {p2col:    {bf:{help nwload }}}Loads an available network as Stata variables{p_end}
 {p2col:    {bf:{help nwsync }}}Sync network with Stata variables{p_end}
 {p2col:    {bf:{help nwtomata }}}Returns a Mata matrix holding the adjacency matrix of a network{p_end}
@@ -121,16 +122,23 @@ An alphabetical index of all {it:nwcommands} is available in
 {p2colset 12 35 36 2}
 {p2col:    {bf:{help _nwnodeid }}}Returns the nodeid of a node given its node label{p_end}
 {p2col:    {bf:{help _nwnodelab }}}Returns the nodelab of a node given its nodeid{p_end}
-{p2col:    {bf:{help nwcompressobs }}}Compresses observations in Stata{p_end}
+{p2col:    {bf:{help nwcompressobs }}} Compresses observations in Stata{p_end}
 {marker uncategorized}{...}
 
 {col 8}   {c TLC}{hline 24}{c TRC}
 {col 8}{hline 3}{c RT}       {it:Uncategorized}{col 36}{c LT}{hline}
 {col 8}   {c BLC}{hline 24}{c BRC}
 {p2colset 12 35 36 2}
+{p2col:{bf:{help _extract_valuelabels }}}{err}no help file yet{txt}{p_end}
+{p2col:{bf:{help _nwdeploy }}}{err}no help file yet{txt}{p_end}
+{p2col:{bf:{help _nwevalnetexp }}}{err}no help file yet{txt}{p_end}
+{p2col:{bf:{help _nwsyntax }}}{err}no help file yet{txt}{p_end}
+{p2col:{bf:{help _nwsyntax_other }}}{err}no help file yet{txt}{p_end}
+{p2col:{bf:{help _opts_oneof }}}{err}no help file yet{txt}{p_end}
 {p2col:{bf:{help nwbetween }}}{err}no help file yet{txt}{p_end}
 {p2col:{bf:{help nwclique }}}{err}no help file yet{txt}{p_end}
 {p2col:{bf:{help nwdropnodes }}}{err}no help file yet{txt}{p_end}
+{p2col:{bf:{help nwds }}}{err}no help file yet{txt}{p_end}
 {p2col:{bf:{help nwduplicate }}}{err}no help file yet{txt}{p_end}
 {p2col:{bf:{help nwergm }}}{err}no help file yet{txt}{p_end}
 {p2col:{bf:{help nwevcent }}}{err}no help file yet{txt}{p_end}
@@ -152,9 +160,3 @@ An alphabetical index of all {it:nwcommands} is available in
 {p2col:{bf:{help nwtab }}}{err}no help file yet{txt}{p_end}
 {p2col:{bf:{help nwvalidvars }}}{err}no help file yet{txt}{p_end}
 {p2col:{bf:{help webnwuse }}}{err}no help file yet{txt}{p_end}
-{p2col:{bf:{help _extract_valuelabels }}}{err}no help file yet{txt}{p_end}
-{p2col:{bf:{help _nwdeploy }}}{err}no help file yet{txt}{p_end}
-{p2col:{bf:{help _nwevalnetexp }}}{err}no help file yet{txt}{p_end}
-{p2col:{bf:{help _nwsyntax }}}{err}no help file yet{txt}{p_end}
-{p2col:{bf:{help _nwsyntax_other }}}{err}no help file yet{txt}{p_end}
-{p2col:{bf:{help _opts_oneof }}}{err}no help file yet{txt}{p_end}

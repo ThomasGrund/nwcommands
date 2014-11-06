@@ -26,7 +26,7 @@ syntax anything(name=netname), formula(string) [ ergmoptions(string) ergmdetail 
 		
 	// Save relevant data be opened in R
 	drop if _n > `netsize'
-	capture save ergdata.dta, replace
+	capture saveold ergdata.dta, replace
 	
 	if _rc != 0 {
 		di "{err}ergdata.dta could not be saved." _n ///
@@ -172,8 +172,9 @@ syntax anything(name=netname), formula(string) [ ergmoptions(string) ergmdetail 
 		capture file close nwprofile_handle
 	}
 
-	scalar correctfile = length("$rpath") - 4
-	if (lower(substr("$rpath", correctfile , .)) != "r.exe"){
+	scalar correctfile = length("$rpath") 
+	
+	if (lower(substr("$rpath", correctfile , .)) != "r"){
 		di 
 		di "{err}Try again."
 		global rpath ""

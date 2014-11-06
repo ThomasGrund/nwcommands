@@ -2,15 +2,19 @@ v 3
 d nwcommands-hlp. Social Network Analysis Using Stata - Help Files
 d Thomas U. Grund and Peter Hedström, Linköping University, www.liu.se/ias
 d email: contact@nwcommands.org
-d Distribution-Date: 9oct2014
+d Distribution-Date: 6nov2014
+f _nwnodeid.sthlp
+f _nwnodelab.sthlp
 f animate.sthlp
 f netexample.sthlp
 f netlist.sthlp
 f netname.sthlp
 f newnetname.sthlp
 f nodeid.sthlp
+f nw_alphabetical.sthlp
+f nw_intro.sthlp
+f nw_topical.sthlp
 f nwaddnodes.sthlp
-f nwassortmix.sthlp
 f nwclear.sthlp
 f nwcloseness.sthlp
 f nwclustering.sthlp
@@ -28,6 +32,7 @@ f nwexport.sthlp
 f nwfromedge.sthlp
 f nwgen.sthlp
 f nwgeodesic.sthlp
+f nwhomophily.sthlp
 f nwimport.sthlp
 f nwkeep.sthlp
 f nwload.sthlp
@@ -49,10 +54,6 @@ f nwtranspose.sthlp
 f nwtriads.sthlp
 f nwunab.sthlp
 f nwuse.sthlp
+f nwutility.sthlp
 f nwvalidate.sthlp
 f nwvalue.sthlp
-f nw_alphabetical.sthlp
-f nw_intro.sthlp
-f nw_topical.sthlp
-f _nwnodeid.sthlp
-f _nwnodelab.sthlp
