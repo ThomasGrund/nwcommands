@@ -2,7 +2,7 @@ capture program drop _nwdeploy
 program _nwdeploy
 	
 	tempname deploy_ado
-	file open `deploy_ado' using "`c(pwd)'\nwcommands-ado.pkg", replace write
+	file open `deploy_ado' using nwcommands-ado.pkg, replace write
 	file write `deploy_ado' "v 3" _n
 	file write `deploy_ado' "d nwcommands-ado. Social Network Analysis Using Stata" _n
 	file write `deploy_ado' "d Thomas U. Grund and Peter Hedström, Linköping University, www.liu.se/ias" _n
@@ -143,8 +143,9 @@ program _nwdeploy
 	foreach file in `netfiles' {
 		file write `deploy_ado' "f `file'" _n
 	}
+	di "h1"
 	file close `deploy_ado'
-	
+	di "h2"
 	
 	file open deploy_hlp using nwcommands-hlp.pkg, replace write
 	file write deploy_hlp "v 3" _n
