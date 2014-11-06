@@ -9,8 +9,8 @@ program nwplot
 	set more off
 	syntax [anything(name=netname)][if/], [ arrows edgesize(string) ASPECTratio(string) components(string) arcstyle(string) arcbend(string) arcsplines(integer 10) nodexy(varlist numeric min=2 max=2) edgeforeground(string) GENerate(string) colorpalette(string) edgecolorpalette(string) edgepatternpalette(string) symbolpalette(string) lineopt(string) scatteropt(string) legendopt(string) size(string) color(string) symbol(string) edgecolor(string) label(varname) nodefactor(string) sizebin(string) edgefactor(string) arrowfactor(string) arrowgap(string) arrowbarbfactor(string) layout(string) iterations(integer 1000) scheme(string) * ]
 	_nwsyntax `netname', max(1)
-	
-	qui if "`if'"!="" {
+
+    qui if "`if'"!="" {
 		nwgen _temp_if = `netname'
 		nwdrop _temp_if if (!(`if'))
 		local netname "_temp_if"
@@ -77,12 +77,12 @@ program nwplot
 		}
 	}
 	
-	local layout_gridcols = `columns'
-	local layout_components = `components'
+	local layout_gridcols = "`columns'"
+	local layout_components = "`components'"
 	local layout = "`anything'"
 	_opts_oneof "mds mdsclassical grid circle nodexy" "layout" "`layout'" 6556
 
-	qui if "`lgc'" != "" {
+	if "`lgc'" != "" {
 		tempvar _lgc
 		nwgen _temp_lgc = `netname'
 		nwgen `_lgc' = lgc(`temp_lgc')
@@ -90,7 +90,6 @@ program nwplot
 		local netname "_temp_lgc"
 		_nwsyntax `netname', max(1)
 	}
-	
 	
 	// Check matsize (because mds requires STATA matrix)
 	if (c(matsize) <`nodes'& "`layout'" == "mds") {
