@@ -8,7 +8,7 @@
 {title:Title}
 
 {p2colset 5 18 22 2}{...}
-{p2col :nwrandom {hline 2}}Generate a random Erdos-Renyi network{p_end}
+{p2col :nwrandom {hline 2}}Generates a random Erdos-Renyi network{p_end}
 {p2colreset}{...}
 
 

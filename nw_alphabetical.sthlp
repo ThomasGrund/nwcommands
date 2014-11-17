@@ -31,7 +31,7 @@
 {p2col:{bf:{help nwdropnodes }}}{err}no help file yet{txt}{p_end}
 {p2col:{bf:{help nwds }}}{err}no help file yet{txt}{p_end}
 {p2col:{bf:{help nwduplicate }}}{err}no help file yet{txt}{p_end}
-{p2col:{bf:{help nwdyadprob }}}Generate a network based on tie probabilities{p_end}
+{p2col:{bf:{help nwdyadprob }}}Generates a network based on tie probabilities{p_end}
 {p2col:{bf:{help nwdyads }}}Dyad census of the network{p_end}
 {p2col:{bf:{help nwergm }}}{err}no help file yet{txt}{p_end}
 {p2col:{bf:{help nwevcent }}}{err}no help file yet{txt}{p_end}
@@ -43,10 +43,10 @@
 {p2col:{bf:{help nwgeodesic }}}Calculates shortest paths between nodes{p_end}
 {p2col:{bf:{help nwhomophily }}}Generate a homophilious network{p_end}
 {p2col:{bf:{help nwimport }}}Import network from external source{p_end}
-{p2col:{bf:{help nwinf }}}{err}no help file yet{txt}{p_end}
 {p2col:{bf:{help nwinfo }}}{err}no help file yet{txt}{p_end}
 {p2col:{bf:{help nwkeep }}}Keeps a network or only keeps certain nodes of a network{p_end}
 {p2col:{bf:{help nwkeepnodes }}}{err}no help file yet{txt}{p_end}
+{p2col:{bf:{help nwlattice }}}Generates a lattice network{p_end}
 {p2col:{bf:{help nwload }}}Loads an available network as Stata variables{p_end}
 {p2col:{bf:{help nwmovie }}}{err}no help file yet{txt}{p_end}
 {p2col:{bf:{help nwname }}}{err}no help file yet{txt}{p_end}
@@ -54,15 +54,18 @@
 {p2col:{bf:{help nwpath }}}Calculate paths between node {it:ego} and node {it:alter}{p_end}
 {p2col:{bf:{help nwpermute }}}Random permutation of the network{p_end}
 {p2col:{bf:{help nwplot }}}Plot a network{p_end}
+{p2col:{bf:{help nwpref }}}Generates a preferential-attachment network{p_end}
 {p2col:{bf:{help nwqap }}}{err}no help file yet{txt}{p_end}
-{p2col:{bf:{help nwrandom }}}Generate a random Erdos-Renyi network{p_end}
+{p2col:{bf:{help nwrandom }}}Generates a random Erdos-Renyi network{p_end}
 {p2col:{bf:{help nwreach }}}{err}no help file yet{txt}{p_end}
 {p2col:{bf:{help nwrecode }}}{err}no help file yet{txt}{p_end}
 {p2col:{bf:{help nwrename }}}{err}no help file yet{txt}{p_end}
 {p2col:{bf:{help nwreplace }}}{err}no help file yet{txt}{p_end}
 {p2col:{bf:{help nwreplacemat }}}{err}no help file yet{txt}{p_end}
+{p2col:{bf:{help nwring }}}Generates a ring-lattice network{p_end}
 {p2col:{bf:{help nwsave }}}Save networks in file{p_end}
 {p2col:{bf:{help nwset }}}{err}no help file yet{txt}{p_end}
+{p2col:{bf:{help nwsmall }}}Generates a small-world network{p_end}
 {p2col:{bf:{help nwsummary }}}{err}no help file yet{txt}{p_end}
 {p2col:{bf:{help nwsym }}}Symmetrizes a network{p_end}
 {p2col:{bf:{help nwsync }}}Sync network with Stata variables{p_end}

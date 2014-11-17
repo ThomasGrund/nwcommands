@@ -62,13 +62,17 @@ An alphabetical index of all {it:nwcommands} is available in
 {col 8}{hline 3}{c RT}       {it:Generators}{col 36}{c LT}{hline}
 {col 8}   {c BLC}{hline 24}{c BRC}
 {p2colset 12 35 36 2}
-{p2col:    {bf:{help nwdyadprob }}}Generate a network based on tie probabilities{p_end}
+{p2col:    {bf:{help nwdyadprob }}}Generates a network based on tie probabilities{p_end}
 {p2col:    {bf:{help nwgen }}}Network extensions of generate{p_end}
 {p2col:    {bf:{help nwgeodesic }}}Calculates shortest paths between nodes{p_end}
 {p2col:    {bf:{help nwhomophily }}}Generate a homophilious network{p_end}
+{p2col:    {bf:{help nwlattice }}}Generates a lattice network{p_end}
 {p2col:    {bf:{help nwpath }}}Calculate paths between node {it:ego} and node {it:alter}{p_end}
 {p2col:    {bf:{help nwpermute }}}Random permutation of the network{p_end}
-{p2col:    {bf:{help nwrandom }}}Generate a random Erdos-Renyi network{p_end}
+{p2col:    {bf:{help nwpref }}}Generates a preferential-attachment network{p_end}
+{p2col:    {bf:{help nwrandom }}}Generates a random Erdos-Renyi network{p_end}
+{p2col:    {bf:{help nwring }}}Generates a ring-lattice network{p_end}
+{p2col:    {bf:{help nwsmall }}}Generates a small-world network{p_end}
 {p2col:    {bf:{help nwtranspose }}}Transposes a network{p_end}
 {marker information}{...}
 
@@ -144,7 +148,6 @@ An alphabetical index of all {it:nwcommands} is available in
 {p2col:{bf:{help nwevcent }}}{err}no help file yet{txt}{p_end}
 {p2col:{bf:{help nwexpand }}}{err}no help file yet{txt}{p_end}
 {p2col:{bf:{help nwgenerate }}}{err}no help file yet{txt}{p_end}
-{p2col:{bf:{help nwinf }}}{err}no help file yet{txt}{p_end}
 {p2col:{bf:{help nwinfo }}}{err}no help file yet{txt}{p_end}
 {p2col:{bf:{help nwkeepnodes }}}{err}no help file yet{txt}{p_end}
 {p2col:{bf:{help nwmovie }}}{err}no help file yet{txt}{p_end}

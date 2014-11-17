@@ -16,8 +16,8 @@
 {col 31}{bf:Alphabetical list of nwcommands}
 
 
-	*! Date        : 3sept2014
-	*! Version     : 1.0.1
+	*! Date        : 12nov2014
+	*! Version     : 1.4
 	*! Contact     : thomas.u.grund@gmail.com
 	*! Web         : {browse "http://nwcommands.org"}
 	*! Bugs        : {browse "mailto:bug@nwcommands.org"}

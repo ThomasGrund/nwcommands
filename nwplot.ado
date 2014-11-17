@@ -671,6 +671,7 @@ program nwplot
 	
 	if ("`arcstyle'" != "straight"){
 		di "{txt}Generating splines..."
+		//save raw.dta, replace
 		qui nwplotsplines, unbend(straight) arrow(arrow) x1(sx) y1(sy) x2(ex) y2(ey) bend(`arcbend') splines(`arcsplines')
 	}
 	
@@ -679,7 +680,7 @@ program nwplot
 	mata: st_store((1::rows(ncolor)),("ncolor"), ncolor[.,.])
 	mata: st_store((1::rows(ncolor)),("nsymbol"), nsymbol[.,.])
 	mata: st_sstore((1::rows(nlabel)),("nlabel"), nlabel[.,.])
-	
+
 	local binfactor = 1/`sizebin'
 	qui replace nsize = (ceil(nsize * `binfactor'))* `sizebin'
 	qui tab nsize, matrow(nsizerow)
@@ -977,6 +978,7 @@ program nwplotsplines
 	replace `mult2' = 1 - 2 * (`x2' > `x1') if `y1' == `y2'
 
 	gen `alpha' = (acos(abs(`x2' - `x1')/`l'))
+	replace `alpha' = acos(1) if `alpha' == .
 	gen `beta' = _pi / 2 + `alpha'
 
 	gen `x3n' = (`x1' + 1/2 * (`x2' - `x1')) 
@@ -1416,19 +1418,22 @@ real matrix function gridlayout(real scalar N,  real scalar cols)
 	real colvector 	V, C
 	real matrix 	Coord
 
-	V= (1::N) :- 1
-
-	C = J(N,1,cols)	
-		
+	V= (1::N)
+	rows = ceil(N / cols)
+	
 	Coord=J(N,2,.)
-	Coord[.,1] = mod(V,C):* (100 / cols)
-	Coord[.,2] = floor( (V:/C)):* (100 / cols)
+	Coord[.,1] = J(N,1,100) :- floor((V:-1) :/rows) :* (100 / (cols - 1))
+	
+	Coord[.,2] = mod(V, rows)
+	Coord[.,2] = editvalue(Coord[.,2],0,rows)
+    Coord[.,2] = J(N,1,100) :- ((Coord[.,2] :- 1) :* (100 / (rows - 1)))
 	
 	CoordMax1 = max(Coord[.,1])
 	CoordMax2 = max(Coord[.,2])
 	Coord[.,1] = (((Coord[.,1] :/ CoordMax1)))
-	Coord[.,2] = J(N,1,1) :- (((Coord[.,2] :/ CoordMax2)))
+	Coord[.,2] = (((Coord[.,2] :/ CoordMax2)))
 	Coord[.,1] = Coord[.,1] * 1.5
+	
 	return(Coord)
 }
 end
