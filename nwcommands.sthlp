@@ -17,7 +17,7 @@
 
 
 	*! Date        : 12nov2014
-	*! Version     : 1.4
+	*! Version     : 1.0.4
 	*! Contact     : thomas.u.grund@gmail.com
 	*! Web         : {browse "http://nwcommands.org"}
 	*! Bugs        : {browse "mailto:bug@nwcommands.org"}
