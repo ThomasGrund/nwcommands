@@ -1,60 +1,65 @@
+*! Date      :18nov2014
+*! Version   :1.0.4.1
+*! Author    :Thomas Grund
+*! Email     :thomas.u.grund@gmail.com
+
 capture program drop nwreplacemat
 program nwreplacemat
 	version 9.0
 	syntax anything(name=netname), newmat(string) [vars(string) labs(string) nosync netonly]
-	_nwsyntax `netname', max(1)
+	_nwsyntax , max(1)
 	
-	mata: st_numscalar("r(matrows)", rows(`newmat'))
-	mata: st_numscalar("r(matcols)", cols(`newmat'))
+	mata: st_numscalar("r(matrows)", rows())
+	mata: st_numscalar("r(matcols)", cols())
 	local matrows = r(matrows)
 	local matcols = r(matcols)
 	
 	// newmat is invalid (not N x X matrix)
-	if (`matrows' != `matcols'){
+	if ( != ){
 		di "{err}input matrix has invalid dimensions"
 		erorr 6082
 	}
 	
 	// newmat is of different size than the network
-	if (`matrows' != `nodes'){
-		//di "{txt}input matrix has different dimensions than existing {it:network} {bf:`netname'}. size of {bf:`netname'} has been adjusted."
-		local nodes = `matrows'
+	if ( != ){
+		//di "{txt}input matrix has different dimensions than existing {it:network} {bf:}. size of {bf:} has been adjusted."
+		local nodes = 
 		
-		if "`netonly'" != "" {
-			mata: `newmat'
-			mata: nw_mata`id' = `newmat'
-			global nwsize_`id' = `matrows'
-			if "`vars'" != "" {
-				global nw_`id' "`vars'"
+		if "" != "" {
+			mata: 
+			mata: nw_mata = 
+			global nwsize_ = 
+			if "" != "" {
+				global nw_ ""
 			}
-			if "`labs'" != "" {
-				global nwlabs_`id' "`labs'"
+			if "" != "" {
+				global nwlabs_ ""
 			}
 		}
 		else {
-			nwdrop `netname', `netonly'
-			nwrandom `nodes', prob(1) name(`netname') vars(`vars') labs(`labs')
-			nwreplacemat `netname', newmat(`newmat') `nosync' 
+			nwdrop , 
+			nwrandom , prob(1) name() vars() labs()
+			nwreplacemat , newmat()  
 			// delete empty observations in Stata
 			nwcompressobs
 		}
 	}
 	else {
-		mata: nw_mata`id' = `newmat'
-		if "`netonly'" == "" {
-			if "`sync'" == "" {
-				nwsync `netname'
+		mata: nw_mata = 
+		if "" == "" {
+			if "" == "" {
+				nwsync 
 			}
 		}
 	}
 	
 	// check for directed/undirected of new network and adjust if necessary
-	mata: st_numscalar("r(directed)", (issymmetric(`newmat') == 1))
+	mata: st_numscalar("r(directed)", (issymmetric() == 1))
 	
-	if (`r(directed)' == 1) {
-		global nwdirected_`id' = "false"
+	if ( == 1) {
+		global nwdirected_ = "false"
 	}
 	else {
-		global nwdirected_`id' = "true"
+		global nwdirected_ = "true"
 	}
 end

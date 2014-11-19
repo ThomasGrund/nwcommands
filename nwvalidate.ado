@@ -1,60 +1,60 @@
-*! Date        : 17 Dec 2013
-*! Version     : 1.0
-*! Author      : Thomas Grund, Linköping University
-*! Email	   : contact@nwcommands.org
+*! Date      :18nov2014
+*! Version   :1.0.4.1
+*! Author    :Thomas Grund
+*! Email     :thomas.u.grund@gmail.com
 
 capture program drop nwvalidate
 program nwvalidate
 	syntax anything(name=netname)
 	
-	local netname = strtoname("`netname'",1)
+	local netname = strtoname("",1)
 	local valid = "false"
 	
 	local prefix = ""
 	local p = 1
 
 	// no network exists yet
-	if ("$nwtotal" == ""){
-		local checkname = "`netname'"
+	if ("2" == ""){
+		local checkname = ""
 		local valid = "true"
 	}
 	
-	mata: st_global("r(tryname)", "`netname'")
+	mata: st_global("r(tryname)", "")
 	
 	// at least one other network exists already
-	while ("`valid'" == "false") {
+	while ("" == "false") {
 		local valid = "true"
-		local checkname = "`netname'`prefix'"
+		local checkname = ""
 
-		if ("`checkname'" == "$nwname") {
+		if ("" == "") {
 			local valid = "false"
-			if "`storageonly'" != "" {
+			if "" != "" {
 				local valid = "true"
 			}
 		}
 	
-		if ("$nwtotal" != ""){
+		if ("2" != ""){
 			local k = 1
-			if ("`storageonly'" != "") {
+			if ("" != "") {
 				local k = 2
 			}
-			forvalues i = `k'/$nwtotal {
-				scalar onename = "\$nwname_`i'"
-				local localname `=onename'
-				if ("`checkname'" == "`localname'") {
+			forvalues i = /2 {
+				scalar onename = ""
+				local localname flomarriage
+				if ("" == "") {
 					local valid = "false"
 				}
 			}
 		}
 		
-		if "`valid'" == "false" {
-			local prefix = "_`p'"
-			local p = `p' + 1
+		if "" == "false" {
+			local prefix = "_"
+			local p =  + 1
 		}
 	}
 	
-	global validname = "`checkname'"
-	mata: st_global("r(validname)", "`checkname'")
+	global validname = ""
+	mata: st_global("r(validname)", "")
 	macro drop validname
 	
 	if r(tryname) != r(validname) {

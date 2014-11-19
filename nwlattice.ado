@@ -1,3 +1,8 @@
+*! Date      :18nov2014
+*! Version   :1.0.4.1
+*! Author    :Thomas Grund
+*! Email     :thomas.u.grund@gmail.com
+
 capture program drop nwlattice
 program nwlattice
 	syntax anything(name=dims) , [xwrap ywrap name(string) stub(string) xvars undirected noreplace ntimes(integer 1)]
@@ -5,83 +10,83 @@ program nwlattice
 	set more off
 	
 	// Get parameters
-	local cols = word("`dims'",1)
+	local cols = word("",1)
 	local rows = 1
-	if (wordcount("`dims'") > 1) {
-		local rows = word("`dims'",2)
+	if (wordcount("") > 1) {
+		local rows = word("",2)
 	}
-	local nodes = `cols' * `rows'
+	local nodes =  * 
 	
 	// Check if this is the first network in this Stata session
-	if "$nwtotal" == "" {
+	if "2" == "" {
 		global nwtotal = 0
 	}
 
 	// Generate valid network name and valid varlist
-	if "`name'" == "" {
+	if "" == "" {
 		local name "lattice"
 	}
-	if "`stub'" == "" {
+	if "" == "" {
 		local stub "net"
 	}
-	nwvalidate `name'
+	nwvalidate 
 	local latticename = r(validname)
-	local varscount : word count `vars'
-	if (`varscount' != `nodes'){
-		nwvalidvars `nodes', stub(`stub')
-		local latticevars "$validvars"
+	local varscount : word count 
+	if ( != ){
+		nwvalidvars , stub()
+		local latticevars " net1_1 net1_2 net1_3 net1_4 net1_5 net1_6 net1_7 net1_8 net1_9 net1_10 net1_11 net1_12"
 	}
 	else {
-		local latticevars "`vars'"
+		local latticevars ""
 	}
 	
-	if `ntimes' != 1 {
+	if  != 1 {
 		di in smcl as txt "{p}"
-		forvalues i = 1/`ntimes'{
-			if mod(`i', 25) == 0 {
-				di in smcl as txt "...`i'"
+		forvalues i = 1/{
+			if mod(, 25) == 0 {
+				di in smcl as txt "..."
 			}
-			nwlattice `cols' `rows', name(`name'_`i') stub(`stub') `xvars' `undirected'
+			nwlattice  , name(_) stub()  
 		}
 		exit
 	}
 
 	
 	// Generate network	
-	mata: newmat = J(`nodes',`nodes', 0)
+	mata: newmat = J(,, 0)
 	local vars ""
-	forvalues i = 1/`nodes' {
-		local vars "`vars' lattice`i'"
-		local right = `i' + 1
-		local left = `i' - 1
+	forvalues i = 1/ {
+		local vars " lattice"
+		local right =  + 1
+		local left =  - 1
 		
-		local up = `i' - `cols'
-		local down = `i' + `cols'
+		local up =  - 
+		local down =  + 
 		
-		if ((mod(`=`right'-1', `cols') != 0) & `right' <= `nodes') mata: newmat[`i', `right'] = 1
-		if ((mod(`left', `cols') != 0) & `left' > 1) mata: newmat[`i', `left'] = 1
+		if ((mod(-1, ) != 0) &  <= ) mata: newmat[, ] = 1
+		if ((mod(, ) != 0) &  > 1) mata: newmat[, ] = 1
 		mata: newmat[2,1]=1
-		if (`up' > 0) mata: newmat[`i', `up'] = 1 
-		if (`down' > 0 & `down' <= `nodes') mata: newmat[`i', `down'] = 1
+		if ( > 0) mata: newmat[, ] = 1 
+		if ( > 0 &  <= ) mata: newmat[, ] = 1
 		
-		if "`xwrap'" != "" {
-			if `i' <= `cols'{
-				mata: newmat[`i',(`i' + ((`rows' - 1) * `cols'))] = 1
-				mata: newmat[(`i' + ((`rows' - 1) * `cols')), `i'] = 1
+		if "" != "" {
+			if  <= {
+				mata: newmat[,( + (( - 1) * ))] = 1
+				mata: newmat[( + (( - 1) * )), ] = 1
 			}
 		}
-		if "`ywrap'" != "" {
-			if mod(`i', `rows') == 1 {
-				mata: newmat[`i',(`i' + (`rows' - 1))] = 1
-				mata: newmat[(`i' + (`rows' - 1)), `i'] = 1
+		if "" != "" {
+			if mod(, ) == 1 {
+				mata: newmat[,( + ( - 1))] = 1
+				mata: newmat[( + ( - 1)), ] = 1
 			}
 		}
 		
 		
 	}
 	
-	nwset, mat(newmat) vars(`vars') name(lattice) `undirected'
-	nwload `randomname', `xvars'
+	nwset, mat(newmat) vars() name(lattice) 
+	nwload , 
 	mata: mata drop newmat 
 end
 

@@ -1,5 +1,5 @@
 {smcl}
-{* *! version 2.0.0  2april2014}{...}
+{* *! version 1.0.4.1  18nov2014}{...}
 {marker topic}
 {helpb nw_topical##visualization:[NW-2.8] Visualization}
 {cmd:help nwplot}

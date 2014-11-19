@@ -1,7 +1,7 @@
-*! Date        : 24aug2014
-*! Version     : 1.0
-*! Author      : Thomas Grund, Linköping University
-*! Email	   : contact@nwcommands.org
+*! Date      :18nov2014
+*! Version   :1.0.4.1
+*! Author    :Thomas Grund
+*! Email     :thomas.u.grund@gmail.com
 
 capture program drop nwrandom
 program nwrandom
@@ -9,95 +9,95 @@ program nwrandom
 	version 9.0
 	set more off
 	// Check if this is the first network in this Stata session
-	if "$nwtotal" == "" {
+	if "2" == "" {
 		global nwtotal = 0
 	}
 
 	// Generate valid network name and valid varlist
-	if "`name'" == "" {
+	if "" == "" {
 		local name "random"
 	}
-	if "`stub'" == "" {
+	if "" == "" {
 		local stub "net"
 	}
-	nwvalidate `name'
+	nwvalidate 
 	local randomname = r(validname)
-	local varscount : word count `vars'
-	if (`varscount' != `nodes'){
-		nwvalidvars `nodes', stub(`stub')
-		local randomvars "$validvars"
+	local varscount : word count 
+	if ( != ){
+		nwvalidvars , stub()
+		local randomvars " net1_1 net1_2 net1_3 net1_4 net1_5 net1_6 net1_7 net1_8 net1_9 net1_10 net1_11 net1_12"
 	}
 	else {
-		local randomvars "`vars'"
+		local randomvars ""
 	}
 	
-	if `ntimes' != 1 {
+	if  != 1 {
 		di in smcl as txt "{p}"
-		forvalues i = 1/`ntimes'{
-			if mod(`i', 25) == 0 {
-				di in smcl as txt "...`i'"
+		forvalues i = 1/{
+			if mod(, 25) == 0 {
+				di in smcl as txt "..."
 			}
-			nwrandom `nodes', name(`name'_`i') density(`density') prob(`prob') stub(`stub') `xvars' `undirected'
+			nwrandom , name(_) density() prob() stub()  
 		}
 		exit
 	}
 	
 	// Generate probability network as Mata matrix
-	if ("`prob'" != "") {
-		mata: newmat = J(`nodes', `nodes', 0)
-		if "`undirected'" == "" {
-			mata: newmat = floor(uniform(`nodes',`nodes') :+ `prob')
+	if ("" != "") {
+		mata: newmat = J(, , 0)
+		if "" == "" {
+			mata: newmat = floor(uniform(,) :+ )
 		}	
 		else {
-			mata: newmat = makesymmetric(floor(uniform(`nodes',`nodes') :+ `prob'))
+			mata: newmat = makesymmetric(floor(uniform(,) :+ ))
 		}
-		mata: for (i=1; i<=`nodes'; i++) newmat[i,i] = 0
+		mata: for (i=1; i<=; i++) newmat[i,i] = 0
 		mata: mata drop i
 			}
-	if ("`density'" != "") {
-		local ties = floor((`nodes' * (`nodes' -1)) * `density')
-		local n2 = `nodes'*`nodes'
-		if ("`undirected'" == ""){
-			mata: newmat=(1::`n2')
+	if ("" != "") {
+		local ties = floor(( * ( -1)) * )
+		local n2 = *
+		if ("" == ""){
+			mata: newmat=(1::)
 			mata: _jumble(newmat)
-			mata: newmat=colshape(newmat, `nodes')
-			mata: newmat = (newmat:<=`ties')
+			mata: newmat=colshape(newmat, )
+			mata: newmat = (newmat:<=)
 		}
 		else {
-			mata: newmat = helper(`nodes', `ties')
+			mata: newmat = helper(, )
 			mata: tiesDiag = sum(diagonal(newmat))
 			mata: st_numscalar("r(tiesdiag)", tiesDiag)
 		}
 	}
 	
-	if ("`prob'"=="" & "`density'"==""){
+	if (""=="" & ""==""){
 		di "{err}either {it:prob}() or {it:density}() missing"
 		exit
 	}
 	
 	local tiesdiag = r(tiesdiag)
 	mata: st_rclear()
-	nwset, mat(newmat) vars(`randomvars') name(`randomname') `undirected'
+	nwset, mat(newmat) vars() name() 
 	
 	// correct for ties on diagonal
-	qui if ("`undirected'" != "" & "`density'" != ""){
-		forvalues i = 1/`tiesdiag' {
+	qui if ("" != "" & "" != ""){
+		forvalues i = 1/ {
 			local found = 0
-			while (`found' == 0) {
-				local rrow =  ceil((`nodes'- 1)* uniform()) + 1
-				local rcol =  ceil((`rrow'- 1)* uniform())
-				nwvalue `randomname'[`rrow', `rcol']
+			while ( == 0) {
+				local rrow =  ceil((- 1)* uniform()) + 1
+				local rcol =  ceil((- 1)* uniform())
+				nwvalue [, ]
 				if r(value) == 0 {
 					local found = 1
-					nwreplace `randomname'[`rrow',`rcol']=1
+					nwreplace [,]=1
 					continue, break
 				}
 			}
 		}
-		nwsym `randomname'
+		nwsym 
 	}
 
-	nwload `randomname', `xvars' 
+	nwload ,  
 	mata: mata drop newmat
 end
 

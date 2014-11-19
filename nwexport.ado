@@ -1,45 +1,45 @@
-*! Date        : 3sept2014
-*! Version     : 1.0.1
-*! Author      : Thomas Grund, Linköping University
-*! Email	   : contact@nwcommands.org
+*! Date      :18nov2014
+*! Version   :1.0.4.1
+*! Author    :Thomas Grund
+*! Email     :thomas.u.grund@gmail.com
 
 capture program drop nwexport
 program nwexport
 	version 9
 	syntax [anything(name=netname)],[FName(string asis) replace]	
 	
-	_nwsyntax `netname', max(1)
+	_nwsyntax , max(1)
 	
-	if ("`path'" != ""){
-		local last = substr("`path'", -1, .)
-		if ("`last'" != "/" | "`last'" != "\"){
-			local path = "`path'/"
+	if ("" != ""){
+		local last = substr("", -1, .)
+		if ("" != "/" | "" != "\"){
+			local path = "/"
 		}
 	}
 	
-	di `"`fname'"'
+	di `""'
 	
-	scalar onevars = "\$nw_`id'"
-	local vars `=onevars'
+	scalar onevars = ""
+	local vars marriage_4 marriage_5 marriage_6 marriage_7 marriage_8 marriage_10 marriage_11 marriage_12 marriage_13 marriage_14 marriage_15 marriage_16
 	
-	if (`"`fname'"' == "") {
-		local fname "`name'.net"
+	if (`""' == "") {
+		local fname ".net"
 	}
 
-	di `"{txt}Exporting network: `fname'"'
-	di `"file open expfile using `path'`fname', write `replace'"'
+	di `"{txt}Exporting network: "'
+	di `"file open expfile using , write "'
 	
-	file open expfile using `"`path'`fname'"', write `replace'
-	file write expfile "*Vertices `nodes'" _newline
-	forvalues i = 1/`nodes' {
-		file write expfile (`i')
+	file open expfile using `""', write 
+	file write expfile "*Vertices " _newline
+	forvalues i = 1/ {
+		file write expfile ()
 		file write expfile (" ")
 		file write expfile (char(34))
-		local onevar : word `i' of `vars'
-		file write expfile ("`onevar'")
+		local onevar : word  of 
+		file write expfile ("")
 		file write expfile (char(34)) _newline	
 	}
-	if ("`directed'" == "true"){
+	if ("" == "true"){
 		file write expfile "*Arcs"
 	}
 	else {
@@ -47,18 +47,18 @@ program nwexport
 	}
 	
 	preserve
-	nwtoedge `netname'
+	nwtoedge 
 	local ties = _N
-	forvalues i = 1/`ties' {
-		if `netname'[`i'] != 0 {
-			local value = `netname'[`i']
-			local k = _fromid[`i']
-			local l = _toid[`i']
+	forvalues i = 1/ {
+		if [] != 0 {
+			local value = []
+			local k = _fromid[]
+			local l = _toid[]
 			file write expfile _newline
-			file write expfile (`k')
+			file write expfile ()
 			file write expfile " "
-			file write expfile (`l')
-			file write expfile " `value'" 	
+			file write expfile ()
+			file write expfile " " 	
 		}
 	
 	}

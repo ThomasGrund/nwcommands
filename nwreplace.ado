@@ -21,6 +21,7 @@ program nwreplace
 	}
 	
 	nwtomata `netname', mat(onenet)
+
 	local matacmd "mata: onenet`subset'"
 	capture `matacmd'
 	if _rc != 0 {
@@ -40,22 +41,64 @@ program nwreplace
 	// get rid of first equal sign
 	local nonet = substr(trim("`nonet'"),2,.)
 	
-	// separate out in condition
+	// separate out conditions
 	local inpos = strpos("`nonet'", " in ")
-	local nonetNoin "`nonet'"
-	if (`inpos' > 0){
-		local nonetNoin = substr("`nonet'",1,`inpos')
-		local incmd = substr("`nonet'", `=`inpos' + 4',.)
+	local ifpos = strpos("`nonet'", " if ")
+	local ifegopos = strpos("`nonet'", " ifego ")
+	local ifalterpos = strpos("`nonet'"," ifalter ")
+	
+	if (`inpos' == 0) { 
+		local inpos = "" 
+	}
+	if (`ifpos' == 0) { 
+		local ifpos = "" 
+	}
+	if (`ifegopos' == 0) { 
+		local ifegopos = "" 
+	}
+	if (`ifalterpos' == 0) { 
+		local ifalterpos = "" 
 	}
 
-	// separate out if condition
-	local ifpos = strpos("`nonetNoin'", " if ")
-	local netexp "`nonetNoin'"
-	if (`ifpos' > 0){
-		local netexp = substr("`nonetNoin'",1,`ifpos')
-		local ifcmd = substr("`nonetNoin'", `=`ifpos' + 4',.)
+	numlist "`ifpos' `ifegopos' `ifalterpos' `inpos'", sort
+	local condition "`r(numlist)'"
+	local condlength = wordcount("`condition'")
+	forvalues i = 1 / `condlength' {
+		local w = word("`condition'", `i')
+		if ("`w'" == "`inpos'"){
+			local inend = word("`condition'", `=`i' + 1')'
+			if "`inend'" == "" {
+				local inend = "."
+			}
+			local incmd = substr("`nonet'", `=`inpos'  + 4', `=`inend' - `inpos' - 4')
+		}
+		if ("`w'" == "`ifpos'"){
+			local ifend = word("`condition'", `=`i' + 1')
+			if "`ifend'" == "" {
+				local ifend = "."
+			}
+			local ifcmd = substr("`nonet'", `=`ifpos'  + 4', `=`ifend' - `ifpos' - 4')
+		}
+		if ("`w'" == "`ifegopos'"){
+			local ifegoend = word("`condition'", `=`i' + 1')
+			if "`ifegoend'" == "" {
+				local ifegoend = "."
+			}
+			local ifegocmd = substr("`nonet'", `=`ifegopos'  + 7', `=`ifegoend' - `ifegopos' - 7')
+		}
+		if ("`w'" == "`ifalterpos'"){
+			local ifalterend = word("`condition'", `=`i' + 1')
+			if "`ifalterend'" == "" {
+				local ifalterend = "."
+			}
+			local ifaltercmd = substr("`nonet'", `=`ifalterpos'  + 9', `=`ifalterend' - `ifalterpos' - 9')
+		
+		}
 	}
 	
+	local firstcond = word("`condition'",1) 
+	local netexp = substr("`nonet'",1, `firstcond') 
+
 	// evaluate expression
 	_nwevalnetexp `netexp' % _replacenet
 
@@ -63,14 +106,29 @@ program nwreplace
 		mata: _replacenet = J(`nodes', `nodes', _replacenet[1,1]) 
 	}
 	
-	// deal with if condition
+	// deal with conditions
 	nwtomata `netname', mat(_oldnet)
 	
 	if "`ifcmd'" != "" {
 		local ifcmd = "(`ifcmd')"
-		_nwevalnetexp `ifcmd' % _ifnet
+		_nwevalnetexp `ifcmd' % _ifnet	
 		mata: _replacenet =  (_oldnet :* (_ifnet :==0)) + (_replacenet :* _ifnet) 
 		mata: mata drop _ifnet
+	}
+	
+	if "`ifegocmd'" != "" {
+		local ifegocmd = "(`ifegocmd')"
+		_nwevalnetexp `ifegocmd' % _ifegonet	
+		mata: _replacenet =  (_oldnet :* (_ifegonet :==0)) + (_replacenet :* _ifegonet) 
+		mata: mata drop _ifegonet
+	}
+	
+	if "`ifaltercmd'" != "" {
+		local ifaltercmd = "(`ifaltercmd')"
+		_nwevalnetexp `ifaltercmd' % _ifalternet	
+		mata: _ifalternet = _ifalternet'
+		mata: _replacenet =  (_oldnet :* (_ifalternet :==0)) + (_replacenet :* _ifalternet) 
+		mata: mata drop _ifalternet
 	}
 	
 	// deal with in condition
@@ -118,6 +176,7 @@ program nwreplace
 	}
 	mata: mata drop _replacenet _oldnet 
 	capture mata: mata drop onenet
+	capture nwdrop __temp*
 	nwname `netname'
 	nwcompressobs
 end

@@ -1,10 +1,7 @@
-// date: 24aug2014
-// author: Thomas Grund, Linköping University
-
-*! Date        : 24aug2014
-*! Version     : 1.0
-*! Author      : Thomas Grund, Linköping University
-*! Email	   : contact@nwcommands.org
+*! Date      :18nov2014
+*! Version   :1.0.4.1
+*! Author    :Thomas Grund
+*! Email     :thomas.u.grund@gmail.com
 
 capture program drop nwvalidvars
 program nwvalidvars
@@ -13,29 +10,29 @@ program nwvalidvars
 	// Generate temporary varlist and check for each variable if it already exists.
 	local varlist = "" 	
 	local invalid = 0
-	forvalues i=1/`nodes' {
-		local varlist "`varlist' `stub'`i'"
-		capture confirm variable `stub'`i'
+	forvalues i=1/ {
+		local varlist " "
+		capture confirm variable 
 		if !_rc {
-			local invalid = `invalid' + 1
+			local invalid =  + 1
 		}
 	}
 	// Finds valid Stata variable names to store network.
-	if `invalid' > 0 { 
+	if  > 0 { 
 		local stub_add = 0
-		while `invalid' > 0 {
+		while  > 0 {
 			local varlist = ""
-			local stub_add = `stub_add' + 1
+			local stub_add =  + 1
 			local invalid = 0
-			forvalues i=1/`nodes' {
-				local varlist "`varlist' `stub'`stub_add'_`i'"
-				capture confirm variable `stub'`stub_add'_`i'
+			forvalues i=1/ {
+				local varlist " _"
+				capture confirm variable _
 				if !_rc {
-					local invalid = `invalid' + 1
+					local invalid =  + 1
 				}
 			}
 		}
 	}
-	global validvars "`varlist'"
+	global validvars ""
 end
 	

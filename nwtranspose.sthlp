@@ -1,5 +1,5 @@
 {smcl}
-{* *! version 1.0.6  23aug2014 author: Thomas Grund}{...}
+{* *! version 1.0.4.1  18nov2014}{...}
 {marker topic}
 {helpb nw_topical##generator:[NW-2.3] Generators}
 {cmd:help nwtranspose}

@@ -1,47 +1,52 @@
+*! Date      :18nov2014
+*! Version   :1.0.4.1
+*! Author    :Thomas Grund
+*! Email     :thomas.u.grund@gmail.com
+
 capture program drop nwutility
 program nwutility
 	syntax [anything(name=netname)], [Benefit(real 1) Cost(real 1) INTRValue(string) INTRCost(string) *]
-	_nwsyntax `netname', max(1)
+	_nwsyntax , max(1)
 
-	local netname_backup "`netname'"
+	local netname_backup ""
 	
-	if `benefit' > 1 | `benefit' < 0 {
+	if  > 1 |  < 0 {
 		di "{err {bf:benefit} needs to be in the range between 0 and 1."
 		error 60044
 	}
 	
-	if "`intrvalue'" != "" {
-		_nwsyntax_other `intrvalue'
-		if `othernodes' != `nodes' {
-			di "{err}network {bf:`intrvalue'} of wrong size"
+	if "" != "" {
+		_nwsyntax_other 
+		if  !=  {
+			di "{err}network {bf:} of wrong size"
 			error 60033
 		}
-		nwtomata `intrvalue', mat(checkedvalue)
+		nwtomata , mat(checkedvalue)
 	}
 	else {
-		mata: checkedvalue = (I(`nodes') :- 1) :*(-1)
+		mata: checkedvalue = (I() :- 1) :*(-1)
 	}
 	
-	if "`intrcost'" != "" {
-		_nwsyntax_other `intrcost'
-		if `othernodes' != `nodes' {
-			di "{err}network {bf:`intrcost'} of wrong size"
+	if "" != "" {
+		_nwsyntax_other 
+		if  !=  {
+			di "{err}network {bf:} of wrong size"
 			error 60033
 		}
-		nwtomata `intrvalue', mat(checkedcost)
+		nwtomata , mat(checkedcost)
 	}
 	else {
-		mata: checkedcost = (I(`nodes') :- 1) :*(-1)
+		mata: checkedcost = (I() :- 1) :*(-1)
 	}
 
-	nwgenerate _temp_util = (_nwgeodesic `netname', `options')
+	nwgenerate _temp_util = (_nwgeodesic , )
 	nwtomata _temp_util, mat(geonet)
 	nwdrop _temp_util
-	if ("`intrvalue'" == "" & "`intrcost'" == ""){
-		mata: util = util_simple(distance_distribution(geonet), `benefit', `cost')
+	if ("" == "" & "" == ""){
+		mata: util = util_simple(distance_distribution(geonet), , )
 	}
 	else {
-		nwtomata `netname', mat(nw)
+		nwtomata , mat(nw)
 		mata: util = util_weighted(nw, geonet, checkedvalue, checkedcost, 1) 
 		mata: mata drop nw
 		mata: mata drop checkedcost

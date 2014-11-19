@@ -1,15 +1,15 @@
-*! Date        : 24aug2014
-*! Version     : 1.0
-*! Author      : Thomas Grund, Linköping University
-*! Email	   : contact@nwcommands.org
+*! Date      :18nov2014
+*! Version   :1.0.4.1
+*! Author    :Thomas Grund
+*! Email     :thomas.u.grund@gmail.com
 
 capture program drop nwclear
 program nwclear
 	clear
 	// clear all mata networks
-	if "$nwtotal" != "" { 
-		forvalues i = 1/$nwtotal {
-			capture mata: mata drop nw_mata`i'
+	if "2" != "" { 
+		forvalues i = 1/2 {
+			capture mata: mata drop nw_mata
 		}
 	}
 	capture macro drop _all

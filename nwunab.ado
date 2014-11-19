@@ -1,3 +1,8 @@
+*! Date      :18nov2014
+*! Version   :1.0.4.1
+*! Author    :Thomas Grund
+*! Email     :thomas.u.grund@gmail.com
+
 capture program drop nwunab
 program nwunab, rclass
 	syntax anything, [ min(passthru) max(passthru)]
@@ -6,14 +11,14 @@ program nwunab, rclass
 	preserve
 	drop _all
 	qui nwset
-	foreach n in `r(names)' {
-		gen `n' = .
+	foreach n in  {
+		gen  = .
 	}
-	di "Netlist: `netlist'"
-	unab unabnets : `netlist', `max' `min'
-	local numnets : word count "`unablist'"
-	return local networks `numnets'
-	return local netlist "`unabnets'" 
-	c_local `macro_name' "`unabnets'"
+	di "Netlist: "
+	unab unabnets : ,  
+	local numnets : word count ""
+	return local networks 
+	return local netlist "" 
+	c_local  ""
 	restore
 end

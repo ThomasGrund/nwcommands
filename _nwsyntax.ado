@@ -1,58 +1,58 @@
-*! Date        : 10sept2014
-*! Version     : 1.1.0
-*! Author      : Thomas Grund, Linköping University
-*! Email	   : contact@nwcommands.org
+*! Date      :18nov2014
+*! Version   :1.0.4.1
+*! Author    :Thomas Grund
+*! Email     :thomas.u.grund@gmail.com
 
 capture program drop _nwsyntax
 program _nwsyntax
 	syntax [anything],[max(integer 1) min(passthru) nocurrent name(string) id(string)]
-	if "`name'" == "" {
+	if "" == "" {
 		local name = "netname"
 	}
-	if "`id'" == "" {
+	if "" == "" {
 		local id = "id"
 	}
-	local netname = "`name'"
-	local netid = "`id'"
+	local netname = ""
+	local netid = ""
 	
-	if "`anything'" == ""  & "`current'" == ""{
+	if "" == ""  & "" == ""{
 		nwcurrent
 		local anything = r(current)
 	}
 	
-	capture nwunab _temp : `anything', max(`max') `min'
+	capture nwunab _temp : , max() 
 	if _rc != 0 {
 		if _rc == 111 {
-			di "{err}network `anything' not found"
+			di "{err}network  not found"
 			error 6001
 		}
 		if _rc == 102 {
-			di "{err}`anything'"
+			di "{err}"
 			di "too few networks specified"
 			error 6002
 		}
 		if _rc == 103 {
-			di "{err}`anything'"
+			di "{err}"
 			di "too many networks specified"
 			error 6003
 		}
 	}
 
 	
-	local networks : word count `_temp'
-	local lastnet : word `networks' of `_temp'
+	local networks : word count 
+	local lastnet : word  of 
 	mata: st_rclear()
 	
-	nwname `lastnet'
+	nwname 
 	local id = r(id)
-	mata: _diag(nw_mata`id', 0)
+	mata: _diag(nw_mata, 0)
 	
-	c_local id "`r(id)'"		
-	c_local `netname' "`_temp'"
-	c_local nodes "`r(nodes)'"
-	c_local `name' "`_temp'"
-	c_local directed "`r(directed)'"
-	c_local networks "`networks'"
+	c_local id ""		
+	c_local  ""
+	c_local nodes ""
+	c_local  ""
+	c_local directed ""
+	c_local networks ""
 	
 	
 end

@@ -1,12 +1,12 @@
 *! Date        : 24aug2014
 *! Version     : 1.0
-*! Author      : Thomas Grund, Linköping University
+*! Author      : Thomas Grund, Linkoping University
 *! Email	   : contact@nwcommands.org
 
 capture program drop nwdropnodes
 program nwdropnodes 
 	version 9
-	syntax [anything(name=netname)] , [nodes(string) keepmat(string) attributes(varlist) netonly]
+	syntax [anything(name=netname)] , nodes(string) [keepmat(string) attributes(varlist) netonly]
 	local nodelist "`nodes'"	
 	_nwsyntax `netname', max(1)
 	
@@ -18,6 +18,7 @@ program nwdropnodes
 			local newnodelist "`newnodelist' `r(nodeid)'"
 		}
 		else {
+			_nwnodeid `netname', nodeid(`onenode')
 			local newnodelist "`newnodelist' `onenode'"
 		}
 	}

@@ -1,35 +1,35 @@
-*! Date        : 15sept2014
-*! Version     : 1.0
-*! Author      : Thomas Grund, Linköping University
-*! Email	   : contact@nwcommands.org
+*! Date      :18nov2014
+*! Version   :1.0.4.1
+*! Author    :Thomas Grund
+*! Email     :thomas.u.grund@gmail.com
 
 capture program drop nwkeep 
 program nwkeep
 	syntax [anything(name=netname)][if/] [in/],[ attributes(string)]
-	_nwsyntax `netname', max(9999)
-	local keepnets = "`netname'"
+	_nwsyntax , max(9999)
+	local keepnets = ""
 
 	_nwsyntax _all, max(9999)
-	foreach k in `keepnets' {
-		local netname : subinstr local netname "`k'" "", all word
+	foreach k in  {
+		local netname : subinstr local netname "" "", all word
 	}	
 	
-	if "`if'" == "" & "`in'" == "" {
-		nwdrop `netname'
+	if "" == "" & "" == "" {
+		nwdrop 
 		nwcompressobs
 		exit
 	}
 	else {
-		local netname "`keepnets'"
+		local netname ""
 
-		if "`if'" != "" {
-			local if "if (!(`if'))"
+		if "" != "" {
+			local if "if (!())"
 		}
 	
-		if "`in'" != "" {
-			local in "in (!(`in'))"
+		if "" != "" {
+			local in "in (!())"
 		}
-		nwdrop `netname' `if' `in', attributes(`attributes') 
+		nwdrop   , attributes() 
 	}
 end
 	

@@ -1,7 +1,7 @@
-*! Date        : 11nov2014
-*! Version     : 1.0
-*! Author      : Thomas Grund, Linkoping University
-*! Email	   : contact@nwcommands.org
+*! Date      :18nov2014
+*! Version   :1.0.4.1
+*! Author    :Thomas Grund
+*! Email     :thomas.u.grund@gmail.com
 
 capture program drop nwpref
 program nwpref
@@ -9,50 +9,50 @@ program nwpref
 	syntax anything(name=nodes) [, ntimes(integer 1) vars(string) stub(string) name(string) m0(integer 2) m(integer 2) prob(real 0) undirected xvars noreplace]
 	set more off
 	
-	if `nodes' <= 1 {
+	if  <= 1 {
 		noisily display as error "The number of nodes must be an integer larger than 1."
 		error 125
 	}
 
-	local directed = ("`undirected'" == "")
+	local directed = ("" == "")
 
 		// Check if this is the first network in this Stata session
-	if "$nwtotal" == "" {
+	if "2" == "" {
 		global nwtotal = 0
 	}
 
 	// Generate valid network name and valid varlist
-	if "`name'" == "" {
+	if "" == "" {
 		local name "pref"
 	}
-	if "`stub'" == "" {
+	if "" == "" {
 		local stub "net"
 	}
-	nwvalidate `name'
+	nwvalidate 
 	local prefname = r(validname)
-	local varscount : word count `vars'
-	if (`varscount' != `nodes'){
-		nwvalidvars `nodes', stub(`stub')
-		local prefvars "$validvars"
+	local varscount : word count 
+	if ( != ){
+		nwvalidvars , stub()
+		local prefvars " net1_1 net1_2 net1_3 net1_4 net1_5 net1_6 net1_7 net1_8 net1_9 net1_10 net1_11 net1_12"
 	}
 	else {
-		local prefvars "`vars'"
+		local prefvars ""
 	}
 	
-	if `ntimes' != 1 {
+	if  != 1 {
 		di in smcl as txt "{p}"
-		forvalues i = 1/`ntimes'{
-			if mod(`i', 25) == 0 {
-				di in smcl as txt "...`i'"
+		forvalues i = 1/{
+			if mod(, 25) == 0 {
+				di in smcl as txt "..."
 			}
-			nwpref `nodes', m0(`m0') m(`m') prob(`prob') name(`name'_`i') stub(`stub') `xvars' `undirected'
+			nwpref , m0() m() prob() name(_) stub()  
 		}
 		exit
 	}
 	
-	mata: newmat = prefattach(`nodes',`m0',`m',`prob',`directed')
-	nwset, mat(newmat) vars(`prefvars') name(`prefname') `undirected' 
-	nwload `prefname', `xvars' 
+	mata: newmat = prefattach(,,,,)
+	nwset, mat(newmat) vars() name()  
+	nwload ,  
 	
 	
 end

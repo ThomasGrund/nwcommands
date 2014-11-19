@@ -1,45 +1,45 @@
-*! Date        : 24aug2014
-*! Version     : 1.0
-*! Author      : Thomas Grund, Linköping University
-*! Email	   : contact@nwcommands.org
+*! Date      :18nov2014
+*! Version   :1.0.4.1
+*! Author    :Thomas Grund
+*! Email     :thomas.u.grund@gmail.com
 
 capture program drop nwdrop
 program nwdrop
 	version 9
 	syntax [anything(name=netname)] [if/] [in/], [netonly ATTRibutes(varlist) reverseif]
-	_nwsyntax `netname', max(9999)
+	_nwsyntax , max(9999)
 
-	local nets `networks'
+	local nets 
 	local z = 0
-	qui foreach dropnet in `netname' {
-		nwname `dropnet'
+	qui foreach dropnet in  {
+		nwname 
 		local id = r(id)
 		local nodes = r(nodes)
-		local z = `z' + 1
+		local z =  + 1
 		
 		// only drop nodes 
-		if ("`if'" != "" | "`in'" != ""){
+		if ("" != "" | "" != ""){
 			tempvar keepnode
-			gen `keepnode' = 1
-			if "`if'" != "" {
-				replace `keepnode' = 0 if `if'
-				if ("`reverseif'"!= ""){
-					recode `keepnode' (0=1) (1=0)
+			gen  = 1
+			if "" != "" {
+				replace  = 0 if 
+				if (""!= ""){
+					recode  (0=1) (1=0)
 				}
 			}
-			if "`in'" != "" {
-				replace `keepnode' = 0 in `in'
+			if "" != "" {
+				replace  = 0 in 
 			}
 			
-			mata: keepnode = st_data((1,`nodes'), st_varindex("`keepnode'"))
+			mata: keepnode = st_data((1,), st_varindex(""))
 			
 			// WHY DID I INCLUDE THIS? IT MESSES WITH NWPLOT (MDS)
 			// make sure that attributes are only included for dropping one network
-			//if (`z' != `nets') {
-			//	nwdropnodes `dropnet', keepmat(keepnode) `netonly'
+			//if ( != ) {
+			//	nwdropnodes , keepmat(keepnode) 
 			//}
 			//else {
-				nwdropnodes `dropnet', keepmat(keepnode) `netonly' attributes(`attributes')
+				nwdropnodes , keepmat(keepnode)  attributes()
 			//}
 			mata: mata drop keepnode
 		}
@@ -47,41 +47,41 @@ program nwdrop
 		// drop the whole network
 		else {
 			// delete Stata variables if needed
-			scalar onenw = "\$nw_`id'"
-			if "`netonly'" == "" {
-				capture confirm variable `=onenw'
+			scalar onenw = ""
+			if "" == "" {
+				capture confirm variable marriage_4 marriage_5 marriage_6 marriage_7 marriage_8 marriage_10 marriage_11 marriage_12 marriage_13 marriage_14 marriage_15 marriage_16
 				if _rc == 0 {
-					qui drop `=onenw'
+					qui drop marriage_4 marriage_5 marriage_6 marriage_7 marriage_8 marriage_10 marriage_11 marriage_12 marriage_13 marriage_14 marriage_15 marriage_16
 				}
 				capture drop _label	 
 			}
 	
 			// update all Stata/Mata macros
-			local k 	= $nwtotal - 1
-			forvalues j = `id'/`k' {
-				local next = `j' + 1
-				nwname, id(`next')
-				global nwname_`j' = r(name)
-				global nwsize_`j' = r(nodes)
-				global nwdirected_`j' = r(directed)			
+			local k 	= 2 - 1
+			forvalues j = / {
+				local next =  + 1
+				nwname, id()
+				global nwname_ = r(name)
+				global nwsize_ = r(nodes)
+				global nwdirected_ = r(directed)			
 		
-				scalar movenw = "\$nw_`next'"
-				global nw_`j' `=movenw'
+				scalar movenw = ""
+				global nw_ 
 				
-				mata: mata drop nw_mata`j'
-				mata: nw_mata`j' = nw_mata`next'
+				mata: mata drop nw_mata
+				mata: nw_mata = nw_mata
 			}
 			
 			// clean-up
-			macro drop nw_$nwtotal
-			macro drop nwsize_$nwtotal
-			macro drop nwname_$nwtotal
-			macro drop nwdirected_$nwtotal
-			macro drop nwlabs_$nwtotal
-			macro drop nwedgelabs_$nwtotal
-			mata: mata drop nw_mata$nwtotal
-			global nwtotal `=$nwtotal - 1'
-			global nwtotal_mata = `=$nwtotal_mata - 1'
+			macro drop nw_2
+			macro drop nwsize_2
+			macro drop nwname_2
+			macro drop nwdirected_2
+			macro drop nwlabs_2
+			macro drop nwedgelabs_2
+			mata: mata drop nw_mata2
+			global nwtotal 1
+			global nwtotal_mata = 1
 		}
 	}
 	nwcompressobs

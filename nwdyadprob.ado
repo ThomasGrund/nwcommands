@@ -1,7 +1,7 @@
-*! Date        : 24aug2014
-*! Version     : 1.0
-*! Author      : Thomas Grund, Linköping University
-*! Email	   : contact@nwcommands.org
+*! Date      :18nov2014
+*! Version   :1.0.4.1
+*! Author    :Thomas Grund
+*! Email     :thomas.u.grund@gmail.com
 
 capture program drop nwdyadprob
 program nwdyadprob
@@ -18,52 +18,52 @@ program nwdyadprob
 	}
 	
 	// Check if this is the first network in this Stata session
-	if "$nwtotal" == "" {
+	if "2" == "" {
 		global nwtotal = 0
 	}
 	
 	// Get parameters
-	nwname `weightnet'	
+	nwname 	
 	local nodes = r(nodes)
-	local ties = `nodes' * (`nodes' -1) * `density'
+	local ties =  * ( -1) * 
 	
 	// Generate valid network name and valid varlist
-	if "`name'" == "" {
+	if "" == "" {
 		local name "dyadprob"
 	}
-	if "`stub'" == "" {
+	if "" == "" {
 		local stub "net"
 	}
-	nwvalidate `name'
+	nwvalidate 
 	local homoname = r(validname)
-	local varscount : word count `vars'
-	if (`varscount' != `nodes'){
-		nwvalidvars `nodes', stub(`stub')
-		local homovars "$validvars"
+	local varscount : word count 
+	if ( != ){
+		nwvalidvars , stub()
+		local homovars " net1_1 net1_2 net1_3 net1_4 net1_5 net1_6 net1_7 net1_8 net1_9 net1_10 net1_11 net1_12"
 	}
 	else {
-		local homovars "`vars'"
+		local homovars ""
 	}
 	
 	// Generate network from weight network
 	preserve
-	nwtoedge `weightnet', full
+	nwtoedge , full
 	
-	if "`undirected'" != "" {
-		replace `weightnet' = 0 if _toid <= _fromid
+	if "" != "" {
+		replace  = 0 if _toid <= _fromid
 	}
 	
-	gsample `ties' [aweight=`weightnet'], generate(link) wor
+	gsample  [aweight=], generate(link) wor
 	qui nwfromedge _fromid _toid link, name(_tempnetwork)
-	nwset net*, name(`homoname') vars(`homovars') `xvars'
+	nwset net*, name() vars() 
 	nwdrop _tempnetwork	
 	restore
 	
-	if "`undirected'" != "" {
-		nwsym `homoname'
+	if "" != "" {
+		nwsym 
 	}
-	if "`xvars'" == "" {
-		nwload `homoname', `xvars'
+	if "" == "" {
+		nwload , 
 	}
 end
 

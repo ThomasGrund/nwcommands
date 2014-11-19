@@ -1,80 +1,85 @@
+*! Date      :18nov2014
+*! Version   :1.0.4.1
+*! Author    :Thomas Grund
+*! Email     :thomas.u.grund@gmail.com
+
 capture program drop _nwsyntax_other
 program _nwsyntax_other
 	syntax [anything],[min(integer 1) max(integer 1) exactly(integer 0) nocurrent forcedirected(string)]
 	
 	nwset, nooutput
 	local networks = r(networks)
-	local user = "`anything'"
+	local user = ""
 	
-	if "`anything'" == ""  & "`current'" == ""{
+	if "" == ""  & "" == ""{
 		nwcurrent
 		local anything = r(current)
 	}
 	// Deal with _all
-	if "`anything'" == "_all" {
+	if "" == "_all" {
 		local allnames = ""
-		forvalues i = 1/`networks' {
-			nwname, id(`i')
+		forvalues i = 1/ {
+			nwname, id()
 			local newname = r(name)
-			local allnames "`allnames' `newname'" 
+			local allnames " " 
 		}
-		local anything "`allnames'"
+		local anything ""
 	}		
 		
 	// Deal with *
-	di "`newanything'"
-	local newanything "`anything'"
-	foreach onenet in `anything' {
-		local onenet_exp = subinstr("`onenet'","*",".*",99)
+	di ""
+	local newanything ""
+	foreach onenet in  {
+		local onenet_exp = subinstr("","*",".*",99)
 		local newonenet = ""
-		forvalues i = 1/$nwtotal {
-			scalar onename = "\$nwname_`i'"
+		forvalues i = 1/2 {
+			scalar onename = ""
 			local localname = onename
-			local sta = regexm("`localname'", "^`onenet_exp'$")
-			if `sta' == 1 {
-				local newonenet "`newonenet' `localname'"
+			local sta = regexm("", "^$")
+			if  == 1 {
+				local newonenet " "
 			}
 		}
-		local newanything : subinstr local newanything "`onenet'" "`newonenet'", word all
+		local newanything : subinstr local newanything "" "", word all
 	}
-	local anything "`newanything'"
+	local anything ""
 	
-	foreach onenet in `anything' {
-		nwname `onenet', newdirected(`forcedirected')
+	foreach onenet in  {
+		nwname , newdirected()
 		local name = r(name)
 		local id = r(id)
 		local nodes = r(nodes)
 		local directed = r(directed)
 		
 		// remove all self-loops
-		mata: _diag(nw_mata`id', 0)
+		mata: _diag(nw_mata, 0)
 	}
 	
-	local anycount : word count `anything'
-	if ((`anycount' > `max') | (`anycount' < `min'))& `exactly' == 0{
-		di "{err}wrong number of networks; only {bf:`max'} allowed"
+	local anycount : word count 
+	if (( > ) | ( < ))&  == 0{
+		di "{err}wrong number of networks; only {bf:} allowed"
 		error 6020
 	}
-	if `exactly' != 0 {
+	if  != 0 {
 		local newanything ""
 		local last ""
-		forvalues i = 1/`exactly' {
-			local next : word `i' of `anything'
-			if "`next'" != "" {
-				local last "`next'"
+		forvalues i = 1/ {
+			local next : word  of 
+			if "" != "" {
+				local last ""
 			}
 			else {
-				local next "`last'"
+				local next ""
 			}
-			local newanything "`newanything' `next'"
+			local newanything " "
 		}	
-		local anything "`newanything'"
+		local anything ""
 	}
 	
-	c_local othernetname "`anything'"
-	c_local othernodes "`nodes'"
-	c_local otherid "`id'"
-	c_local othername "`name'"
-	c_local otherdirected "`directed'"
+	c_local othernetname ""
+	c_local othernodes ""
+	c_local otherid ""
+	c_local othername ""
+	c_local otherdirected ""
 end
 

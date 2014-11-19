@@ -1,30 +1,30 @@
-*! Date        : 3sept2014
-*! Version     : 1.0.1
-*! Author      : Thomas Grund, Linköping University
-*! Email	   : contact@nwcommands.org
+*! Date      :18nov2014
+*! Version   :1.0.4.1
+*! Author    :Thomas Grund
+*! Email     :thomas.u.grund@gmail.com
 
 capture program drop nwtab1
 program nwtab1
 	
 	syntax [anything] , [selfloop *]
-	_nwsyntax `anything'
+	_nwsyntax 
 	
 	preserve
-	nwname `netname'
-	if "`r(directed)'" == "false" {
+	nwname 
+	if "" == "false" {
 		local undirected = "undirected"
 	}
-	local edgelabs `r(edgelabs)'
+	local edgelabs 
 	
-	nwtoedge `netname', type(full)
-	qui if "`selfloop'" == "" {
+	nwtoedge , type(full)
+	qui if "" == "" {
 		drop if _fromid == _toid 
 	}
-	local ident = length("`netname'") + 20
+	local ident = length("") + 20
 	di
-	di "{txt}   Network:  {res}`netname'{txt}{col `ident'}Directed: {res}`directed'{txt}"
-	capture label def elab `edgelabs'
-	capture label val `netname' elab
-	tab `netname', `options'
+	di "{txt}   Network:  {res}{txt}{col }Directed: {res}{txt}"
+	capture label def elab 
+	capture label val  elab
+	tab , 
 	restore
 end

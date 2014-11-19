@@ -1,12 +1,17 @@
+*! Date      :18nov2014
+*! Version   :1.0.4.1
+*! Author    :Thomas Grund
+*! Email     :thomas.u.grund@gmail.com
+
 capture program drop nwinfo
 program nwinfo
 	version 9
-	syntax [anything(name=netname)]
+	syntax [anything(name=netname)][, id(numlist mx = 2) mat]
 	
-	_nwsyntax `netname', max(9999)
+	_nwsyntax , max(9999)
 	
-	foreach onenet in `netname' {
-		nwinf `onenet'
+	foreach onenet in  {
+		nwinf 
 	}
 	
 end
@@ -15,76 +20,76 @@ end
 capture program drop nwinf
 program nwinf
 	version 9
-	syntax [anything(name=netname)], [id(string)]
+	syntax [anything(name=netname)], [id(string) mat]
 	
 	
-	if ("$nwtotal" == "" | "$nwtotal" == "0"){
+	if ("2" == "" | "2" == "0"){
 		exit
 	}
 	
-	if ("`netname'" == "" & "`id'" == ""){
+	if ("" == "" & "" == ""){
 		local id = 1
 	}
 		
-	if "`id'" == "" {
+	if "" == "" {
 		local id = -1
-		forvalues i = 1/$nwtotal {
-			scalar onename = "\$nwname_`i'"
+		forvalues i = 1/2 {
+			scalar onename = ""
 			local localname = onename
-			if "`localname'" == "`netname'" {
-				local id = `i'
+			if "" == "" {
+				local id = 
 			}
 		}
 	}
 	else {
-		scalar onename = "\$nwname_`id'"
+		scalar onename = ""
 		local thisname = onename
-		if (`id' < 1 | `id' > $nwtotal) {
+		if ( < 1 |  > 2) {
 			di "{err}Index out of bounds."
 			error 234
 		}
 	}
 
 	mata: st_rclear()
-	mata: st_numscalar("r(id)", `id')
+	mata: st_numscalar("r(id)", )
 
-	if ("`id'" == "-1") {
-		di "{err}Network {res}`netname'{err} not found."
+	if ("" == "-1") {
+		di "{err}Network {res}{err} not found."
 		exit
 	}
 	
-	scalar onename = "\$nwname_`id'"
+	scalar onename = ""
 	local thisname = onename
-	scalar onedirected = "\$nwdirected_`id'"
+	scalar onedirected = ""
 	local localdirected = onedirected
-	scalar onesize = "\$nwsize_`id'"
+	scalar onesize = ""
 	local localsize = onesize
 
-	mata: minval = min(nw_mata`id')
-	mata: maxval = max(nw_mata`id')
+	mata: minval = min(nw_mata)
+	mata: maxval = max(nw_mata)
 	
-	mata: st_global("r(name)", "`thisname'")
-	mata: st_global("r(directed)", "`localdirected'")
-	mata: st_numscalar("r(nodes)", `localsize')
+	mata: st_global("r(name)", "")
+	mata: st_global("r(directed)", "")
+	mata: st_numscalar("r(nodes)", )
 	mata: st_numscalar("r(minval)", minval)
 	mata: st_numscalar("r(maxval)", maxval)	
-	mata: nw_binary = nw_mata`id' :/ nw_mata`id'
+	mata: nw_binary = nw_mata :/ nw_mata
 	mata: _diag(nw_binary, J(rows(nw_binary),1,0))
 				
 	if (r(directed)=="false"){
 		mata: edgecount = sum(nw_binary) / 2
-		mata: edgecountvalue = sum(nw_mata`id') / 2
+		mata: edgecountvalue = sum(nw_mata) / 2
 		mata: st_numscalar("r(edges)", edgecount)
 		mata: st_numscalar("r(edges_value)", edgecountvalue)
 	}
 	else {
 		mata: arccount = sum(nw_binary) 
-		mata: arccountvalue = sum(nw_mata`id')
+		mata: arccountvalue = sum(nw_mata)
 		mata: st_numscalar("r(arcs)", arccount)
 		mata: st_numscalar("r(arcs_value)", arccountvalue)
 	}
 	
-	mata: st_numscalar("r(density)", (sum(nw_binary) / (`localsize' * (`localsize' - 1))))
+	mata: st_numscalar("r(density)", (sum(nw_binary) / ( * ( - 1))))
 	
 	mata: mata drop nw_binary
 	capture mata: mata drop edgecount
@@ -93,16 +98,16 @@ program nwinf
 	capture mata: mata drop arccountvalue
 
 	di "{hline 50}"
-	di "{txt}   Network name: {res} `r(name)'"
-	di "{txt}   Network id: {res} `r(id)'"
-	di "{txt}   Directed: {res}`r(directed)'"
-	di "{txt}   Nodes: {res}`r(nodes)'"
+	di "{txt}   Network name: {res} "
+	di "{txt}   Network id: {res} "
+	di "{txt}   Directed: {res}"
+	di "{txt}   Nodes: {res}"
 	if (r(directed) == "false"){
-		di "{txt}   Edges: {res}`r(edges)'"
+		di "{txt}   Edges: {res}"
 	}
 	if (r(directed) == "true"){
-		di "{txt}   Arcs: {res}`r(arcs)'"
+		di "{txt}   Arcs: {res}"
 	}
-	di "{txt}   Density: {res} `r(density)'"
+	di "{txt}   Density: {res} "
 	di "{hline 50}"
 end

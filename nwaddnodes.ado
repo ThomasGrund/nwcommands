@@ -1,42 +1,42 @@
-*! Date        : 24aug2014
-*! Version     : 1.0
-*! Author      : Thomas Grund, Linköping University
-*! Email	   : contact@nwcommands.org
+*! Date      :18nov2014
+*! Version   :1.0.4.1
+*! Author    :Thomas Grund
+*! Email     :thomas.u.grund@gmail.com
 
 capture program drop nwaddnodes
 program nwaddnodes
 	syntax [anything(name=netname)], newnodes(integer) [vars(string)]
 
-	_nwsyntax `netname', max(1)
+	_nwsyntax , max(1)
 	
-	if "`stub'" == "" {
+	if "" == "" {
 		local stub = "new"
 	}
 	
-	if ("`vars'" == "") {
+	if ("" == "") {
 		// Generate temporary varlist and check for each variable if it already exists.
 		local vars = "" 	
 		local invalid = 0
-		forvalues i=1/`newnodes' {
-			local vars "`vars' `stub'`i'"
-			capture confirm variable `stub'`i'
+		forvalues i=1/ {
+			local vars " "
+			capture confirm variable 
 			if !_rc {
-				local invalid = `invalid' + 1
+				local invalid =  + 1
 			}
 		}
 		
 		// Finds valid Stata variable names to store network.
-		if `invalid' > 0 { 
+		if  > 0 { 
 			local stub_add = 0
-			while `invalid' > 0 {
+			while  > 0 {
 				local vars = ""
-				local stub_add = `stub_add' + 1
+				local stub_add =  + 1
 				local invalid = 0
-				forvalues i=1/`newnodes' {
-					local vars "`vars' `stub'`stub_add'_`i'"
-					capture confirm variable `stub'`stub_add'_`i'
+				forvalues i=1/ {
+					local vars " _"
+					capture confirm variable _
 					if !_rc {
-						local invalid = `invalid' + 1
+						local invalid =  + 1
 					}
 				}
 			}
@@ -45,40 +45,40 @@ program nwaddnodes
 	else {
 		preserve
 		drop _all
-		nwload `netname'
-		foreach onevar in `vars'  {
-			capture confirm variable `onevar'
+		nwload 
+		foreach onevar in   {
+			capture confirm variable 
 			if (_rc == 0) {
-				di "{err}Node variable `onevar' already in use. Choose option vars() differently."
+				di "{err}Node variable  already in use. Choose option vars() differently."
 				error 6070
 			}
 		}
-		local vars_count : word count `vars'
-		if (`vars_count' != `newnodes') {
+		local vars_count : word count 
+		if ( != ) {
 				di "{err}Wrong number of new variables in option vars()."
 				error 6070	
 		}
 		restore
 	}
 
-	local newnodes = `nodes' + `newnodes'
-	nwtomata `netname', mat(oldmat)
-	mata: newmat = J(`newnodes',`newnodes', 0)
-	mata: newmat[|1,1 \ `nodes',`nodes'|] = oldmat
+	local newnodes =  + 
+	nwtomata , mat(oldmat)
+	mata: newmat = J(,, 0)
+	mata: newmat[|1,1 \ ,|] = oldmat
 	
-	scalar onevars = "\$nw_`id'"
-	local oldvars `=onevars'
-	capture drop `oldvars'
+	scalar onevars = ""
+	local oldvars marriage_4 marriage_5 marriage_6 marriage_7 marriage_8 marriage_10 marriage_11 marriage_12 marriage_13 marriage_14 marriage_15 marriage_16
+	capture drop 
 	
-	scalar onelabs = "\$nwlabs_`id'"
-	local oldlabs `=onelabs'
+	scalar onelabs = ""
+	local oldlabs bischeri castellani ginori guadagni lamberteschi pazzi peruzzi pucci ridolfi salviati strozzi tornabuoni
 	
-    //mata: mata drop nw_mata`id'
-	mata: nw_mata`id' = newmat
-	global nwsize_`id' = `newnodes'
-	global nw_`id' "`oldvars' `vars'" 
-	global nwlabs_`id' "`oldlabs' `vars'"
-	nwload `netname'
+    //mata: mata drop nw_mata
+	mata: nw_mata = newmat
+	global nwsize_ = 
+	global nw_ " " 
+	global nwlabs_ " "
+	nwload 
 
 	mata: mata drop newmat
 end

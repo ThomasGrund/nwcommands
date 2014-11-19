@@ -1,45 +1,50 @@
+*! Date      :18nov2014
+*! Version   :1.0.4.1
+*! Author    :Thomas Grund
+*! Email     :thomas.u.grund@gmail.com
+
 capture program drop nwgenerate
 program nwgenerate
-	local arg ="`0'"
+	local arg ="nwgenerate.ado, date(18nov2014) author(Thomas Grund) email(thomas.u.grund@gmail.com) version(1.0.4.1) other()"
 	gettoken arg options: arg, parse(",") bind
-	if "`options'" != "" {
-		local options = substr("`options'", 2,.)
+	if "" != "" {
+		local options = substr("", 2,.)
 	}
 	gettoken netname netexp: arg, parse("=")
-	local netname = trim("`netname'")
+	local netname = trim("")
 	
 	// check if network or variable should be created
 	
 	gettoken job jobrest: netexp, parse("(")
-	local job = trim("`job'")
-	local job = substr("`job'", 2,.)
-	local selectjob : word 1 of `job'
+	local job = trim("")
+	local job = substr("", 2,.)
+	local selectjob : word 1 of 
 	local nwgenopt "evcent context degree outdegree indegree isolates components lgc clustering closeness farness nearness between"
 	local whichjob : list  nwgenopt & selectjob
-	local nwgenvar : word count `whichjob'
+	local nwgenvar : word count 
 	
 	// generate network
-	if `nwgenvar' == 0 {
+	if  == 0 {
 	
 		// replace the network if it exists already
-		if (strpos("`options'", "replace")!=0){
-			capture nwdrop `netname'
+		if (strpos("", "replace")!=0){
+			capture nwdrop 
 		}
 	
-		capture nwname `netname'
+		capture nwname 
 		if _rc == 0 {
-			di "{err}network {it:`netname'} already defined"
+			di "{err}network {it:} already defined"
 			error 6004
 		}
 	
 		// get rid of first equal sign and check for single generator
-		local netexp = substr(trim("`netexp'"),2,.)
-		if (substr("`netexp'",1,1)=="_") {
-			local netexp "(`netexp')"
+		local netexp = substr(trim(""),2,.)
+		if (substr("",1,1)=="_") {
+			local netexp "()"
 		}
 	
 		// evaluate network expression
-		_nwevalnetexp `netexp' % _genmat
+		_nwevalnetexp  % _genmat
 		local nodes = r(nodes)
 	
 		// check if new network id directed
@@ -47,91 +52,91 @@ program nwgenerate
 		if (r(sym) == 1){
 			local undirected "undirected"
 		}
-		nwrandom `nodes', prob(0) name(`netname') `undirected' `options'
-		nwreplacemat `netname', newmat(_genmat)
+		nwrandom , prob(0) name()  
+		nwreplacemat , newmat(_genmat)
 	
 		mata: st_rclear()
-		nwname `netname'
-		mata: st_global("r(netexp)", "`netexp'")
+		nwname 
+		mata: st_global("r(netexp)", "")
 		mata: mata drop _genmat
 	}
 	// generate variable
 	qui else {
 		// get whatever is inside parenthesis
-		local start = strpos("`netexp'", "(")
-		local length = (strpos("`netexp'",")")) - `start' - 1
-		local subopt = substr("`netexp'", `=`start' + 1', `length')
+		local start = strpos("", "(")
+		local length = (strpos("",")")) -  - 1
+		local subopt = substr("", 1, )
 		
 		// nwclustering shortcuts
-		if "`whichjob'" == "clustering" {
-			nwclustering `subopt', gen(`netname') `options'
+		if "" == "clustering" {
+			nwclustering , gen() 
 		}
 		
 		// nwcloseness shortcuts
-		if "`whichjob'" == "closeness" {
+		if "" == "closeness" {
 			tempvar _t1 _t2
-			nwcloseness `subopt', gen(`netname' `_t1' `_t2') `options'
+			nwcloseness , gen(  ) 
 		}
-		if "`whichjob'" == "farness" {
+		if "" == "farness" {
 			tempvar _t1 _t2
-			nwcloseness `subopt', gen(`_t1' `netname' `_t2') `options'
+			nwcloseness , gen(  ) 
 		}
-		if "`whichjob'" == "nearness" {
+		if "" == "nearness" {
 			tempvar _t1 _t2
-			nwcloseness `subopt', gen(`_t1' `_t2' `netname') `options'
+			nwcloseness , gen(  ) 
 		}
 		
 		// nwcomponents shortcuts
-		if "`whichjob'" == "components" {
-			nwcomponents `subopt', gen(`netname') `options'
+		if "" == "components" {
+			nwcomponents , gen() 
 		}
-		if "`whichjob'" == "lgc" {
-			nwcomponents `subopt', gen(`netname') lgc `options'
+		if "" == "lgc" {
+			nwcomponents , gen() lgc 
 		}
 		
 		// nwdegree shortcuts
-		if "`whichjob'" == "isolates" {
+		if "" == "isolates" {
 			tempvar _t1 _t2 _t3
-			nwdegree `subopt', isolates gen(`_t1' `_t2' `_t3' `netname') `options'
+			nwdegree , isolates gen(   ) 
 		}
-		if "`whichjob'" == "indegree" {
+		if "" == "indegree" {
 			tempvar _t1 _t2 _t3
-			nwdegree `subopt', gen(`_t1' `_t2' `netname' `_t3') `options'
-			capture confirm variable `netname'
+			nwdegree , gen(   ) 
+			capture confirm variable 
 			if _rc != 0 {
-				nwdegree `subopt', gen(`netname' `_t1' `_t2' `_t3') `options'
+				nwdegree , gen(   ) 
 			}
 		}
-		if "`whichjob'" == "outdegree" {
+		if "" == "outdegree" {
 			tempvar _t1 _t2 _t3
-			nwdegree `subopt', gen(`_t1' `netname' `_t2'  `_t3') `options'
-			capture confirm variable `netname'
+			nwdegree , gen(    ) 
+			capture confirm variable 
 			if _rc != 0 {
-				nwdegree `subopt', gen(`netname' `_t1' `_t2' `_t3') `options'
+				nwdegree , gen(   ) 
 			}
 		}
-		if "`whichjob'" == "degree" {
+		if "" == "degree" {
 			tempvar _t1 _t2 _t3
-			nwdegree `subopt', gen(`netname' `_t1' `_t2'  `_t3') `options'
-			capture confirm variable `netname'
+			nwdegree , gen(    ) 
+			capture confirm variable 
 			if _rc != 0 {
-				nwdegree `subopt', gen(`_t1' `netname' `_t2' `_t3') `options'
+				nwdegree , gen(   ) 
 			}
 		}
 		
 		// nwbetween shortcuts
-		if "`whichjob'" == "between" {
-			nwbetween `subopt', gen(`netname') `options'
+		if "" == "between" {
+			nwbetween , gen() 
 		}
 		
 		// nwcontext shortcuts
-		if "`whichjob'" == "context" {
-			nwcontext `subopt', gen(`netname') `options'
+		if "" == "context" {
+			nwcontext , gen() 
 		}
 		
 		// nwevcent shortcuts
-		if "`whichjob'" == "evcent" {
-			nwevcent `subopt', gen(`netname') `options'
+		if "" == "evcent" {
+			nwevcent , gen() 
 		}
 		
 	}

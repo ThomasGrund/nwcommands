@@ -1,6 +1,5 @@
 {smcl}
-{* *! version 1.0.6  23aug2014 author: Thomas Grund}{...}
-{cmd:help nwcurrent}
+{* *! version 1.0.4.1  18nov2014}{...}
 {marker topic}
 {helpb nw_topical##information:[NW-2.4] Information}
 {hline}

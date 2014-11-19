@@ -1,58 +1,58 @@
-*! Date        : 24aug2014
-*! Version     : 1.0
-*! Author      : Thomas Grund, Linköping University
-*! Email	   : contact@nwcommands.org
+*! Date      :18nov2014
+*! Version   :1.0.4.1
+*! Author    :Thomas Grund
+*! Email     :thomas.u.grund@gmail.com
 
 capture program drop nwsync
 program def nwsync
 	version 9
 	syntax [anything(name=netname)],[fromstata label]
 	
-	_nwsyntax `netname', max(9999)
+	_nwsyntax , max(9999)
 
-	nwname `netname'
+	nwname 
 	local id = r(id)
 	local nodes = r(nodes)
-	scalar onevars = "\$nw_`id'"
-	local vars `=onevars'
-	local labs "`r(labs)'"
+	scalar onevars = ""
+	local vars marriage_4 marriage_5 marriage_6 marriage_7 marriage_8 marriage_10 marriage_11 marriage_12 marriage_13 marriage_14 marriage_15 marriage_16
+	local labs ""
 
-	if "`label'" != "" {
-		if "`fromstata'" != "" {
+	if "" != "" {
+		if "" != "" {
 			capture confirm variable _nodelab
 			if _rc == 0 {
-				nwname `netname', newlabsfromvar(_nodelab)
+				nwname , newlabsfromvar(_nodelab)
 			}
 		}
 		else {
-			foreach lab in `labs' {
-				qui replace _nodelab = `"`lab'"' in `j'
-				local j = `j' + 1
+			foreach lab in  {
+				qui replace _nodelab = `""' in 
+				local j =  + 1
 			}
 		}
 	}
-	capture confirm variable `vars'
+	capture confirm variable 
 	qui if (_rc == 0){
 		// sync from Stata to network
-		if "`fromstata'" != "" {
-			mata: _syncmat = st_data((1::`nodes'),"`vars'")
-			nwreplacemat `netname', newmat(_syncmat) nosync
+		if "" != "" {
+			mata: _syncmat = st_data((1::),"")
+			nwreplacemat , newmat(_syncmat) nosync
 			mata: mata drop _syncmat
 		}
 		// sync from network to Stata
 		else {
-			nwtomata `netname', mat(_syncmat)
+			nwtomata , mat(_syncmat)
 			local stataObs = _N
-			if (`stataObs' < `nodes'){
-				set obs `nodes'
+			if ( < ){
+				set obs 
 			}
 			local i = 1
-			foreach var in `vars' {
+			foreach var in  {
 				tempvar onecol
-				gen `onecol' = .
-				mata: st_store((1,`nodes'), tokens("`onecol'"), _syncmat[.,`i']) 
-				replace `var' = `onecol'
-				local i = `i' + 1
+				gen  = .
+				mata: st_store((1,), tokens(""), _syncmat[.,]) 
+				replace  = 
+				local i =  + 1
 			}
 			mata: mata drop _syncmat
 		}
