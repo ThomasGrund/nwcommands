@@ -1,5 +1,5 @@
 {smcl}
-{* *! version 1.0.4.1  18nov2014}{...}
+{* *! version 1.0.6  23aug2014 author: Thomas Grund}{...}
 {marker topic}
 {helpb nw_topical##utilities:[NW-2.7] Utilities}
 {cmd:help nwvalidate}

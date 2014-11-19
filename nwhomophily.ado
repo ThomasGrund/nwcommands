@@ -1,57 +1,57 @@
-*! Date      :18nov2014
-*! Version   :1.0.4.1
-*! Author    :Thomas Grund
-*! Email     :thomas.u.grund@gmail.com
+*! Date        : 24aug2014
+*! Version     : 1.0
+*! Author      : Thomas Grund, Linköping University
+*! Email	   : contact@nwcommands.org
 
 capture program drop nwhomophily
 program def nwhomophily
 	syntax varlist(min=1), homophily(string) density(real) [mode(string) nodes(string) name(string) stub(string) xvars undirected]
 	
-	local vc = wordcount("")
-	local hc = wordcount("")
-	local mc = wordcount("")
+	local vc = wordcount("`varlist'")
+	local hc = wordcount("`homophily'")
+	local mc = wordcount("`'")
 	
-	if ( != ) {
+	if (`vc' != `hc') {
 		di "{err}option {it:homophily} needs to have as many entries {it:varlist}."
 		error 6300
 	}
 
 	// Check if this is the first network in this Stata session
-	if "2" == "" {
+	if "$nwtotal" == "" {
 		global nwtotal = 0
 	}
 	
-	if "" == "" {
+	if "`nodes'" == "" {
 		local nodes = _N
-		foreach var of varlist  {
-			qui sum 
+		foreach var of varlist `varlist' {
+			qui sum `varlist'
 			local temp = r(N)
-			local nodes = min(,)
+			local nodes = min(`temp',`nodes')
 		}
 	}
 	
 	// generate valid network name and valid varlist
-	if "" == "" {
+	if "`name'" == "" {
 		local name "assortative"
 	}
-	if "" == "" {
+	if "`stub'" == "" {
 		local stub "net"
 	}
-	nwvalidate 
+	nwvalidate `name'
 	local assortname= r(validname)
 	
 	local gencmd "nwgenerate _tempassort ="
 	
-	forvalues i = 1/{
-		local onevar = word("",)
-		local onehom = word("",)
-		local onemode = word("",)
-		local gencmd " exp((_nwexpand , mode()) * ()) *"
+	forvalues i = 1/`vc'{
+		local onevar = word("`varlist'",`i')
+		local onehom = word("`homophily'",`i')
+		local onemode = word("`mode'",`i')
+		local gencmd "`gencmd' exp((_nwexpand `onevar', mode(`onemode')) * (`onehom')) *"
 	}
-	local gencmd " 1"
-	qui 
+	local gencmd "`gencmd' 1"
+	qui `gencmd'
 	
-	nwdyadprob _tempassort, density() name() 
+	nwdyadprob _tempassort, density(`density') name(`assortname') `undirected'
 	nwdrop _tempassort	
 end
 	

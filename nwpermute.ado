@@ -1,44 +1,44 @@
-*! Date      :18nov2014
-*! Version   :1.0.4.1
-*! Author    :Thomas Grund
-*! Email     :thomas.u.grund@gmail.com
+*! Date        : 3sept2014
+*! Version     : 1.0.1
+*! Author      : Thomas Grund, Linköping University
+*! Email	   : contact@nwcommands.org
 
 capture program drop nwpermute	
 program nwpermute
 	version 9.0
 	syntax [anything(name=netname)], [ id(string) xvars name(string) vars(string) stub(string) noreplace ]
 	
-	_nwsyntax , max(1)
-	scalar onevars = ""
-	local vars marriage_4 marriage_5 marriage_6 marriage_7 marriage_8 marriage_10 marriage_11 marriage_12 marriage_13 marriage_14 marriage_15 marriage_16
+	_nwsyntax `netname', max(1)
+	scalar onevars = "\$nw_`id'"
+	local vars `=onevars'
 	
 	// generate valid network name and valid varlist
-	if "" == "" {
-		local name "_perm"
+	if "`name'" == "" {
+		local name "`netname'_perm"
 	}
-	if "" == "" {
+	if "`stub'" == "" {
 		local stub "perm"
 	}
 
-	nwvalidate 
+	nwvalidate `name'
 	local name = r(validname)
-	local varscount : word count 
-	if ( != ){
-		nwvalidvars , stub()
-		local permvars " net1_1 net1_2 net1_3 net1_4 net1_5 net1_6 net1_7 net1_8 net1_9 net1_10 net1_11 net1_12"
+	local varscount : word count `vars'
+	if (`varscount' != `nodes'){
+		nwvalidvars `nodes', stub(`stub')
+		local permvars "$validvars"
 	}
 	else {
-		local permvars ""
+		local permvars "`vars'"
 	}
 
-	nwtomata , mat(onenet)
+	nwtomata `netname', mat(onenet)
 	mata: perm = permutenet(onenet)
 
-	if ""=="false" {
+	if "`directed'"=="false" {
 		local undirected = "undirected"
 	}
-	nwrandom , prob(0) name() vars()  
-	nwreplacemat , newmat(perm)
+	nwrandom `nodes', prob(0) name(`name') vars(`vars') `undirected' `xvars'
+	nwreplacemat `name', newmat(perm)
 end
 
 capture mata mata drop permutenet()

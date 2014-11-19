@@ -1,52 +1,52 @@
-*! Date      :18nov2014
-*! Version   :1.0.4.1
-*! Author    :Thomas Grund
-*! Email     :thomas.u.grund@gmail.com
+*! Date        : 11sept2014
+*! Version     : 1.0.1
+*! Author      : Thomas Grund, Linköping University
+*! Email	   : contact@nwcommands.org
 
 capture program drop nwuse
 program nwuse
 	syntax anything [, nwclear clear *]
-	local webname = subinstr("", ".dta","",99)
+	local webname = subinstr("`anything'", ".dta","",99)
 	
-	
-	
+	`clear'
+	`nwclear'
 
 	if c(k) > 0 & _N > 0{
 		local reloadExisting = "yes"
 		gen _running = _n
 		tempfile existing 
-		qui save  
+		qui save `existing' 
 	}
-	qui use , 
+	qui use `webname', `options'
 	
 	capture {
 		confirm variable _format _nets _name _size _directed _edgelabs
 		local f = _format[1]
 		local nets = _nets[1]
-		forvalues i = 1/ {
-			local s = _size[]
-			confirm variable _nodevar
-			confirm variable _nodelab
-			if "" == "edgelist"{
-				local nextname = _name[]
-				confirm variable _
+		forvalues i = 1/`nets' {
+			local s = _size[`i']
+			confirm variable _nodevar`i'
+			confirm variable _nodelab`i'
+			if "`f'" == "edgelist"{
+				local nextname = _name[`i']
+				confirm variable _`nextname'
 			}
-			if "" == "matrix" {
-				forvalues j = 1/ {
-					local nodevar 
-					confirm variable 
+			if "`f'" == "matrix" {
+				forvalues j = 1/`s' {
+					local nodevar `=_nodevar`i'[`j']'
+					confirm variable `nodevar'
 				}
 			}
 
-			if "" != "matrix" & "" != "edgelist" {
-				di "{err}file {bf:.dta} has the wrong format."
+			if "`f'" != "matrix" & "`f'" != "edgelist" {
+				di "{err}file {bf:`webname'.dta} has the wrong format."
 				error 6702	
 			}
 		}
 	}
 	
 	if _rc != 0 {
-		di "{err}file {bf:.dta} has the wrong format."
+		di "{err}file {bf:`webname'.dta} has the wrong format."
 		error 6702
 	}
 
@@ -54,23 +54,23 @@ program nwuse
 	local nets = _nets[1]
 	local allnets ""
 	local allnames ""
-	forvalues i = 1 /  {
-		local name = trim(_name[])
-		local allnets " _"
-		local allnames " "
-		local size = _size[]
-		local directed = _directed[]
-		local edgelabs = _edgelabs[]
+	forvalues i = 1 / `nets' {
+		local name = trim(_name[`i'])
+		local allnets "`allnets' _`name'"
+		local allnames "`allnames' `name'"
+		local size = _size[`i']
+		local directed = _directed[`i']
+		local edgelabs = _edgelabs[`i']
 		local vars ""
 		local labs ""
-		forvalues j = 1 /  {
-			local nextvar = _nodevar[] 
-			local nextlab = _nodelab[]
-			local labs " "
-			local vars " "
+		forvalues j = 1 / `size' {
+			local nextvar = _nodevar`i'[`j'] 
+			local nextlab = _nodelab`i'[`j']
+			local labs "`labs' `nextlab'"
+			local vars "`vars' `nextvar'"
 		}
 	
-		if "" == "false" {
+		if "`directed'" == "false" {
 			local directed = ""
 			local undirected = "undirected"
 		}
@@ -80,28 +80,28 @@ program nwuse
 		}
 		preserve
 		
-		local nname "_"
-		if "" == "edgelist"{
-			keep _fromid _toid 
-			qui nwfromedge _fromid _toid  if  != . , name() vars() labs()  
+		local nname "_`name'"
+		if "`frmat'" == "edgelist"{
+			keep _fromid _toid `nname'
+			qui nwfromedge _fromid _toid `nname' if `nname' != . , name(`name') vars(`vars') labs(`labs') `undirected' `directed'
 		}
-		if "" == "matrix"{
-			local _netstub 
-			nwset , name() vars() labs() 
+		if "`frmat'" == "matrix"{
+			local _netstub `vars'
+			nwset `_netstub', name(`name') vars(`vars') labs(`labs') `undirected'
 		}
 		restore
 	}
 	
 	capture drop _*
-	capture drop 
+	capture drop `allnets'
 	
 	di 
 	di "{txt}{it:Loading successful}"
 	nwset
 	qui drop if _n > r(max_nodes)
-	qui if "" != "" {
+	qui if "`reloadExisting'" != "" {
 		gen _running=_n
-		merge m:m _running using , nogenerate
+		merge m:m _running using `existing', nogenerate
 		drop _running
 		
 	}

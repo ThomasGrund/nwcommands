@@ -1,7 +1,7 @@
-*! Date      :18nov2014
-*! Version   :1.0.4.1
-*! Author    :Thomas Grund
-*! Email     :thomas.u.grund@gmail.com
+*! Date        : 11nov2014
+*! Version     : 1.0
+*! Author      : Thomas Grund, Linkoping University
+*! Email	   : contact@nwcommands.org
 
 capture program drop nwpref
 program nwpref
@@ -9,50 +9,50 @@ program nwpref
 	syntax anything(name=nodes) [, ntimes(integer 1) vars(string) stub(string) name(string) m0(integer 2) m(integer 2) prob(real 0) undirected xvars noreplace]
 	set more off
 	
-	if  <= 1 {
+	if `nodes' <= 1 {
 		noisily display as error "The number of nodes must be an integer larger than 1."
 		error 125
 	}
 
-	local directed = ("" == "")
+	local directed = ("`undirected'" == "")
 
 		// Check if this is the first network in this Stata session
-	if "2" == "" {
+	if "$nwtotal" == "" {
 		global nwtotal = 0
 	}
 
 	// Generate valid network name and valid varlist
-	if "" == "" {
+	if "`name'" == "" {
 		local name "pref"
 	}
-	if "" == "" {
+	if "`stub'" == "" {
 		local stub "net"
 	}
-	nwvalidate 
+	nwvalidate `name'
 	local prefname = r(validname)
-	local varscount : word count 
-	if ( != ){
-		nwvalidvars , stub()
-		local prefvars " net1_1 net1_2 net1_3 net1_4 net1_5 net1_6 net1_7 net1_8 net1_9 net1_10 net1_11 net1_12"
+	local varscount : word count `vars'
+	if (`varscount' != `nodes'){
+		nwvalidvars `nodes', stub(`stub')
+		local prefvars "$validvars"
 	}
 	else {
-		local prefvars ""
+		local prefvars "`vars'"
 	}
 	
-	if  != 1 {
+	if `ntimes' != 1 {
 		di in smcl as txt "{p}"
-		forvalues i = 1/{
-			if mod(, 25) == 0 {
-				di in smcl as txt "..."
+		forvalues i = 1/`ntimes'{
+			if mod(`i', 25) == 0 {
+				di in smcl as txt "...`i'"
 			}
-			nwpref , m0() m() prob() name(_) stub()  
+			nwpref `nodes', m0(`m0') m(`m') prob(`prob') name(`name'_`i') stub(`stub') `xvars' `undirected'
 		}
 		exit
 	}
 	
-	mata: newmat = prefattach(,,,,)
-	nwset, mat(newmat) vars() name()  
-	nwload ,  
+	mata: newmat = prefattach(`nodes',`m0',`m',`prob',`directed')
+	nwset, mat(newmat) vars(`prefvars') name(`prefname') `undirected' 
+	nwload `prefname', `xvars' 
 	
 	
 end

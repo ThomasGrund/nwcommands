@@ -1,8 +1,3 @@
-*! Date      :18nov2014
-*! Version   :1.0.4.1
-*! Author    :Thomas Grund
-*! Email     :thomas.u.grund@gmail.com
-
 capture program drop nwqap	
 program nwqap
 syntax [anything (name=formula)] [, detail type(string) mode(string) PERMutations(integer 500) save(string) ]
@@ -10,205 +5,205 @@ syntax [anything (name=formula)] [, detail type(string) mode(string) PERMutation
 
 	mata: st_rclear()
 	
-	if "" == "" {
+	if "`type'" == "" {
 		local type = "logit"
 	}
 	
 	// Get general information.
-	local vars = wordcount("")
-	if ( < 2) {
+	local vars = wordcount("`formula'")
+	if (`vars' < 2) {
 		di "{err}Formula wrongly specified."
 		error 6057
 	}
 	
-	local net = word("", 1)
-	_nwsyntax , max(1)	
-	nwtomata , mat(dvnet)
+	local net = word("`formula'", 1)
+	_nwsyntax `net', max(1)	
+	nwtomata `net', mat(dvnet)
 	
 	// Generate dataset in long format.
-	mata: datalong = J(( * ),, 0)
+	mata: datalong = J((`nodes' * `nodes'),`vars', 0)
 	
 	local i = 1
 	local t = 1
 	
 	local prefix ""
 	
-	foreach entry in  {
-		nwvalidate 
+	foreach entry in `formula' {
+		nwvalidate `entry'
 		// DV or IV is network
 		if (r(exists) == "true") {
-			nwname 
-			local nextname ""
-			if r(nodes) !=  {
+			nwname `entry'
+			local nextname "`r(name)'"
+			if r(nodes) != `nodes' {
 				di "{err}Networks of different size."
 				error 6056
 			}
-			nwtomata , mat(onenet)
+			nwtomata `entry', mat(onenet)
 			mata: _diag(onenet, J(rows(onenet), 1, .))
 			mata: temp = transformIntoLong(onenet)
-			mata: datalong[,] = temp
-			local i =  + 1
-			local prefix " "
+			mata: datalong[,`i'] = temp
+			local i = `i' + 1
+			local prefix "`prefix' `nextname'"
 		}
 		// Assume IV to be a variable.
 		else {
-			confirm variable 
+			confirm variable `entry'
 			// Make network out of IV.
-			tokenize 
-			nwexpand , name(_tempexpand) mode("") nodes()
+			tokenize `mode'
+			nwexpand `entry', name(_tempexpand) mode("``t''") nodes(`nodes')
 			nwtomata _tempexpand, mat(onenet)
 			mata: _diag(onenet, J(rows(onenet), 1, .))
 			mata: temp = transformIntoLong(onenet)
-			mata: datalong[,] = temp
-			local i =  + 1
+			mata: datalong[,`i'] = temp
+			local i = `i' + 1
 			nwdrop _tempexpand
-			if "" == "" {
-				local prefix " same_"
+			if "``t''" == "" {
+				local prefix "`prefix' same_`entry'"
 			}
 			else {
-				local prefix " _"
+				local prefix "`prefix' ``t''_`entry'"
 			}
-			local t =  + 1
+			local t = `t' + 1
 		}
 	}
 		
 	preserve
 	drop _all
-	local obs =  * 
-	qui set obs 
-	qui foreach entry in  {
-		gen  = .
+	local obs = `nodes' * `nodes'
+	qui set obs `obs'
+	qui foreach entry in `formula' {
+		gen `entry' = .
 	}
 	mata: st_store(.,.,datalong)
 		
 	tempname memhold
     tempfile results
 	
-	qui gen _original = 
-	qui replace  = .
+	qui gen `net'_original = `net'
+	qui replace `net' = .
 	
-	quietly postfile   using , replace
+	quietly postfile `memhold' `formula' using `results', replace
 	
 	// Run regression on permutations.
 	set more off
 	di 
 	local perm_running 1
-	qui forvalues j = 1/ {
-		if  == 1 {
-			noisily di "{txt}Permutation: 1 out of "
+	qui forvalues j = 1/`permutations' {
+		if `j' == 1 {
+			noisily di "{txt}Permutation: 1 out of `permutations'"
 		}
-		if  / 50 >=  {
-			noisily di "{txt}Permutation:  out of "
-			local perm_running =  + 1
+		if `j' / 50 >= `perm_running' {
+			noisily di "{txt}Permutation: `=`perm_running'*50' out of `permutations'"
+			local perm_running = `perm_running' + 1
 		}
 		mata: perm_net = permute_net(dvnet)
 		mata: net_long = transformIntoLong(perm_net)
-		mata: st_store(., "", net_long)
-		 
+		mata: st_store(., "`net'", net_long)
+		`type' `formula'
 	
 		mat temp_coeff = e(b)
 		local post_txt = ""
-		local varsminus =  - 1
-		forvalues i = 1/ {
-			local post_txt = " ()"
+		local varsminus = `vars' - 1
+		forvalues i = 1/`varsminus' {
+			local post_txt = "`post_txt' (`=round(temp_coeff[1,`i'], 0.0001)')"
 		}
-		local post_txt ="() "
-		post  
+		local post_txt ="(`=round(_b[_cons], 0.0001)') `post_txt'"
+		post `memhold' `post_txt'
 	}
-	postclose 
+	postclose `memhold'
 	
 	// Run regression with original data.
-	qui replace  = _original
-	if "" != "" {
-		 
+	qui replace `net' = `net'_original
+	if "`detail'" != "" {
+		`type' `formula'
 	}
 	else {
-		quietly  
+		quietly `type' `formula'
 	}
 	mat reg_results = e(b)
 	
 	// Calculate p-values.
-	use , clear
-	if "" != "" {
-		save "", replace
+	use `results', clear
+	if "`save'" != "" {
+		save "`save'", replace
 	}	
-	matrix pvalues = J(1, , .)
+	matrix pvalues = J(1, `vars', .)
 	local k = 1
-	qui foreach entry in  {
-		if ("" == "") {
-			local orig_result = reg_results[1,]
+	qui foreach entry in `formula' {
+		if ("`entry'" == "`net'") {
+			local orig_result = reg_results[1,`vars']
 		}
 		else {
-			local orig_result = reg_results[1,]
+			local orig_result = reg_results[1,`k']
 		}
 		
 		local novariation = "false"	
-		sum 
-		if ( == 0) {
+		sum `entry'
+		if (`r(sd)' == 0) {
 			local novariation = "true"
-			di ""
+			di "`novariation'"
 		}
-		local diff = abs(r(mean) - )
-		local upper_mark = r(mean) + 
-		local lower_mark = r(mean) - 
-		count if  > 
+		local diff = abs(r(mean) - `orig_result')
+		local upper_mark = r(mean) + `diff'
+		local lower_mark = r(mean) - `diff'
+		count if `entry' > `upper_mark'
 		local upper = r(N)
-		count if  < 
+		count if `entry' < `lower_mark'
 		local lower = r(N)	
-		local outer =  + 	
+		local outer = `upper' + `lower'	
 		count
 		local total = r(N)
-		local p =  / 	
-		if "" == "true" {
+		local p = `outer' / `total'	
+		if "`novariation'" == "true" {
 			local p = "."
 		}
-		if ("" == "") {
-			mat pvalues[1,] = 
+		if ("`entry'" == "`net'") {
+			mat pvalues[1,`vars'] = `p'
 		}
 		else {
-			mat pvalues[1,] = 
-			local k =  + 1
+			mat pvalues[1,`k'] = `p'
+			local k = `k' + 1
 		}
 	}	
 	restore
 	
 	//  Display results.
 	local max_l = 0
-	tokenize ""
-	if  < 20 {
+	tokenize "`prefix'"
+	if `max_l' < 20 {
 		local max_l = 20
 	}
 	di 
 	di 
-	qui nwinfo 
-	local dyads =  *  -  
+	qui nwinfo `net'
+	local dyads = `r(nodes)' * `r(nodes)' - `r(nodes)' 
 	di "{txt}Multiple Regression Quadratic Assignment Procedure"
 	di
 	di "{txt}  Estimation{col 25}={res}  QAP" 
-	di "{txt}  Regression{col 25}={res}  "
-	di "{txt}  Permutations{col 25}={res}  "  
-	di "{txt}  Number of vertices{col 25}=  {res}" 
+	di "{txt}  Regression{col 25}={res}  `type'"
+	di "{txt}  Permutations{col 25}={res}  `permutations'"  
+	di "{txt}  Number of vertices{col 25}=  {res}`r(nodes)'" 
 	if r(directed) == "true" {
-		di "{txt}  Number of arcs{col 25}=  {res}" 
+		di "{txt}  Number of arcs{col 25}=  {res}`r(arcs)'" 
 	}
 	if r(directed) == "false" {
-		di "{txt}  Number of edges{col 25}=  {res}"
+		di "{txt}  Number of edges{col 25}=  {res}`r(edges)'"
 	}
-	//di "{txt}  Number of dyads{col 25}=  {res}"
+	//di "{txt}  Number of dyads{col 25}=  {res}`dyads'"
 	di 
-	di "{txt}{hline 3}{c TT}{hline 25}"
-	di "{col 2}{ralign 1:}{col 4}{c |}{col 11}Coef.{col 20}P-value"
-	di "{hline 3}{c +}{hline 25}"
-	local constant = round(reg_results[1,], 0.000001)
+	di "{txt}{hline `=`max_l' + 3'}{c TT}{hline 25}"
+	di "{col 2}{ralign `=`max_l'+1':`net'}{col `=`max_l' + 4'}{c |}{col `=`max_l' + 11'}Coef.{col `=`max_l' + 20'}P-value"
+	di "{hline `=`max_l' + 3'}{c +}{hline 25}"
+	local constant = round(reg_results[1,`=`vars''], 0.000001)
 	
-	forvalues k=2/{
-		local coeff = 
-		local pvalue = 
-		di as text "{txt}{col 2}{ralign 1:}{col 4}{c |}{col 5}{ralign 11:{res}}{col 20}{ralign 5:}"
+	forvalues k=2/`vars'{
+		local coeff = `=round(float(reg_results[1,`=`k'-1']), 0.000001)'
+		local pvalue = `=round(float(pvalues[1,`=`k'-1']),0.001)'
+		di as text "{txt}{col 2}{ralign `=`max_l'+1':``k''}{col `=`max_l' + 4'}{c |}{col `=`max_l' + 5'}{ralign 11:{res}`coeff'}{col `=`max_l' + 20'}{ralign 5:`pvalue'}"
 	}
-	di "{txt}{col 2}{ralign 1:_cons}{col 4}{c |}{col 5}{ralign 11:{res}}"
-	di "{txt}{hline 3}{c BT}{hline 25}"
-	di "{error}"
+	di "{txt}{col 2}{ralign `=`max_l'+1':_cons}{col `=`max_l' + 4'}{c |}{col `=`max_l' + 5'}{ralign 11:{res}`constant'}"
+	di "{txt}{hline `=`max_l' + 3'}{c BT}{hline 25}"
+	di "{error}`message'"
 	
 	mata: st_global("e(title)", "Multivariate regression quadratic assignment procedure")
 	mata: p = st_matrix("pvalues")

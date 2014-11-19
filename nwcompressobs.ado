@@ -1,23 +1,18 @@
-*! Date      :18nov2014
-*! Version   :1.0.4.1
-*! Author    :Thomas Grund
-*! Email     :thomas.u.grund@gmail.com
-
 capture program drop nwcompressobs
 program nwcompressobs
 	tempvar allmissing
 	tempvar temp
 	
-	qui gen  = .
+	qui gen `allmissing' = .
 	qui foreach var of varlist _all {
-		capture encode , gen()
+		capture encode `var', gen(`temp')
 		if (_rc == 0){
-			replace  = 0 if  != .
-			drop 
+			replace `allmissing' = 0 if `temp' != .
+			drop `temp'
 		}
 		else {
-			replace  = 0 if  != .
+			replace `allmissing' = 0 if `var' != .
 		}
 	}
-	qui drop if ( == .)
+	qui drop if (`allmissing' == .)
 end

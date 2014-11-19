@@ -1,49 +1,44 @@
-*! Date      :18nov2014
-*! Version   :1.0.4.1
-*! Author    :Thomas Grund
-*! Email     :thomas.u.grund@gmail.com
-
 capture program drop nwtostata
 program nwtostata
 version 9
 syntax, mat(string) [ gen(namelist min=1) stub(string) ]
 
-	mata: st_numscalar("r(rows)", rows())
+	mata: st_numscalar("r(rows)", rows(`mat'))
 	local rows = r(rows)
-	if  > 15 {
-		set obs 
+	if `rows' > `=_N' {
+		set obs `rows'
 	}
-	opts_exclusive "`""' "
+	opts_exclusive "`"`gen'"' `sub'"
 	
-	if "" != "" & "" != "" {
+	if "`gen'" != "" & "`stub'" != "" {
 		dis as error "Either option gen or option stub needs to be specified, but not both."
 		error 184
 	}
 	
 	
-	if "" == "" & "" == "" {
+	if "`gen'" == "" & "`stub'" == "" {
 		dis as error "Either option gen or option stub needs to be specified."
 		error 198
 	}
 
-	if "" != "" {
-		foreach x of newlist  {
-			quietly gen  = .
+	if "`gen'" != "" {
+		foreach x of newlist `gen' {
+			quietly gen `x' = .
 		}
-		mata: st_view(nwtostataview=.,(1,rows()),tokens(""))
+		mata: st_view(nwtostataview=.,(1,rows(`mat')),tokens("`gen'"))
 	}
 	
-	if "" != "" {
-		mata: st_numscalar("r(cols)", cols())
+	if "`stub'" != "" {
+		mata: st_numscalar("r(cols)", cols(`mat'))
 		local cols = r(cols)
-		forvalues i = 1/ {
-			quietly gen  =.
+		forvalues i = 1/`cols' {
+			quietly gen `stub'`i' =.
 		}
-		unab vars : *
-		mata: st_view(nwtostataview=.,(1,rows()),tokens(""))
+		unab vars : `stub'*
+		mata: st_view(nwtostataview=.,(1,rows(`mat')),tokens("`vars'"))
 	}
-	mata: nwtostataview[.,.] = 
-	capture quietly compress 
-	capture quietly compress *
+	mata: nwtostataview[.,.] = `mat'
+	capture quietly compress `gen'
+	capture quietly compress `stub'*
 	mata: mata drop nwtostataview
 end

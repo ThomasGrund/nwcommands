@@ -1,32 +1,27 @@
-*! Date      :18nov2014
-*! Version   :1.0.4.1
-*! Author    :Thomas Grund
-*! Email     :thomas.u.grund@gmail.com
-
 capture program drop _opts_oneof
 program _opts_oneof
         version 8.2
 
         args opts optname selectopt errcode
 
-        local opts = trim("")     // to trim leading and trailing spaces
+        local opts = trim("`opts'")     // to trim leading and trailing spaces
 
-		local s = wordcount("")
+		local s = wordcount("`opts'")
 		local found = 0
-		forvalues i=1/{
-			local oneopt = word("", )
-			if "" == "" {
+		forvalues i=1/`s'{
+			local oneopt = word("`opts'", `i')
+			if "`oneopt'" == "`selectopt'" {
 				local found = 1
 			}
         }
-		local opts = subinstr(""," ",",",.)
+		local opts = subinstr("`opts'"," ",",",.)
 
-        if  == 1{ // no error message or return code 
+        if `found' == 1{ // no error message or return code 
                 exit
         }
-		di in smcl as err `"option {bf:()} invalid; only one of {bf:} is allowed"'
-        if `""' != "" {
-                exit 
+		di in smcl as err `"option {bf:`optname'(`selectopt')} invalid; only one of {bf:`opts'} is allowed"'
+        if `"`errcode'"' != "" {
+                exit `errcode'
         }
         else {
                 exit 198

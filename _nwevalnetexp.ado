@@ -1,38 +1,33 @@
-*! Date      :18nov2014
-*! Version   :1.0.4.1
-*! Author    :Thomas Grund
-*! Email     :thomas.u.grund@gmail.com
-
 capture program drop _nwevalnetexp
 program _nwevalnetexp
 	
-	local arg = "_nwevalnetexp.ado, date(18nov2014) author(Thomas Grund) email(thomas.u.grund@gmail.com) version(1.0.4.1) other()"
+	local arg = "`0'"
 	gettoken netexp result: arg, parse("%")
 	// prepare result
-	local result = trim(subinstr("", "%", "",.))
+	local result = trim(subinstr("`result'", "%", "",.))
 	
 	// prepare netexp and perform basic syntax check
-	local netexp = trim("")
-	local lnet = length("") 
-	local netexp = substr("", 1, )
-	local netexp_raw = ""
+	local netexp = trim("`netexp'")
+	local lnet = length("`netexp'") 
+	local netexp = substr("`netexp'", 1, `lnet')
+	local netexp_raw = "`netexp'"
 	
 	local parenthesisBalance = 0
-	forvalues i = 1/{
-		local charAt = substr("",,1)
-		if ("" == "(") local parenthesisBalance =  + 1
-		if ("" == ")") local parenthesisBalance =  - 1
+	forvalues i = 1/`lnet'{
+		local charAt = substr("`netexp'",`i',1)
+		if ("`charAt'" == "(") local parenthesisBalance = `parenthesisBalance' + 1
+		if ("`charAt'" == ")") local parenthesisBalance = `parenthesisBalance' - 1
 	}
-	if ("" == "" |  != 0){a
+	if ("`netexp'" == "" | `parenthesisBalance' != 0){a
 		di "{err}{it:netexp} empty or contains unmatched parentheses"
 		error 6077
 	}
 	
 	// check for simple non-network expressions
-	capture mata: 
+	capture mata: `netexp'
 	if (_rc == 0) {
-		mata:  = 
-		mata: st_numscalar("r(nodes)", rows())
+		mata: `result' = `netexp'
+		mata: st_numscalar("r(nodes)", rows(`result'))
 		local nodes = r(nodes)
 	}
 	else {
@@ -45,94 +40,94 @@ program _nwevalnetexp
 
 	// left-align parenthesis
 	forvalues k = 1/10 {
-		local nonet = subinstr("","( ", "(",.)
+		local nonet = subinstr("`netexp'","( ", "(",.)
 	}
 		
 	// identify network generator commands
-	local checkstring = ""
-	local nw_start = strpos("","(_nw")
+	local checkstring = "`netexp'"
+	local nw_start = strpos("`checkstring'","(_nw")
 	local nwgenNum = 0
 	
-	while (!= 0) {
-		local checkstring = substr("", ,.)
-		local checkstring_length = length("")
+	while (`nw_start'!= 0) {
+		local checkstring = substr("`checkstring'", `nw_start',.)
+		local checkstring_length = length("`checkstring'")
 		local balance = 0
 		local i = 1
-		while ( <= ) {
-			local ch = substr("", , 1)
-			if ("" == "(") local balance =  + 1
-			if ("" == ")") local balance =  - 1
-			if ( == 0) {
-				local nwgenNum =  + 1
-				local gencmd = substr("", 3, -3)
-				local gencmdReplace = trim("_")
-				local _tempnet = "_tempgen"
+		while (`i' <= `checkstring_length') {
+			local ch = substr("`checkstring'", `i', 1)
+			if ("`ch'" == "(") local balance = `balance' + 1
+			if ("`ch'" == ")") local balance = `balance' - 1
+			if (`balance' == 0) {
+				local nwgenNum = `nwgenNum' + 1
+				local gencmd = substr("`checkstring'", 3, `=`i'-3')
+				local gencmdReplace = trim("_`gencmd'")
+				local _tempnet = "_tempgen`nwgenNum'"
 								
 				// add identifier of new temporary network
-				if (strpos("",",") != 0){
-					local gencmd " name() xvars noreplace"
+				if (strpos("`gencmd'",",") != 0){
+					local gencmd "`gencmd' name(`_tempnet') xvars noreplace"
 				}
 				else {
-					local gencmd ", name() xvars noreplace"
+					local gencmd "`gencmd', name(`_tempnet') xvars noreplace"
 				}
 				
-				// check that a valididty of nw-generator and execute it 				local generator = word("", 1)
-				local generator = word("",1)
+				// check that a valididty of nw-generator and execute it 				local generator = word("`gencmd'", 1)
+				local generator = word("`gencmd'",1)
 
-				capture which 
+				capture which `generator'
 				if (_rc == 0) {
 					// networks before generator executed
 					capture nwset
 					local totalNetsBefore = r(networks)
 					
-					capture 
+					capture `gencmd'
 					// network after generator executed
 					capture nwset
 					local totalNetsAfter = r(networks)
-					if ( == ) {
-						local nwgenNum =  - 1
+					if (`totalNetsBefore' == `totalNetsAfter') {
+						local nwgenNum = `nwgenNum' - 1
 						local errorOccured = "errorGeneratorFailed"
 						local errorCode = 6079
-						local errorGenerator = ""
+						local errorGenerator = "`gencmd'"
 						continue, break
 					}
 				}
 				else {	
-					local nwgenNum =  - 1
+					local nwgenNum = `nwgenNum' - 1
 					local errorOccured = "errorInvalidGenerator"
 					local errorCode = 6078
-					local errorGenerator = ""
+					local errorGenerator = "`generator'"
 					continue, break
 				}
 				
 				// replace gencmd in netexp 
-				local netexp = subinstr("", "", "",1)
-				local checkstring = trim("")
-				local checknext_len = length("") - 3
-				local checknext = substr("",3,)
-				local nw_start = strpos("","(_nw") + 2
-				if ( == 2) local nw_start = 0
-				local i =  + 1
+				local netexp = subinstr("`netexp'", "`gencmdReplace'", "`_tempnet'",1)
+				local checkstring = trim("`checkstring'")
+				local checknext_len = length("`checkstring'") - 3
+				local checknext = substr("`checkstring'",3,`checknext_len')
+				local nw_start = strpos("`checknext'","(_nw") + 2
+				if (`nw_start' == 2) local nw_start = 0
+				local i = `checkstring_length' + 1
 			}
-			local i =  + 1
+			local i = `i' + 1
 		}
-		if ("" != "") {
+		if ("`errorOccured'" != "") {
 			continue, break
 		}
 	}	
 	
 	// executes an early cleanup in case an error occured generating temporary network
-	if ("" != ""){	
-		forvalues i = 1/ {
-			nwdrop _tempgen
+	if ("`errorOccured'" != ""){	
+		forvalues i = 1/`nwgenNum' {
+			nwdrop _tempgen`i'
 		}
-		if "" == "errorInvalidGenerator" {
-			di "{err}subcommand {bf:} is not a valid {it:nwgenerator}"
+		if "`errorOccured'" == "errorInvalidGenerator" {
+			di "{err}subcommand {bf:`errorGenerator'} is not a valid {it:nwgenerator}"
 		}
-		if "" == "errorGeneratorFailed" {
-			di "{err}subcommand {bf:} failed to generate a network"
+		if "`errorOccured'" == "errorGeneratorFailed" {
+			di "{err}subcommand {bf:`errorGenerator'} failed to generate a network"
 		}
-		error 
+		error `errorCode'
 	}
 	
 	/////////////////////////////
@@ -141,104 +136,104 @@ program _nwevalnetexp
 	/////////////////////////////
 	
 	// Deal with operators in netexp expression 
-	local exp ""
+	local exp "`netexp'"
 	local stataVars = 0
 	local netexp_mata ""
 	
 	// replace all other operators
-	local exp = subinstr("","**"," matmult ",.)
-	local exp = subinstr("","=="," :== ",.)
-	local exp = subinstr("",">="," :grequ ",.)
-	local exp = subinstr("","<="," :smequ ",.)	
-	local exp = subinstr("",">"," :> ",.)
-	local exp = subinstr("","<"," :< ",.)	
-	local exp = subinstr("",":grequ"," :>= ",.)
-	local exp = subinstr("",":smequ"," :<= ",.)	
-	local exp = subinstr("","*"," :* ",.)
-	local exp = subinstr("","/"," :/ ",.)
-	local exp = subinstr("","(-"," (J(matanodes , matanodes , mataminus1) * ",.)
-	local exp = subinstr("","-"," :- ",.)
-	local exp = subinstr("","mataminus1","-1",.)
-	local exp = subinstr("","+"," :+ ",.)
-	local exp = subinstr("","&"," :& ",.)
-	local exp = subinstr("","|"," :| ",.)
-	local exp = subinstr("","("," ( ",.)
-	local exp = subinstr("",")"," ) ",.)
-	local exp = subinstr("","["," [ ",.)
-	local exp = subinstr("","]"," ] ",.)
-	local exp = subinstr("","::"," :: ",.)
-	local exp = subinstr("",","," , ",.)
-	local exp = subinstr("","!="," :!= ",.)
-	local exp = subinstr(""," matmult "," * ",.)
+	local exp = subinstr("`exp'","**"," matmult ",.)
+	local exp = subinstr("`exp'","=="," :== ",.)
+	local exp = subinstr("`exp'",">="," :grequ ",.)
+	local exp = subinstr("`exp'","<="," :smequ ",.)	
+	local exp = subinstr("`exp'",">"," :> ",.)
+	local exp = subinstr("`exp'","<"," :< ",.)	
+	local exp = subinstr("`exp'",":grequ"," :>= ",.)
+	local exp = subinstr("`exp'",":smequ"," :<= ",.)	
+	local exp = subinstr("`exp'","*"," :* ",.)
+	local exp = subinstr("`exp'","/"," :/ ",.)
+	local exp = subinstr("`exp'","(-"," (J(matanodes , matanodes , mataminus1) * ",.)
+	local exp = subinstr("`exp'","-"," :- ",.)
+	local exp = subinstr("`exp'","mataminus1","-1",.)
+	local exp = subinstr("`exp'","+"," :+ ",.)
+	local exp = subinstr("`exp'","&"," :& ",.)
+	local exp = subinstr("`exp'","|"," :| ",.)
+	local exp = subinstr("`exp'","("," ( ",.)
+	local exp = subinstr("`exp'",")"," ) ",.)
+	local exp = subinstr("`exp'","["," [ ",.)
+	local exp = subinstr("`exp'","]"," ] ",.)
+	local exp = subinstr("`exp'","::"," :: ",.)
+	local exp = subinstr("`exp'",","," , ",.)
+	local exp = subinstr("`exp'","!="," :!= ",.)
+	local exp = subinstr("`exp'"," matmult "," * ",.)
 
 	// cycle through expression words first to get number of maxAllowedNodes
-	local exp_words = wordcount("")
-	local exp_net = ""
-	tokenize ""
+	local exp_words = wordcount("`exp'")
+	local exp_net = "`exp'"
+	tokenize "`exp_net'"
 	local maxAllowedNodes = 9999
-	forvalues i = 1/ {
-		local x ""
+	forvalues i = 1/`exp_words' {
+		local x "``i''"
 		mata: st_rclear()
-		capture nwname 
+		capture nwname `x'
 		if (_rc == 0){
-			local maxAllowedNodes = min(, r(nodes))
+			local maxAllowedNodes = min(`maxAllowedNodes', r(nodes))
 		}
 	}
 		
 	// set number of nodes
-	local nodes = 
+	local nodes = `maxAllowedNodes'
 	
 	// cycle through words in netexp
-	local exp = subinstr("", "matanodes", "",.)
-	local exp_words = wordcount("")
-	local exp_net = ""
-	tokenize ""
+	local exp = subinstr("`exp'", "matanodes", "`nodes'",.)
+	local exp_words = wordcount("`exp'")
+	local exp_net = "`exp'"
+	tokenize "`exp_net'"
 
-	forvalues i = 1/ {
-		local x ""
+	forvalues i = 1/`exp_words' {
+		local x "``i''"
 		local operators = "op round( exp( abs( sqrt( log( ln( J , * :!= :: [ ] :& :| :> :< :>= :<= :* :/ :== & | :- :+ ( )"
-		local isoperator = (strpos("", "") > 0)
-		local subnet = "[(1::),(1::)]"
+		local isoperator = (strpos("`operators'", "`x'") > 0)
+		local subnet = "[(1::`nodes'),(1::`nodes')]"
 		// word is not a number or operator
-		if (real("")== . &  != 1 ){		
+		if (real("`x'")== . & `isoperator' != 1 ){		
 			local found = 0
 			
 			// word is a network
-			capture nwname 
+			capture nwname `x'
 			local id = r(id)
 			if (_rc == 0){	
 				local found = 1
-				local exp = subinword("", "", "nw_mata ",1)
+				local exp = subinword("`exp'", "`x'", "nw_mata`id'`subnet' ",1)
 			}
 			
 			// word is Stata _n or _N
-			if ("" == "_n" | "" == "_N" ){
+			if ("`x'" == "_n" | "`x'" == "_N" ){
 				local found = 1
 				tempvar _ntemp
-				gen  = 
-				local exp = subinword("", "", "",.)
-				local x = ""
+				gen `_ntemp' = `x'
+				local exp = subinword("`exp'", "`x'", "`_ntemp'",.)
+				local x = "`_ntemp'"
 			}
 			
 			// word is a Stata variable
-			capture confirm variable 
+			capture confirm variable `x'
 			if (_rc == 0){
 				local obsStata = _N
-				local maxAllowedNodes = min(, )
-				local nodes = 
+				local maxAllowedNodes = min(`obsStata', `nodes')
+				local nodes = `maxAllowedNodes'
 				local found = 1
-				local stataVars =  + 1
-				mata: stataVar_ = st_data((1::),"")
-				local exp = subinword("", "", "stataVar_",.)
+				local stataVars = `stataVars' + 1
+				mata: stataVar_`stataVars' = st_data((1::`nodes'),"`x'")
+				local exp = subinword("`exp'", "`x'", "stataVar_`stataVars'",.)
 			}
 			
 			// word is neither number, operator, nor network or variable
-			if ( == 0) {
-				if (strpos("","_nw") == 1){
-					di "{err}{it:nwgenerator} {bf:} failed"
+			if (`found' == 0) {
+				if (strpos("`x'","_nw") == 1){
+					di "{err}{it:nwgenerator} {bf:`x'} failed"
 				}
 				else {
-					di "{err}{it:network} or {it:variable} {bf:} not found"
+					di "{err}{it:network} or {it:variable} {bf:`x'} not found"
 				}
 				local errorOccued = "errorNetwork"
 				continue, break
@@ -247,70 +242,70 @@ program _nwevalnetexp
 	}
 	
 	// executes an early cleanup in case a network cound not be found
-	if ("" == "errorNetwork"){	
-		forvalues i = 1/ {
-			nwdrop _tempgen
+	if ("`errorOccured'" == "errorNetwork"){	
+		forvalues i = 1/`nwgenNum' {
+			nwdrop _tempgen`i'
 		}
 		error 6001	
 	}
-	local netexp_mata = ""
+	local netexp_mata = "`exp'"
 
 	// to handle single numbers
-	local sub_exp = ""
+	local sub_exp = "`exp'"
 	local subpos1 = 1
-	local subnodes = 
-	while ( != 0) {
-		local subpos1 = strpos("","[")
-		local subpos2 = strpos("","]")
-		local subdiff =  -  + 1
-		local sub = trim(substr("", ,))
-		local subcomma = strpos("", ",")
-		local subend1 =  - 2
-		local substart2 =  + 1
-		local sublen2 = length("") - 
-		local sub1 = substr("",2,)
-		local sub2 = substr("", , )
-		if ( != 0) {
-			local sub1 = "()"
-			local sub2 = "()"
-			mata: st_numscalar("r(sub1)", rows())
-			mata: st_numscalar("r(sub2)", rows())
-			local subwords1 = wordcount("")
-			local subnodes = min(, )
-			local subnodes = min(, )
+	local subnodes = `nodes'
+	while (`subpos1' != 0) {
+		local subpos1 = strpos("`sub_exp'","[")
+		local subpos2 = strpos("`sub_exp'","]")
+		local subdiff = `subpos2' - `subpos1' + 1
+		local sub = trim(substr("`sub_exp'", `subpos1',`subdiff'))
+		local subcomma = strpos("`sub'", ",")
+		local subend1 = `subcomma' - 2
+		local substart2 = `subcomma' + 1
+		local sublen2 = length("`sub'") - `substart2'
+		local sub1 = substr("`sub'",2,`subend1')
+		local sub2 = substr("`sub'", `substart2', `sublen2')
+		if (`subpos1' != 0) {
+			local sub1 = "(`sub1')"
+			local sub2 = "(`sub2')"
+			mata: st_numscalar("r(sub1)", rows(`sub1'))
+			mata: st_numscalar("r(sub2)", rows(`sub2'))
+			local subwords1 = wordcount("`sub1'")
+			local subnodes = min(`subnodes', `r(sub1)')
+			local subnodes = min(`subnodes', `r(sub2)')
 			// invalid subnet
 			if r(sub1) != r(sub2) {
-				local subprint = subinstr(""," ","",.)
-				di "{err}{it:subnet} {bf:} not square"
+				local subprint = subinstr("`sub'"," ","",.)
+				di "{err}{it:subnet} {bf:`subprint'} not square"
 				local errorOccured = "errorSubnet"
 				continue, break
 			}
 		}
 		
-		local nextsubstart =  + 1
-		local sub_exp = substr("",,.)		
+		local nextsubstart = `subpos2' + 1
+		local sub_exp = substr("`sub_exp'",`nextsubstart',.)		
 	}
 	
 	
 	// invoke early cleanup because of subnet failure
-	if "" == "errorSubnet" {
-		forvalues j= 1/ {
-			mata: mata drop stataVar_
+	if "`errorOccured'" == "errorSubnet" {
+		forvalues j= 1/`stataVars' {
+			mata: mata drop stataVar_`j'
 		}
 	
-		forvalues i = 1/ {
-			nwdrop _tempgen
+		forvalues i = 1/`nwgenNum' {
+			nwdrop _tempgen`i'
 		}
 		error 6500
 	}
 	
-	local netexp_mata = " J(,,1) :* "
-	local matacmd ""
-	//di "Mata: "
+	local netexp_mata = " J(`subnodes',`subnodes',1) :* `netexp_mata'"
+	local matacmd "`netexp_mata'"
+	//di "Mata: `matacmd'"
 	// execute network expression in mata
-	if ("" != ""){
-		capture mata: mata drop 
-		mata:  = 
+	if ("`result'" != ""){
+		capture mata: mata drop `result'
+		mata: `result' = `matacmd'
 	}
 	
 	/////////////////////////////
@@ -318,17 +313,17 @@ program _nwevalnetexp
 	// clean up 
 	//
 	/////////////////////////////
-	forvalues j= 1/ {
-		mata: mata drop stataVar_
+	forvalues j= 1/`stataVars' {
+		mata: mata drop stataVar_`j'
 	}
 	
-	forvalues i = 1/ {
-		nwdrop _tempgen
+	forvalues i = 1/`nwgenNum' {
+		nwdrop _tempgen`i'
 	}
 	}
 	mata: st_rclear()
-	mata: st_numscalar("r(nodes)", )
-	mata: st_global("r(mat)", "")
-	mata: st_global("r(netexp)","")
+	mata: st_numscalar("r(nodes)", `nodes')
+	mata: st_global("r(mat)", "`result'")
+	mata: st_global("r(netexp)","`netexp_raw'")
 	
 end

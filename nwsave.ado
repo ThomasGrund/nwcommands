@@ -1,25 +1,25 @@
-*! Date      :18nov2014
-*! Version   :1.0.4.1
-*! Author    :Thomas Grund
-*! Email     :thomas.u.grund@gmail.com
+*! Date        : 3sept2014
+*! Version     : 1.0
+*! Author      : Thomas Grund, Linköping University
+*! Email	   : contact@nwcommands.org
 
 capture program drop nwsave
 program nwsave
 	syntax anything [, old * format(string)]
-	local webname = subinstr("", ".dta","",.)
+	local webname = subinstr("`anything'", ".dta","",.)
 
 	_nwsyntax _all, max(99999)
-	local nets : word count 
+	local nets : word count `netname'
 
 	
-	if "" == "" {
+	if "`format'" == "" {
 		local format = "matrix"
 	}
-	if (20 > c(max_k_theory)){
+	if (`=`nodes_all' + 20' > c(max_k_theory)){
 		local format = "edgelist" 
 	}
 	
-	_opts_oneof "matrix edgelist" "format" "" 6556
+	_opts_oneof "matrix edgelist" "format" "`format'" 6556
 		
 	preserve	
 	qui {
@@ -31,47 +31,47 @@ program nwsave
 	tempfile attributes
 	capture drop _*
 	gen _running = _n
-	foreach onenet in  {
-		nwname 
-		local varstodelete ""
-		foreach onevar in  {
-			capture drop 
+	foreach onenet in `netname' {
+		nwname `onenet'
+		local varstodelete "`r(vars)'"
+		foreach onevar in `varstodelete' {
+			capture drop `onevar'
 			capture drop _nodelab
 			capture drop _nodevar
 			capture drop _nodeid
 		}
 	}
-	save , replace
+	save`old' `attributes', replace
 	
-	if "" == "edgelist" {
+	if "`format'" == "edgelist" {
 		clear
 		gen _fromid = .
 		gen _toid = .
 		tempfile edgelist_all
-		save 
-		foreach onenet in  {
-			tempfile edgelist_
-			nwtoedge 
-			rename  _
-			save edgelist_, replace
-			merge m:m _fromid _toid using , nogenerate
-			save , replace
+		save `edgelist_all'
+		foreach onenet in `netname' {
+			tempfile edgelist_`onenet'
+			nwtoedge `onenet'
+			rename `onenet' _`onenet'
+			save edgelist_`onenet', replace
+			merge m:m _fromid _toid using `edgelist_all', nogenerate
+			save `edgelist_all', replace
 		}
 	}
-	if "" == "matrix" {
+	if "`format'" == "matrix" {
 		clear
 		local i = 1
-		foreach onenet in  {
-			nwname 
-			local vars ""
-			nwload 
+		foreach onenet in `netname' {
+			nwname `onenet'
+			local vars "`r(vars)'"
+			nwload `onenet'
 			capture drop _nodelab _nodevar _nodeid
 			local j = 1
-			foreach v of varlist  {
-				rename  _net_
-				local j =  + 1
+			foreach v of varlist `vars' {
+				rename `v' _net`i'_`j'
+				local j = `j' + 1
 			}
-			local i =  + 1
+			local i = `i' + 1
 		}
 	}
 
@@ -84,52 +84,52 @@ program nwsave
 	
 	local i = 1
 	local n = _N
-	if  < {
-		set obs 
+	if `n' < `nets'{
+		set obs `nets'
 	}
-	foreach onenet in  {
-		nwname 
-		replace _name = "" in 
-		local nodes = 
-		replace _size =  in 
-		replace _directed = "" in 
-		replace _edgelabs = `""' in 
-		nwload , labelonly
-		rename _nodelab _newlabel
-		rename _nodevar _newvar
-		local i =  + 1
+	foreach onenet in `netname' {
+		nwname `onenet'
+		replace _name = "`r(name)'" in `i'
+		local nodes = `r(nodes)'
+		replace _size = `nodes' in `i'
+		replace _directed = "`r(directed)'" in `i'
+		replace _edgelabs = `"`r(edgelabs)'"' in `i'
+		nwload `onenet', labelonly
+		rename _nodelab _newlabel`i'
+		rename _nodevar _newvar`i'
+		local i = `i' + 1
 	}
 	save att1, replace
 	
 	local i = 1
-	foreach onenet in  {
-		rename _newlabel _nodelab
-		rename _newvar _nodevar
+	foreach onenet in `netname' {
+		rename _newlabel`i' _nodelab`i'
+		rename _newvar`i' _nodevar`i'
 		gen _runningnumber = _n
 		tostring _runningnumber, replace
-		replace _nodevar = "_net_" + _runningnumber
+		replace _nodevar`i' = "_net`i'_" + _runningnumber
 		drop _runningnumber
-		local i =  + 1
+		local i = `i' + 1
 	}	
 	
-	if "" == "matrix" {
+	if "`format'" == "matrix" {
 		replace _format = "matrix" in 1
 		
 	}
 	
-	if "" == "edgelist" {
+	if "`format'" == "edgelist" {
 		replace _format = "edgelist" in 1
 		
 	}
 	
-	replace _nets =  in 1
+	replace _nets = `nets' in 1
 	order _format _nets _name _size _directed _edgelabs _nodevar* _nodelab*
 	gen _running = _n
-	qui merge m:m _running using , nogenerate
+	qui merge m:m _running using `attributes', nogenerate
 	drop _running
 	
 	}
-	save .dta, 
+	save`old' `webname'.dta, `options'
 	restore
 end
 

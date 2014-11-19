@@ -1,7 +1,7 @@
-*! Date      :18nov2014
-*! Version   :1.0.4.1
-*! Author    :Thomas Grund
-*! Email     :thomas.u.grund@gmail.com
+*! Date        : 3sept2014
+*! Version     : 1.0.1
+*! Author      : Thomas Grund, Linköping University
+*! Email	   : contact@nwcommands.org
 
 capture program drop nwset	
 program nwset
@@ -14,51 +14,51 @@ syntax [varlist (default=none)][, nooutput name(string) vars(string) labs(string
 	local allnames ""
 	
 	// display information about network
-	if ("" == "" & "" == "") {
-		if ("2" == "" | "2" == "0") {
+	if ("`varlist'" == "" & "`mat'" == "") {
+		if ("$nwtotal" == "" | "$nwtotal" == "0") {
 			mata: st_numscalar("r(networks)", 0)
 			noi di "{err}No network found."
 			error 6001
 		}
 		else { 
-			if ("" != "nooutput") {
-				local networks = plural(2, "network")
-				di "{txt}(2 )"
+			if ("`output'" != "nooutput") {
+				local networks = plural($nwtotal, "network")
+				di "{txt}($nwtotal `networks')"
 				// information about networks
-				if "" == "" {
+				if "`detail'" == "" {
 					di "{hline 20}"
 				}
-				forvalues i=1/2{		
-					scalar onesize = ""
-					local thissize 12
-					local max_nodes = max(, )
-					scalar onename = ""
-					local allnames " flomarriage"
-					scalar onenw = ""
-					scalar onelabs = ""
-					local l `"bischeri castellani ginori guadagni lamberteschi pazzi peruzzi pucci ridolfi salviati strozzi tornabuoni"'
-					scalar onedirected = ""
-					scalar oneedgelabs = ""
-					if "" != "" {
+				forvalues i=1/`=$nwtotal'{		
+					scalar onesize = "\$nwsize_`i'"
+					local thissize `=onesize'
+					local max_nodes = max(`max_nodes', `thissize')
+					scalar onename = "\$nwname_`i'"
+					local allnames "`allnames' `=onename'"
+					scalar onenw = "\$nw_`i'"
+					scalar onelabs = "\$nwlabs_`i'"
+					local l `"`=onelabs'"'
+					scalar onedirected = "\$nwdirected_`i'"
+					scalar oneedgelabs = "\$nwedgelabs_`i'"
+					if "`detail'" != "" {
 						di 
 						di "{hline 50}"
-						if ( == 2){
-							di "{txt} ) Current Network"
+						if (`i' == $nwtotal){
+							di "{txt} `i') Current Network"
 						}
 						else {
-							di "{txt} ) Stored Network"
+							di "{txt} `i') Stored Network"
 						}
 						di "{hline 50}"
-						di "{txt}   Network name: {res}flomarriage"
-						di "{txt}   Directed: {res}false"
-						di "{txt}   Nodes: {res}12"
-						di "{txt}   Network id: {res}"
-						di "{txt}   Variables: {res}marriage_4 marriage_5 marriage_6 marriage_7 marriage_8 marriage_10 marriage_11 marriage_12 marriage_13 marriage_14 marriage_15 marriage_16"
-						di `"{txt}   Labels: {res}bischeri castellani ginori guadagni lamberteschi pazzi peruzzi pucci ridolfi salviati strozzi tornabuoni"'
-						di `"{txt}   Edgelabels: {res}"'
+						di "{txt}   Network name: {res}`=onename'"
+						di "{txt}   Directed: {res}`=onedirected'"
+						di "{txt}   Nodes: {res}`=onesize'"
+						di "{txt}   Network id: {res}`i'"
+						di "{txt}   Variables: {res}`=onenw'"
+						di `"{txt}   Labels: {res}`=onelabs'"'
+						di `"{txt}   Edgelabels: {res}`=oneedgelabs'"'
 					}
 					else {
-						di "      {res}flomarriage"
+						di "      {res}`=onename'"
 					}
 					
 					
@@ -70,82 +70,82 @@ syntax [varlist (default=none)][, nooutput name(string) vars(string) labs(string
 	// set the network
 	else {
 		// set network from varlist
-		if "" != "" {
-			local size :word count 
-			local varscount : word count 
-			local labscount : word count 
-			qui nwtomata , mat(onenet)
+		if "`varlist'" != "" {
+			local size :word count `varlist'
+			local varscount : word count `vars'
+			local labscount : word count `labs'
+			qui nwtomata `varlist', mat(onenet)
 			local mat = "onenet"
-			if ( != ) unab vars: 
-			if ( != ) local labs ""
+			if (`varscount' != `size') unab vars: `varlist'
+			if (`labscount' != `size') local labs "`vars'"
 
 		}
 		// set network from mata matrix
 		else {
 			// either varlist or mat needs to be given
-			if ("" == ""){
+			if ("`mat'" == ""){
 				di "{err}either {it:varlist} or option {it:mat()} needs to be specfied"
 				exit
 			}
 			// mat is given
 			else {
-				mata: onenet =  
-				mata: st_numscalar("msize", rows())
+				mata: onenet = `mat' 
+				mata: st_numscalar("msize", rows(`mat'))
 				local size = msize
-				local varscount : word count 
-				local labscount : word count 
+				local varscount : word count `vars'
+				local labscount : word count `labs'
 				// generate vars"
-				if("" != ""){
+				if("`varscount'" != "`size'"){
 					local vars ""
-					forvalues i = 1/ {
-						local vars " var"
+					forvalues i = 1/`size' {
+						local vars "`vars' var`i'"
 					}
 				}
 				// get labels
-				if ( != ){
-					local labs ""
+				if (`labscount' != `size'){
+					local labs "`vars'"
 				}
 			}
 		}
 
-		if "" == "" {
+		if "`name'" == "" {
 			local name "network"
 		}
 		
-		nwvalidate 
+		nwvalidate `name'
 		local name = r(validname)
 			
-		if "2" == "" {
+		if "$nwtotal" == "" {
 			global nwtotal 0
 		}
 		
 		local directed_new = "true"
-		if "" != "" {
+		if "`undirected'" != "" {
 			local directed_new = "false"
 		}
-		if"" != "" {
+		if"`directed'" != "" {
 			local directed_new = "true"
 		}
 
-		local new_nwtotal = 2 + 1
-		mata: nw_mata = onenet
-		global nw_ ""
+		local new_nwtotal = $nwtotal + 1
+		mata: nw_mata`new_nwtotal' = onenet
+		global nw_`new_nwtotal' "`vars'"
 		
-		global nwlabs_ `""'
-		global nwedgelabs_ `""'
-		global nwsize_ ""
-		global nwname_ ""
-		global nwdirected_ ""
+		global nwlabs_`new_nwtotal' `"`labs'"'
+		global nwedgelabs_`new_nwtotal' `"`edgelabs'"'
+		global nwsize_`new_nwtotal' "`size'"
+		global nwname_`new_nwtotal' "`name'"
+		global nwdirected_`new_nwtotal' "`directed_new'"
 		
-		global nwtotal = 
-		global nwtotal_mata = 2
+		global nwtotal = `new_nwtotal'
+		global nwtotal_mata = $nwtotal
 
 		mata: mata drop onenet
 	}
 	
 	mata: st_rclear()
-	mata: st_numscalar("r(networks)", 2)
-	mata: st_numscalar("r(max_nodes)", )
-	mata: st_global("r(names)", "")
+	mata: st_numscalar("r(networks)", $nwtotal)
+	mata: st_numscalar("r(max_nodes)", `max_nodes')
+	mata: st_global("r(names)", "`allnames'")
 
 end

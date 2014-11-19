@@ -1,5 +1,5 @@
 {smcl}
-{* *! version 1.0.4.1  18nov2014}{...}
+{* *! version 1.0.0  9sept2014}{...}
 {marker topic}
 {helpb nw_topical##utilities:[NW-2.7] Utilities}
 {p2colset 5 15 19 2}{...}
@@ -46,7 +46,7 @@ Within a program low-level parsing of network lists might be needed.  For instan
 
       {cmd:nwuse glasgow, nwclear}
       {cmd:nwunab nets : glasg*}
-      {cmd:nwinfo }
+      {cmd:nwinfo `nets'}
 		
 {pstd}
 The local macro {hi:nets} would then contain the unabbreviated network

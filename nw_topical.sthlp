@@ -1,5 +1,5 @@
 {smcl}
-{* *! version 1.0.0  18nov2014}{...}
+{* *! version 1.0.0  3sept2014}{...}
 {cmd:help nw_topical}
 {hline}
 {phang}
@@ -82,14 +82,6 @@ An alphabetical index of all {it:nwcommands} is available in
 {p2colset 12 35 36 2}
 {p2col:    {bf:{help nwcurrent }}}Sets the current network{p_end}
 {p2col:    {bf:{help nwdyads }}}Dyad census of the network{p_end}
-{marker manipulation}{...}
-
-{col 8}   {c TLC}{hline 24}{c TRC}
-{col 8}{hline 3}{c RT}       {it:Manipulation}{col 36}{c LT}{hline}
-{col 8}   {c BLC}{hline 24}{c BRC}
-{p2colset 12 35 36 2}
-{p2col:    {bf:{help nwaddnodes }}}Adds isolate nodes to a network {p_end}
-{p2col:    {bf:{help nwreplace }}}Replace content of existing network{p_end}
 {marker analysis}{...}
 
 {col 8}   {c TLC}{hline 24}{c TRC}
@@ -115,7 +107,7 @@ An alphabetical index of all {it:nwcommands} is available in
 {p2col:    {bf:{help nwclear }}} Clear all networks and variables from memory{p_end}
 {p2col:    {bf:{help nwload }}}Loads an available network as Stata variables{p_end}
 {p2col:    {bf:{help nwsync }}}Sync network with Stata variables{p_end}
-{p2col:    {bf:{help nwtomata }}}Return a Mata matrix holding the adjacency matrix of a network{p_end}
+{p2col:    {bf:{help nwtomata }}}Returns a Mata matrix holding the adjacency matrix of a network{p_end}
 {p2col:    {bf:{help nwtostata }}}Converts network from Mata to Stata{p_end}
 {p2col:    {bf:{help nwunab }}}Unabbreviate network list{p_end}
 {p2col:    {bf:{help nwvalidate }}}Checks if a network already exists and proposes an alternative unique name {p_end}
@@ -164,6 +156,7 @@ An alphabetical index of all {it:nwcommands} is available in
 {p2col:{bf:{help nwreach }}}{err}no help file yet{txt}{p_end}
 {p2col:{bf:{help nwrecode }}}{err}no help file yet{txt}{p_end}
 {p2col:{bf:{help nwrename }}}{err}no help file yet{txt}{p_end}
+{p2col:{bf:{help nwreplace }}}{err}no help file yet{txt}{p_end}
 {p2col:{bf:{help nwreplacemat }}}{err}no help file yet{txt}{p_end}
 {p2col:{bf:{help nwset }}}{err}no help file yet{txt}{p_end}
 {p2col:{bf:{help nwsummary }}}{err}no help file yet{txt}{p_end}

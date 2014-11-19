@@ -1,19 +1,14 @@
-*! Date      :18nov2014
-*! Version   :1.0.4.1
-*! Author    :Thomas Grund
-*! Email     :thomas.u.grund@gmail.com
-
 capture program drop animate
 program animate
 	syntax anything, graphs(string) [imagickpath(string) delay(string) noloop showcommand keepeps mag(integer 100)]
 
-	if "" != "" {
-		local ipend = substr("",-1,.)
-		if "" != "/" & "" != "\" {
-			local imagickpath "/"
+	if "`imagickpath'" != "" {
+		local ipend = substr("`imagickpath'",-1,.)
+		if "`ipend'" != "/" & "`ipend'" != "\" {
+			local imagickpath "`imagickpath'/"
 		}
 	}
-	if trim("") == "noloop"{
+	if trim("`loop'") == "noloop"{
 		local dloop = 1
 	}
 	else {
@@ -31,54 +26,54 @@ program animate
 		}
 	}
 	
-	di `"{err}command requires {net "http://www.imagemagick.org/":ImageMagick} to be installed on your computer; {net "":download it here}"'
+	di `"{err}command requires {net "http://www.imagemagick.org/":ImageMagick} to be installed on your computer; {net "`download'":download it here}"'
 	
-	if "" == "" {
+	if "`delay'" == "" {
 		local delay "50"
 	}
 	local epslist ""
-	local numgraphs : word count 
+	local numgraphs : word count `graphs'
 	local i = 1
-	qui if "" == "_all" {
+	qui if "`graphs'" == "_all" {
 		graph dir
-		local graphs 
+		local graphs `r(list)'
 	}
-	foreach g in  {
-		local gl = length("") - 4
+	foreach g in `graphs' {
+		local gl = length("`g'") - 4
 		
-		if (substr("", -4, .) == ".gph") {
-			graph use 
-			local geps = substr("",1, )
+		if (substr("`g'", -4, .) == ".gph") {
+			graph use `g'
+			local geps = substr("`g'",1, `gl')
 		}
 		else {
-			graph display 
-			local geps 
+			graph display `g'
+			local geps `g'
 		}
 		
-		graph export .eps, replace 
-		//mag()
-		local epslist " .eps"
+		graph export `geps'.eps, replace 
+		//mag(`mag')
+		local epslist "`epslist' `geps'.eps"
 	
-		if  ==  {
-			local last ".eps"
+		if `i' == `numgraphs' {
+			local last "`geps'.eps"
 		}
-		local i =  + 1
+		local i = `i' + 1
 	}
 	
-	local lastname : word  of 
-	local lastdelay = 
-	local shellcmd "convert -delay   -delay  .eps -loop  .gif"
-	shell 
+	local lastname : word `numgraphs' of `graphs'
+	local lastdelay = `delay'
+	local shellcmd "`imagickpath'convert -delay `delay' `epslist' -delay `lastdelay' `last'.eps -loop `dloop' `anything'.gif"
+	shell `shellcmd'
 	
-	if "" != "" {
-		di ""
+	if "`showcommand'" != "" {
+		di "`shellcmd'"
 	}
-	if "" == "" {
+	if "`keepeps'" == "" {
 		if c(os) == "MaxOSX" {
-			shell rm 
+			shell rm `epslist'
 		}
 		else {
-			shell del 
+			shell del `epslist'
 		}
 	}
 end

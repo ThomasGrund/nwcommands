@@ -1,50 +1,50 @@
-*! Date      :18nov2014
-*! Version   :1.0.4.1
-*! Author    :Thomas Grund
-*! Email     :thomas.u.grund@gmail.com
+*! Date        : 24aug2014
+*! Version     : 1.0
+*! Author      : Thomas Grund, Linköping University
+*! Email	   : contact@nwcommands.org
 
 capture program drop nwvalue	
 program nwvalue
-	local netname ="nwvalue.ado, date(18nov2014) author(Thomas Grund) email(thomas.u.grund@gmail.com) version(1.0.4.1) other()"
+	local netname ="`0'"
 	
 	gettoken netname exp : netname, parse("=")
 	
 	// a specific entries are given
-	local ego = strpos("","[") 
-	local alter = strpos("","]") 
-	local sep = strpos("",",")
-	local subset = substr("",,.)
-	if ( != 0) {
-		local e1 =  + 1
-		local e2 =  -  - 1
-		local a1 =   + 1
-		local a2 =  -  - 1
-		local n1 =  - 1
-		local egoid = substr("", , )
-		local alterid = substr("", , )
-		local netname = substr("", 1, )
+	local ego = strpos("`netname'","[") 
+	local alter = strpos("`netname'","]") 
+	local sep = strpos("`netname'",",")
+	local subset = substr("`netname'",`ego',.)
+	if (`ego' != 0) {
+		local e1 = `ego' + 1
+		local e2 = `sep' - `ego' - 1
+		local a1 =  `sep' + 1
+		local a2 = `alter' - `sep' - 1
+		local n1 = `ego' - 1
+		local egoid = substr("`netname'", `e1', `e2')
+		local alterid = substr("`netname'", `a1', `a2')
+		local netname = substr("`netname'", 1, `n1')
 	}
 
-	nwtomata , mat(onenet)
-	capture mata: onenet
+	nwtomata `netname', mat(onenet)
+	capture mata: onenet`subset'
 	if _rc != 0 {
-		di "{err}{it:nwsubset} {bf:} invalid"
+		di "{err}{it:nwsubset} {bf:`subset'} invalid"
 		error 6400
 	}
 	
 	mata: st_rclear()
-	if (!= 0) {
+	if (`ego'!= 0) {
 		/*
-		if "" != "" {
+		if "`exp'" != "" {
 			local exp : subinstr local exp "=" ""
-			mata: onenet[,] = J(rows(onenet[,]), cols(onenet[,]), )
+			mata: onenet[`egoid',`alterid'] = J(rows(onenet[`egoid',`alterid']), cols(onenet[`egoid',`alterid']), `=`exp'')
 		}
 		*/
-		mata: subnet = onenet[,]
+		mata: subnet = onenet[`egoid',`alterid']
 		mata: st_numscalar("r(rows)", rows(subnet))
 		mata: st_numscalar("r(cols)", cols(subnet))
 
-		if ( == 1 &  == 1) {
+		if (`r(rows)' == 1 & `r(cols)' == 1) {
 			mata: st_rclear()
 			mata: st_numscalar("r(value)", subnet[1,1])
 			mata: mata drop subnet

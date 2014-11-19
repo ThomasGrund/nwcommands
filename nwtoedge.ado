@@ -1,8 +1,3 @@
-*! Date      :18nov2014
-*! Version   :1.0.4.1
-*! Author    :Thomas Grund
-*! Email     :thomas.u.grund@gmail.com
-
 capture program drop nwtoedge
 program nwtoedge
 	version 9
@@ -11,176 +6,176 @@ program nwtoedge
 	tempfile fromfile tofile
 	tempvar totperfrom totperto dropcomp mergefrom mergeto 
 
-	_nwsyntax , max(2)
+	_nwsyntax `netname', max(2)
 
-	if ("" == "") {
+	if ("`type'" == "") {
 		local type = "compact"
 	}
-	local numnets = wordcount("")
+	local numnets = wordcount("`netname'")
 	
-	qui if ( == 2){
+	qui if (`numnets' == 2){
 		local type = "full"
 		
-		local net1 = word("", 1)
-		nwname 
+		local net1 = word("`netname'", 1)
+		nwname `net1'
 		local nodes1 = r(nodes)
 		
-		local net2 = word("", 2)
-		nwname 
+		local net2 = word("`netname'", 2)
+		nwname `net2'
 		local nodes2 = r(nodes)	
 		
 		// networks of different size
-		if ( != ){
+		if (`nodes1' != `nodes2'){
 			gen temp = .
 			tempfile current 
 			tempfile edgelist1
-			save 
-			nwtoedge , type(full) fromvars() tovars() fromid() toid()
-			save 
-			use , clear
-			nwtoedge , type(full)
-			merge 1:1 _fromid _toid using , nogenerate
+			save `current'
+			nwtoedge `net1', type(full) fromvars(`fromvars') tovars(`tovars') fromid(`fromid') toid(`toid')
+			save `edgelist1'
+			use `current', clear
+			nwtoedge `net2', type(full)
+			merge 1:1 _fromid _toid using `edgelist1', nogenerate
 			exit
 		}
 	
 	}
 
-	if "" == "" {
+	if "`fromid'" == "" {
 		local fromid fromid
 	}
 	
-	if "" == "" {
+	if "`toid'" == "" {
 		local toid toid
 	}
 	
-	local n = 
-	local n2 =  * 
+	local n = `nodes'
+	local n2 = `nodes' * `nodes'
 
 	preserve
 
-	qui if "" != ""  {
-		capture quietly gen long  =_n
-		if  != _n {
-			dis as error "Variable  does not contain node number." 
+	qui if "`fromvars'" != ""  {
+		capture quietly gen long `fromid' =_n
+		if `fromid' != _n {
+			dis as error "Variable `fromid' does not contain node number." 
 			dis as error "Please rename existing variable or choose another name for the new variable."
 			error 110
 		}
-		quietly compress  
-		keep  
-		capture foreach x of varlist  {
-			rename  from_
+		quietly compress `fromid' 
+		keep `fromid' `fromvars'
+		capture foreach x of varlist `fromvars' {
+			rename `x' from_`x'
 		}
 		capture unab frfromvars : from_*
-		sort 
-		quietly save 
+		sort `fromid'
+		quietly save `fromfile'
 	}
 
-	qui if "" != ""  {
+	qui if "`tovars'" != ""  {
 		restore
 		preserve
-		capture quietly gen long  =_n
-		if  != _n {
-			dis as error "Variable  does not contain node number. Please rename."
+		capture quietly gen long `toid' =_n
+		if `toid' != _n {
+			dis as error "Variable `toid' does not contain node number. Please rename."
 			dis as error "Please rename existing variable or choose another name for the new variable."
 			error 110
 		}
-		quietly compress 
-		keep  
-		foreach x of varlist  {
-			rename  to_
+		quietly compress `toid'
+		keep `toid' `tovars'
+		foreach x of varlist `tovars' {
+			rename `x' to_`x'
 		}
 		capture unab totovars : to_*
-		sort 
-		quietly save 
+		sort `toid'
+		quietly save `tofile'
 	}	
 	
 	qui drop _all 
 	
 	tempfile onenet_file0
-	qui set obs 
-	qui gen long  = ceil(_n/)
-	bysort : gen long  = _n
-	order  
-	sort  
-	qui save 
+	qui set obs `n2'
+	qui gen long `fromid' = ceil(_n/`n')
+	bysort `fromid': gen long `toid' = _n
+	order `fromid' `toid'
+	sort `fromid' `toid'
+	qui save `onenet_file0'
 	restore
 	
 	local z = 1
-	local num_nets = wordcount("")
+	local num_nets = wordcount("`netname'")
 
 	local directed_all = "true"
-	qui forvalues i=1/ {
-		local onenet : word  of 
+	qui forvalues i=1/`num_nets' {
+		local onenet : word `i' of `netname'
 		preserve
 		
-		tempfile onenet_file
-		nwname 
-		if "" == "false" {
+		tempfile onenet_file`i'
+		nwname `onenet'
+		if "`r(directed)'" == "false" {
 			local directed_all = "false"
 		}
 		local nodes = r(nodes)
 		local id = r(id)
-		scalar onevars = ""
-		local vars marriage_4 marriage_5 marriage_6 marriage_7 marriage_8 marriage_10 marriage_11 marriage_12 marriage_13 marriage_14 marriage_15 marriage_16"
+		scalar onevars = "\$nw_`id'"
+		local vars `=onevars'"
 		drop _all
-		nwload , nocurrent
-		nwtomata , mat(nwtoedgenet)
+		nwload `onenet', nocurrent
+		nwtomata `onenet', mat(nwtoedgenet)
 		mata: nwtoedgenet = colshape(nwtoedgenet,1)
 		drop _all
-		qui set obs 
-		local link ""
-		qui gen  = .
+		qui set obs `n2'
+		local link "`onenet'"
+		qui gen `link' = .
 		mata: st_view(nwfulledgeview=.,.,.)
 		mata: nwfulledgeview[.,.] = nwtoedgenet
-		gen long  = ceil(_n/)
-		bysort : gen long  = _n
+		gen long `fromid' = ceil(_n/`n')
+		bysort `fromid': gen long `toid' = _n
 		
-		if (== 1 & "" == "") {		
-			if ("" == "compact"){
-				keep if ( != 0 |  == ) 
+		if (`num_nets'== 1 & "`full'" == "") {		
+			if ("`type'" == "compact"){
+				keep if (`link' != 0 | `fromid' == `toid') 
 			}
-			if ("" == "nozero"){
-				keep if  != 0  
+			if ("`type'" == "nozero"){
+				keep if `link' != 0  
 			}
 		}
 		
-		order  
-		sort  
-		save 
+		order `fromid' `toid'
+		sort `fromid' `toid'
+		save `onenet_file`i''
 		mata: mata drop nwtoedgenet nwfulledgeview
 		restore
 	}	
 	
-	qui use , clear
+	qui use `onenet_file0', clear
 	local z = 1
-	qui foreach onenet in  {
-		merge m:1   using , nogenerate
-		order  
-		sort  
-		local z =  + 1
-		//keep if  != .
+	qui foreach onenet in `netname' {
+		merge m:1 `fromid' `toid' using `onenet_file`z'', nogenerate
+		order `fromid' `toid'
+		sort `fromid' `toid'
+		local z = `z' + 1
+		//keep if `onenet' != .
 	}
 	
-	qui if ""  != "" { 
-		sort  
-		merge m:1  using , nogenerate
+	qui if "`fromvars'"  != "" { 
+		sort `fromid' 
+		merge m:1 `fromid' using `fromfile', nogenerate
 	}
 	
-	qui if ""  != "" { 
-		sort 
-		merge m:1  using , nogenerate 
+	qui if "`tovars'"  != "" { 
+		sort `toid'
+		merge m:1 `toid' using `tofile', nogenerate 
 	}
-	sort   
+	sort `fromid' `toid' 
 	rename fromid _fromid
 	rename toid _toid
 
-	if "" == "false" {
+	if "`directed_all'" == "false" {
 		local forceundirected = "forceundirected"
 	}
-	if "" != "" {
+	if "`forcedirected'" != "" {
 		local forceundirected = ""
 	}
-	if "" != "" {
+	if "`forceundirected'" != "" {
 		qui drop if _fromid > _toid
 	}
 end	

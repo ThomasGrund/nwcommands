@@ -1,6 +1,6 @@
 {smcl}
-{* *! version 1.0.4.1  18nov2014}{...}
-{marker topic}
+{* *! version 1.0.6  23aug2014 author: Thomas Grund}{...}
+{marker topical}
 {helpb nw_topical##manipulation:[NW-2.5] Manipulation}
 {cmd:help nwaddnodes}
 {hline}

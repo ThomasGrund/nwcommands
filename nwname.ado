@@ -1,8 +1,3 @@
-*! Date      :18nov2014
-*! Version   :1.0.4.1
-*! Author    :Thomas Grund
-*! Email     :thomas.u.grund@gmail.com
-
 capture program drop nwname
 program nwname
 	version 9
@@ -10,133 +5,133 @@ program nwname
 	
 	mata: st_rclear()
 	
-	local nets wordcount("")
-	if  > 1 {
+	local nets wordcount("`netname'")
+	if `nets' > 1 {
 		di "{err}only one {it:netname} allowed"
 		error 6055
 	}
 	
-	if ("2" == "" | "2" == "0"){
+	if ("$nwtotal" == "" | "$nwtotal" == "0"){
 		di "{err}no {it:network} found"
 		error 6001
 	}
 	
-	if ("" == "" & "" == ""){
-		local id = 2
+	if ("`netname'" == "" & "`id'" == ""){
+		local id = $nwtotal
 	}
 
 	  
-	if "" == "" {
+	if "`id'" == "" {
 	    qui nwunab nets : _all	
-		local id : list posof "" in nets
+		local id : list posof "`netname'" in nets
 		mata: st_rclear()
-		if  == 0 {
+		if `id' == 0 {
 			local id = -1
 		}
 	}
 	else {
-		scalar onename = ""
+		scalar onename = "\$nwname_`id'"
 		local thisname = onename
-		if ( < 1 |  > 2) {
+		if (`id' < 1 | `id' > $nwtotal) {
 			di "{err}index {it:id} out of bounds"
 			error 6002
 		}
 	}
 
-	mata: st_numscalar("r(id)", )
-	if ("" == "-1") {
-		di "{err}{it:network} {bf:} not found"
+	mata: st_numscalar("r(id)", `id')
+	if ("`id'" == "-1") {
+		di "{err}{it:network} {bf:`netname'} not found"
 		mata: st_rclear()
 		error 6001
 	}
 	else {
-		local onesize = ""
-		local thissize = ""
+		local onesize = "\$nwsize_`id'"
+		local thissize = "`onesize'"
 		
-		if "" != "" {
-			if _N <  {
-				di "{err}variable {it:} invalid
+		if "`newlabsfromvar'" != "" {
+			if _N < `onesize' {
+				di "{err}variable {it:`newlabsfromvar'} invalid
 				error
 			}
 			local newlabs ""
-			forvalues i = 1/ {
-				local onelab = []
-				local newlabs " " 
+			forvalues i = 1/`onesize' {
+				local onelab = `newlabsfromvar'[`i']
+				local newlabs "`newlabs' `onelab'" 
 			}
 		}
 		
-		local cnewlabs : word count 
-		local cnewvars : word count 
+		local cnewlabs : word count `newlabs'
+		local cnewvars : word count `newvars'
 		
-		if ("" != "") {
-			global nwname_ = ""
-			local thisname = ""
+		if ("`newname'" != "") {
+			global nwname_`id' = "`newname'"
+			local thisname = "`newname'"
 		}
 		else {
-			scalar onename = ""
+			scalar onename = "\$nwname_`id'"
 			local thisname = onename
 		}
 		
-		if ( == ) {
-			global nwlabs_ `""'
-			local thislabs `""'
+		if (`cnewlabs' == `thissize') {
+			global nwlabs_`id' `"`newlabs'"'
+			local thislabs `"`newlabs'"'
 		}
 		else {
-			scalar onelabs = ""
+			scalar onelabs = "\$nwlabs_`id'"
 			local thislabs = onelabs
 		}
-		if ( == ) {
-			global nw_ ""
-			local thisvar ""
+		if (`cnewvars' == `thissize') {
+			global nw_`id' "`newvars'"
+			local thisvar "`newvars'"
 		}
 		else {
-			scalar onevars = ""
+			scalar onevars = "\$nw_`id'"
 			local thisvars = onevars
 		}
-		if ("" != "") {
-			global nwdirected_ = ""
-			local thisdirected = ""
+		if ("`newdirected'" != "") {
+			global nwdirected_`id' = "`newdirected'"
+			local thisdirected = "`newdirected'"
 		}
 		else {
-			scalar onedirected = ""
+			scalar onedirected = "\$nwdirected_`id'"
 			local thisdirected = onedirected
 		}
-		if ("" != "") {
-			global nwtitle_ = ""
-			local thistitle = ""
+		if ("`newtitle'" != "") {
+			global nwtitle_`id' = "`newtitle'"
+			local thistitle = "`newtitle'"
 		}
 		else {
-			scalar onetitle = ""
+			scalar onetitle = "\$nwtitle_`id'"
 			local thistitle = onetitle
 		}
-		if (`""' != "") {
-			global nwedgelabs_ = `""'
-			local thisedgelabs = `""'
+		if (`"`newedgelabs'"' != "") {
+			global nwedgelabs_`id' = `"`newedgelabs'"'
+			local thisedgelabs = `"`newedgelabs'"'
 		}
 		else {
-			scalar oneedgelabs = ""
+			scalar oneedgelabs = "\$nwedgelabs_`id'"
 			local thisedgelabs = oneedgelabs
 		}
-		if ("" != "") {
-			global nwdescription_ = ""
-			local thisdescription = ""
+		if ("`newdescription'" != "") {
+			global nwdescription_`id' = "`newdescription'"
+			local thisdescription = "`newdescription'"
 		}
 		else {
-			scalar onedescription= ""
+			scalar onedescription= "\$newdescription`id'"
 			local thisdescription = onedescription
 		}
 		
 	}
 
-	scalar onesize = ""
+	scalar onesize = "\$nwsize_`id'"
 	local localsize = onesize
-	mata: st_global("r(edgelabs)", `""')
-	mata: st_global("r(labs)", `""')
-	mata: st_global("r(vars)", "")
-	mata: st_global("r(directed)", "")
-	mata: st_global("r(name)", "")
+	mata: st_global("r(edgelabs)", `"`thisedgelabs'"')
+	mata: st_global("r(labs)", `"`thislabs'"')
+	mata: st_global("r(vars)", "`thisvars'")
+	mata: st_global("r(directed)", "`thisdirected'")
+	mata: st_global("r(name)", "`thisname'")
 	
-	mata: st_global("r(title)", "")
-	mata: st_numscalar("r(nodes)", )
+	mata: st_global("r(title)", "`thistitle'")
+	mata: st_numscalar("r(nodes)", `localsize')
 	
 end

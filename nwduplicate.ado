@@ -1,21 +1,16 @@
-*! Date      :18nov2014
-*! Version   :1.0.4.1
-*! Author    :Thomas Grund
-*! Email     :thomas.u.grund@gmail.com
-
 capture program drop nwduplicate
 program nwduplicate
 	version 9
 	syntax [anything(name=netname)], [name(string) vars(string) xvars]
 		
 	qui nwset
-	if "" == "" {
+	if "`netname'" == "" {
 		nwcurrent
 		local netname = r(current)
 	}
 	
 	// get parameters
-	nwname 
+	nwname `netname'
 	local nodes = r(nodes)
 	local id = r(id)
 	if (r(directed) != "true"){
@@ -23,23 +18,23 @@ program nwduplicate
 	}
 	
 	// generate valid network name and valid varlist
-	if "" == "" {
-		local name "_copy"
+	if "`name'" == "" {
+		local name "`netname'_copy"
 	}
 
-	nwvalidate 
+	nwvalidate `name'
 	local copyname = r(validname)
-	local varscount : word count 
-	if ( != ){
+	local varscount : word count `vars'
+	if (`varscount' != `nodes'){
 		// obtain vars from original
-		scalar onevars = ""
-		local copyvars marriage_4 marriage_5 marriage_6 marriage_7 marriage_8 marriage_10 marriage_11 marriage_12 marriage_13 marriage_14 marriage_15 marriage_16
+		scalar onevars = "\$nw_`id'"
+		local copyvars `=onevars'
 	}
 	else {
-		local copyvars ""
+		local copyvars "`vars'"
 	}
 	
 	// create network
-	nwtomata , mat(onenet)
-	nwset, name() vars() mat(onenet) 
+	nwtomata `netname', mat(onenet)
+	nwset, name(`copyname') vars(`copyvars') mat(onenet) `undirected'
 end
