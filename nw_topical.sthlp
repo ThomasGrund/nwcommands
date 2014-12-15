@@ -171,4 +171,5 @@
 {p2col:{bf:{help _opts_oneof }}}{err}no help file yet{txt}{p_end}
 {p2col:{bf:{help nwergm }}}{err}no help file yet{txt}{p_end}
 {p2col:{bf:{help nwmovie }}}{err}no help file yet{txt}{p_end}
+{p2col:{bf:{help nwsociomatrix }}}{err}no help file yet{txt}{p_end}
 {p2col:{bf:{help nwtostata }}}{err}no help file yet{txt}{p_end}

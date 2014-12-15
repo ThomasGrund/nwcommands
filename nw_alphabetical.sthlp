@@ -65,6 +65,7 @@
 {p2col:{bf:{help nwsave }}}Save networks in file{p_end}
 {p2col:{bf:{help nwset }}}Declare data to be network data{p_end}
 {p2col:{bf:{help nwsmall }}}Generate a small-world network{p_end}
+{p2col:{bf:{help nwsociomatrix }}}{err}no help file yet{txt}{p_end}
 {p2col:{bf:{help nwsummarize }}}Summarize a network{p_end}
 {p2col:{bf:{help nwsym }}}Symmetrize network{p_end}
 {p2col:{bf:{help nwsync }}}Sync network with Stata variables{p_end}

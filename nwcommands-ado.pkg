@@ -64,6 +64,7 @@ f nwring.ado
 f nwsave.ado
 f nwset.ado
 f nwsmall.ado
+f nwsociomatrix.ado
 f nwsummarize.ado
 f nwsym.ado
 f nwsync.ado
@@ -86,3 +87,6 @@ f glasgow.dta
 f glasgow_edge.dta
 f stockholm.dta
 f gang_pajek.net
+f scheme-s1network.scheme
+f scheme-s2network.scheme
+f scheme-s3network.scheme
