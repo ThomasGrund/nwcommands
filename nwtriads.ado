@@ -3,17 +3,13 @@ program nwtriads
 	version 9
 	syntax [anything(name=netname)]
 	
+	_nwsyntax `netname', max(1)
+	
 	if "`mode'" == "" {
 		local mode = "dyad"
 	}
 	
-	if "`netname'" == "" {
-		nwcurrent
-		local netname = r(current)
-	}
 	
-	nwname `netname'
-
 	nwtomata `netname', mat(censusNet)
 	mata: A = censusNet :/censusNet
 	mata: _editmissing(A, 0)
@@ -68,6 +64,8 @@ program nwtriads
 	mata: st_numscalar("r(_111D)", x_111D)
 	mata: st_numscalar("r(_111U)", x_111U)
 	mata: mata drop censusNet A C E M Ecompl
+	mata: st_global("r(name)", "`netname'")
+	
 	di
 	di "{txt}    Triad census: {res} `netname'{txt}"
 	di 

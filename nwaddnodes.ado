@@ -1,13 +1,18 @@
 *! Date        : 24aug2014
 *! Version     : 1.0
-*! Author      : Thomas Grund, Linköping University
+*! Author      : Thomas Grund, Linkoping University
 *! Email	   : contact@nwcommands.org
 
 capture program drop nwaddnodes
 program nwaddnodes
-	syntax [anything(name=netname)], newnodes(integer) [vars(string)]
+	syntax [anything(name=netname)], newnodes(integer) [vars(string) labs(string) generate(string)]
 
 	_nwsyntax `netname', max(1)
+	
+	if "`generate'" != "" {
+		nwduplicate `netname', name(`generate')
+		_nwsyntax `generate', max(1)
+	}
 	
 	if "`stub'" == "" {
 		local stub = "new"
@@ -61,6 +66,7 @@ program nwaddnodes
 		restore
 	}
 
+	local newnodes_orig + `newnodes'
 	local newnodes = `nodes' + `newnodes'
 	nwtomata `netname', mat(oldmat)
 	mata: newmat = J(`newnodes',`newnodes', 0)
@@ -77,7 +83,17 @@ program nwaddnodes
 	mata: nw_mata`id' = newmat
 	global nwsize_`id' = `newnodes'
 	global nw_`id' "`oldvars' `vars'" 
-	global nwlabs_`id' "`oldlabs' `vars'"
+	
+	local wc : word count `labs' 
+	local overlap : list labs & oldlabs
+	local oc : word count `overlap'
+	
+	if (`wc' == `newnodes_orig' & `oc' == 0) {
+		global nwlabs_`id' "`oldlabs' `labs'"
+	}
+	else {
+		global nwlabs_`id' "`oldlabs' `vars'"
+	}
 	nwload `netname'
 
 	mata: mata drop newmat

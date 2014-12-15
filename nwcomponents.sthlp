@@ -2,33 +2,35 @@
 {* *! version 1.0.6  23aug2014 author: Thomas Grund}{...}
 {marker topic}
 {helpb nw_topical##analysis:[NW-2.6] Analysis}
-{cmd:help nwcomponents}
-{hline}
 
 {title:Title}
 
-{p2colset 5 21 22 2}{...}
-{p2col :nwcomponents {hline 2}}Calculates the largest component and the number of network components{p_end}
+{p2colset 9 21 22 2}{...}
+{p2col :nwcomponents {hline 2} Calculate network components / largest component}
 {p2colreset}{...}
 
 {title:Syntax}
 
-{p 5 17 2}
+{p 8 17 2}
 {cmdab: nwcomponents} 
 {it:{help netlist}}
 [, {opt lgc}
-{opt generate}({help newvarname})]
+{opth generate(newvarname)}]
 
-{p 8 17 2}
+
+{synoptset 25 tabbed}{...}
+{synopthdr}
+{synoptline}
+{synopt:{opth generate(newvarname)}}name of the Stata variable that stores information about components; default = {it:_component} or {it:_lgc}{p_end}
+{synopt:{opt lgc}}calculate membership to largest component{p_end}
 
 {p2colreset}{...}
 	
 {title:Description}
 
 {pstd}
-Calculates the components of a network or a list of networks. A component is a set of nodes that are
-only connected among each other. Nodes can only belong to one component. Furthermore, 
-additional information about the size of each component is returned in {it:r(comp_sizeid)}. 
+Calculate the components of a network or a list of networks. A component is a set of nodes that are
+only connected among each other. All calculations are performed on the non-directed version of the networks. Nodes can only belong to one component. 
 
 {pstd}
 By default, {cmd:nwcomponents} generates 
@@ -36,24 +38,42 @@ a new variable {it:_components} which stores the component membership.
 When option {bf:lgc} is specified, the command generates a new variable 
 {it:_lgc} which stores information about membership to the largest component.
 
-{title:Options}
 
-{phang}
-{opt lgc} Calculate membership to the largest component.
+{title:Stores results}
 
-{phang}
-{opt generate}({help newvar}) Name of new variable for either _component or _lgc.
+	Scalars
+	  {bf:r(components)}		number of components
+	  
+	Matrices
+	  {bf:r(comp_sizeid)}		distribution over components
+	  
 
-{title:Remarks}
+{title:Examples}
+
+	{cmd:. webnwuse florentine, nwclear}
+	{cmd:. nwcomponents flomarriage}
+
+	{res}{hline 40}
+	{txt}  Network name: {res}flomarriage
+	{txt}  Components: {res}2
+
+	 {txt}_component {c |}      Freq.     Percent        Cum.
+	{hline 12}{c +}{hline 35}
+	{txt}          1 {c |}{res}         15       93.75       93.75
+	{txt}          2 {c |}{res}          1        6.25      100.00
+	{txt}{hline 12}{c +}{hline 35}
+	      Total {c |}{res}         16      100.00{txt}
   
-    All ties are treated as undirected for the calculation of components.
+ {pstd}
+ This shows that there are two components in the Florentine marriage network. All except one node belong to the first
+ components. Some alternative ways how the commands can be used.
+ 
+	{cmd:. webnwuse glasgow}
+	{cmd:. nwcomponents glasgow1, generate(mycomponent)} 
+	{cmd:. nwcomponents _all, lgc} 
+	{cmd:. nwcomponents _all, lgc generate(mylgc)} 
   
 
-  {title:Examples}
-
-  {cmd:. webnwuse glasgow}
-  {cmd:. nwcomponents glasgow1}
-  {cmd:. nwcomponents glasgow1, generate(mycomponent)} 
-  {cmd:. nwcomponents _all, lgc} 
-  {cmd:. nwcomponents _all, lgc generate(mylgc)} 
-  
+ {title:See also}
+ 
+	{help nwgen}

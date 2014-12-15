@@ -2,41 +2,39 @@
 {* *! version 1.0.0  3sept2014}{...}
 {marker topic}
 {helpb nw_topical##analysis:[NW-2.6] Analysis}
-{cmd:help nwcorrelate}
-{hline}
 
 {title:Title}
 
-{p2colset 5 20 23 2}{...}
-{p2col :nwcorrelate {hline 2}}Correlates either two networks or one network and an attribute{p_end}
+{p2colset 9 20 23 2}{...}
+{p2col :nwcorrelate {hline 2} Correlate networks and variables}
 {p2colreset}{...}
 
 
 {title:Syntax}
 
-{p 5 17 2}
+{p 8 17 2}
 {cmdab: nwcorrelate} 
-{help netname:netname1}
-{help netname:netname2}
+{it:{help netname:netname1}}
+{it:{help netname:netname2}}
 [
-{opt permutations(integer)}
+{opth permutations(int)}
 {opt saving}
-{help kdensity:kdensity_options}]
+{it:{help kdensity:kdensity_options}}]
 
-{p 5 17 2}
+{p 8 17 2}
 {cmdab: nwcorrelate} 
-{help netname:netname}
+{it:{help netname:netname}}
 , 
-{opt attribute}({help var})
-[{opt mode}({help nwexpand##expand_mode:expand_mode})
-{opt permutations(integer)}
+{opth attribute(varname)}
+[{opt mode}({it:{help nwexpand##expand_mode:expand_mode}})
+{opth permutations(int)}
 {opt saving}
-{help kdensity:kdensity_options}]
+{it:{help kdensity:kdensity_options}}]
 
 {synoptset 30 tabbed}{...}
 {synopthdr}
 {synoptline}
-{synopt:{opt mode}({help nwexpand##expand_mode:expand_mode})}expand mode{p_end}
+{synopt:{opt mode}({it:{help nwexpand##expand_mode:expand_mode})}}expand mode{p_end}
 {synopt:{opt permutations(integer)}}number of QAP permuations{p_end}
 {synopt:{opt saving}}saves QAP permuations{p_end}
 
@@ -44,51 +42,111 @@
 {title:Description}
 
 {pstd}
-Correlates either 1) two networks with each other or 2) one network and
-one attribute.
+This command is the network version of {help correlate}. It can be used in two different ways:
+
+{pmore}
+1) Correlate two networks with each other
+
+{pmore}
+2) Correlate one network and one variable
 
 {pstd}
-The option {it:permuatation(integer)} creates QAP permutations of the first network and 
+The option {bf:permuatation()} creates {help nwqap:QAP permutations} of the first network and 
 generates a distribution of correlation coefficients under the null-hypothesis that there is
-no correlation. A plot is displayed and additional information is returned in the return vector. 
+no correlation. In practice, rows and columns of {help netname} are reshuffled and the correlation 
+coefficient is calculated again and again. Based on this distribution a {it:p-value} and a confidence
+interval is calculated. A plot is displayed and additional information is returned in the return vector. 
 
 
 {title:Two networks}
 
 {pstd}
 When two networks {help netname:netname1} and {help netname:netname2} are given, 
-the command calculates the correlation between netname1_ij and netname2_ij. 
+the command calculates the element-by-element correlation of the underlying adjaceny matrices {it:M1}
+and {it:M2} for the two networks. Notice, that the diagonal of the matrices is not considered. 
 
-{title:One network and one attribute}
 {pstd}
-When one network {help netname} and one attribute {help varname} are given, the command calculates
-the correlation between netname_ij and x_ij, where x_ij is:
+The correlation coefficient for two networks indicates how much these two networks overlap. It is exactly
+1 when the two networks completely overlap ({it:M1_ij == M2_ij}). It is -1 when the two networks are inverse
+to each other ({it:M1_ij != M2_ij}).
 
-    {it:x_ij = mode(varname[i], varname[j])}
-
-{pstd}	
-By default, {it:mode} is set to {cmd:mode(same)}, which is:
-
-	{it:same(x_ij) = (varname[i] == varname[j])}
-
-	{pstd}
-Other modes are:
-	
-	{it:sender(x_ij) = varname[i]}
-	{it:receiver(x_ij) = varname[i]}
-	{it:dist(x_ij) = (varname[i] - varname[j])}
-	{it:distinv(x_ij) = 1 / (varname[i] - varname[j])}
-	{it:absdist(x_ij) = |(varname[i] - varname[j])|}	
-	{it:absdistinv(x_ij) = 1 / |(varname[i] - varname[j])|}
-
-{title:Examples}
+{pstd}
+This correlates two networks with each other:
 
 	{cmd:. webnwuse glasgow}
 	{cmd:. nwcorrelate glasgow1 glasgow2, permutations(50)}
+
+	{res}{hline 40}
+	{txt}  Network name: {res}glasgow1
+	{txt}  Network2 name: {res}glasgow2
+	{hline 40}
+	{txt}    Correlation: {res}.4732457209617567{txt}
 	
-	// One network and one attribute
-	{cmd:. nwcorrelate glasgow1 sport1, permutations(50)}
+{pstd}
+In this case, there is a moderate positive correlation between the two networks.
+
 	
+{title:One network and one attribute}
+
+{pstd}
+When the command is called with one {help netname} and one {help varname} (specified in {bf:attribute()})
+it calculates the element-by-element correlation between the adjacency matrix {it:M} of {help netname} and 
+an {help nwexpand:expanded network} based on {help varname}. 
+
+{pstd}
+Practically, it compares {it:M_ij} with {it:x_ij}, where
+
+	{it:x_ij = mode(varname[i], varname[j])}
+
+{pstd}	
+By default, {it:mode} is set to {cmd:mode(same)}, which is (for other modes see {help nwexpand}):
+
+	{it:same(x_ij) = (varname[i] == varname[j])}
+
+{pstd}
+Such dyad-level correlation between network ties and some artifically generated network based on some variable,
+can be extremely useful to e.g. assess the level of homphily in a network. Homophily refers to the concept that
+network ties might be more likely between similar individuals. 
+
+{pstd}
+The correlation coefficient between a network and a variable (with {it:mode=same}) is exactly 1 when ties 
+only exist between individuals who are similar and -1 when ties only exist between individuals who are different
+according to {help varname}. When an attribute is not categorical, but metric instead, it makes a lot of sense to 
+use option {bf:mode(absdist)}.
+	
+{pstd}
+This correlates one network and one attribute with each other:
+
+	{cmd:. nwcorrelate glasgow1, attribute(sport1) permutations(50)}
+
+	{res}{hline 40}
+	{txt}  Network name: {res}glasgow1
+	{txt}  Attribute: {res}same_sport1
+	{hline 40}
+	{txt}    Correlation: {res}.0253824782677835{txt}
+
+	
+{pstd}
+There is hardly any correlation. Similarity on doing sports does not seem to matter for indivdiuals to have
+friendship ties. Notice that the previous command is equivalent to:
+
+	{cmd:. nwexpand sport1, mode(same) name(same_sport)}
+	{cmd:. nwcorrelate glasgow1 same_sport, permutations(50)}	
+
+
+{title:Stored results}
+
+	Scalars:
+	  {bf:r(corr)}		correlation coefficient
+	  {bf:r(pvalue)}	p-value of correlation coefficient
+	  {bf:r(ub)}		upper bound, 95% confidence interval
+	  {bf:r(lb)}		lower bound, 95% confidence interval
+
+	Macros:
+	  {bf:r(name_1)}	name of {it:netname1}
+	  {bf:r(name_2)}	name of {it:netname2} or the expanded network 
+	  
+
 {title:See also}
 
-	{help nwtable}, {help nwexpand}
+	{help nwtabulate}, {help nwexpand}

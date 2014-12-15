@@ -1,6 +1,6 @@
 capture program drop nwqap	
 program nwqap
-syntax [anything (name=formula)] [, detail type(string) mode(string) PERMutations(integer 500) save(string) ]
+syntax [anything (name=formula)] [, detail type(string) typeoptions(string) mode(string) PERMutations(integer 500) save(string) ]
     set more off
 
 	mata: st_rclear()
@@ -11,7 +11,7 @@ syntax [anything (name=formula)] [, detail type(string) mode(string) PERMutation
 	
 	// Get general information.
 	local vars = wordcount("`formula'")
-	if (`vars' < 2) {
+	if (`vars' < 1) {
 		di "{err}Formula wrongly specified."
 		error 6057
 	}
@@ -99,7 +99,7 @@ syntax [anything (name=formula)] [, detail type(string) mode(string) PERMutation
 		mata: perm_net = permute_net(dvnet)
 		mata: net_long = transformIntoLong(perm_net)
 		mata: st_store(., "`net'", net_long)
-		`type' `formula'
+		`type' `formula', `typeoptions'
 	
 		mat temp_coeff = e(b)
 		local post_txt = ""
@@ -175,7 +175,7 @@ syntax [anything (name=formula)] [, detail type(string) mode(string) PERMutation
 	}
 	di 
 	di 
-	qui nwinfo `net'
+	qui nwsummarize `net'
 	local dyads = `r(nodes)' * `r(nodes)' - `r(nodes)' 
 	di "{txt}Multiple Regression Quadratic Assignment Procedure"
 	di

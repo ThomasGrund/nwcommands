@@ -9,7 +9,6 @@ program nwunab, rclass
 	foreach n in `r(names)' {
 		gen `n' = .
 	}
-	di "Netlist: `netlist'"
 	unab unabnets : `netlist', `max' `min'
 	local numnets : word count "`unablist'"
 	return local networks `numnets'

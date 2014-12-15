@@ -1,12 +1,14 @@
 *! Date        : 3sept2014
-*! Version     : 1.0.1
-*! Author      : Thomas Grund, Linköping University
+*! Version     : 1.0.4
+*! Author      : Thomas Grund, Link0ping University
 *! Email	   : contact@nwcommands.org
 
 capture program drop nwcorrelate	
 program nwcorrelate
 syntax [anything(name=netnames)] [,  mode(string) ATTRibute(string) PERMutations(integer 1) SAVing *]
 
+	_nwsyntax `netnames', max(2)
+	local netnames `netname'
 	// Set mode.
 	if "`mode'" == "" {
 		local mode = "same"
@@ -142,7 +144,9 @@ syntax [anything(name=netnames)] [,  mode(string) ATTRibute(string) PERMutations
 	di "{hline 40}"
 	di "{txt}    Correlation: {res}`r(corr)'"
 	_return hold r1
-	capture nwdrop `net2'
+	if "`attribute'" != "" {
+		capture nwdrop `net2'
+	}
 	_return restore r1
 end
 

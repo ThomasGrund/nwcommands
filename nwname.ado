@@ -1,7 +1,7 @@
 capture program drop nwname
 program nwname
 	version 9
-	syntax [anything(name=netname)], [id(string) newlabs(string) newlabsfromvar(varname) newvars(string) newname(string) newdirected(string) newtitle(string) newedgelabs(string asis) newdescription(string)]
+	syntax [anything(name=netname)], [id(string) newlabs(string) newlabsfromvar(varname) newvars(string) newname(string) newdirected(string) ]
 	
 	mata: st_rclear()
 	
@@ -64,8 +64,12 @@ program nwname
 		local cnewvars : word count `newvars'
 		
 		if ("`newname'" != "") {
-			global nwname_`id' = "`newname'"
-			local thisname = "`newname'"
+			nwvalidate `newname'
+			global nwname_`id' = "`r(validname)'"
+			local thisname = "`r(validname)'"
+			if "`r(validname)'" != "`r(tryname)'" {
+				di "{txt}Warning: network {bf:`r(tryname)'} already exists. Name has been changed to {bf:`r(validname)'}."
+			}
 		}
 		else {
 			scalar onename = "\$nwname_`id'"
@@ -79,16 +83,26 @@ program nwname
 		else {
 			scalar onelabs = "\$nwlabs_`id'"
 			local thislabs = onelabs
+			if `cnewlabs' > 0 {
+				di "{err}{bf:(`newlabs')} needs to have {bf:`thissize'} words"
+				error 60030
+			}
 		}
+		
 		if (`cnewvars' == `thissize') {
 			global nw_`id' "`newvars'"
-			local thisvar "`newvars'"
+			local thisvars "`newvars'"
 		}
 		else {
 			scalar onevars = "\$nw_`id'"
 			local thisvars = onevars
+			if `cnewvars' > 0 {
+				di "{err}{bf:(`newvars')} needs to have {bf:`thissize'} words"
+				error 60030
+			}
 		}
 		if ("`newdirected'" != "") {
+			_opts_oneof "true false" "newdirected" "`newdirected'" 60040
 			global nwdirected_`id' = "`newdirected'"
 			local thisdirected = "`newdirected'"
 		}
@@ -123,6 +137,18 @@ program nwname
 		
 	}
 
+	//check if there are too many labels 
+	
+	local lc : word count `thislabs'
+	if `lc' > `onesize' {
+		local shortenedlabs ""
+		forvalues i = 1 / `onesize' {
+			local onelab : word `i' of `thislabs'
+			local shortenedlabs `"`shortenedlabs `onelab'"'
+		}
+		local thislabs `shortenedlabs'
+	}
+	
 	scalar onesize = "\$nwsize_`id'"
 	local localsize = onesize
 	mata: st_global("r(edgelabs)", `"`thisedgelabs'"')

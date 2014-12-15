@@ -1,121 +1,131 @@
-*! Date        : 3sept2014
-*! Version     : 1.0.1
+*! Date        : 8dec2014
+*! Version     : 1.0.4
 *! Author      : Thomas Grund, Linköping University
 *! Email	   : contact@nwcommands.org
 
 capture program drop nwfromedge
 program nwfromedge
-	syntax varlist(min=2 max=3) [if] [, xvars name(string) vars(string) labs(string asis) edgelabs(string) stub(string) directed undirected]
+	syntax varlist(min=2 max=3) [if] [, xvars name(string) vars(string) labs(string asis) edgelabs(string) stub(string) directed undirected ]
 
-	local v1 : word 1 of `varlist'
-	local v2 : word 2 of `varlist'
-	
-	// check for string variables
-	capture confirm string variable `v1' `v2'
-	local fromStrings = 0
-	tempfile dictionaryString
-	
-	qui if _rc == 0 {
-		local fromStrings = 1
-		preserve
-		
-		local v1 = "from"
-		local v2 = "to"
-		stack `v1' `v2', into(`v1') clear
-		egen _nodeid = group(`v1')
-		gen `v2' = `v1'
-		drop _stack	
-		save `dictionaryString', replace
-		restore
-
-		merge m:n `v1' using `dictionaryString'
-		rename _nodeid `v1'_id
-		drop if _merge != 3
-		drop _merge
-
-		merge m:n `v2' using `dictionaryString'
-		rename _nodeid `v2'_id
-		drop if _merge != 3
-		drop _merge
-		
-		drop `v1' `v2'
-		rename `v1'_id `v1'
-		rename `v2'_id `v2'
-	}
-	
-	
-	if "`if'" != ""{ 
-		keep `if'
-	}
+	// obtain variable names
 	local fromvar : word 1 of `varlist'
 	local tovar : word 2 of `varlist'
+	
+	qui{
+	
+	tempvar _value
 	if (wordcount("`varlist'") == 3) {
 		local value : word 3 of `varlist'
+		gen `_value' = `value'
 		_extract_valuelabels `value'
 		local edgelabs "`r(valuelabels)'"
 	}
 	else {
-		local value ""
+		gen `_value' = 1
 	}
-
-	tempfile dictionary
-	qui {
+	
+	// check for string variables
+	capture confirm string variable `fromvar' `tovar'
+	local fromStrings = 0
+	tempfile dictionaryString
+	
+	// if condition
+	if "`if'" != ""{ 
+		keep `if'
+	}
+	
+	// deal with strings as node identifiers
+	if _rc == 0 {
+		local fromStrings = 1
+		
+		tempvar _nodeid _fromvarid _tovarid
+			
 		preserve
-		// Generate a dictionary that maps the raw id's from the edgelist to consecutive id numbers.
-		keep `fromvar' `tovar'
-		stack `fromvar' `tovar', into(_rawid) clear
-		keep _rawid
-		egen _id = group(_rawid)
-		collapse (mean) _rawid, by(_id)
-		sort _rawid
-		save `dictionary', replace
-		sort _id 
-		if `"`labs'"' == ""{
-			local labs "" 
-			forvalues i = 1 / `=_N' {
-				local onelab = _rawid[`i']
-				local labs "`labs' `onelab'"
+		stack `fromvar' `tovar', into(`fromvar') clear
+		egen `_nodeid' = group(`fromvar')
+		gen `tovar' = `fromvar'
+		drop _stack	
+		save `dictionaryString', replace
+		save dict, replace
+		
+		sort `_nodeid'
+		keep if `_nodeid' != `_nodeid'[_n-1]
+		if "`labs'" == "" {
+			forvalues k = 1/ `=_N'{
+				local labs "`labs' `=`fromvar'[`k']'"
 			}
 		}
 		restore
-	
-		// Map raw id's with dictionary
-		gen _rawid = `fromvar'
-		sum _rawid
-		sort _rawid
-		merge m:1 _rawid using `dictionary', nogenerate
-		rename _id __fromid 
-		replace _rawid = `tovar'
-		drop `fromvar' `tovar'
-		sort _rawid
-		merge m:1 _rawid using `dictionary', nogenerate
-		rename _id __toid
-		drop _rawid
-	
-		// Generate link variable (net)
-		sum __fromid
-		local maxNodes = r(max)
-	
-		gen mynet = (__fromid!=. & __toid != .)
-		replace __fromid = __toid if __fromid == .
-		replace __toid = __fromid if __toid == .
-	
-		if "`value'" != "" {
-			replace mynet = mynet * `value'
-		}
-		sort __fromid __toid
-		collapse (max) mynet, by(__fromid __toid)
-		drop if __fromid == . & __toid == .
-	
-		// Get adjacency matrix of edgelist in Stata
-		reshape wide mynet, i(__fromid) j(__toid)
-		foreach var of varlist mynet* {
-			replace `var' = 0 if `var' == .
-		}
-		capture drop `value' __fromid
+		
+		merge m:n `fromvar' using `dictionaryString'
+		gen `_fromvarid' = `_nodeid' 
+		drop if _merge != 3
+		drop _merge `_nodeid'
+		merge m:n `tovar' using `dictionaryString'
+		gen `_tovarid' = `_nodeid'
+		drop if _merge != 3
+		drop _merge
+
+		destring `fromvar', force replace
+		destring `tovar', force replace
+		replace `fromvar' = `_fromvarid'
+		replace `tovar' = `_tovarid'
+		collapse (max) `_value', by(`fromvar' `tovar')
 	}
-	local nodes = _N
+
+	// deal with non-consecutive integers as node identifiers
+	set more off
+	tempfile dictionaryConsecutive
 	
+	preserve
+	tempvar _rawid _id _fromid _toid 
+	tempname mynet
+	
+	// Generate a dictionary that maps the raw id's from the edgelist to consecutive id numbers.
+	keep `fromvar' `tovar'
+	stack `fromvar' `tovar', into(`_rawid') clear
+	keep `_rawid'
+	egen `_id' = group(`_rawid')
+	collapse (mean) `_rawid', by(`_id')
+	sort `_rawid'
+	save `dictionaryConsecutive', replace
+	restore
+
+	// Map raw id's with dictionary
+	gen `_rawid' = `fromvar'
+	sort `_rawid'
+	merge m:1 `_rawid' using `dictionaryConsecutive'
+	drop if _merge != 3
+	drop _merge
+	replace `fromvar' = `_id'
+	drop `_id'
+	replace `_rawid' = `tovar'
+	
+	sort `_rawid'
+	merge m:1 `_rawid' using `dictionaryConsecutive'
+	drop if _merge != 3
+	drop _merge
+	replace `tovar' = `_id' 
+	
+	
+	sum `fromvar'
+	local maxNodes = r(max)
+	sum `tovar'
+	if r(max) > `maxNodes' {
+		local maxNodes = r(max)
+	}
+	capture mata: mata drop mata_value 
+	capture mata: mata drop mata_from 
+	capture mata: mata drop mata_to
+	
+	putmata mata_value = `_value'
+	putmata mata_from = `fromvar'
+	putmata mata_to = `tovar'	
+	mata: onenet = _getAdjacency(mata_from, mata_to, mata_value, `maxNodes')
+	capture mata: mata drop mata_value 
+	capture mata: mata drop mata_from 
+	capture mata: mata drop mata_to
+
 	// Generate valid network name and valid varlist
 	if "`name'" == "" {
 		local name "network"
@@ -123,44 +133,55 @@ program nwfromedge
 	if "`stub'" == "" {
 		local stub "net"
 	}
+	
 	nwvalidate `name'
 	local edgename = r(validname)
 	local varscount : word count `vars'
-	
-	if (`varscount' != `nodes'){
-		nwvalidvars `nodes', stub(`stub')
+	if (`varscount' != `maxNodes'){
+		nwvalidvars `maxNodes', stub(`stub')
 		local edgevars "$validvars"
 		
 	}
 	else {
 		local edgevars "`vars'"
 	}
-	
+
 	// Set the new network
-	qui nwset mynet*, name(`edgename') vars(`edgevars') labs(`labs') edgelabs(`edgelabs')
-	qui drop _all
+	nwset , mat(onenet) name(`edgename') vars(`edgevars') labs(`labs') edgelabs(`edgelabs')
+	
 	if "`xvars'" == "" {
+		qui drop _all
 		qui nwload
 	}
+	
 	if "`directed'" == "" {
 		nwsym, check 
 		if "`r(is_symmetric)'" == "true" {
 			nwsym
 		}
 	}
+
 	if "`undirected'" != "" {
 		nwsym
 	}
 	
-	if "`fromStrings'" == "1" {
-		preserve
-		use `dictionaryString', clear
-		drop if `v1' == `v1'[_n-1]
-		nwname, newlabsfromvar(`v1')
-		restore
 	}
 	
 	di 
 	di "{txt}{it:Loading successful}"
-	nwsummary
+	nwsummarize
 end
+
+capture mata : mata drop _getAdjacency()
+mata:
+real matrix function _getAdjacency(real matrix from, real matrix to, real matrix value, real scalar nodes) {
+	
+	onenet = J(nodes, nodes, 0)
+	for (i = 1; i <= rows(from); i++) {
+		i
+		onenet[from[i,1],to[i,1]] = value[i,1]
+	}
+	return(onenet)
+}
+end
+

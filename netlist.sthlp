@@ -2,8 +2,6 @@
 {* *! version 1.0.6  6sept2014 author: Thomas Grund}{...}
 {marker topic}
 {helpb nw_topical##concept:[NW-2.1] Concepts}
-{cmd:help netlist}
-{hline}
 
 {marker description}{...}
 {title:Description}
@@ -66,14 +64,16 @@ Some commands default to using all networks if none are specified.
 {marker examples}{...}
 {title:Examples}
 
-{phang}{cmd:. nwuse glasgow}{p_end}
-{phang}{cmd:. nwset}
+	{cmd:. nwuse glasgow}
+	{cmd:. nwset}
 
-{pstd}These four commands are equivalent.{p_end}
-{phang}{cmd:. nwinfo glasgow1 glasgow2 glasgow3}{p_end}
-{phang}{cmd:. nwinfo glasgow1-glasgow3}{p_end}
-{phang}{cmd:. nwinfo glasg*}{p_end}
-{phang}{cmd:. nwinfo _all}{p_end}
+{pstd}The next four commands are all equivalent.
+
+	{cmd:. nwsummarize glasgow1 glasgow2 glasgow3}
+	{cmd:. nwsummarize glasgow1-glasgow3}{
+	{cmd:. nwsummarize glasg*}{
+	{cmd:. nwsummarize _all}{
 
 {title:See also}
-   {help netname}
+
+   {help netname}, {help nwsummarize}

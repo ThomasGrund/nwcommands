@@ -1,13 +1,22 @@
 *! Date        : 3sept2014
 *! Version     : 1.0.1
-*! Author      : Thomas Grund, Linköping University
+*! Author      : Thomas Grund, Linkoping University
 *! Email	   : contact@nwcommands.org
 
 capture program drop nwset	
 program nwset
-syntax [varlist (default=none)][, nooutput name(string) vars(string) labs(string asis) edgelabs(string asis) detail mat(string) undirected directed]
+syntax [varlist (default=none)][, clear nwclear nooutput name(string) vars(string) labs(string asis) edgelabs(string asis) detail mat(string) undirected directed]
 	set more off
 
+	if "`clear'" != "" {
+		nwdrop _all, netonly
+		exit
+	}
+	if "`nwclear'" != "" {
+		nwclear
+		exit
+	}	
+	
 	local numnets = 0
 	mata: st_rclear()
 	local max_nodes = 0
@@ -27,7 +36,7 @@ syntax [varlist (default=none)][, nooutput name(string) vars(string) labs(string
 				// information about networks
 				if "`detail'" == "" {
 					di "{hline 20}"
-				}
+				}			
 				forvalues i=1/`=$nwtotal'{		
 					scalar onesize = "\$nwsize_`i'"
 					local thissize `=onesize'
@@ -59,10 +68,7 @@ syntax [varlist (default=none)][, nooutput name(string) vars(string) labs(string
 					}
 					else {
 						di "      {res}`=onename'"
-					}
-					
-					
-					
+					}				
 				}
 			}
 		}
@@ -74,6 +80,10 @@ syntax [varlist (default=none)][, nooutput name(string) vars(string) labs(string
 			local size :word count `varlist'
 			local varscount : word count `vars'
 			local labscount : word count `labs'
+			local varlistcount: word count `varlist'
+			if (`varlistcount' > _N ) {
+				exit
+			}
 			qui nwtomata `varlist', mat(onenet)
 			local mat = "onenet"
 			if (`varscount' != `size') unab vars: `varlist'

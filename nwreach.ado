@@ -1,6 +1,6 @@
 capture program drop nwreach
 program nwreach
-	syntax [anything(name=reachnet)], [ name(string) vars(string) xvars symoff noreplace]
+	syntax [anything(name=reachnet)], [ name(string) vars(string) xvars nosym noreplace]
 	_nwsyntax `reachnet', name(reachnet)
 
 	// Generate valid name and vars
@@ -26,7 +26,10 @@ program nwreach
 		local reachvars "`vars'"
 	}	
 	
-	nwgeodesic `reachnet', name(`reachname') vars(`reachvars') unconnected(0) `xvars' `symoff'
-	nwreplace `reachname' = 1 if `reachname' >= 0
-	nwname `reachname', newdirected(true)
+	qui nwgeodesic `reachnet', name(`reachname') vars(`reachvars') unconnected(0) `xvars' `sym'
+	qui nwreplace `reachname' = 1 if `reachname' > 0
+	qui nwreplace `reachname' = 0 if `reachname' <= 0
+	if "`sym'" != "" {
+		qui nwname `reachname', newdirected(true)
+	}
 end

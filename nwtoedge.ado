@@ -1,19 +1,18 @@
 capture program drop nwtoedge
 program nwtoedge
 	version 9
-	syntax [anything(name=netname)][, forceundirected forcedirected type(string) KEEPTOnodes KEEPEgo NOFRomvars FRomvars(varlist) TOvars(varlist)  ///
+	syntax [anything(name=netname)][, forceundirected forcedirected FRomvars(varlist) TOvars(varlist)  ///
 	fromid(name) toid(name) link(name) full] 
 	tempfile fromfile tofile
 	tempvar totperfrom totperto dropcomp mergefrom mergeto 
-
+	
 	_nwsyntax `netname', max(2)
-
-	if ("`type'" == "") {
-		local type = "compact"
-	}
+	
+	local nm "`netname'"
+	
 	local numnets = wordcount("`netname'")
 	
-	qui if (`numnets' == 2){
+	if (`numnets' == 2){
 		local type = "full"
 		
 		local net1 = word("`netname'", 1)
@@ -30,14 +29,16 @@ program nwtoedge
 			tempfile current 
 			tempfile edgelist1
 			save `current'
-			nwtoedge `net1', type(full) fromvars(`fromvars') tovars(`tovars') fromid(`fromid') toid(`toid')
+			nwtoedge `net1', full fromvars(`fromvars') tovars(`tovars') fromid(`fromid') toid(`toid')
 			save `edgelist1'
 			use `current', clear
-			nwtoedge `net2', type(full)
+			nwtoedge `net2', full
 			merge 1:1 _fromid _toid using `edgelist1', nogenerate
 			exit
 		}
-	
+	}
+	else {
+		local net1 `netname'
 	}
 
 	if "`fromid'" == "" {
@@ -50,7 +51,7 @@ program nwtoedge
 	
 	local n = `nodes'
 	local n2 = `nodes' * `nodes'
-
+	
 	preserve
 
 	qui if "`fromvars'" != ""  {
@@ -178,5 +179,11 @@ program nwtoedge
 	if "`forceundirected'" != "" {
 		qui drop if _fromid > _toid
 	}
+	
+	if "`full'" == "" {
+		capture drop if `net1' == .
+		capture drop if `net2' == .
+	}
+
 end	
 	

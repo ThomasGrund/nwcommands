@@ -1,6 +1,6 @@
-*! Date        : 15sept2014
+*! Date        : 15nov2014
 *! Version     : 1.0
-*! Author      : Thomas Grund, Linköping University
+*! Author      : Thomas Grund, Linkoping University
 *! Email	   : contact@nwcommands.org
 
 capture program drop _nwnodeid
@@ -15,9 +15,10 @@ program _nwnodeid
 	capture confirm integer number `nodelab'
 	if _rc == 0 {
 		if `nodelab' > `nodes' {
+			
 			mata: st_numscalar("r(nodeid)", -1)
-			di "{err}{it:nodeid} `nodelab' out of bounds"
-			error 6012
+			di "{err}{it:nodelab} {bf:`nodelab'} out of bounds"
+			error 600021
 		}
 		mata: st_numscalar("r(nodeid)", `nodelab')
 		exit
@@ -48,7 +49,7 @@ program _nwnodeid
 		}
 		if `found' == 0 {
 			mata: st_numscalar("r(nodeid)", -1)
-			di "{err}{it:nodelab} `nodelab' out of bounds"
+			di "{err}{it:nodelab} `nodelab' not found"
 			error 6012
 		}
 	}

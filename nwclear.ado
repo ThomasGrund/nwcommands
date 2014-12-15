@@ -22,3 +22,4 @@ program nwclear
 	capture return clear
 	capture mata: st_rclear()
 end
+

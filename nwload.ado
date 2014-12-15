@@ -5,7 +5,7 @@
 
 capture program drop nwload
 program nwload
-	syntax [anything(name=loadname)][, id(string) nocurrent xvars labelonly]
+	syntax [anything(name=loadname)][, id(string) nocurrent xvars labelonly force]
 
 	nwset, nooutput
 	
@@ -17,21 +17,50 @@ program nwload
 	else {
 		nwname, id("`id'")
 	}
-	local id = r(id)
 	local nodes = r(nodes)
 	
-	if (("`xvars'" == "") | ("`labelonly'" != "")){
+	if (`nodes' > 1000 & "`force'" == "" & "`labelonly'" == "") {
+		exit
+	}
+	
+	if (`=`c(k)' + `nodes'' >= `c(max_k_theory)') {
+		exit
+	}
+	
+	scalar onename = "\$nwname_`id'"
+	local localname `=onename'
+	scalar onevars = "\$nw_`id'"
+	local localvars `=onevars'
+	scalar onelabs = "\$nwlabs_`id'"
+	local locallabs `"`=onelabs'"'
+		
+		
+	if "`labelonly'" != "" {		
+
+		
+		capture drop _nodelab
+		capture drop _nodeid
+		if `=_N' < `nodes' {
+			set obs `nodes'
+		}
+		
+		gen _nodelab = ""
+		gen _nodeid = _n if _n <= `nodes'
+		local j = 1
+		foreach lab in `locallabs' {
+			qui replace _nodelab = `"`lab'"' in `j'
+			local j = `j' + 1
+		}
+		exit
+
+	}
+	
+	if (("`xvars'" == "") & ("`labelonly'" == "")){
 		capture drop _nodelab
 		capture drop _nodevar
 		qui mata: st_addvar("str20", "_nodelab")
 		qui mata: st_addvar("str20", "_nodevar")
-		
-		scalar onename = "\$nwname_`id'"
-		local localname `=onename'
-		scalar onevars = "\$nw_`id'"
-		local localvars `=onevars'
-		scalar onelabs = "\$nwlabs_`id'"
-		local locallabs `"`=onelabs'"'
+	
 		
 		if _N < `nodes' {
 			set obs `nodes'
@@ -50,7 +79,7 @@ program nwload
 		}
 		capture drop _nodeid
 		gen _nodeid = _n if _n <= `nodes'
-		if ("`labelonly'" == "") nwtostata, mat(nw_mata`id') gen(`localvars')
+		nwtostata, mat(nw_mata`id') gen(`localvars')
 	}
 	
 	if ("`current'" != "nocurrent") {

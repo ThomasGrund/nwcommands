@@ -1,12 +1,10 @@
 {smcl}
 {* *! version 1.0.0  3sept2014}{...}
-{cmd:help nwtabulate}
-{hline}
 
 {title:Title}
 
-{p2colset 5 20 23 2}{...}
-{p2col :nwtabulate {hline 2}}One-way table of edge / tie values of a network{p_end}
+{p2colset 9 20 23 2}{...}
+{p2col :nwtabulate {hline 2} One-way table of dyads}
 {p2colreset}{...}
 
 
@@ -14,9 +12,10 @@
 
 {p 8 17 2}
 {cmdab: nwtab:ulate} 
-[{help netname}]
+[{it:{help netname}}]
 [{cmd:,}
-{opt selfloop oneway}]
+{opt selfloop}
+{it:{help tabulate_oneway##tabulate1_options:tabulate1_options}}]
 
 {synoptset 20 tabbed}{...}
 {synopthdr}
@@ -27,7 +26,13 @@
 {title:Description}
 
 {pstd}
-{cmd:nwtabulate} tabulates the edge / tie values of a network. 
+The one-way nwtabulate simply tabulates all dyads in the network and shows the distribution of dyad
+values. It works just as {help tabulate}, but on the level of network dyads. By default, the diagonal of
+the underlying adjacency matrix of {help netname} is excluded, unless {bf:selfloop} is specified.
+
+{pstd}
+The command calls {help tabulate} with a temporary variable that holds the dyads of a network, hence, all 
+{it:{help tabulate_oneway##tabulate1_options:tabulate1_options}} can be used.
 
 {title:Example}
 	
@@ -47,9 +52,10 @@
       Total {c |}{res}      1,431      100.00
 
 	  {pstd}{txt}
-In the gang network, 1116 potential (undirected) co-offending ties are not realized, 182 ties have the value 1,
+In the {it:gang} network, 1116 potential (undirected) co-offending ties are not realized, 182 ties have the value 1,
 92 ties have the value 2 and so on.
+
 
 {title:See also}
 
-    {help nwtab2} {help tabulate}
+    {help nwtab2:two-way nwtabulate}, {help tabulate}

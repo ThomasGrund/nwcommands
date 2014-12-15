@@ -1,6 +1,6 @@
 capture program drop nwexpand	
 program nwexpand
-	syntax varlist(min=1 max=1),[ stub(string) mode(string) vars(string) nodes(integer 0) end(string) xvars name(string) noreplace]
+	syntax varlist(min=1 max=1),[ stub(string) mode(string) vars(string) nodes(integer 0) xvars name(string) noreplace]
 	
 
 	// check if this is the first network in this Stata session
@@ -12,6 +12,7 @@ program nwexpand
 		local mode = "same"
 	}
 	
+	
 	_opts_oneof "same dist absdist distinv abdistinv sender receiver" "mode" "`mode'" 6555
 
 	if `nodes' == 0{
@@ -21,7 +22,7 @@ program nwexpand
 			error 6200
 		}
 	}
-
+		
 	// generate valid network name and valid varlist
 	if "`name'" == "" {
 		local name "`mode'_`varlist'"
@@ -30,10 +31,10 @@ program nwexpand
 		local stub "`mode'"
 	}
 	nwvalidate `name'
-	nwvalidvars `nodes', stub("`stub'")
 	local expandname = r(validname)
+	nwvalidvars `nodes', stub("`stub'")
 	local expandvars "$validvars"
-	
+		
 	// generate network
 	mata: attr = st_data((1::`nodes'),"`varlist'")
 	if "`mode'" == "" {

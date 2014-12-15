@@ -1,23 +1,29 @@
 v 3
 d nwcommands-hlp. Social Network Analysis Using Stata - Help Files
-d Thomas U. Grund and Peter Hedström, Linköping University, www.liu.se/ias
+d Thomas U. Grund and Peter Hedstrom, Linkoping University, www.liu.se/ias
 d email: contact@nwcommands.org
-d Distribution-Date: 17nov2014
+d Distribution-Date: 15dec2014
 f _nwnodeid.sthlp
 f _nwnodelab.sthlp
+f _nwsyntax.sthlp
 f animate.sthlp
 f netexample.sthlp
+f netexp.sthlp
 f netlist.sthlp
 f netname.sthlp
 f newnetname.sthlp
 f nodeid.sthlp
 f nw_alphabetical.sthlp
 f nw_intro.sthlp
+f nw_programming.sthlp
+f nw_start.sthlp
 f nw_topical.sthlp
 f nwaddnodes.sthlp
+f nwbetween.sthlp
 f nwclear.sthlp
 f nwcloseness.sthlp
 f nwclustering.sthlp
+f nwcommands.sthlp
 f nwcomponents.sthlp
 f nwcompressobs.sthlp
 f nwcontext.sthlp
@@ -25,26 +31,44 @@ f nwcorrelate.sthlp
 f nwcurrent.sthlp
 f nwdegree.sthlp
 f nwdrop.sthlp
+f nwdropnodes.sthlp
+f nwds.sthlp
+f nwduplicate.sthlp
 f nwdyadprob.sthlp
 f nwdyads.sthlp
+f nwevcent.sthlp
+f nwexpand.sthlp
 f nwexport.sthlp
 f nwfromedge.sthlp
 f nwgen.sthlp
+f nwgenerate.sthlp
 f nwgeodesic.sthlp
 f nwhomophily.sthlp
 f nwimport.sthlp
+f nwissymmetric.sthlp
+f nwkatz.sthlp
 f nwkeep.sthlp
+f nwkeepnodes.sthlp
 f nwlattice.sthlp
 f nwload.sthlp
+f nwname.sthlp
 f nwneighbor.sthlp
 f nwpath.sthlp
 f nwpermute.sthlp
 f nwplot.sthlp
 f nwpref.sthlp
+f nwqap.sthlp
 f nwrandom.sthlp
+f nwreach.sthlp
+f nwrecode.sthlp
+f nwrename.sthlp
+f nwreplace.sthlp
+f nwreplacemat.sthlp
 f nwring.sthlp
 f nwsave.sthlp
+f nwset.sthlp
 f nwsmall.sthlp
+f nwsummarize.sthlp
 f nwsym.sthlp
 f nwsync.sthlp
 f nwtab1.sthlp
@@ -52,11 +76,12 @@ f nwtab2.sthlp
 f nwtabulate.sthlp
 f nwtoedge.sthlp
 f nwtomata.sthlp
-f nwtostata.sthlp
 f nwtranspose.sthlp
 f nwtriads.sthlp
 f nwunab.sthlp
 f nwuse.sthlp
 f nwutility.sthlp
 f nwvalidate.sthlp
+f nwvalidvars.sthlp
 f nwvalue.sthlp
+f webnwuse.sthlp

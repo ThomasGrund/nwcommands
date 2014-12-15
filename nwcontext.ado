@@ -9,12 +9,11 @@ program nwcontext
 	syntax [anything(name=netname)],  ATTRibute(string) [mat(string) stat(string) mode(string) GENerate(string) noweight]
 	
 	_nwsyntax `netname', max(1)
-	local nodes = `r(nodes)'
-	
+
 	if "`stat'" == "" {
 		local stat = "mean"
 	}
-	_opts_oneof "mean max min sum" "stat" "`stat'" 6810
+	_opts_oneof "mean max min sum sd" "stat" "`stat'" 6810
 	if "`mode'" == "" {
 		local mode = "outgoing"
 	}

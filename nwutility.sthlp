@@ -2,13 +2,11 @@
 {* *! version 1.0.0  3sept2014}{...}
 {marker topic}
 {helpb nw_topical##analysis:[NW-2.6] Analysis}
-{cmd:help nwutility}
-{hline}
 
 {title:Title}
 
-{p2colset 5 18 22 2}{...}
-{p2col :nwutility  {hline 2}}Calculates utility scores according to Jackson and Wollinsky (1996){p_end}
+{p2colset 9 18 22 2}{...}
+{p2col :nwutility  {hline 2} Calculate utility scores according to Jackson and Wollinsky (1996)}
 {p2colreset}{...}
 
 
@@ -18,18 +16,18 @@
 {cmdab: nwutility} 
 [{help netname}]
 {cmd:,}
-[{opt benefit(real)}
-{opt cost(real)}
-{opt value}({help netname})
-{help nwgeodesic:geodesic_options}]
+[{opth benefit(real)}
+{opth cost(real)}
+{opth value(netname)}
+{it:{help nwgeodesic:geodesic_options}}]
 
 
 {synoptset 30 tabbed}{...}
 {synopthdr}
 {synoptline}
-{synopt:{opt benefit(real)}}benefit from connected node{p_end}
-{synopt:{opt cost(real)}}cost of connection{p_end}
-{synopt:{opt value}({help netname})}intrinsic values of connecetd nodes}
+{synopt:{opth benefit(real)}}benefit from connected node{p_end}
+{synopt:{opth cost(real)}}cost of connection{p_end}
+{synopt:{opth value(netname)}}intrinsic values of connecetd nodes}
 
 
 {title:Description}
@@ -38,7 +36,7 @@
 {cmd:nwutility} calculates node-level utility scores according to the connections model in Jackson and Wollinsky (1996). The command generates the variables _benefit, _cost and _util.	
 In this model of strategic network formation, each node i is assigned a utility score, which is calculated as:
 
-{pstd}
+{pmore}
 		U(i) = w_ii + sum_j[benefit^(d_ij) * w_ij] - sum_j_n_Nj(g)[cost * y_ij]
 
 {pstd}
@@ -68,6 +66,7 @@ Then one can use the value option in nwutility
 
 {pstd}
 Jackson, M. and Wollinsky, A. (1996) A Strategic Model of Social and Economic Networks. {it:Journal of Exonomic Theory}, 71, pp. 44-74.
+	
 	
 {title:Remarks}
 

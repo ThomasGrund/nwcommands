@@ -1,14 +1,26 @@
 *! Date        : 24aug2014
 *! Version     : 1.0
-*! Author      : Thomas Grund, Linköping University
+*! Author      : Thomas Grund, Linkoping University
 *! Email	   : contact@nwcommands.org
 
 capture program drop nwdropnodes
 program nwdropnodes 
 	version 9
-	syntax [anything(name=netname)] , [nodes(string) keepmat(string) attributes(varlist) netonly]
-	local nodelist "`nodes'"	
+	syntax [anything(name=netname)] [, nodes(string) keepmat(string) attributes(varlist) netonly generate(string)]
+	capture numlist "`nodes'"
+	if _rc == 0 {
+		local nodelist = "`r(numlist)'"
+	}
+	else {
+		local nodelist "`nodes'"
+	}	
+	
 	_nwsyntax `netname', max(1)
+	
+	if "`generate'" != "" {
+		nwduplicate `netname', name(`generate')
+		_nwsyntax `generate', max(1)
+	}
 	
 	local newnodelist ""
 	foreach onenode in `nodelist' {
@@ -38,9 +50,20 @@ program nwdropnodes
 		local keepmat = "keepmat"
 		mata: `keepmat' = J(`nodes',1,1)
 		foreach onenode in `nodelist' {
-			mata: `keepmat'[`onenode',1] = 0
+			if `onenode' <= `nodes' {
+				mata: `keepmat'[`onenode',1] = 0
+			}
 		}
 	}
+	else {
+		mata: keepmatSize = rows(`keepmat')
+		mata: st_numscalar("r(keepmatsize)", keepmatSize)
+		if `r(keepmatsize)' != `nodes' {
+			mata: `keepmat' = J(`nodes',1,1)
+			di "{txt}Warning: Mata matrix {bf:keepmat} has the wrong size; no nodes dropped."
+		}
+	}
+	
 
 	foreach onevar in `vars' {
 		local i = `i' + 1
@@ -75,6 +98,7 @@ program nwdropnodes
 		mata: mata drop attr subattr
 	}
 	mata: mata drop keepnet keepvector
+	mata: st_rclear()
 	//nwcompressobs
 end
 

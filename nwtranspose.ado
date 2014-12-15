@@ -11,6 +11,10 @@ program nwtranspose
 	_nwsyntax `netname', max(1)
 	local transname "`netname'"
 
+	if "`name'" != "" {
+		local replace "noreplace"
+	}
+	
 	if ("`replace'" != ""){
 		// generate valid network name and valid varlist
 		if "`name'" == "" {

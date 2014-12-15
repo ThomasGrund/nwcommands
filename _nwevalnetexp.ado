@@ -179,7 +179,7 @@ program _nwevalnetexp
 			local maxAllowedNodes = min(`maxAllowedNodes', r(nodes))
 		}
 	}
-		
+	
 	// set number of nodes
 	local nodes = `maxAllowedNodes'
 	
@@ -187,12 +187,16 @@ program _nwevalnetexp
 	local exp = subinstr("`exp'", "matanodes", "`nodes'",.)
 	local exp_words = wordcount("`exp'")
 	local exp_net = "`exp'"
+	
 	tokenize "`exp_net'"
 
 	forvalues i = 1/`exp_words' {
 		local x "``i''"
 		local operators = "op round( exp( abs( sqrt( log( ln( J , * :!= :: [ ] :& :| :> :< :>= :<= :* :/ :== & | :- :+ ( )"
-		local isoperator = (strpos("`operators'", "`x'") > 0)
+		local isoperator_match : list operators & x
+		local isoperator = wordcount("`isoperator_match'")		
+		
+		//(strpos("`operators'", "`x'") > 0)
 		local subnet = "[(1::`nodes'),(1::`nodes')]"
 		// word is not a number or operator
 		if (real("`x'")== . & `isoperator' != 1 ){		
@@ -286,7 +290,6 @@ program _nwevalnetexp
 		local sub_exp = substr("`sub_exp'",`nextsubstart',.)		
 	}
 	
-	
 	// invoke early cleanup because of subnet failure
 	if "`errorOccured'" == "errorSubnet" {
 		forvalues j= 1/`stataVars' {
@@ -301,12 +304,15 @@ program _nwevalnetexp
 	
 	local netexp_mata = " J(`subnodes',`subnodes',1) :* `netexp_mata'"
 	local matacmd "`netexp_mata'"
+	
 	//di "Mata: `matacmd'"
+	
 	// execute network expression in mata
 	if ("`result'" != ""){
 		capture mata: mata drop `result'
 		mata: `result' = `matacmd'
 	}
+
 	
 	/////////////////////////////
 	//

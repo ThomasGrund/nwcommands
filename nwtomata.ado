@@ -1,12 +1,12 @@
 *! Date        : 24aug2014
 *! Version     : 1.0
-*! Author      : Thomas Grund, Linköping University
+*! Author      : Thomas Grund, Linkoping University
 *! Email	   : contact@nwcommands.org
 
 capture program drop nwtomata
 program nwtomata
 version 9
-syntax [anything(name=netname)][, mat(string)] 
+syntax [anything(name=netname)], mat(string)
 	if "`mat'" == "" {
 		local mat network
 	}

@@ -53,6 +53,7 @@ program nwneighbor
 
 	mata: st_rclear()
 	capture mata: neighbor=jumble(neighbors)[1]
+	capture mata: st_numscalar("r(ego)", `ego')
 	capture mata: st_numscalar("r(oneneighbor)", neighbor)
 	capture mata: st_matrix("r(neighbors)", neighbors)
 	

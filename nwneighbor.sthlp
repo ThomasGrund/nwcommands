@@ -1,14 +1,12 @@
 {smcl}
 {* *! version 1.0.1  17may2012 author: Thomas Grund}{...}
+{marker topic}
 {helpb nw_topical##analysis:[NW-2.6] Analysis}
-{cmd:help nwgeodesic}
-{cmd:help nwneighbor}
-{hline}
 
 {title:Title}
 
-{p2colset 5 20 22 2}{...}
-{p2col :nwneighbor {hline 2}}Extracts the network neighbors of a node{p_end}
+{p2colset 9 20 22 2}{...}
+{p2col :nwneighbor {hline 2} Extract the network neighbors of a node}
 {p2colreset}{...}
 
 
@@ -17,73 +15,94 @@
 {p 8 17 2}
 {cmdab: nwneighbor} 
 [{it:{help netname}}],
-{opt ego}({help nodeid})
-[{opt mode}({help nodeid})]
+{opth ego(nodeid)}
+[{opth mode(nodeid)}]
 
 {p 8 17 2}
 {cmdab: nwneighbor} 
 [{it:{help netname}}],
-{opt ego}({help nodelab})
-[{opt mode}({help nwneighbor##context:context})]
+{opth ego(nodelab)}
+[{opt mode}({it:{help nwneighbor##context:context}})]
 
 
 {synoptset 20 tabbed}{...}
 {synopthdr}
 {synoptline}
-{syntab:Main}
-{synopt:{opt ego}({help nodeid})}nodeid of network node i{p_end}
-{synopt:{opt ego}({help nodelab})}nodelab of network node i{p_end}
-{synopt:{opt mode}({help nwneighbor##context:context})}defines network neighbors of node i as either nodes j who receive ties from i, send ties to j or both{p_end}
+{synopt:{opth ego(nodeid)}}node{p_end}
+{synopt:{opth ego(nodelab)}}node{p_end}
+{synopt:{opt mode}({it:{help nwneighbor##context:context}})}defines the network neighborhood of node {it:ego}; default = {it:outgoing}{p_end}
 {synoptline}
 {p2colreset}{...}
 		
-{synoptset 20 tabbed}{...}
+{synoptset 15 tabbed}{...}
 {marker context}{...}
 {p2col:{it:context}}{p_end}
 {p2line}
-{p2col:{cmd: outgoing}}network neighbors of node i are all nodes j who receive a tie from i; default
+{p2col:{cmd: outgoing}}network neighbors of node {it:ego} are all nodes {it:j} who receive a tie from {it:ego}; default
 		{p_end}
-{p2col:{cmd: incoming}}network neighbors of node i are all nodes j who send a tie to i; default
+{p2col:{cmd: incoming}}network neighbors of node{it:ego} are all nodes {it:j} who send a tie to {it:ego}
 		{p_end}
-{p2col:{cmd: both}}network neighbors of node i are all nodes j who either send a tie to i or receive a tie from i
+{p2col:{cmd: both}}network neighbors of node {it:ego} are all nodes {it:j} who either send a tie to {it:ego} or receive a tie from {it:ego}
 		{p_end}
 
 		
 {title:Description}
 
 {pstd}
-{cmd: nwneighbor} retrieves one or more network neighbors for node with id {it: nodeid}. By default,
-neighbors of  node i are drawn from outgoing ties, i.e. all nodes j with a tie (i,j). Returns the scalar {it: r(oneneighbor)}, which
-stores the id of one randomly selected network neighbor. If node {it: nodeid} does not have any neighbors at all,
-{it: r(oneneighbor)} stores a missing value. Also returns the Stata matrix 
-{it: r(neighbors)} with a complete (shuffled) list of all network neighbors of node {it: nodeid}.   
-
-{title:Options}
-
-{phang}
-{opt ego}({help nwneighbor##nodeid:nodeid}) Must be specified and indicates the node for whom network neighbors should be retrieved.
-
-{phang}
-{opt mode}({help nwneighbor##context:context}) Defines which nodes j should belong to the network neighborhood of node i. The default option is 
-{it: outgoing}, i.e. all nodes j to whom node i has an outgoing tie. Alternatively, one can choose options 
-{it: incoming} or {it:both}. Notice that in the latter case, nodes j will appear twice in the calculation when 
-they both receive and send a tie from/to node i. 
-
-
-{title:Remarks}
+{cmd: nwneighbor} returns the network neighbors of node {it:ego}. The network neighborhood of a node is defined in {opt mode()}. By default,
+the neighborhood of node {it:ego} consists of all nodes {it:j}, who receive a tie from node {it:ego}. Tie values are ignored.
 
 {pstd}
-Tie values are ignored. 
+Also saves the (shuffled) list of neighbors in the return vector. 
+
+{title:Stored results}
+
+	Scalars
+	  {bf:r(ego)}		nodeid of ego
+	  {bf:r(oneneighbor)}	one randomly selected neighbor
+	
+	Matrices
+	  {bf:r(neighbors)} 	reshuffled list of all neighbors
 
 
 {title:Examples}
-     {cmd:. nwclear}
-     {cmd:. nwrandom 20, prob(.1)}
-     {cmd:. nwneighor, ego(1)}
 
-   or
-     {cmd:. nwneighbor, ego(net1)}
+{pstd}
+The command can be used both with the {help nodeid} or the {help nodelab} of a node {it:ego}. For example,
+this loads the {help netexample:Florentine data} and returns the business partners of the "ginori"
+family. 
+
+
+	{com}. nwneighbor flobusiness, ego(ginori)
+
+	{hline 40}
+	{txt}  Network: {res}flobusiness
+	{hline 40}
+	{txt}    Ego        : {res}ginori	
+	{txt}    Neighbors  : {res}{res}barbadori{txt} , {res}medici{txt}
+	{hline 40}
+
+{pstd}
+This shows that the "ginori" family has business relationships with the "barbadori" and the "medici". One could
+have also used the nodeid = 2 of the "ginori" family to get their network neighbors (see {help _nwnodeid} on how to obtain such an id from
+a nodelab).
+
+	{com}. nwneighbor flobusiness, ego(2){txt}
+
+{pstd}
+The first syntax displays the {help nodelab}, while the second displays the {help nodeid} of the
+network neighbors. Both commands store the following in the return vector:
+		
+	{com}. return list {txt}
+	
+	scalars:
+	  r(ego) =  {res}6{txt}
+	  r(oneneighbor) =  {res}3{txt}
+
+	matrices:
+	   r(neighbors) : {res} 2 x 1
+	   
 
 {title:Also see}
 
-   {help nwcontext}, {help nwname}, {help nwinfo}
+   {help nwcontext}, {help nwgeodesic}, {help nwpath}, {help _nwnodelab}, {help _nwnodeid}

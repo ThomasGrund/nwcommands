@@ -80,7 +80,7 @@ program nwlattice
 		
 	}
 	
-	nwset, mat(newmat) vars(`vars') name(lattice) `undirected'
+	nwset, mat(newmat) vars(`vars') name(`name') `undirected'
 	nwload `randomname', `xvars'
 	mata: mata drop newmat 
 end

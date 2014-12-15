@@ -6,8 +6,7 @@
 capture program drop nwdegree
 program nwdegree
 	version 9
-	syntax [anything(name=netname)],[ isolates unweighted GENerate(string)]
-	
+	syntax [anything(name=netname)],[ isolates valued GENerate(string) in(string) out(string) *]
 	_nwsyntax `netname', max(9999)
 	if `networks' > 1 {
 		local k = 1
@@ -17,17 +16,12 @@ program nwdegree
 	foreach netname_temp in `netname' {
 		_nwsyntax `netname_temp'
 		
-		local directed = r(directed)
+		local directed `directed'
 		nwtomata `netname_temp', mat(degreeNet)
 	
-		if "`unweighted'" != "" {
+		if "`valued'" == "" {
 			mata: degreeNet = degreeNet :/ degreeNet
 			mata: _editmissing(degreeNet,0)
-		}
-	
-		local gencount : word count `generate'
-		if (`gencount' != 4) {
-			local generate = "_degree _outdegree _indegree _isolates"
 		}
 	
 		mata: outdegree = (colsum(degreeNet))'
@@ -38,14 +32,21 @@ program nwdegree
 		}
 	
 		local _degree : word 1 of `generate'
-		local _outdegree : word 2 of `generate'
-		local _indegree : word 3 of `generate'
-		local _isolates : word 4 of `generate'
+		if "`_degree'" == "" {
+			local _degree = cond("`valued'"=="", "_degree", "_strength") 
+		}
+		
+		local _outdegree "_out`_degree'"
+		local _indegree "_in`_degree'"
+		local _isolates : word 2 of `generate'
+		if "`_isolates'" == "" {
+			local _isolates "_isolate"
+		}
 	
 		capture drop `_degree'`k'
 		capture drop `_outdegree'`k'
 		capture drop `_indegree'`k'
-	
+		
 		if ("`directed'" == "false"){
 			nwtostata, mat(outdegree) gen(`_degree'`k')
 		}
@@ -66,7 +67,6 @@ program nwdegree
 			}
 		}
 	
-		mata: st_rclear()
 		mata: mata drop outdegree indegree degreeNet
 		if "`more'" != "" & "`k'" != "`more'" {
 			local k = `k' + 1
@@ -78,10 +78,10 @@ program nwdegree
 	di "{hline 40}"
 	di "{txt}    Degree distribution"
 	if "`directed'" == "true"{
-		tab `_indegree'`k' 
-		tab `_outdegree'`k'
+		tab `_indegree'`k', `in'
+		tab `_outdegree'`k', `out'
 	}
 	else {
-		tab `_degree'`k'
+		tab `_degree'`k', `options'
 	}
 end	

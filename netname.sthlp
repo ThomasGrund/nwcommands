@@ -2,12 +2,7 @@
 {* *! version 1.0.6  16may2012 author: Thomas Grund}{...}
 {marker topic}
 {helpb nw_topical##concept:[NW-2.1] Concepts}
-{title:Title}
 
-    {hi:netname}
-
-
-{marker description}{...}
 {title:Description}
 
 {pstd}

@@ -2,10 +2,11 @@
 {* *! version 1.2.3  11feb2011}{...}
 {marker topic}
 {helpb nw_topical##utilities:[NW-2.7] Utilities}
+
 {title:Title}
 
-{p2colset 5 15 22 2}{...}
-{p2col :nwclear {hline 2}} Clear all networks and variables from memory{p_end}
+{p2colset 9 15 22 2}{...}
+{p2col :nwclear {hline 2} Clear all networks and variables from memory}
 {p2colreset}{...}
 
 
@@ -14,17 +15,26 @@
 
 {p 8 13 2}{cmd:nwclear}
 
-{title:Remarks}
 
-{phang2}This command is equivalent to:{p_end}
-{phang2}{cmd:. nwdrop _all}{p_end}
-{phang2}{cmd:. clear}{p_end}
+{title:Description}
 
-{marker examples}{...}
-{title:Examples}
+{pstd}
+Clears all networks and variables from memory. This is the network extension of {help clear}. One can also just drop
+some or all networks using {help nwdrop}.
 
-{phang2}{cmd:. nwuse glasgow}{p_end}
-{phang2}{cmd:. nwclear}{p_end}
+{pstd}
+This example loads network data and clears everything afterwards.
+
+	{cmd:. webnwuse glasgow}
+	{cmd:. nwclear}
+
+{pstd}	
+Alternatively, one can also just drop networks. This does not delete the Stata variables that are not associated 
+with networks. For more information see {help nwdrop}. 
+
+	{cmd:. nwdrop _all}
+	
 
 {title:See also}
+
   {help nwdrop}, {help clear}

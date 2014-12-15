@@ -2,13 +2,11 @@
 {* *! version 1.0.0  3sept2014}{...}
 {marker topic}
 {helpb nw_topical##information:[NW-2.4] Information}
-{cmd:help nwdyads}
-{hline}
 
 {title:Title}
 
-{p2colset 5 16 22 2}{...}
-{p2col :nwdyads  {hline 2}}Dyad census of the network{p_end}
+{p2colset 9 16 22 2}{...}
+{p2col :nwdyads  {hline 2} Dyad census}
 {p2colreset}{...}
 
 
@@ -16,27 +14,68 @@
 
 {p 8 17 2}
 {cmdab: nwdyads} 
-[{help netname}]
+[{it:{help netname}}]
 
 {title:Description}
 
 {pstd}
-Returns the dyad census of the network. When the network is directed, each dyad 
-(pair of nodes i and j) can be either 1) mutually connected, 2) asymmetrically connected, 
-3) not connected at all. When the network is undirected, each dyad pair can be either 1)
-connected or 2) not connected. Also returns results in the return vector. 
+Returns the dyad census of a network. This is a way to characterize a network based on its dyads.
+
+{pstd}
+In directed network, each dyad (pair of nodes {it:i} and {it:j}) can be one of the following:
+
+{pmore}
+1) mutually connected: {it:M_ij = M_ji = 1}
+
+{pmore}
+2) asymmetrically connected: {it:M_ij = 1}, but {it:M_ji = 0} 
+
+{pmore}
+3) not connected at all: {it:M_ij = M_ji = 1}
+
+
+{pstd}
+In undirected network, each dyad (pair of nodes {it:i} and {it:j}) can be one of the following:
+
+{pmore}
+1) connected: {it:M_ij = M_ji = 1}
+
+{pmore}
+2) unconnected:  {it:M_ij = M_ji = 0}
 
 
 {title:Examples}
 	
-	// Undirected network
 	{cmd:. webnwuse florentine}
-	{cmd:. nwdyads}
-	
-	// Directed network
-	{cmd:. webnwuse glasgow}
-	{cmd:. nwdyads}
+	{com}. nwdyads
+	{res}
+	{txt}    Dyad census: {res} flomarriage{txt}
 
+	{txt}{ralign 10:Mutual}{col 20}{c |}{ralign 10:Null}
+	{hline 11}{c +}{hline 11}
+	{res}{ralign 10:20}{col 20}{c |}{ralign 10:100}
+
+	{com}. webnwuse glasgow
+	{com}. nwdyads
+	{res}
+	{txt}    Dyad census: {res} glasgow3{txt}
+
+	{txt}{ralign 10:Mutual}{col 20}{c |}{ralign 10:Asym}{col 32}{c |}{ralign 10:Null}
+	{hline 11}{c +}{hline 11}{c +}{hline 11}
+	{res}{ralign 10:45}{col 20}{c |}{ralign 10:32}{col 32}{c |}{ralign 10:1148}{txt}
+
+
+{title:Stored results}
+
+	Scalars:
+	  {bf:r(_100)}	mutual dyads
+	  {bf:r(_010)}	asymmetric dyads
+	  {bf:r(_000)}	null dyads
+	  
+	Macros:
+	  {bf:r(name)}	name of network
+	  
+	  
 {title:See also}
 
 	{help nwtriads}

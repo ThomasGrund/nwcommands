@@ -12,8 +12,10 @@
 
 capture program drop nwbetween
 program nwbetween
-	syntax [anything(name=netname)], [GENerate(string) sym]
+	syntax [anything(name=netname)], [GENerate(string) nosym]
 	_nwsyntax `netname', max(9999)
+	_nwsetobs `netname'
+	
 	if `networks' > 1 {
 		local k = 1
 	}
@@ -24,9 +26,11 @@ program nwbetween
 			mata: betweennet = betweennet :+ betweennet'
 		}
 	
-		mata: betweennet = betweennet :/ betweennet
-		mata: _editmissing(betweennet, 0)
-	
+		if "`sym'" == "" {
+			mata: betweennet = betweennet :/ betweennet
+			mata: _editmissing(betweennet, 0)
+		}
+		
 		mata: C = between(betweennet)
 		if "`sym'" != ""  {
 			mata: C = C:/2
@@ -42,6 +46,7 @@ program nwbetween
 		mata: mata drop betweennet C
 		local k = `k' + 1
 	}
+	mata: st_rclear()
 end
 
 

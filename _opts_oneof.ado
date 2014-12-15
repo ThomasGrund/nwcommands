@@ -19,7 +19,7 @@ program _opts_oneof
         if `found' == 1{ // no error message or return code 
                 exit
         }
-		di in smcl as err `"option {bf:`optname'(`selectopt')} invalid; only one of {bf:`opts'} is allowed"'
+		di in smcl as err `"option {it:`optname'}{bf:(`selectopt')} invalid; only one of {bf:`opts'} is allowed"'
         if `"`errcode'"' != "" {
                 exit `errcode'
         }

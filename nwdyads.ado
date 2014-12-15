@@ -3,17 +3,11 @@ program nwdyads
 	version 9
 	syntax [anything(name=netname)], [ triad ]
 	
+	_nwsyntax `netname', max(1)
+	
 	if "`mode'" == "" {
 		local mode = "dyad"
 	}
-	
-	if "`netname'" == "" {
-		nwcurrent
-		local netname = r(current)
-	}
-	
-	nwname `netname'
-	local directed = r(directed)
 	
 	mata: st_rclear()
 	
@@ -52,14 +46,14 @@ program nwdyads
 		mata: st_numscalar("r(_001)", null)
 		mata: st_numscalar("r(_010)", zero)
 		mata: st_numscalar("r(_100)", mutual)
-		
 		di
 		di "{txt}    Dyad census: {res} `netname'{txt}"
 		di 
 		di "{txt}{ralign 10:Mutual}{col 12}{c |}{ralign 10:Null}"
 		di "{hline 11}{c +}{hline 11}"
 		di "{res}{ralign 10:`r(_100)'}{col 12}{c |}{ralign 10:`r(_001)'}"
-	}		
+	}
+	mata: st_global("r(name)", "`netname'")
 end
 	
 	

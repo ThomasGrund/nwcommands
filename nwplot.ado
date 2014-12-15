@@ -7,9 +7,19 @@ capture program drop nwplot
 program nwplot
 	version 9.0
 	set more off
-	syntax [anything(name=netname)][if/], [ arrows edgesize(string) ASPECTratio(string) components(string) arcstyle(string) arcbend(string) arcsplines(integer 10) nodexy(varlist numeric min=2 max=2) edgeforeground(string) GENerate(string) colorpalette(string) edgecolorpalette(string) edgepatternpalette(string) symbolpalette(string) lineopt(string) scatteropt(string) legendopt(string) size(string) color(string) symbol(string) edgecolor(string) label(varname) nodefactor(string) sizebin(string) edgefactor(string) arrowfactor(string) arrowgap(string) arrowbarbfactor(string) layout(string) iterations(integer 1000) scheme(string) * ]
+	syntax [anything(name=netname)][if/], [ lab  labelopt(string) _layoutfunction(string) arrows edgesize(string) ASPECTratio(string) components(string) arcstyle(string) arcbend(string) arcsplines(integer 10) nodexy(varlist numeric min=2 max=2) edgeforeground(string) GENerate(string) colorpalette(string) edgecolorpalette(string) edgepatternpalette(string) symbolpalette(string) lineopt(string) scatteropt(string) legendopt(string) size(string) color(string) symbol(string) edgecolor(string) label(varname) nodefactor(string) sizebin(string) edgefactor(string) arrowfactor(string) arrowgap(string) arrowbarbfactor(string) layout(string) iterations(integer 1000) scheme(string) * ]
 	_nwsyntax `netname', max(1)
-
+	
+	
+	if "`labelopt'" != "" {
+		local scatteropt "`scatteropt' `labelopt'"
+	}
+	qui if "`lab'" != ""{
+		capture drop _nodelab
+		capture drop _nodeid
+		nwload, labelonly
+		local label "_nodelab"
+	}
     qui if "`if'"!="" {
 		nwgen _temp_if = `netname'
 		nwdrop _temp_if if (!(`if'))
@@ -80,7 +90,7 @@ program nwplot
 	local layout_gridcols = "`columns'"
 	local layout_components = "`components'"
 	local layout = "`anything'"
-	_opts_oneof "mds mdsclassical grid circle nodexy" "layout" "`layout'" 6556
+	_opts_oneof "mds mdsclassical grid circle nodexy _layoutfunction" "layout" "`layout'" 6556
 
 	if "`lgc'" != "" {
 		tempvar _lgc
@@ -401,7 +411,7 @@ program nwplot
 		
 		local edgesize = trim("`othernetname'")
 		local othernetname = ""
-		qui nwsummary `edgesize'
+		qui nwsummarize `edgesize'
 		local siznodes = r(nodes)
 		
 		if `nodes' != `siznodes' {
@@ -449,7 +459,7 @@ program nwplot
 		_nwsyntax_other `edgecolor', max(1) nocurrent forcedirected(true)
 		local edgecolor = trim("`othernetname'")
 		local othernetname = ""
-		qui nwsummary `edgecolor'
+		qui nwsummarize `edgecolor'
 		local siznodes = r(nodes)
 
 		if `nodes' != `siznodes' {
@@ -458,12 +468,13 @@ program nwplot
 		}
 		local edgecolorkeys "`forcekeys'"
 
-		if "`forcekeys'" == "" {
-			qui nwtab2 `edgecolor'
-			matrix edgecolor_mat = r(col)
-			local edgecolor_matrows = colsof(edgecolor_mat)
+		qui if "`forcekeys'" == "" {
+			nwtabulate `edgecolor', matrow(r)
+			matrix edgecolor_mat = r
+			
+			local edgecolor_matrows = rowsof(edgecolor_mat)
 			forvalues i = 1/`edgecolor_matrows'{
-				local eckey = edgecolor_mat[1,`i']
+				local eckey = edgecolor_mat[`i',1]
 				local edgecolorkeys "`edgecolorkeys' `=`eckey'+1'"
 			}
 		}
@@ -508,6 +519,8 @@ program nwplot
 			}
 		}
 	}
+
+	
 	//local layout_gridcols "`columns'"
 	local components = "`layout_components'"
 	
@@ -515,6 +528,10 @@ program nwplot
 		di "{text:Calculating node coordinates...}"
 	}
 	
+	if ("`layout'"=="_layoutfunction") {
+		gettoken _layoutfcn _layoutfcnopt: _layoutfunction, parse(",")
+		mata: Coord = `_layoutfcn'(M`_layoutfcnopt')
+	}
 	if ("`layout'"== "mds"){
 		mata: Coord = netplotmds(M, `iterations')
 	}
@@ -527,10 +544,11 @@ program nwplot
 		
 		// Deal with isolates
 		tempvar _isolates
-		nwgen `_isolates' = isolates(`netname')
+		nwgen `_isolates' = isolates(`netname')		
 		count if `_isolates' == 1
 		local isol = `r(N)'
 		local nonisol = `nodes' - `isol'
+		
 		
 		// Get number of components
 		tempvar _component
@@ -541,6 +559,8 @@ program nwplot
 			replace `_component' = 1 - `_component'
 			local components = 1
 		}
+		
+		
 		
 		local compnum = r(components)		
 		local compnum_nonisol = `compnum' - `isol'
@@ -574,16 +594,13 @@ program nwplot
 
 		
 		// Go through all (non-isolates) components (that should be plotted in boxes) from large to small
-		forvalues i = 1/`components' {
-			
+		qui forvalues i = 1/`components' {
 			nwduplicate `netname', name(`netname'_comp`i')
 			capture drop _id
 			gen _id = _n
 			
-			// Only keep the nodes in the i'th largest component as network i		
 			nwdrop `netname'_comp`i' if `_component' != comp_freqid[`i', 2], attributes(_id) netonly
 			nwtomata `netname'_comp`i', mat(compmat)
-			
 			// Original id's of selected nodes
 			mata: original_id = st_data((1::rows(compmat)), "_id")
 			
@@ -634,11 +651,12 @@ program nwplot
 		mata: Coord[.,2] = st_data((1,rows(M)),"`nodey'")
 	}
 	
+	
 	// Obtain tie coordinates 
 	mata: TC = getTieCoordinates(Coord,nsize,NumElist(plotmat), edgecolormat, edgesizemat, `nodefactor', `doarrows', `arrowgap')
 	mata: st_numscalar("r(TC)", rows(TC))
 	local minObs = max(`r(TC)', `nodes')
-
+	
 	// Prepare temporary Stata dataset for plotting
 	preserve
 	qui drop _all

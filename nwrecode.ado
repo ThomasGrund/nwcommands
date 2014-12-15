@@ -1,58 +1,51 @@
 capture program drop nwrecode
 program nwrecode
 	version 9
-	syntax [anything(name=arg)] [if/], [newvalue(string)]
-	
-	qui nwset
+	syntax anything(name=arg) [, into(string) generate(string) prefix(string) *]
+
 	if "`arg'" == "" {
 		exit
 	}
 	
-	gettoken next arg: arg, bind
-	local onenet = "`next'"
-	qui capture nwname `next'
-	
-	if _rc != 0 {
-		nwcurrent
-		local onenet = r(current)
-	}
-	else {
-		gettoken next arg: arg, bind
+	if "`into'" != "" {
+		local generate "`into'"
 	}
 	
-	nwtomata `onenet', mat(recodeNet)
+	local ruleStart = strpos("`arg'", "(")
+	local netname = substr("`arg'",1, `=`ruleStart'-1')
+	local rules = substr("`arg'",`ruleStart',.)
 
-	while "`next'" != "" {
-		// Parse rules
-		// Get rid of brackets
-		local rule = subinstr("`next'", "(","",.)
-		local rule = subinstr("`rule'",")","",.)
+	_nwsyntax `netname', max(9999)
 	
-		gettoken leftside rightside: rule, parse("=")
-		local rightside = subinstr("`rightside'","=","",.)
-		if wordcount("`rightside'") != 1 {
-			di "{err}Recoding rule wrongly specified."
-			error 6077
+	preserve
+	tokenize `generate'
+	local i = 1
+	foreach onenet in `netname' {
+		nwtoedge `onenet'
+		recode `onenet' `rules', `options'		
+		qui nwfromedge _fromid _toid `onenet', name(__temp_network)
+		nwtomata __temp_network, mat(recodeNet)
+		if "`generate'" == "" & "`prefix'" == "" {
+			nwreplacemat `onenet', newmat(recodeNet)
 		}
-	
-		numlist "`leftside'"
-		local leftside = r(numlist)
-	
-		di "L: `leftside'"
-		di "R: `rightside'"
-	
-		foreach value in `leftside' {
-			local newvalue = `rightside' * 10000
-			mata: _editvalue(recodeNet, `value', `newvalue')
+		else {
+			if "`prefix'" != "" {
+				nwduplicate `onenet', name(`prefix'`onenet')
+				nwreplacemat `prefix'`onenet', newmat(recodeNet)
+			}
+			if "`generate'" != "" {
+				if "``i''" != "" {
+					nwduplicate `onenet', name(``i'')
+					nwreplacemat ``i'', newmat(recodeNet)	
+				}
+				else {
+					nwreplacemat `onenet', newmat(recodeNet)
+				}
+			}
 		}
-		gettoken next arg: arg, bind	
+		capture nwdrop __temp_network
+		mata: mata drop recodeNet
+		local i = `i' + 1
 	}
-	
-	// Clean up if expression.
-	
-	mata: recodeNet = (recodeNet :> 1000) * recodeNet :/ 10000 
-	
-	nwreplace `onenet', newmat(recodeNet)
-	mata: mata drop recodeNet
-	
+	restore
 end

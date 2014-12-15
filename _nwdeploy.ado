@@ -1,6 +1,8 @@
 capture program drop _nwdeploy
 program _nwdeploy
-	
+	syntax ,[author(string) version(string) email(string) other(string)]
+
+	set more off
 	tempname deploy_ado
 	file open `deploy_ado' using nwcommands-ado.pkg, replace write
 	file write `deploy_ado' "v 3" _n
@@ -18,6 +20,10 @@ program _nwdeploy
 	tempfile topics
 	postfile `memhold' str30 cmdname str40 link str30 topic using `topics'
 	foreach file in `sthlpfiles' {
+		// add sthlp meta info
+		//di "sthlp: `file'"
+		//qui _addmeta_hlp `file', date(`d') version(`version')
+		
 		local cmdname = substr("`file'", 1, `=(length("`file'") - 6)') 
 		getcmdtopic `cmdname'
 		if "`r(cmdtopic)'" != "" {
@@ -31,44 +37,38 @@ program _nwdeploy
 
 	preserve
 	use `topics', clear
+
 	sort topic cmdname
 	
 	tempname topical
 	file open `topical' using nw_topical.sthlp, replace write
 	file write `topical' "{smcl}" _n ///	
-			"{* *! version 1.0.0  3sept2014}{...}"  _n ///
-		    "{cmd:help nw_topical}" _n ///
-            "{hline}" _n ///
-			"{phang}" _n ///
-			"{manlink NW-2 intro} {hline 2} topical list of {it:nwcommands}" _n ///
-			" "_n ///
-			"{col 5}{hline}" _n ///
-			"{p2colset 5 32 34 2}"  _n ///
+			"{* *! version `version' `d'}{...}"  _n ///
+		    "{phang}" _n ///
+			"{help nwcommands:NW-2 topical} {hline 2} " _n ///
+			"{hline 2} Topical list of network commands" _n ///
 			"" _n ///
-			"{title:Contents}"_n ///
+			"{title:Contents}" _n ///	
 			"" _n ///
-			"{pstd}" _n ///
-			"An alphabetical index of all {it:nwcommands} is available in" _n ///
-			"{bf:{help nw_alphabetical:[NW-3] intro}}. There are some general categories:"_n ///
-			""_n ///
-			"{pstd}"_n ///
-			"{bf:{help nw_topical##concept:[NW-2.1] Concepts}}{p_end}"_n ///
-			"{pstd}"_n ///
-			"{bf:{help nw_topical##import:[NW-2.2] Import/Export}}{p_end}"_n ///
-			"{pstd}"_n ///
-			"{bf:{help nw_topical##generator:[NW-2.3] Generators}}{p_end}"_n ///
-			"{pstd}"_n ///
-			"{bf:{help nw_topical##information:[NW-2.4] Information}}{p_end}"_n ///
-			"{pstd}"_n ///
-			"{bf:{help nw_topical##manipulation:[NW-2.5] Manipulation}}{p_end}"_n ///
-			"{pstd}"_n ///
-			"{bf:{help nw_topical##analysis:[NW-2.6] Analysis}}{p_end}"_n ///
-			"{pstd}"_n ///
-			"{bf:{help nw_topical##utilities:[NW-2.7] Utilities}}{p_end}"_n ///
-			"{pstd}"_n ///
-			"{bf:{help nw_topical##visualization:[NW-2.8] Visualization}}{p_end}"_n ///
-			"{pstd}"_n ///
-			"{bf:{help nw_topical##programming:[NW-2.9] Programming }}{p_end}" _n _n
+			"{col 14}Section{col 31}Description" _n ///
+			"{col 14}{hline 46}" _n ///
+"{help nw_topical##concept:{col 14}{bf:[NW-2.1]}{...}{col 31}{bf:Concepts}}" _n ///
+	"" _n ///
+"{help nw_topical##import:{col 14}{bf:[NW-2.2]}{...}{col 31}{bf:Import/Export}}" _n ///
+	"" _n ///
+"{help nw_topical##generator:{col 14}{bf:[NW-2.3]}{...}{col 31}{bf:Generators}}" _n ///
+	"" _n ///
+"{help nw_topical##information:{col 14}{bf:[NW-2.4]}{...}{col 31}{bf:Information}}" _n ///
+	"" _n ///
+"{help nw_topical##manipulation:{col 14}{bf:[NW-2.5]}{...}{col 31}{bf:Manipulation}}" _n ///
+	"" _n ///
+"{help nw_topical##analysis:{col 14}{bf:[NW-2.6]}{...}{col 31}{bf:Analysis}}" _n ///
+	"" _n ///
+"{help nw_topical##utilities:{col 14}{bf:[NW-2.7]}{...}{col 31}{bf:Utilities}}" _n ///
+	"" _n ///
+"{help nw_topical##visualizaion:{col 14}{bf:[NW-2.8]}{...}{col 31}{bf:Visualization}}" _n ///
+	"" _n ///
+"{help nw_topical##programming:{col 14}{bf:[NW-2.9]}{...}{col 31}{bf:Programming}}" _n _n
 
 	set more off
 	gen topicmarker = substr(link, 13,.)
@@ -119,15 +119,18 @@ program _nwdeploy
 	file open `alphabetical' using nw_alphabetical.sthlp, replace write
 	file write `alphabetical' "{smcl}" _n ///	
 			"{* *! version 1.0.0  3sept2014}{...}"  _n ///
-		    "{cmd:help nw_alphabetical}" _n ///
-            "{hline}" _n ///
 			"{phang}" _n ///
-			"{manlink NW-3 intro} {hline 2} alphabetical list of {it:nwcommands}" _n ///
+			"{help nwcommands:NW-3 alphabetical} {hline 2} Alphabetical list of network programs" _n ///
 			" "_n ///
 			"{col 5}{hline}" _n ///
 			"{p2colset 5 32 34 2}" 
 	set more off
 	foreach file in `adofiles' {
+		
+		// add meta to dofiles
+		// di "ado: `file'"
+		//qui _addmeta_do `file', date(`d') author(`author') email(`email') version(`version') other(`other')
+	
 		local cmdname = substr("`file'", 1, `=(length("`file'") - 4)') 
 		getcmddesc `cmdname'
 		file write `deploy_ado' "f `file'" _n
@@ -180,9 +183,10 @@ program getcmddesc, rclass
 		file read `cmdsthlp' line
 		local found = 0
 		while (r(eof)==0 & `found' == 0) {
-			local j = strpos("`line'", "{hline 2}}")
+			local j = strpos("`line'", "{hline 2}")
 			if (`j' >0) {
-                local cmddesc = substr(`"`line'"', `=`j' + 10', `=`=length("`line'")' - 16 - `j'')
+                local cmddesc = substr(`"`line'"', `=`j' + 10', .)
+				local cmddesc = substr("`cmddesc'",1, `=length("`cmddesc'") - 1')
 				local found = 1		
             }
 			file read `cmdsthlp' line
@@ -232,3 +236,77 @@ program getcmdtopic, rclass
 	}
 	file close `cmdsthlp'
 end
+/*
+
+capture program drop _addmeta_do
+program _addmeta_do
+	syntax anything(name=adofile), date(string) [ version(string) author(string) email(string) other(string) ]
+	
+	tempname meta
+	tempname myfile 
+	
+	file open `meta' using "_metatemp.do", write replace 
+	file write `meta' "*! Date      :`date'" _n
+	file write `meta' "*! Version   :`version'" _n
+	file write `meta' "*! Author    :`author'" _n
+	file write `meta' "*! Email     :`email'" _n
+	if "`other'" != "" {
+		file write `meta' "*! Email     :`email'" _n
+	}
+	file write `meta' "" _n
+	
+	file open `myfile' using "`adofile'", read
+	file read `myfile' line
+	
+	local codestarted= 0
+	while r(eof)==0 {
+		di `"`line'"'
+		if ("`=word(`"`line'"',1)'" == "capture"){
+			local codestarted = 1
+		}
+		// copy file
+		if `codestarted' == 1 {
+			file write `meta' "`line'" _n
+		}
+		file read `myfile' line	
+	}
+	file close `myfile'
+	file close `meta'
+	//erase `adofile'
+	//!mv _metatemp.do `adofile'
+end
+
+
+capture program drop _addmeta_hlp
+program _addmeta_hlp
+	syntax anything(name=hlpfile), date(string) version(string)
+
+	set more off
+	tempname meta
+	tempname myfile 
+	
+	file open `meta' using "_metatemp.sthlp", write replace
+	file write `meta' "{smcl}" _n
+	file write `meta' "{* *! version `version'  `date'}{...}" _n	
+	file open `myfile' using "`hlpfile'", read
+	file read `myfile' line
+	
+	local codestarted= 0
+	while r(eof)==0 {
+		if (`"`line'"' == "{marker topic}"){
+			local codestarted = 1
+		}
+		// copy file
+		if `codestarted' == 1 {
+			file write `meta' `"`line'"' _n
+		}
+		file read `myfile' line	
+	}
+	file close `myfile'
+	file close `meta'
+	erase `hlpfile'
+	!mv _metatemp.sthlp `hlpfile'
+end
+
+*/
+

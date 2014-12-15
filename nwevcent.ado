@@ -1,28 +1,43 @@
 capture program drop nwevcent
 program nwevcent
 	version 9
-	syntax [anything(name=netname)] , [GENerate(string)]
-	_nwsyntax `netname', max(1)
+	syntax [anything(name=netname)] , [nosym GENerate(string)]
+	_nwsyntax `netname', max(9999)
+	_nwsetobs `netname'
 	
-	if (_N < `nodes'){
-		set obs `nodes'
+	if `networks' > 1 {
+		local k = 1
 	}
 	
-	nwtomata `netname', mat(evnet)
-	tempvar _isol
-	qui nwdegree `netname', isolates generate(`_isol')
 	if "`generate'" == "" {
-		local generate = "evcent"
+		local generate = "_evcent"
 	}
-	capture drop `generate'
-	gen `generate' = .
-	mata: evnet = (evnet + evnet')
-	mata: evnet = evnet:/ evnet
-	mata: _editmissing(evnet,0)
-	mata: e = evcentrality(evnet)
-	mata: st_store((1::`nodes'),"`generate'",e)
-	replace `generate'= . if _isolates==1
-	mata: mata drop evnet e
+	
+	qui foreach netname_temp in `netname' {
+		tempvar _comp
+		nwcomponents `netname_temp', generate(`_comp')
+		if (r(components) == 1) {
+			nwtomata `netname_temp', mat(evnet)
+			tempvar _deg _out _in _isol
+			nwdegree `netname_temp', isolates generate (`_deg' `_isol')
+
+			capture drop `generate'`k'
+			if "`sym'" == "" {
+				mata: evnet = (evnet + evnet')
+				mata: evnet = evnet:/ evnet
+				mata: _editmissing(evnet,0)
+			}
+			mata: e = evcentrality(evnet)
+			nwtostata, mat(e) gen(`generate'`k')
+			replace `generate'`k'= . if `_isol'==1
+			mata: mata drop evnet e
+		}
+		else {
+			gen `generate'`k' = .
+		}
+		local k = `k' + 1
+	}
+	mata: st_rclear()
 end
 
 capture mata: mata drop evcentrality()

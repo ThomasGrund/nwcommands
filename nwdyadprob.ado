@@ -5,7 +5,7 @@
 
 capture program drop nwdyadprob
 program nwdyadprob
-	syntax anything(name=weightnet), density(string) [name(string) vars(string) xvars undirected]
+	syntax [anything(name=weightnet)],  density(string) [ mat(string) name(string) vars(string) xvars undirected]
 	
 	// Install gsample if needed
 	capture which gsample
@@ -16,16 +16,39 @@ program nwdyadprob
 	if _rc != 0 {
 		ssc install moremata
 	}
+
 	
-	// Check if this is the first network in this Stata session
-	if "$nwtotal" == "" {
-		global nwtotal = 0
+	if "`weightnet'" != "" {
+		_nwsyntax `weightnet'
+		local ties = `nodes' * (`nodes' -1) * `density'
 	}
+
 	
-	// Get parameters
-	nwname `weightnet'	
-	local nodes = r(nodes)
-	local ties = `nodes' * (`nodes' -1) * `density'
+	// Generate network from weight network
+	preserve
+	if "`mat'" != "" {
+		capture mata: `mat'
+		if _rc == 0 {
+			mata: st_numscalar("r(validmata)", (rows(`mat') == cols(`mat')))
+			if `r(validmata)' == 1 {
+				mata: st_numscalar("r(nodes)", rows(`mat'))
+				local nodes = `r(nodes)'
+				local ties = `nodes' * (`nodes' -1) * `density'
+				tempname dyads
+				mata: `dyads' = colshape(`mat', 1)
+				drop _all
+				getmata `dyads'
+				rename `dyads' `mat'
+				local weightnet "`mat'"
+				gen _fromid = mod(_n,`nodes')
+				gen _toid = ceil(_n /`nodes')
+				replace _fromid = 1 if _fromid == 0
+			}
+		}
+	}
+	else {
+		nwtoedge `weightnet', full forcedirected
+	}
 	
 	// Generate valid network name and valid varlist
 	if "`name'" == "" {
@@ -45,12 +68,15 @@ program nwdyadprob
 		local homovars "`vars'"
 	}
 	
-	// Generate network from weight network
-	preserve
-	nwtoedge `weightnet', full
-	
 	if "`undirected'" != "" {
 		replace `weightnet' = 0 if _toid <= _fromid
+	}
+	
+	gen _nonzero = (`weightnet' > 0)
+	qui sum _nonzero
+	if `r(sum)' < `ties' {
+		di "{err}Not enough non-zero weights to generate `ties' ties"
+		exit
 	}
 	
 	gsample `ties' [aweight=`weightnet'], generate(link) wor

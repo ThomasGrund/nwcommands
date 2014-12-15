@@ -13,6 +13,7 @@ program nwsym
 	
 	if "`check'" != "" {
 		nwtomata `symname', mat(symnet)
+		mata: st_rclear()
 		mata: st_global("r(name)","`symname'")
 		mata: st_numscalar("r(is_symmetric)", (symnet == symnet'))
 		if `r(is_symmetric)' == 1 {

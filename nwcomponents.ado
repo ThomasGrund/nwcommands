@@ -1,5 +1,5 @@
 *! Date        : 12oct2014
-*! Version     : 1.1
+*! Version     : 1.0.4
 *! Author      : Thomas Grund, Linkoping University
 *! Email	   : contact@nwcommands.org
 
@@ -15,7 +15,9 @@ program nwcomponents, rclass
 		local k = 1
 	}
 	
-	foreach netname_temp in `netname' {
+	qui foreach netname_temp in `netname' {
+		nwname `netname_temp'
+		local nodes = r(nodes)
 		nwtomata `netname_temp', mat(onenet)
 
 		mata: onenet = onenet + onenet'
@@ -37,7 +39,7 @@ program nwcomponents, rclass
 		gen `generate'`k' = .
 	
 		mata: st_rclear()
-		if _N < `nodes' {
+		qui if _N < `nodes' {
 			set obs `nodes'
 		}
 	
@@ -53,11 +55,14 @@ program nwcomponents, rclass
 		mata: comp_sizeid = sort(comp_sizeid, -1)
 		mata: st_numscalar("components", numcomp)
 		mata: st_matrix("comp_sizeid", comp_sizeid)
-	
+			
 		matrix colnames comp_sizeid = size compid share
 	
 		local rowlabs ""
+			
 		return scalar components = components
+		local lcomp = components
+		
 		forvalues i = 1/`=components'{
 			local rowlabs "`rowlabs' comp`i'"
 		}
@@ -65,6 +70,11 @@ program nwcomponents, rclass
 		return matrix comp_sizeid = comp_sizeid
 		mata: mata drop comp numcomp comp_id comp_size comp_sizeid
 
+		noi di "{hline 40}"
+		noi di "{txt}  Network name: {res}`netname_temp'"
+		noi di "{txt}  Components: {res}`lcomp'"
+
+		
 		qui if "`lgc'" != "" {
 			tempvar running
 			gen `running' = _n
@@ -78,7 +88,11 @@ program nwcomponents, rclass
 			sort `running'
 			
 		}
+		noi tab `generate'`k'
+		noi di " "
+		noi di " "
 		local k = `=`k' + 1'
+		
 	}
 end
 

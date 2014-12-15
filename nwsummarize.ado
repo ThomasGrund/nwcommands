@@ -1,12 +1,12 @@
-capture program drop nwinfo
-program nwinfo
+capture program drop nwsummarize
+program nwsummarize
 	version 9
-	syntax [anything(name=netname)]
-	
+	syntax [anything(name=netname)][, mat matonly]
+	set more off
 	_nwsyntax `netname', max(9999)
 	
 	foreach onenet in `netname' {
-		nwinf `onenet'
+		nwinf `onenet', `mat' `matonly'
 	}
 	
 end
@@ -15,8 +15,7 @@ end
 capture program drop nwinf
 program nwinf
 	version 9
-	syntax [anything(name=netname)], [id(string)]
-	
+	syntax [anything(name=netname)], [id(string) mat matonly]
 	
 	if ("$nwtotal" == "" | "$nwtotal" == "0"){
 		exit
@@ -75,7 +74,7 @@ program nwinf
 		mata: edgecount = sum(nw_binary) / 2
 		mata: edgecountvalue = sum(nw_mata`id') / 2
 		mata: st_numscalar("r(edges)", edgecount)
-		mata: st_numscalar("r(edges_value)", edgecountvalue)
+		mata: st_numscalar("r(edges_sum)", edgecountvalue)
 	}
 	else {
 		mata: arccount = sum(nw_binary) 
@@ -92,17 +91,25 @@ program nwinf
 	capture mata: mata drop edgecountvalue
 	capture mata: mata drop arccountvalue
 
-	di "{hline 50}"
-	di "{txt}   Network name: {res} `r(name)'"
-	di "{txt}   Network id: {res} `r(id)'"
-	di "{txt}   Directed: {res}`r(directed)'"
-	di "{txt}   Nodes: {res}`r(nodes)'"
-	if (r(directed) == "false"){
-		di "{txt}   Edges: {res}`r(edges)'"
+	if "`matonly'" == "" {
+		di "{hline 50}"
+		di "{txt}   Network name: {res} `r(name)'"
+		di "{txt}   Network id: {res} `r(id)'"
+		di "{txt}   Directed: {res}`r(directed)'"
+		di "{txt}   Nodes: {res}`r(nodes)'"
+		if (r(directed) == "false"){
+			di "{txt}   Edges: {res}`r(edges)'"
+		}
+		if (r(directed) == "true"){
+			di "{txt}   Arcs: {res}`r(arcs)'"
+		}
+		di "{txt}   Minimum value: {res} `r(minval)'"
+		di "{txt}   Maximum value: {res} `r(maxval)'"	
+		di "{txt}   Density: {res} `r(density)'"
 	}
-	if (r(directed) == "true"){
-		di "{txt}   Arcs: {res}`r(arcs)'"
+	
+	if "`mat'`matonly'" !=""{
+		mata: nw_mata`id'
 	}
-	di "{txt}   Density: {res} `r(density)'"
-	di "{hline 50}"
+	//di "{hline 50}"
 end

@@ -6,6 +6,11 @@ program nwgenerate
 		local options = substr("`options'", 2,.)
 	}
 	gettoken netname netexp: arg, parse("=")
+	gettoken dump opts: arg, parse(",") bind
+	if "`opts'" != "" {
+		local 0 `opts'
+		syntax [, xvars vars(string)]
+	}
 	local netname = trim("`netname'")
 	
 	// check if network or variable should be created
@@ -14,13 +19,15 @@ program nwgenerate
 	local job = trim("`job'")
 	local job = substr("`job'", 2,.)
 	local selectjob : word 1 of `job'
-	local nwgenopt "evcent context degree outdegree indegree isolates components lgc clustering closeness farness nearness between"
+	local selectjob "`selectjob'("
+	local nwgenopt "duplicate( dyadprob( geodesic( homophily( lattice( path( permute( pref( random( reach( ring( small( transpose( evcent( context( degree( outdegree( indegree( isolates( components( lgc( clustering( closeness( farness( nearness( between("
 	local whichjob : list  nwgenopt & selectjob
-	local nwgenvar : word count `whichjob'
+	local netfcn : word count `whichjob'
 	
-	// generate network
-	if `nwgenvar' == 0 {
+	// no varfcn or netfcn
+	qui if `netfcn' == 0 {
 	
+		local 0 `
 		// replace the network if it exists already
 		if (strpos("`options'", "replace")!=0){
 			capture nwdrop `netname'
@@ -47,7 +54,8 @@ program nwgenerate
 		if (r(sym) == 1){
 			local undirected "undirected"
 		}
-		nwrandom `nodes', prob(0) name(`netname') `undirected' `options'
+	
+		nwrandom `nodes', prob(0) name(`netname') `undirected' `options' `xvars' `vars'
 		nwreplacemat `netname', newmat(_genmat)
 	
 		mata: st_rclear()
@@ -55,83 +63,148 @@ program nwgenerate
 		mata: st_global("r(netexp)", "`netexp'")
 		mata: mata drop _genmat
 	}
-	// generate variable
-	qui else {
+	// generate variable or network based on function
+	 else  {
 		// get whatever is inside parenthesis
 		local start = strpos("`netexp'", "(")
 		local length = (strpos("`netexp'",")")) - `start' - 1
 		local subopt = substr("`netexp'", `=`start' + 1', `length')
 		
+		/// NETWORK PRODUCING FUNCTIONS
+		/////////
+		
+		// nwduplicate shortcut
+		if "`whichjob'" == "duplicate(" {
+			nwduplicate `subopt', name(`netname') `options'
+		}				
+
+		// nwdyadprob shortcut
+		if "`whichjob'" == "dyadprob(" {
+			nwdyadprob `subopt', name(`netname') `options'
+		}	
+		
+		// nwgeodesic shortcut
+		if "`whichjob'" == "geodesic(" {
+			nwgeodesic `subopt', name(`netname') `options'
+		}
+		// nwgeodesic shortcut
+		if "`whichjob'" == "homophily(" {
+			nwhomophily `subopt', name(`netname') `options'
+		}
+		// nwlattice shortcut
+		if "`whichjob'" == "lattice(" {
+			nwlattice `subopt', name(`netname') `options'
+		}	
+		// nwlattice shortcut
+		if "`whichjob'" == "path(" {
+			nwpath `subopt', name(`netname') `options'
+		}
+		// nwlattice shortcut
+		if "`whichjob'" == "permute(" {
+			nwpermute `subopt', name(`netname') `options'
+		}	
+		// nwpref shortcut
+		if "`whichjob'" == "permute(" {
+			nwpref `subopt', name(`netname') `options'
+		}	
+		// nwrandom shortcut
+		if "`whichjob'" == "random(" {
+			nwrandom `subopt', name(`netname') `options'
+		}	
+		// nwreach shortcut
+		if "`whichjob'" == "reach(" {
+			nwreach `subopt', name(`netname') `options'
+		}	
+		// nwring shortcut
+		if "`whichjob'" == "ring(" {
+			nwring `subopt', name(`netname') `options'
+		}	
+		// nwsmall shortcut
+		if "`whichjob'" == "small(" {
+			nwsmall `subopt', name(`netname') `options'
+		}
+		// nwtranspose shortcut
+		if "`whichjob'" == "transpose(" {
+			nwtranspose `subopt', name(`netname') `options'
+		}	
+		
+		/// VARIABLE PRODUCING FUNCTIONS
+		/////////
+		
 		// nwclustering shortcuts
-		if "`whichjob'" == "clustering" {
+		if "`whichjob'" == "clustering(" {
 			nwclustering `subopt', gen(`netname') `options'
 		}
 		
 		// nwcloseness shortcuts
-		if "`whichjob'" == "closeness" {
+		if "`whichjob'" == "closeness(" {
 			tempvar _t1 _t2
 			nwcloseness `subopt', gen(`netname' `_t1' `_t2') `options'
 		}
-		if "`whichjob'" == "farness" {
+		if "`whichjob'" == "farness(" {
 			tempvar _t1 _t2
 			nwcloseness `subopt', gen(`_t1' `netname' `_t2') `options'
 		}
-		if "`whichjob'" == "nearness" {
+		if "`whichjob'" == "nearness(" {
 			tempvar _t1 _t2
 			nwcloseness `subopt', gen(`_t1' `_t2' `netname') `options'
 		}
 		
 		// nwcomponents shortcuts
-		if "`whichjob'" == "components" {
+		if "`whichjob'" == "components(" {
 			nwcomponents `subopt', gen(`netname') `options'
 		}
-		if "`whichjob'" == "lgc" {
+		if "`whichjob'" == "lgc(" {
 			nwcomponents `subopt', gen(`netname') lgc `options'
 		}
 		
 		// nwdegree shortcuts
-		if "`whichjob'" == "isolates" {
-			tempvar _t1 _t2 _t3
-			nwdegree `subopt', isolates gen(`_t1' `_t2' `_t3' `netname') `options'
+		if "`whichjob'" == "isolates(" {
+			tempvar _t1 
+			nwdegree `subopt', isolates gen(`_t1'  `netname') `options'
+			capture drop *`_t1'
 		}
-		if "`whichjob'" == "indegree" {
-			tempvar _t1 _t2 _t3
-			nwdegree `subopt', gen(`_t1' `_t2' `netname' `_t3') `options'
-			capture confirm variable `netname'
-			if _rc != 0 {
-				nwdegree `subopt', gen(`netname' `_t1' `_t2' `_t3') `options'
+		if "`whichjob'" == "indegree(" {
+			tempvar _t1 
+			nwdegree `subopt', gen(`netname' `_t1') `options'
+			capture confirm variable _in`netname'
+			if _rc == 0 {
+				rename _in`netname' `netname'
+				drop _out`netname'
 			}
 		}
-		if "`whichjob'" == "outdegree" {
-			tempvar _t1 _t2 _t3
-			nwdegree `subopt', gen(`_t1' `netname' `_t2'  `_t3') `options'
-			capture confirm variable `netname'
-			if _rc != 0 {
-				nwdegree `subopt', gen(`netname' `_t1' `_t2' `_t3') `options'
+		if "`whichjob'" == "outdegree(" {
+			tempvar _t1
+			nwdegree `subopt', gen(`netname' `_t1') `options'
+			capture confirm variable _out`netname'
+			if _rc == 0 {
+				rename _out`netname' `netname'
+				drop _in`netname'
 			}
 		}
-		if "`whichjob'" == "degree" {
-			tempvar _t1 _t2 _t3
-			nwdegree `subopt', gen(`netname' `_t1' `_t2'  `_t3') `options'
-			capture confirm variable `netname'
-			if _rc != 0 {
-				nwdegree `subopt', gen(`_t1' `netname' `_t2' `_t3') `options'
+		if "`whichjob'" == "degree(" {
+			tempvar _t1
+			nwdegree `subopt', gen(`netname' `_t1') `options'
+			capture confirm variable _out`netname'
+			if _rc == 0 {
+				rename _out`netname' `netname'
+				drop _in`netname'
 			}
 		}
 		
 		// nwbetween shortcuts
-		if "`whichjob'" == "between" {
-			nwbetween `subopt', gen(`netname') `options'
+		if "`whichjob'" == "between(" {
+			nwbetween `subopt', generate(`netname') `options'
 		}
 		
 		// nwcontext shortcuts
-		if "`whichjob'" == "context" {
-			nwcontext `subopt', gen(`netname') `options'
+		if "`whichjob'" == "context(" {
+			nwcontext `subopt', generate(`netname') `options'
 		}
 		
 		// nwevcent shortcuts
-		if "`whichjob'" == "evcent" {
-			nwevcent `subopt', gen(`netname') `options'
+		if "`whichjob'" == "evcent(" {
+			nwevcent `subopt', generate(`netname') `options'
 		}
 		
 	}

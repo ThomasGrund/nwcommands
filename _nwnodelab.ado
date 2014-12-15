@@ -1,6 +1,6 @@
 *! Date        : 15sept2014
 *! Version     : 1.0
-*! Author      : Thomas Grund, Linköping University
+*! Author      : Thomas Grund, Linkoping University
 *! Email	   : contact@nwcommands.org
 
 capture program drop _nwnodelab
@@ -10,8 +10,8 @@ program _nwnodelab
 
 	if `nodeid' > `nodes' {
 		mata: st_rclear()
-		di "{err}{it:nodeid} `nodeid' out of bounds"
-		error 6012
+		di "{err}{it:nodeid} {bf:`nodeid'} out of bounds"
+		error 600022
 	}
 	else {
 		local onelab : word `nodeid' of `r(labs)'

@@ -12,7 +12,7 @@ program def nwhomophily
 	local mc = wordcount("`'")
 	
 	if (`vc' != `hc') {
-		di "{err}option {it:homophily} needs to have as many entries {it:varlist}."
+		di "{err}option {bf:homophily()} needs to have one entry for each variable in {it:varlist}."
 		error 6300
 	}
 
@@ -32,7 +32,7 @@ program def nwhomophily
 	
 	// generate valid network name and valid varlist
 	if "`name'" == "" {
-		local name "assortative"
+		local name "homophily"
 	}
 	if "`stub'" == "" {
 		local stub "net"
@@ -42,17 +42,25 @@ program def nwhomophily
 	
 	local gencmd "nwgenerate _tempassort ="
 	
+	tempname __temp0
+	tempname __temp
+	
+	mata: `__temp0' = J(`nodes', `nodes', 1)
 	forvalues i = 1/`vc'{
+	
 		local onevar = word("`varlist'",`i')
 		local onehom = word("`homophily'",`i')
 		local onemode = word("`mode'",`i')
-		local gencmd "`gencmd' exp((_nwexpand `onevar', mode(`onemode')) * (`onehom')) *"
+		
+		nwexpand `onevar', mode(`onemode') name(_tempexpand)
+		nwtomata _tempexpand, mat(`__temp')
+		nwdrop _tempexpand
+		
+		mata: `__temp' = `__temp' :* `onehom'
+		mata: `__temp0' = `__temp0' :* `__temp'
 	}
-	local gencmd "`gencmd' 1"
-	qui `gencmd'
-	
-	nwdyadprob _tempassort, density(`density') name(`assortname') `undirected'
-	nwdrop _tempassort	
+
+	nwdyadprob , mat(`__temp0') density(`density') name(`assortname') `undirected'
 end
 	
 	

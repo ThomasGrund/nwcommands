@@ -1,6 +1,6 @@
 *! Date        : 3oct2014
-*! Version     : 1.1
-*! Author      : Thomas Grund, Linköping University
+*! Version     : 1.0.4
+*! Author      : Thomas Grund, Linkoping University
 *! Email	   : contact@nwcommands.org
 
 capture program drop nwclustering
@@ -13,6 +13,7 @@ program nwclustering
 	if `networks' > 1 {
 		local k = 1
 	}
+	_nwsetobs `netname'
 	
 	foreach netname_temp in `netname' {
 		_nwsyntax_other `netname_temp'
@@ -27,6 +28,8 @@ program nwclustering
 		if _N <= `othernodes' {
 			set obs `othernodes'
 		}
+		mata: onenet = onenet :/ onenet
+		mata: _editmissing(onenet, 0)
 		mata: st_rclear()
 		mata: c = cluster(onenet)		
 		mata: st_store((1::`othernodes'),"`generate'`k'", c[,1])

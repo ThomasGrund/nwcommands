@@ -1,6 +1,6 @@
 {smcl}
 {* *! version 1.0.2  11feb2011}{...}
-{marker topical}
+{marker topic}
 {helpb nw_topical##information:[NW-2.4] Information}
 {title:Tables of networks}
 

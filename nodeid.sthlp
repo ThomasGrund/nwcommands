@@ -21,13 +21,8 @@ when nodes are deleted.
 
 {pstd}
 A {help _nwnodelab:nodelab} is more flexibile than a {it:nodeid} and attaches a unique {help word} to each node for 
-identification. 
-
-
-Nodelabs can be changed. There are basically two ways. The first one 
-
- with {help nwname:nwname, newlab(lab1 lab2...)} or with {help nwname:nwname, newlabfromvar(varname)}. 
-Nodelabs are also unique for each node in a network and them to identify a node.
+identification. Node labels can be changed. There are basically two ways: 1) using {help nwname:nwname, newlab(lab1 lab2...)} or  2) using {help nwname:nwname, newlabfromvar(varname)}. Node
+labels uniquely identify nodes in a network.
 
 {title:Finding the nodeid and nodelab}
 

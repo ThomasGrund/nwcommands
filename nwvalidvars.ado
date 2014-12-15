@@ -1,14 +1,13 @@
-// date: 24aug2014
-// author: Thomas Grund, Linköping University
-
 *! Date        : 24aug2014
 *! Version     : 1.0
-*! Author      : Thomas Grund, Linköping University
+*! Author      : Thomas Grund, Linkoping University
 *! Email	   : contact@nwcommands.org
 
 capture program drop nwvalidvars
 program nwvalidvars
 	syntax anything(name=nodes), stub(string)
+	
+	mata: st_rclear()
 	
 	// Generate temporary varlist and check for each variable if it already exists.
 	local varlist = "" 	
@@ -20,8 +19,12 @@ program nwvalidvars
 			local invalid = `invalid' + 1
 		}
 	}
-	// Finds valid Stata variable names to store network.
+	mata: st_global("r(valid)", "true")
+	mata: st_global("r(stub)", "`stub'")
+	
+	// Find valid Stata variable names to store network.
 	if `invalid' > 0 { 
+		mata: st_global("r(valid)", "false")
 		local stub_add = 0
 		while `invalid' > 0 {
 			local varlist = ""
@@ -37,5 +40,6 @@ program nwvalidvars
 		}
 	}
 	global validvars "`varlist'"
+	mata: st_global("r(validvars)", "`varlist'")
 end
 	

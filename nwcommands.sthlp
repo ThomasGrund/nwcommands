@@ -1,23 +1,25 @@
 {smcl}
 {* *! version 1.0.0  3sept2014}{...}
-{cmd:help nwcommands}
-{hline}
-{title:Contents}
+
 
 {col 14}Section{col 31}Description
 {col 14}{hline 46}
-{col 14}{bf:{help nw_intro:[NW-1]}}{...}
-{col 31}{bf:Introduction and concepts}
+{help nw_intro:{col 14}{bf:[NW-1]}{...}{col 31}{bf:Introduction and concepts}}
 
-{col 14}{bf:{help nw_topical:[NW-2]}}{...}
-{col 31}{bf:Topical list of nwcommands}
+{help nw_topical:{col 14}{bf:[NW-2]}{...}{col 31}{bf:Topical list of network commands}}
 
-{col 14}{bf:{help nw_alphabetical:[NW-3]}}{...}
-{col 31}{bf:Alphabetical list of nwcommands}
+{help nw_alphabetical:{col 14}{bf:[NW-3]}{...}{col 31}{bf:Alphabetical list of network commands}}
+
+{help nw_start:{col 14}{bf:[NW-4]}{...}{col 31}{bf:Getting started}}
+
+{help nw_programming:{col 14}{bf:[NW-5]}{...}{col 31}{bf:Network programming}}
 
 
-	*! Date        : 12nov2014
-	*! Version     : 1.0.4
-	*! Contact     : thomas.u.grund@gmail.com
-	*! Web         : {browse "http://nwcommands.org"}
-	*! Bugs        : {browse "mailto:bug@nwcommands.org"}
+
+
+		*! Date        : 15dec2014
+		*! Version     : 1.0.5
+		*! Authors     : Thomas U. Grund and Peter Hedstrom
+		*! Contact     : thomas.u.grund@gmail.com
+		*! Web         : {browse "http://nwcommands.org"}
+		*! Bugs        : {browse "mailto:bug@nwcommands.org"}

@@ -20,7 +20,7 @@ program nwreplacemat
 		//di "{txt}input matrix has different dimensions than existing {it:network} {bf:`netname'}. size of {bf:`netname'} has been adjusted."
 		local nodes = `matrows'
 		
-		if "`netonly'" != "" {
+		if ("`netonly'" != "" | "`sync'" != "") {
 			mata: `newmat'
 			mata: nw_mata`id' = `newmat'
 			global nwsize_`id' = `matrows'

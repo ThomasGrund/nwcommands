@@ -2,13 +2,11 @@
 {* *! version 1.0.1  16may2012 author: Thomas Grund}{...}
 {marker topic}
 {helpb nw_topical##analysis:[NW-2.6] Analysis}
-{cmd: help nwdegree}
-{hline}
 
 {title:Title}
 
-{p2colset 5 17 22 2}{...}
-{p2col :nwdegree {hline 2}}Degree centrality and distribution{p_end}
+{p2colset 9 17 22 2}{...}
+{p2col :nwdegree {hline 2} Degree centrality and distribution}
 {p2colreset}{...}
 
 
@@ -18,14 +16,24 @@
 {cmdab: nwdegree} 
 [{it:{help netlist}}]
 [{cmd:,}
+{opt generate}({it:{help varname:var1 var2}})
 {opt isolates}
-{opt unweighted}]
+{opt valued}
+{opt in}({it:{help tabulate_oneway##tabulate1_options:tabulate_opt}})
+{opt out}({it:{help tabulate_oneway##tabulate1_options:tabulate_opt}})
+{it:{help tabulate_oneway##tabulate1_options:tabulate_opt}}
+]
 
-{synoptset 20 tabbed}{...}
+{synoptset 25 tabbed}{...}
 {synopthdr}
 {synoptline}
+{synopt:{opt generate}({it:{help varname:var1 var2}})}Generate variables for {it:degree} and {it:isolates}; 
+default:{it: var1 = _degree, var2 = _isolates}{p_end}
 {synopt:{opt isolates}}Generate variable for network isolates{p_end}
-{synopt:{opt unweighted}}Ignore tie weights/values{p_end}
+{synopt:{opt valued}}Consider tie values; calculate {it:strength} instead of {it:degree}{p_end}
+{synopt:{opt in}({it:{help tabulate_oneway##tabulate1_options:tabulate_opt}})}Options used for tabulating {it:indegree}{p_end}
+{synopt:{opt out}({it:{help tabulate_oneway##tabulate1_options:tabulate_opt}})}Options used for tabulating {it:indegree}{p_end}
+{synopt:{it:{help tabulate_oneway##tabulate1_options:tabulate_opt}}}Options used for tabulating {it:degree}{p_end}
 {synoptline}
 {p2colreset}{...}
 
@@ -33,31 +41,52 @@
 {title:Description}
 
 {pstd}
-{cmd:nwdegree} calculates the degree centrality for each node of a network or list of networks. Generates the 
-Stata variables {it:_indegree} (the sum of the links received from other nodes) and {it:_outdegree} 
-(the sum of the links sent to other nodes). The rows in Stata correspond to the{help nodeid: nodeids} of nodes. When a network is undirected only {it:_degree} is calculated. 
-For weihgted networks the sum of incoming tie values and the sum of outgoing tie values are calculated. The command can also be used to identify network isolates, i.e. nodes that are not connected to
-any other node. Returns additional information about network density in the return vector.
-
-{title:Options}
-
-{phang}
-{opt isolates} Generate the variable {it:_isolates} that indicates whether a node is an isolate or not.
-
-{phang}
-{opt unweighted} Ignores all tie values.
-
-{title:Remarks}
+{cmd:nwdegree} calculates degree centrality for each node of a network or list and tabulates the result. Generates the Stata variables {it:var1} for undirected networks and the variables {it:_outvar1} (number of outgoing ties) 
+and {it:_invar1} (number of incoming ties) for directed networks.  
 
 {pstd}
-The command overwrites the Stata variables {it:_degree}, {it:_indegree}, {it:_outdegree}, and {it:_isolates}
+Option {bf:isolates} generates variable {it:var2} that indicates if a node is an isolate (not connected to any
+other node).
+
+{pstd}
+With option {bf:valued} the command calculates node {it:_strength} (sum of tie values), and {it:_out_strength/_in_strength} 
+for directed networks respectively, instead of node {it:_degree}.
+
+{pstd}
+The Stata variables {it:var1, var2} are overwritten. In case, degree centrality is calculated
+for {it:z} networks at the same time (e.g. {bf:nwdegree glasgow1 glasgow2}), the command generates the variables
+{it:var1_z} and {it:var2_z} for each network. 
+
 
 {title:Examples}
 
-  {cmd:. nwrandom 50, prob(.1)}
-  {cmd:. nwdegree} 
-  {cmd:. return list}
-  
+	{cmd:. webnwuse florentine}
+	{cmd:. nwdegree flomarriage}
+	{res}{hline 40}
+	{txt}  Network name: {res}flomarriage
+	{hline 40}
+	{txt}    Degree distribution
+
+	{txt}    _degree {c |}      Freq.     Percent        Cum.
+	{hline 12}{c +}{hline 35}
+	{txt}          0 {c |}{res}          1        6.25        6.25
+	{txt}          1 {c |}{res}          4       25.00       31.25
+	{txt}          2 {c |}{res}          2       12.50       43.75
+	{txt}          3 {c |}{res}          6       37.50       81.25
+	{txt}          4 {c |}{res}          2       12.50       93.75
+	{txt}          6 {c |}{res}          1        6.25      100.00
+	{txt}{hline 12}{c +}{hline 35}
+	{txt}      Total {c |}{res}         16      100.00{txt}
+
+	
+{pmore}
+In the following example, the degree distributions for in- and outdegree are saved in Stata matrices {it:matindeg} and {it:matoutdeg}:
+
+	{cmd:. webnwuse glasgow}
+	{cmd:. nwdegree glasgow1, in(matcell(matindeg)) out(matcell(matoutdeg))}
+	{cmd:. mat list matindeg}
+	
+	
 {title:See also}
 
-   {help nwbetween}, {help nwcloseness}, {help nwcluster}, {help nwevcent}
+   {help nwbetween}, {help nwcloseness}, {help nwcluster}, {help nwevcent}, {help nwkatz} 

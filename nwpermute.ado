@@ -1,6 +1,6 @@
 *! Date        : 3sept2014
-*! Version     : 1.0.1
-*! Author      : Thomas Grund, Linköping University
+*! Version     : 1.0.4
+*! Author      : Thomas Grund, Linkoping University
 *! Email	   : contact@nwcommands.org
 
 capture program drop nwpermute	
@@ -37,7 +37,7 @@ program nwpermute
 	if "`directed'"=="false" {
 		local undirected = "undirected"
 	}
-	nwrandom `nodes', prob(0) name(`name') vars(`vars') `undirected' `xvars'
+	nwduplicate `netname', name(`name')
 	nwreplacemat `name', newmat(perm)
 end
 

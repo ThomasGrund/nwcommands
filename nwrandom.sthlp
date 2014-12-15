@@ -2,13 +2,11 @@
 {* *! version 1.0.6  16may2012}{...}
 {marker topic}
 {helpb nw_topical##generator:[NW-2.3] Generators}
-{cmd:help nwrandom}
-{hline}
 
 {title:Title}
 
-{p2colset 5 18 22 2}{...}
-{p2col :nwrandom {hline 2}}Generates a random Erdos-Renyi network{p_end}
+{p2colset 9 18 22 2}{...}
+{p2col :nwrandom {hline 2} Generate a random network}
 {p2colreset}{...}
 
 
@@ -16,11 +14,11 @@
 
 {p 8 17 2}
 {cmdab: nwrandom} 
-{it: nodes}
+{it:{help int:nodes}}
 {cmd:,}
-{opt prob(float)} | {opt density(float)}
+{opth prob(float)} | {opth density(float)}
 [{opt undirected}
-{opt ntimes(integer)}
+{opth ntimes(int)}
 {opt name}({it:{help newnetname}})
 {opt vars}({it:{help newvarlist}})
 {opt xvars}]
@@ -28,12 +26,12 @@
 {synoptset 20 tabbed}{...}
 {synopthdr}
 {synoptline}
-{synopt:{it:nodes}}number of nodes{p_end}
-{synopt:{opt prob}({it:float})}probability for a tie to exist{p_end}
-{synopt:{opt density}({it:float})}exact density of the whole network{p_end}
+{synopt:{it:{help int:nodes}}}number of nodes{p_end}
+{synopt:{opth prob(float)}}probability for a tie to exist{p_end}
+{synopt:{opth density(float)}}exact density of the whole network{p_end}
 {synopt:{opt undirected}}generate an undirected network; default = directed{p_end}
-{synopt:{opt ntimes}({it:integer})}number of random networks to be generated; default = 1{p_end}
-{synopt:{opt name}({it:{help newnetname}})}name of the new random network{p_end}
+{synopt:{opth ntimes(int)}}number of random networks to be generated; default = 1{p_end}
+{synopt:{opt name}({it:{help newnetname}})}name of the new random network; default = {it:random}{p_end}
 {synopt:{opt vars}({it:{help newvarlist}})}new variables that are used for the network{p_end}
 {synopt:{opt xvars}}do not generate Stata variables{p_end}
 
@@ -41,11 +39,31 @@
 {title:Description}
 
 {pstd}
-{cmd:nwrandom} generates a directed Erdos-Renyi network with {it: nodes} number of nodes. Each
+{cmd:nwrandom} generates a directed Erdos-Renyi network. Each
 potential tie in the network has the same probability to exist, which is defined 
-by {it:prob(float)}. Alternatively, the overall density of the network can be specified with {it:density(float)}. The 
-difference between the two is that the latter generates the same number of ties when the command
-is repeated, while the former does not necessarily.  
+by {bf:prob()}. Option {bf:prob()} generates ties based on probabilities, which means that
+the exact number of ties can vary. 
+
+{pstd}
+Alternatively, the overall density of the network can be specified with 
+{bf:density()}. This option always generates the same number of ties
+( = {it:density * nodes}), where each tie has the same probability to exist.
+
+{pstd}
+Either {bf:prob()} or {bf:density()} needs to be specified.
+
+{pstd}
+The command can also be used to generate many random networks at the same time. For example, the following command
+produces 100 random networks.
+
+{pmore}
+{bf:. nwrandom 50, ntimes(100)}
+
+{pstd}
+By default, directed networks are generated, option {bf:undirected} generates undiretced networks instead. 
+
+{pstd}
+The command can also be used to generate both complete ({bf:prob(1)}) and empty networks ({bf:prob(0)}). 
 
 
 {title:Examples}
@@ -55,4 +73,9 @@ is repeated, while the former does not necessarily.
 	{cmd:. nwrandom 15, density(0.5)}
 	{cmd:. nwrandom 20, prob(.3) ntimes(5)}
 	{cmd:. nwrandom 10, prob(.2) undirected}
-	{cmd:. nwinfo _all}
+	{cmd:. nwsummarize _all}
+	
+
+{title:See also}
+
+	{help nwsmall}, {help nwpref}, {help nwpref}, {help nwlattice}, {help nwring}

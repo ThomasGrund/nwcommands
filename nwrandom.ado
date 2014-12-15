@@ -5,7 +5,7 @@
 
 capture program drop nwrandom
 program nwrandom
-	syntax anything(name=nodes), [ntimes(integer 1) Density(string) Prob(string) vars(string) stub(string) name(string) undirected xvars noreplace * ]
+	syntax anything(name=nodes), [ntimes(integer 1) Density(string) Prob(string) vars(string) labs(string) stub(string) name(string) undirected xvars noreplace * ]
 	version 9.0
 	set more off
 	// Check if this is the first network in this Stata session
@@ -37,7 +37,7 @@ program nwrandom
 			if mod(`i', 25) == 0 {
 				di in smcl as txt "...`i'"
 			}
-			nwrandom `nodes', name(`name'_`i') density(`density') prob(`prob') stub(`stub') `xvars' `undirected'
+			nwrandom `nodes', name(`name'_`i') density(`density') prob(`prob') stub(`stub') `xvars' `undirected' labs(`labs')
 		}
 		exit
 	}
@@ -97,6 +97,10 @@ program nwrandom
 		nwsym `randomname'
 	}
 
+	local wc : word count `labs'
+	if `wc' == `nodes' {
+		nwname `randomname', newlabs(`labs')
+	}
 	nwload `randomname', `xvars' 
 	mata: mata drop newmat
 end

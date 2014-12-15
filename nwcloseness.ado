@@ -1,6 +1,6 @@
 *! Date        : 24aug2014
-*! Version     : 1.0
-*! Author      : Thomas Grund, Linköping University
+*! Version     : 1.0.4
+*! Author      : Thomas Grund, Linkoping University
 *! Email	   : contact@nwcommands.org
 
 * Calculates actor closeness centrality according to Sabidussi (1966)
@@ -9,11 +9,12 @@
 capture program drop nwcloseness
 program nwcloseness
 	version 9
-	syntax [anything(name=netname)] [, GENerate(string)]	
+	syntax [anything(name=netname)] [, GENerate(string) *]	
 	_nwsyntax `netname', max(9999)
 	if `networks' > 1 {
 		local k = 1
 	}
+	_nwsetobs `netname'
 	
 	local gencount : word count `generate'
 	if (`gencount' != 3) {
@@ -24,7 +25,13 @@ program nwcloseness
 		qui nwgeodesic `netname_temp', name(_tempgeodesic) `options'
 		nwname _tempgeodesic
 		nwtomata _tempgeodesic, mat(geodesic)
+		mata: st_numscalar("r(mindistance)", min(geodesic))
 		mata: far = rowsum(geodesic)
+		
+		if `r(mindistance)' < 0 {
+			mata: far = J(rows(geodesic), 1, .)
+			di "{txt}Warning: network not connected; specify {bf:unconnected()} to obtain results.
+		}
 		
 		_nwsyntax_other `netname_temp'
 		
@@ -44,7 +51,7 @@ program nwcloseness
 		if _N < = `othernodes' {
 			set obs `othernodes'
 		}
-
+		
 		mata: st_store((1::`othernodes'),"`_closeness'`k'",closeness)
 		mata: st_store((1::`othernodes'),"`_farness'`k'",far)
 		mata: st_store((1::`othernodes'),"`_nearness'`k'",nearness)
