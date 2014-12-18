@@ -21,8 +21,12 @@
 {opt clear}]
 
 
-help nw_topical
-
+{synoptset 20 tabbed}{...}
+{synopthdr}
+{synoptline}
+{synopt:{opt nwclear}}clear all networks and variables{p_end}
+{synopt:{opt undirected}}clear variables{p_end}
+{synopt:{opth name(newnetname)}}name of the imported network; default = {it:filename}{p_end}
 
 {synoptset 20 tabbed}{...}
 {marker import_type}{...}

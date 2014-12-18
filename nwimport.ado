@@ -7,6 +7,15 @@ program nwimport
 	qui `clear'
 	qui `nwclear'
 	
+	if "`name'" == "" {
+		local fnamerev = strreverse(`"`fname'"')
+		local bslash = strpos(`"`fnamerev'"', "/")
+		local fslash = strpos(`"`fnamerev'"', "\")
+		local slash = max(`bslash', `fslash')
+		local slash = cond(`slash'== 0, length(`"`fnamerev'"'), `slash')
+		local name = substr(`"`fname'"', `=length(`"`fname'"') - `slash' + 1', .)
+	}
+	
 	capture qui nwset
 	local nets_before = r(networks)
 		
@@ -21,7 +30,7 @@ program nwimport
 		 capture _nwimport_edgelist `fname', `options'
 	}
 	if "`import_type'" == "pajek" {
-		 capture _nwimport_pajek `fname', `options'
+		 capture _nwimport_pajek `fname', `options'		 
 	}
 	if "`import_type'" == "gml" {
 		capture _nwimport_gml `fname', `options'
@@ -62,10 +71,11 @@ program nwimport
 			}
 		}
 		di "{hline 30}"
-		di  "{txt}{it:Loading networks from file {bf:`fname'} succeeded}"
-		di "{txt}(`=`nets_now'-`nets_before'' networks loaded)"
-		di "{hline 30}"
-		di 
+		di  "{txt}{it:Importing successful}"
+		nwset
+		//di "{txt}(`=`nets_now'-`nets_before'' networks loaded)"
+		//di "{hline 30}"
+		//di 
 	}
 	else {
 		di 
@@ -98,7 +108,6 @@ program _nwimport_pajek
 		file open importfile using `anything', read
 		file read importfile line
 	    while `"`line'"' != "" {
-
 			// get first word
 			local f_cmd : word 1 of `line'
 			local f_cmd = lower("`f_cmd'")
@@ -128,10 +137,8 @@ program _nwimport_pajek
 							local attributes "`attributes' str30 __x`=`k'-2'" 
 						}
 					}
-					di "Attrib: `attributes'"
 					
 					postfile `dict_handler' _nodeid str30 _nodelab `attributes' using `dict'
-					//int _xcoord int _ycoord using `dict'
 					while (`f_star' != 1) {
 						local tempid : word 1 of `line'
 						local templab : word 2 of `line'
@@ -148,12 +155,10 @@ program _nwimport_pajek
 								local attributes_post `"`attributes_post' ("`tempx'")"'
 							}
 						}
-						di `"`attributes_post'"'
 						
 						local templab = cond("`templab'" == "", "`tempid'", "`templab'")
 						local templab = subinstr("`templab'", " ","_",.)
 						
-						di `"post `dict_handler' (`tempid') ("`templab'") `attributes_post'"'
 						post `dict_handler' (`tempid') ("`templab'") `attributes_post'
 
 						file read importfile line
@@ -275,26 +280,25 @@ program _nwimport_pajek
 		}
 		file close importfile
 
-		save test, replace
-	di "nwfromedge _fromid _toid _value, xvars name(`name') labs(`labs') `nwfromedgeopt'"
 		nwfromedge _fromid _toid _value, xvars name(`name') labs(`labs') `nwfromedgeopt' 
-		clear
+		
 		
 		qui nwname
 		local nodes = r(nodes)
+		
+		restore
+		
 		capture drop _nodeid
 		capture drop _nodelab
-		capture drop _xcoord 
+		capture drop _xcoord
 		capture drop _ycoord 
 		
+		if _N < `nodes' {
+			set obs `nodes'
+		}
 	    gen _nodeid = _n if _n <= `nodes'
-		
-		exit
-		qui merge 1:1 _nodeid using `dict', nogenerate
-		qui nwname, newlabsfromvar(_nodelab)
-		
-		di "h99"
-		use `dict', clear
+		merge m:n _nodeid using `dict', nogenerate
+		qui nwname, newlabsfromvar(_nodelab)	
 end
 
 
@@ -821,20 +825,6 @@ program _nwimpdl_nodelist1
 	nwfromedge _all, name(`netlabs') labs(`labs') `directed' `undirected' `xvars'
 	restore
 end
-
-
-capture program drop _insert_edge
-program _insert_edge
-	syntax, from(string) to(string) value(string)
-	if ("`from'" != "-1" & "`to'" != "-1"){
-		local n = _N
-		local newN = `n' + 1
-		set obs `newN'
-		replace _fromid = "`from'" in `newN'
-		replace _toid = "`to'"  in `newN'
-		replace _value = `value' in `newN'
-	}
-end	
 
 
 

@@ -136,6 +136,7 @@ For example, this generates a Mata matrix:
 
 	{cmd:. nwclear}
 	{cmd:. mata: net = (0,1,0,0\1,0,0,1\1,1,0,0\1,1,1,0)}
+	{cmd:. nwset, mat(net) name(network)}
 
 {pstd}
 This also generates a network called {it:network}. When no {bf:name()} for a network is specified, the command makes a valid suggestion (see {help nwvalidate}).
