@@ -31,6 +31,7 @@ program _nwexport_pajek
 	syntax [anything(name=netname)], fname(string) [replace]
 	
 	nwname `netname'
+	
 	local vars "`r(vars)'"
 	local labs "`r(labs)'"
 	local directed "`r(directed)'"

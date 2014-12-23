@@ -40,22 +40,30 @@ program nwload
 		
 		capture drop _nodelab
 		capture drop _nodeid
+		capture drop _nodevar
+		
 		if `=_N' < `nodes' {
 			set obs `nodes'
 		}
 		
 		gen _nodelab = ""
+		gen _nodevar = ""
 		gen _nodeid = _n if _n <= `nodes'
 		local j = 1
 		foreach lab in `locallabs' {
 			qui replace _nodelab = `"`lab'"' in `j'
 			local j = `j' + 1
 		}
+		local j = 1
+		foreach var in `localvars' {
+			qui replace _nodevar= `"`var'"' in `j'
+			local j = `j' + 1
+		}
 		exit
 
 	}
 	
-	if (("`xvars'" == "") & ("`labelonly'" == "")){
+	qui if (("`xvars'" == "") & ("`labelonly'" == "")){
 		capture drop _nodelab
 		capture drop _nodevar
 		qui mata: st_addvar("str20", "_nodelab")

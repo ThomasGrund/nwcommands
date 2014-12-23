@@ -1,4 +1,4 @@
-capture program drop _nwdeploy
+ capture program drop _nwdeploy
 program _nwdeploy
 	syntax ,[author(string) version(string) email(string) other(string)]
 
@@ -148,6 +148,10 @@ program _nwdeploy
 	}
 	local schemefiles : dir "`c(pwd)'" files "*.scheme"
 	foreach file in `schemefiles' {
+		file write `deploy_ado' "f `file'" _n
+	}
+	local dlfiles : dir "`c(pwd)'" files "*.dat"
+	foreach file in `dlfiles' {
 		file write `deploy_ado' "f `file'" _n
 	}
 	file close `deploy_ado'

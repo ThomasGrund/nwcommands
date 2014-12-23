@@ -66,10 +66,10 @@ Can also be used to import networks from the internet:
 
 
 {marker ucinet}{...}
-{title:Import Ucinet .dl format}
+{title:Import Ucinet DL format}
 
 {pstd}
-{cmd:nwimport} can import the most common Ucinet .dl format types: {it:fullmatrix, upperhalf, edgelist1, nodelist1}. It also supports
+{cmd:nwimport} can import the most common Ucinet DL format types: {it:fullmatrix, upperhalf, edgelist1, nodelist1}. It also supports
 multiple networks ({it:nm > 0), diagonal = absent, labels:, matrix labels:, level labels:, labels embedded, row labels embedded, col labels embedded}. Two-mode
 networks are not supported. For a detailed description of the Ucinet .dl file format see {browse "http://gephi.github.io/users/supported-graph-formats/ucinet-dl-format/":here}
 or the {browse "https://www.soc.umn.edu/~knoke/pages/UCINET_6_User's_Guide.doc":Ucinet manual}. Here is a {help netexample##ucinet:list of popular networks delivered with Ucinet}.  

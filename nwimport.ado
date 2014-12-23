@@ -8,12 +8,16 @@ program nwimport
 	qui `nwclear'
 	
 	if "`name'" == "" {
-		local fnamerev = strreverse(`"`fname'"')
+		local fname_temp =  subinstr(`"`fname'"', char(34), "", .)
+		local fnamerev = strreverse(`"`fname_temp'"')
 		local bslash = strpos(`"`fnamerev'"', "/")
 		local fslash = strpos(`"`fnamerev'"', "\")
 		local slash = max(`bslash', `fslash')
 		local slash = cond(`slash'== 0, length(`"`fnamerev'"'), `slash')
-		local name = substr(`"`fname'"', `=length(`"`fname'"') - `slash' + 1', .)
+		local name = substr(`"`fname_temp'"', `=length(`"`fname_temp'"') - `slash' + 1', .)
+		local name = subinstr(`"`name'"',".net", "", .)
+		local name = subinstr(`"`name'"',".dat", "", .)
+		local name = subinstr(`"`name'"', char(34), "", .)
 	}
 	
 	capture qui nwset
@@ -39,9 +43,9 @@ program nwimport
 		capture _nwimport_graphml `fname', `options'
 	}
 	if "`import_type'" == "ucinet" {
-		 capture _nwimpdl `fname'
+		  capture _nwimpdl `fname'
+		  local nameoff = r(nameoff)
 	}
-	
 	local i = 1
 	capture qui nwset
 	local nets_now = `r(networks)'
@@ -61,7 +65,7 @@ program nwimport
 			}
 				
 			local onename : word `i' of `name'
-			if "`onename'" != "" {
+			if "`onename'" != ""  & "`nameoff'" != "true"{
 				local newnamecmd "newname(`onename')"
 			}
 			nwname, id(`j') `newnamecmd' `newdirectedcmd'
@@ -1057,6 +1061,8 @@ program _nwimpdl
 				if (lower("`secondword'") == "labels:"){
 					local labels_on = 0
 					local netlabels_on = 1	
+					local nameoff = "true"
+					noi di "NN:`nameoff'"
 				}
 			}
 			if (lower("`oneword'") == "row" | lower("`oneword'") == "col") {
@@ -1121,9 +1127,10 @@ program _nwimpdl
 	local f : list format & sformat
 	if "`f'" == "" {
 		di "{err}Ucinet format = {bf:`format'} not supported."
-	}
+	}	
+	mata: st_global("r(nameoff)","`nameoff'")
 end
-	
+
 	
 	
 

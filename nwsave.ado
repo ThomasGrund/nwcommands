@@ -22,12 +22,11 @@ program nwsave
 	_opts_oneof "matrix edgelist" "format" "`format'" 6556
 		
 	preserve	
-	qui {
+	 qui {
 	
 	local nodes = 0
 	local i = 1
 
-	
 	tempfile attributes
 	capture drop _*
 	gen _running = _n
@@ -81,7 +80,7 @@ program nwsave
 	gen _size = .
 	gen _directed = ""
 	gen _edgelabs = ""
-	
+
 	local i = 1
 	local n = _N
 	if `n' < `nets'{
@@ -99,7 +98,6 @@ program nwsave
 		rename _nodevar _newvar`i'
 		local i = `i' + 1
 	}
-	save att1, replace
 	
 	local i = 1
 	foreach onenet in `netname' {
