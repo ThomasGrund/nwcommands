@@ -143,6 +143,9 @@ syntax [anything(name=netnames)] [,  mode(string) ATTRibute(string) PERMutations
 	}
 	di "{hline 40}"
 	di "{txt}    Correlation: {res}`r(corr)'"
+	if "`r(pvalue)'" != "" {
+		di "{txt}    P-value: {res}`r(pvalue)'"
+	}
 	_return hold r1
 	if "`attribute'" != "" {
 		capture nwdrop `net2'

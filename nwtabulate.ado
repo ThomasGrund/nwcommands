@@ -112,6 +112,7 @@ program nwtab2
 		di "{txt}   Attribute:  {res}`arg2'{txt}"
 		
 		if "`undirected'" != "" {
+			//qui keep if _fromid <= _toid
 			di
 			di"{txt}       The network is undirected."
 			di"{txt}       The table shows two entries for each edge."
@@ -130,6 +131,10 @@ program nwtab2
 		local ident = max(length("`netname1'"), length("`netname2'")) + 20
 		di "{txt}   Network 1:  {res}`netname1'{txt}{col `ident'}Directed: {res}`directed1'{txt}"
 		di "{txt}   Network 2:  {res}`netname2'{txt}{col `ident'}Directed: {res}`directed2'{txt}"
+		
+		if "`undirected'" != "" {
+			qui keep if _fromid <= _toid
+		}
 		local stubw = length("`tabn1'") + 4	
 		capture label def elab1 `edgelabs1'
 		capture label def elab2 `edgelabs2'

@@ -1,12 +1,24 @@
 *! Date        : 7sept2014
 *! Version     : 1.0.1
-*! Author      : Thomas Grund, Linköping University
+*! Author      : Thomas Grund, Linkoping University
 *! Email	   : contact@nwcommands.org
 
 capture program drop nwmovie
 program nwmovie
-	syntax anything(name=netname), [z(integer 1) keepeps fname(string) explosion(string) titles(string) delay(string) size(varlist) color(varlist) symbol(varlist) edgecolor(string) edgesize(string) frames(integer 20)*]
-	_nwsyntax `netname', max(999)
+	syntax anything(name=netname), [z(integer 1) imagick(string) keepeps fname(string) explosion(string) titles(string) delay(string) size(varlist) color(varlist) symbol(varlist) edgecolor(string) edgesize(string) frames(integer 20)*]
+
+
+	if c(os) == "MacOSX" {
+		nwmovie_install_osx
+	}
+	
+	if c(os) == "Windows" {
+		nwmovie_install_win
+	}
+	
+	
+	// make movie
+	_nwsyntax `netname', max(999) min(2)
 	local k : word count `netname'
 	
 	// check and clean networks as edgecolor and edgesize
@@ -16,40 +28,6 @@ program nwmovie
 	_nwsyntax_other `edgecolor', exactly(`networks') nocurrent
 	local edgecolor_check "`othernetname'"
 	
-	
-	// check for ImageMagick
-		
-	// Check for third party profile 
-	capture findfile _nwprofile.do
-	local found_IM = 0
-	capture if (_rc == 0) {
-		file open nwprofile_handle using _nwprofile.do, read
-		file read nwprofile_handle line
-		while r(eof)==0 {
-			gettoken thirdparty third: line, parse("----")
-			local thirdfile = substr("`third'", 5,.)
-			if (trim("`thirdparty'") == "ImageMagick") {
-				global rpath `thirdfile'
-				local found_IM = 1
-			}
-			file read nwprofile_handle line
-		}
-        file close nwprofile_handle
-	}
-	
-	// ImageMagick not found in nwprofile.do
-	if (`found_IM' == 0){
-		di "{err}Stata could not find ImageMagick on your computer."
-		di "Please specify in the dialog box where ImageMagick can be found."
-		di 
-		di "If you have not installed ImageMagick you need to do this first:"
-		di "{browse www.ixxxxx.org:    Click here to install ImageMagick}"		
-		
-		capture window fopen impath "Locate convert" "convert.exe|convert.exe" 
-		capture file open nwprofile_handle using _nwprofile.do, write append
-		capture file write nwprofile_handle "ImageMagick ---- $impath" _n
-		capture file close nwprofile_handle
-	}
 	
 	capture drop _c1_* 
 	capture drop _c2_*
@@ -168,18 +146,18 @@ program nwmovie
 		noi di "{txt}Processing network {bf:`first'}"
 		if `i' == 1 {
 			qui nwplot `first', generate(_c1_x _c1_y) size(`firstsize') symbol(`firstsymb', norescale forcekeys(`symbol_uniquevalues')) color(`firstcol', norescale forcekeys(`color_uniquevalues')) edgesize(`firstedgesize') edgecolor(`firstedgecol') title("`firsttitle'"`title_opt') `options'	
-			qui graph export first`st'.eps, replace mag(200) logo(on)
+			qui graph export `c(pwd)'/first`st'.eps, replace mag(200) logo(on)
 		}
 		else {
 			qui nwplot `first', generate(_c1_x _c1_y) size(`firstsize') symbol(`firstsymb', norescale forcekeys(`symbol_uniquevalues')) color(`firstcol', norescale forcekeys(`color_uniquevalues')) edgesize(`firstedgesize') edgecolor(`firstedgecol') title("`secondtitle'"`title_opt') `options'	
-			qui graph export frame`st'.eps, replace mag(200) logo(on)
+			qui graph export `c(pwd)'/frame`st'.eps, replace mag(200) logo(on)
 		}
 		local st = string(`z',"%05.0f")
-		qui graph export frame`st'.eps, replace mag(200) logo(on)
+		qui graph export `c(pwd)'/frame`st'.eps, replace mag(200) logo(on)
 		qui nwplot `second', generate(_c2_x _c2_y) size(`secondsize') symbol(`secondsymb', norescale forcekeys(`symbol_uniquevalues')) color(`secondcol', norescale forcekeys(`color_uniquevalues')) edgesize(`secondedgesize') edgecolor(`secondedgecol') title("`secondtitle'"`title_opt') `options'	
 		local expnum = (`z' + `frames' + 2)
 		local st = string(`expnum',"%05.0f")
-		qui graph export frame`st'.eps, replace mag(200) logo(on)		
+		qui graph export `c(pwd)'/frame`st'.eps, replace mag(200) logo(on)		
 		local z = `z' + 2
 		
 
@@ -223,7 +201,7 @@ program nwmovie
 			}
 			capture nwdrop _frame_edgesize
 			
-			qui graph export frame`st'.eps, replace mag(200) logo(on)
+			qui graph export `c(pwd)'/frame`st'.eps, replace mag(200) logo(on)
 			capture drop _frame_x _frame_y 
 			capture drop `frame_size' `frame_edgesize'
 			local z = `z' + 1
@@ -240,21 +218,68 @@ program nwmovie
 	}
 	qui nwplot `second', `nx' size(`secondsize') symbol(`secondsymb', norescale forcekeys(`symbol_uniquevalues')) color(`secondcol', norescale forcekeys(`color_uniquevalues')) edgesize(`secondedgesize') edgecolor(`secondedgecol') title("`secondtitle'" `title_opt') `options'
 	capture drop _c1_* _c2_*
-	qui graph export last`st'.eps, replace mag(200) logo(on)		
+	qui graph export `c(pwd)'/last`st'.eps, replace mag(200) logo(on)		
 	
 	di "Processing network {bf:`second'}"
 	di 
+	graph drop _all
+	
 	di "Rendering movie..."
 
 	//shell convert frame*.eps -transparent white frame*.gif
 	local lastdelay = `delay' * `frames'
-	local shellcmd = "convert -delay `delay' -loop 0 first*.eps frame*.eps -delay `lastdelay' last*.eps `fname'.gif"
-	shell `shellcmd'
+
+
+	local shellcmd = "convert -delay `delay' -loop 0 `c(pwd)'/first*.eps `c(pwd)'/frame*.eps -delay `lastdelay' `c(pwd)'/last*.eps `c(pwd)'/`fname'.gif"
+	
+	if c(os) == "MacOSX" {
+		shell export PATH="$PATH:/usr/local/bin:/usr/bin:/opt/local/bin:/opt/ImageMagick/bin/:`imagick'/";`shellcmd'
+		shell open `fname'.gif -a /Applications/Safari.app/ 
+	}
 	
 	if "`keepeps'" == "" {
-		shell del frame*.*
-		shell del last*.*
+		if c(os) == "Windows" {
+			shell del frame*.*
+			shell del last*.*
+		}
+		else {
+			shell rm first*.*
+			shell rm frame*.*
+			shell rm last*.*
+		}
 	}
+end
+
+
+capture program drop nwmovie_install_osx
+program nwmovie_install_osx
+	tempname nwmovie_sh
+	capture findfile nwmovie.command
+	set more off
+	if _rc != 0 {
+		file open `nwmovie_sh' using nwmovie.command, write
+		file write `nwmovie_sh' "if which brew >/dev/null; then" _n
+		file write `nwmovie_sh' `"echo "Homebrew found""' _n
+		file write `nwmovie_sh' "	else " _n
+		file write `nwmovie_sh' "	mkdir /usr/local" _n
+		file write `nwmovie_sh' "	curl -L https://github.com/Homebrew/homebrew/tarball/master  | tar xz --strip 1 -C /usr/local" _n
+		file write `nwmovie_sh' "fi" _n
+		file write `nwmovie_sh' "if which convert >/dev/null; then" _n
+		file write `nwmovie_sh' `"	echo "ImageMagic found""' _n
+		file write `nwmovie_sh' "else" _n
+		file write `nwmovie_sh' "	brew install ImageMagick" _n
+		file write `nwmovie_sh' "fi" _n
+		file write `nwmovie_sh' "if which gs >/dev/null; then" _n
+		file write `nwmovie_sh' `"	echo "Ghostscript found""' _n
+		file write `nwmovie_sh' "else"_n
+		file write `nwmovie_sh' "	brew install ghostscript" _n
+		file write `nwmovie_sh' "fi" _n
+		file write `nwmovie_sh' "exit"
+		file close `nwmovie_sh'
+		shell export PATH="$PATH:/usr/local/bin:/usr/bin:/opt/local/bin:/bin:`c(pwd)'";chmod +x nwmovie.command
+	}
+	shell export PATH="$PATH:/usr/local/bin:/usr/bin:/opt/local/bin"; nwmovie.command
+	exit
 end
 
 

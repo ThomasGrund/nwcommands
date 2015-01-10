@@ -15,7 +15,7 @@ program webnwuse
 	local thispath = "`path'"
 	
 	if "`subcommand'" != "set" {
-		if "`thispath'" == "" {
+		if "`thispath'" == "" | "`thispath'" == "\" {
 			global nwwebpath = "http://nwcommands.org/data"
 		}
 	}

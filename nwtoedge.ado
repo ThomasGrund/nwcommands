@@ -104,15 +104,15 @@ program nwtoedge
 	local z = 1
 	local num_nets = wordcount("`netname'")
 
-	local directed_all = "true"
+	local directed_all = "false"
 	qui forvalues i=1/`num_nets' {
 		local onenet : word `i' of `netname'
 		preserve
 		
 		tempfile onenet_file`i'
 		nwname `onenet'
-		if "`r(directed)'" == "false" {
-			local directed_all = "false"
+		if "`r(directed)'" == "true" {
+			local directed_all = "true"
 		}
 		local nodes = r(nodes)
 		local id = r(id)
@@ -169,7 +169,7 @@ program nwtoedge
 	sort `fromid' `toid' 
 	rename fromid _fromid
 	rename toid _toid
-
+	
 	if "`directed_all'" == "false" {
 		local forceundirected = "forceundirected"
 	}

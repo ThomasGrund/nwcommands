@@ -14,7 +14,8 @@
 
 {p 8 17 2}
 {cmdab: nwplot}
-[{it:{help netname}}]
+[{it:{help netname}}] 
+[{it:{help if}}]
 [{cmd:,} {it:{help nwplot##node_options:node_options}}
 {it:{help nwplot##label_options:label_options}}
 {it:{help nwplot##edge_options:edge_options}}
@@ -270,12 +271,12 @@ Here, the nodes are plotted with the node labels saved with the network:
 More generally, one can use any {it:varname} as node labels. The next example, does the same as the previous command, 
 but shows how one could use node labels stored elsewhere:
 
-	{cmd:. nwplot flobusiness, label(_nodelabs)}
+	{cmd:. nwplot flobusiness, label(_nodelab)}
 
 {pstd}
 The look and feel of node labels is changed with labelopt():
 
-	{cmd:. nwplot flobusiness, label(_nodelabs) labelopt(mlabsize(huge) mlabcolor(red))}
+	{cmd:. nwplot flobusiness, label(_nodelab) labelopt(mlabsize(huge) mlabcolor(red))}
 	
 {pstd}
 The command draws on normal scatter plots to plot nodes. Once can send all sorts of options directly to these
