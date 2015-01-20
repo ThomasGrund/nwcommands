@@ -49,6 +49,18 @@
 		{p_end}
 {p2col:{cmd: sum}}sum of {help varname} over network neighbors
 		{p_end}
+{p2col:{cmd: sd}}standard deviation of {help varname} over network neighbors
+		{p_end}
+{p2col:{cmd: meanego}}mean of {help varname} over network neighbors; default
+		{p_end}
+{p2col:{cmd: maxego}}maximum of {help varname} over network neighbors and ego
+		{p_end}
+{p2col:{cmd: minego}}minimum of {help varname} over network neighbors and ego
+		{p_end}
+{p2col:{cmd: sumego}}sum of {help varname} over network neighbors and ego
+		{p_end}
+{p2col:{cmd: sdego}}standard deviation of {help varname} over network neighbors and ego
+		{p_end}
 		
 {p2colreset}{...}
 {synoptset 20 tabbed}{...}
@@ -82,12 +94,16 @@ After that a {it:statistic} defined in {opt stat()} is calculated from all weigt
 {it:newvarname}[i] = {it:stat}({it:varname}[j]), for all {it:j} with {it:y_ij} > 0
 
 {pstd}
-When used with the defaults, the command caluculate for each node {it:i} the mean score of its network neighbors on {help varname}.
+When used with the defaults, the command calculates for each node {it:i} the mean score of its network neighbors on {help varname}.
+Valid statistics are: the{bf: mean}, the {bf:max}, the {bf:min}, the {bf:sum} and the {bf:sd} of {help varname}.
 
 {pstd}
-Valid statistics are: the{bf: mean}, the {bf:max}, the {bf:min}, or the {bf:sum} of {help varname}.
+Sometimes, however, one might want to calculate statistics including the attribute of ego. One can achieve this by using the ego-extended version of each statistic
+({bf:meanego},  {bf:maxego},  {bf:minego},  {bf:sumego} and {bf:sdego}), which are calculated in this way:
 
-{pstd}
+{pmore}
+{it:newvarname}[i] = {it:stat}({it:varname}[j]), for all {it:j} with {it:y_ij} > 0 or j == i
+
 
 {title:Remarks}
 
@@ -98,25 +114,46 @@ In the case of undirected networks, no {it: mode} option needs to be specified.
 {title:Examples}
 
 {pstd}
-In this example a new network {it:mynet} is generated on the basis of the Mata matrix {it:mymat}.
+This example loads the Florentine marriage data. The variable {it:wealth} indicates how rich each family is. {bf: nwcontext}
+generates different variables: {it:w_avg} = average wealth of network neighbors,  {it:w_min} = wealth of poorest network neighbor,
+{it:w_min} = wealth of richest network neighbor, {it:w_sd} = standard deviation of wealth over network neighbors.
 
-	{cmd:. nwclear}
-	{cmd:. mata: mymat = (0,1,1\1,0,0\0,0,0)}
-	{cmd:. nwset, mat(mymat) name(mynet)}
+	{com}. webnwuse florentine
+	{com}. nwcontext flomarriage, attribute(wealth) generate(w_avg)
+	{com}. nwcontext flomarriage, attribute(wealth) generate(w_min) stat(min)
+	{com}. nwcontext flomarriage, attribute(wealth) generate(w_max) stat(max)
+	{com}. nwcontext flomarriage, attribute(wealth) generate(w_sd) stat(sd)
+
+	{com}. list w*
+{txt}
+     {c TLC}{hline 8}{c -}{hline 10}{c -}{hline 10}{c -}{hline 10}{c -}{hline 10}{c TRC}
+     {c |} {res}wealth      w_avg      w_min      w_max       w_sd {txt}{c |}
+     {c LT}{hline 8}{c -}{hline 10}{c -}{hline 10}{c -}{hline 10}{c -}{hline 10}{c RT}
+  1. {c |} {res}    10        103        103        103          0 {txt}{c |}
+  2. {c |} {res}    36   47.66667          8        103   40.33471 {txt}{c |}
+  3. {c |} {res}    55       61.5         20        103       41.5 {txt}{c |}
+  4. {c |} {res}    44   67.66666          8        146   57.86382 {txt}{c |}
+  5. {c |} {res}    20   83.33334         49        146   44.37968 {txt}{c |}
+     {c LT}{hline 8}{c -}{hline 10}{c -}{hline 10}{c -}{hline 10}{c -}{hline 10}{c RT}
+  6. {c |} {res}    32         36         36         36          0 {txt}{c |}
+  7. {c |} {res}     8       42.5         36         48   4.330127 {txt}{c |}
+  8. {c |} {res}    42          8          8          8          0 {txt}{c |}
+  9. {c |} {res}   103         31         10         55   17.26268 {txt}{c |}
+ 10. {c |} {res}    48         10         10         10          0 {txt}{c |}
+     {c LT}{hline 8}{c -}{hline 10}{c -}{hline 10}{c -}{hline 10}{c -}{hline 10}{c RT}
+ 11. {c |} {res}    49         70         20        146     54.626 {txt}{c |}
+ 12. {c |} {res}     3          .          .          .          . {txt}{c |}
+ 13. {c |} {res}    27         99         48        146   40.10819 {txt}{c |}
+ 14. {c |} {res}    10       75.5         48        103       27.5 {txt}{c |}
+ 15. {c |} {res}   146         35         20         49   11.89538 {txt}{c |}
+     {c LT}{hline 8}{c -}{hline 10}{c -}{hline 10}{c -}{hline 10}{c -}{hline 10}{c RT}
+ 16. {c |} {res}    48         46          8        103   41.04469 {txt}{c |}
+     {c BLC}{hline 8}{c -}{hline 10}{c -}{hline 10}{c -}{hline 10}{c -}{hline 10}{c BRC}
 	
-	{cmd:. set obs 3}
-	{cmd:. gen var = _n}
-	{cmd:. nwcontext mynet, attribute(var) mode(both) generate(cntx)}
-   
-	{cmd:. list cntx}
-	   {c TLC}{hline 10}{c TRC}
-	   {c |} {res}  cntx   {txt}{c |}
-	   {c LT}{hline 10}{c RT}
-	1. {c |} {res}2.333333 {txt}{c |}
-	2. {c |} {res}       1 {txt}{c |}
-	3. {c |} {res}       1 {txt}{c |}
-	   {c BLC}{hline 10}{c BRC}	
-	
+{pstd}
+One can plot the marriage network with {it:wealth} as node label to better understand how these values come about:
+
+	{cmd:. nwplot flomarriage, label(wealth)}
 
 {title:Also see}
 

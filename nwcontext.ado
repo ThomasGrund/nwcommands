@@ -13,7 +13,7 @@ program nwcontext
 	if "`stat'" == "" {
 		local stat = "mean"
 	}
-	_opts_oneof "mean max min sum sd" "stat" "`stat'" 6810
+	_opts_oneof "mean max min sum sd meanego maxego minego sumego sdego" "stat" "`stat'" 6810
 	if "`mode'" == "" {
 		local mode = "outgoing"
 	}
@@ -30,7 +30,7 @@ program nwcontext
 	}
 	
 	nwtomata `netname', mat(contextNet)
-
+		
 	mata: attr = J(`nodes', 1, 0)
 	if `nodes' >= _N {
 		local validCase = _N
@@ -59,15 +59,60 @@ program nwcontext
 		mata: mata drop netVal
 	}
 	
-	if ("`stat'" == "max"){
-		mata: context = rowmax(contextNet :* attr)
+	if ("`stat'" == "meanego"){
+		mata: _diag(contextNet, 1)
+		mata: netVal = rowsum(contextNet)
+		mata: context = (contextNet * attr) :/ netVal
+		mata: mata drop netVal
 	}
 	
-	if ("`stat'" == "min"){
-		mata: context = rowmin(contextNet :* attr)
+	if ("`stat'" == "sd"){
+		mata: netVal = rowsum(contextNet)
+		mata: avgContext = (contextNet * attr) :/ netVal
+		mata: _editvalue(contextNet,0,.)
+		mata: diffContext = (contextNet :* attr') :- avgContext
+		mata: context = sqrt(rowsum(diffContext :* diffContext):/rowsum(contextNet))
+		mata: mata drop netVal diffContext avgContext 
+	}
+	
+	if ("`stat'" == "sdego"){
+		mata: _diag(contextNet, 1)
+		mata: netVal = rowsum(contextNet)
+		mata: avgContext = (contextNet * attr) :/ netVal
+		mata: _editvalue(contextNet,0,.)
+		mata: diffContext = (contextNet :* attr') :- avgContext
+		mata: context = sqrt(rowsum(diffContext :* diffContext):/rowsum(contextNet))
+		mata: mata drop netVal diffContext avgContext 
+	}
+	
+	if ("`stat'" == "max"){
+		mata: _editvalue(contextNet,0,.)
+		mata: context = rowmax(contextNet :* attr')
+	}
+	
+	if ("`stat'" == "maxego"){
+		mata: _diag(contextNet, 1)4
+		mata: _editvalue(contextNet,0,.)
+		mata: context = rowmax(contextNet :* attr')
+	}
+	
+	if ("`stat'" == "min"){	
+		mata: _editvalue(contextNet,0,.)
+		mata: context = rowmin(contextNet :* attr')
+	}
+	
+	if ("`stat'" == "minego"){	
+		mata: _diag(contextNet, 1)
+		mata: _editvalue(contextNet,0,.)
+		mata: context = rowmin(contextNet :* attr')
 	}
 	
 	if ("`stat'" == "sum"){
+		mata: context = (contextNet * attr) 
+	}
+	
+	if ("`stat'" == "sumego"){
+		mata: _diag(contextNet, 1)
 		mata: context = (contextNet * attr) 
 	}
 	

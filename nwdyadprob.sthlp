@@ -15,9 +15,10 @@
 {p 8 17 2}
 {cmdab: nwdyadprob} 
 [{it:{help netname}}]
-{cmd:,}
+[{cmd:,}
+{opt mat(matamatrix)}
 {opth density(float)}
-[{opth name(netname)}
+{opth name(netname)}
 {opt xvars}
 {opt undirected}]
 
@@ -25,6 +26,7 @@
 {synoptset 20 tabbed}{...}
 {synopthdr}
 {synoptline}
+{synopt:{opt mat}({it:matamatrix})}Mata matrix with tie probabilities{p_end}
 {synopt:{opth density(float)}}density of the new network{p_end}
 {synopt:{opth name(netname)}}name of the new random network{p_end}
 {synopt:{opt xvars}}do not generate Stata variables{p_end}
@@ -35,18 +37,25 @@
 
 {pstd}
 {cmd:nwdyadprob} generates a random network where each tie {it:x_ij} has the 
-probability {it:p_ij} to exist. The values for {it:p_ij} are derived from the edge values
-in network {help netname} and the {it:density}. The command can be used to create
-all sorts of networks based on a matrix for probabilities (given as another network).
+probability {it:p_ij} to exist. The values for {it:p_ij} are derived either 1) from the edge values
+in network {help netname} and the {it:density} (if given) or 2) from a Mata matrix specified in {bf:mat()}. The command can be used to create
+all sorts of networks.
 
 {pstd}
 Let {it:e_ij} be the edge values of network {help netname}. 
 
 {pstd}
-Then, the proability for a tie {it:x_ij} to exist in the newly created network is {it:p_ij}:
+Then, the probability for a tie {it:x_ij} to exist in the newly created network is {it:p_ij}:
 
 {pmore}
 {it:p_ij = ((e_ij) / sum(e_kl)) * density * 100}
+
+{pstd}
+When no {bf:density()} is given, the probability is simply:
+
+{pmore}
+{it:p_ij = e_ij}
+
 
 
 {title:Example}

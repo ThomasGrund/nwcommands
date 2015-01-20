@@ -5,7 +5,7 @@
 
 capture program drop nwdyadprob
 program nwdyadprob
-	syntax [anything(name=weightnet)],  density(string) [ mat(string) name(string) vars(string) xvars undirected]
+	syntax [anything(name=weightnet)],  [ density(string) mat(string) name(string) vars(string) xvars undirected]
 	
 	// Install gsample if needed
 	capture which gsample
@@ -20,7 +20,6 @@ program nwdyadprob
 	
 	if "`weightnet'" != "" {
 		_nwsyntax `weightnet'
-		local ties = `nodes' * (`nodes' -1) * `density'
 	}
 
 	
@@ -72,14 +71,22 @@ program nwdyadprob
 		replace `weightnet' = 0 if _toid <= _fromid
 	}
 	
-	gen _nonzero = (`weightnet' > 0)
-	qui sum _nonzero
-	if `r(sum)' < `ties' {
-		di "{err}Not enough non-zero weights to generate `ties' ties"
-		exit
+	if "`density'" != "" {
+		local ties = `nodes' * (`nodes' -1) * `density'
+		gen _nonzero = (`weightnet' > 0)
+		qui sum _nonzero
+		if `r(sum)' < `ties' {
+			di "{err}Not enough non-zero weights to generate `ties' ties"
+			exit
+		}
+	
+		gsample `ties' [aweight=`weightnet'], generate(link) wor
+	}
+	else {
+		gen link = (`weightnet' > uniform())
 	}
 	
-	gsample `ties' [aweight=`weightnet'], generate(link) wor
+	
 	qui nwfromedge _fromid _toid link, name(_tempnetwork)
 	nwset net*, name(`homoname') vars(`homovars') `xvars'
 	nwdrop _tempnetwork	

@@ -261,8 +261,8 @@ program nwmovie_install_osx
 		file write `nwmovie_sh' "if which brew >/dev/null; then" _n
 		file write `nwmovie_sh' `"echo "Homebrew found""' _n
 		file write `nwmovie_sh' "	else " _n
-		file write `nwmovie_sh' "	mkdir /usr/local" _n
-		file write `nwmovie_sh' "	curl -L https://github.com/Homebrew/homebrew/tarball/master  | tar xz --strip 1 -C /usr/local" _n
+		file write `nwmovie_sh' "	/bin/mkdir /usr/local " _n
+		file write `nwmovie_sh' "	curl -L https://github.com/Homebrew/homebrew/tarball/master  | sudo tar xz --strip 1 -C /usr/local" _n
 		file write `nwmovie_sh' "fi" _n
 		file write `nwmovie_sh' "if which convert >/dev/null; then" _n
 		file write `nwmovie_sh' `"	echo "ImageMagic found""' _n
