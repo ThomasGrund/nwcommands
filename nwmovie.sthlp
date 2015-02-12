@@ -13,10 +13,9 @@
 {title:Syntax}
 
 {p 8 17 2}
-{cmdab: nwanimate}
-[{it:{help netlist}}] 
-[{it:{help if}}]
-[{cmd:,} {it:{help nwplot##node_options:node_options}}
+{cmdab: nwmovie}
+{it:{help netlist}}
+[{cmd:,} {it:{help nwplot##switch_options:switch_options}}
 {it:{help nwplot##label_options:label_options}}
 {it:{help nwplot##edge_options:edge_options}}
 {it:{help nwplot##arrow_options:arrow_options}}
@@ -47,9 +46,9 @@
 {p2col:{it:node_options}}Description{p_end}
 {marker node_options}{...}
 {p2line}
-{synopt:{opt size}({it:{help varname}} [,{it:{help nwplot##node_sub:node_sub}}])}size of the nodes{p_end}
-{p2col:{opt color}({it:{help varname}} [,{it:{help nwplot##node_sub:node_sub}}])}color of the nodes{p_end}
-{p2col:{opt symbol}({it:{help varname}} [,{it:{help nwplot##node_sub:node_sub}}])}symbol of the nodes{p_end}
+{synopt:{opt size}({it:{help varlist}} [,{it:{help nwplot##node_sub:node_sub}}])}size of the nodes; one variable per time point{p_end}
+{p2col:{opt color}({it:{help varlist}} [,{it:{help nwplot##node_sub:node_sub}}])}color of the nodes; one variable per time point{p_end}
+{p2col:{opt symbol}({it:{help varlist}} [,{it:{help nwplot##node_sub:node_sub}}])}symbol of the nodes; one variable per time point{p_end}
 {p2col:{opth nodefactor(float)}}multiply all node sizes by a factor{p_end}
 
 
@@ -78,8 +77,8 @@
 {p2col:{it:edge_options}}Description{p_end}
 {marker edge_options}{...}
 {p2line}
-{p2col:{opt edgesize}({it:{help netname}} [,{it:{help nwplot##edge_sub:edge_sub}}])}use edge values of other network to change width of edges; network needs to have the right dimensions{p_end}
-{p2col:{opt edgecolor}({it:{help netname}} [,{it:{help nwplot##edge_sub:edge_sub}}])}use edge values of other network to change color of edges; network needs to have the right dimensions{p_end}
+{p2col:{opt edgesize}({it:{help netlist}} [,{it:{help nwplot##edge_sub:edge_sub}}])}use edge values of other network to change width of edges; network needs to have the right dimensions{p_end}
+{p2col:{opt edgecolor}({it:{help netlist}} [,{it:{help nwplot##edge_sub:edge_sub}}])}use edge values of other network to change color of edges; network needs to have the right dimensions{p_end}
 {p2col:{opth edgefactor(float)}}multiply all edge sizes by a factor{p_end} 
 
 

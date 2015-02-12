@@ -89,6 +89,9 @@ program nwtab2
 			if _rc == 0 {
 				local netname1 = "`netname'"
 			}
+			else {
+				unab entry : `entry'
+			}
 			capture confirm variable `entry'
 			if _rc == 0 {
 				local attribute1 = "`entry'"
@@ -97,6 +100,13 @@ program nwtab2
 				nwcurrent
 				local netname1 = r(current)
 			}
+			nwname `netname1'
+			local directed1 = "`directed'"
+			local undirected = "" 
+			if ("`directed'" == "false") {
+				local undirected = "forcedirected"
+			}
+			local nodes1 = "`nodes'"
 		}
 	}
 	

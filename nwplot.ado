@@ -367,12 +367,12 @@ program nwplot
 		local symbollabels = ""
 	}
 	
+	local 0 = "`size'"
+	syntax [varlist(min=0 max=1 default=none)][, norescale legendoff forcekeys(string) sizebin(integer 1) *]
+	local size "`varlist'"
 	// Size of nodes
 	if ("`size'" != ""){
 		local nodefactor = `nodefactor' / 2
-		local 0 = "`size'"
-		syntax varlist(min=1 max=1) [, norescale legendoff forcekeys(string) sizebin(integer 1) *]
-		
 		qui sum `varlist' if _n <= `nodes'
 		local sizekeys_legendoff "`legendoff'"
 		local sizekeys "`=round(`r(min)',0.01)' `=round(`r(max)',0.01)'"

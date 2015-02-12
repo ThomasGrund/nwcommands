@@ -71,7 +71,7 @@ program nwmovie
 	
 	if ("`size'" != ""){
 		local 0 `size'
-		syntax [varlist], [*]
+		syntax [varlist(default=none)], [*]
 		local size `varlist'
 		local sizeopt `options'	
 		local s : word count `size'
@@ -81,7 +81,7 @@ program nwmovie
 	}
 	if ("`color'" != ""){
 		local 0 `color'
-		syntax [varlist], [*]
+		syntax [varlist(default=none)], [*]
 		local color `varlist'
 		local coloropt `options'	
 		local s : word count `color'
@@ -109,7 +109,7 @@ program nwmovie
 		
 	if ("`symbol'" != ""){
 		local 0 `symbol'
-		syntax [varlist], [*]
+		syntax [varlist(default=none)], [*]
 		local symbol `varlist'
 		local symbolopt `options'
 		local s : word count `symbol'
@@ -192,9 +192,15 @@ program nwmovie
 		local st = string(`z',"%05.0f")
 					
 		noi di "{txt}Processing network {bf:`first'}"
+		noi di `i'
+		noi nwset
 		if `i' == 1 {
-			qui nwplot `first', generate(_c1_x _c1_y) size(`firstsize', norescale `sizeopt') symbol(`firstsymb', norescale forcekeys(`symbol_uniquevalues') `symbolopt') color(`firstcol', norescale forcekeys(`color_uniquevalues') `coloropt' ) edgesize(`firstedgesize') edgecolor(`firstedgecol') title("`firsttitle'"`title_opt') `options'
+			noi di "h1"
+			noi di `"nwplot `first', generate(_c1_x _c1_y) size(`firstsize', norescale `sizeopt') symbol(`firstsymb', norescale forcekeys(`symbol_uniquevalues') `symbolopt') color(`firstcol', norescale forcekeys(`color_uniquevalues') `coloropt' ) edgesize(`firstedgesize') edgecolor(`firstedgecol') title("`firsttitle'"`title_opt') `options'"'
+
+			noi nwplot `first', generate(_c1_x _c1_y) size(`firstsize', norescale `sizeopt') symbol(`firstsymb', norescale forcekeys(`symbol_uniquevalues') `symbolopt') color(`firstcol', norescale forcekeys(`color_uniquevalues') `coloropt' ) edgesize(`firstedgesize') edgecolor(`firstedgecol') title("`firsttitle'"`title_opt') `options'
 			capture graph export `"`c(pwd)'/first`st'.`pic'"', replace `picopt'
+			noi di "h2"
 			if _rc != 0 {
 				di "{err}No writing right for working directory. Try changing the working directory.{txt}"
 				error
@@ -202,12 +208,16 @@ program nwmovie
 			}
 		}
 		else {
-			qui nwplot `first', generate(_c1_x _c1_y) size(`firstsize', norescale `sizeopt') symbol(`firstsymb', norescale forcekeys(`symbol_uniquevalues') `symbolopt') color(`firstcol',  norescale forcekeys(`color_uniquevalues') `coloropt') edgesize(`firstedgesize') edgecolor(`firstedgecol') title("`secondtitle'"`title_opt') `options'	
+			noi di "h3"
+			noi nwplot `first', generate(_c1_x _c1_y) size(`firstsize', norescale `sizeopt') symbol(`firstsymb', norescale forcekeys(`symbol_uniquevalues') `symbolopt') color(`firstcol',  norescale forcekeys(`color_uniquevalues') `coloropt') edgesize(`firstedgesize') edgecolor(`firstedgecol') title("`secondtitle'"`title_opt') `options'	
 			qui graph export `"`c(pwd)'/frame`st'.`pic'"', replace `picopt'
 		}
+		noi di "h5"
 		local st = string(`z',"%05.0f")
 		qui graph export `"`c(pwd)'/frame`st'.`pic'"', replace `picopt'
+		noi nwset
 		qui nwplot `second', generate(_c2_x _c2_y) size(`secondsize', norescale `sizeopt') symbol(`secondsymb', norescale forcekeys(`symbol_uniquevalues') `symbolopt') color(`secondcol',  norescale forcekeys(`color_uniquevalues') `coloropt') edgesize(`secondedgesize') edgecolor(`secondedgecol') title("`secondtitle'"`title_opt') `options'	
+		di "h6"
 		local expnum = (`z' + `frames' + 2)
 		local st = string(`expnum',"%05.0f")
 		qui graph export `"`c(pwd)'/frame`st'.`pic'"', replace `picopt'
@@ -215,7 +225,7 @@ program nwmovie
 		
 
 		forvalues j = 1/`frames' {
-		
+			di "h7"
 			// Network switch
 			if "`switchnetwork'" == "start" {
 				local framenet "second"
@@ -243,6 +253,8 @@ program nwmovie
 					local thirdcol "firstcol"	
 				}
 			}
+			
+			di "h8"
 
 			// Symbol switch
 			if "`switchsymbol'" == "start" {
@@ -257,6 +269,8 @@ program nwmovie
 					local thirdsymb "firstsymb"	
 				}
 			}
+			
+			di "h9"
 			
 			// Edgecolor switch
 			if "`switchedgecolor'" == "start" {
@@ -286,6 +300,7 @@ program nwmovie
 				}
 			}
 			
+			di "h10"
 			
 			if (mod(`j',5) == 0) noi display "   ...frame `j'/`frames'"
 			local st = string(`z',"%05.0f")
@@ -303,18 +318,25 @@ program nwmovie
 				local nx = ""
 			}
 			
+			di "h11"
 	
 			if ("`size'" != "" | "`edgesize'" != ""){
 				if "`edgesize'" != "" {
-					qui nwgenerate _frame_edgesize = round(`firstedgesize' - `steepness' * (`firstedgesize' - `secondedgesize'))
+					di "nwgenerate _frame_edgesize = round(`firstedgesize' - `steepness' * (`firstedgesize' - `secondedgesize'))"
+
+					qui nwgenerate _frame_edgesize = round(`firstedgesize' - `steepness' * abs(`firstedgesize' - `secondedgesize')))
 				}
 				if "`size'" != "" {
 					tempvar frame_size
 					qui gen `frame_size' = `firstsize' - `steepness' * (`firstsize' - `secondsize')
+					
+					di `"nwplot ``framenet'', `nx'  symbol(``thirdsymb'', norescale forcekeys(`symbol_uniquevalues') `symbolopt') color(``thirdcol'', norescale forcekeys(`color_uniquevalues') `coloropt' ) size(`frame_size', norescale `sizeopt') edgesize(_frame_edgesize) edgecolor(``thirdedgecol'') title("``thirdtitle''"`title_opt') `options'"'
 					qui nwplot ``framenet'', `nx'  symbol(``thirdsymb'', norescale forcekeys(`symbol_uniquevalues') `symbolopt') color(``thirdcol'', norescale forcekeys(`color_uniquevalues') `coloropt' ) size(`frame_size', norescale `sizeopt') edgesize(_frame_edgesize) edgecolor(``thirdedgecol'') title("``thirdtitle''"`title_opt') `options'
 				}
 				else {
-					qui nwplot ``framenet'', `nx'  symbol(``thirdsymb'', norescale forcekeys(`symbol_uniquevalues') `symbolopt') color(``thirdcol'', norescale forcekeys(`color_uniquevalues') `coloropt' ) edgesize(_frame_edgesize) edgecolor(``thirdedgecol'') title("``thirdtitle''"`title_opt') `options'
+					di `"nwplot ``framenet'', `nx'  symbol(``thirdsymb'', norescale forcekeys(`symbol_uniquevalues') `symbolopt') color(``thirdcol'',  norescale forcekeys(`color_uniquevalues') `coloropt' ) edgesize(_frame_edgesize) edgecolor(``thirdedgecol'') title("``thirdtitle''"`title_opt') `options'"'
+			
+					qui nwplot ``framenet'', `nx'  symbol(``thirdsymb'', norescale forcekeys(`symbol_uniquevalues') `symbolopt') color(``thirdcol'',  norescale forcekeys(`color_uniquevalues') `coloropt' ) edgesize(_frame_edgesize) edgecolor(``thirdedgecol'') title("``thirdtitle''"`title_opt') `options'
 				}
 			}
 			else{
@@ -322,6 +344,7 @@ program nwmovie
 			}
 			capture nwdrop _frame_edgesize
 			
+			di "h12"
 			qui graph export `"`c(pwd)'/frame`st'.`pic'"', replace `picopt' 
 			capture drop _frame_x _frame_y 
 			capture drop `frame_size' `frame_edgesize'
