@@ -8,6 +8,9 @@ program nwdegree
 	version 9
 	syntax [anything(name=netname)],[ isolates valued GENerate(string) in(string) out(string) *]
 	_nwsyntax `netname', max(9999)
+	_nwsetobs
+	
+	set more off
 	if `networks' > 1 {
 		local k = 1
 		local more = "`networks'"
@@ -15,6 +18,7 @@ program nwdegree
 	
 	foreach netname_temp in `netname' {
 		_nwsyntax `netname_temp'
+		local nodes_temp `nodes'
 		
 		local directed `directed'
 		nwtomata `netname_temp', mat(degreeNet)
@@ -27,9 +31,6 @@ program nwdegree
 		mata: outdegree = (colsum(degreeNet))'
 		mata: indegree = rowsum(degreeNet)
 	
-		if (_N < `nodes'){
-			set obs `nodes'
-		}
 	
 		local _degree : word 1 of `generate'
 		if "`_degree'" == "" {
@@ -38,7 +39,7 @@ program nwdegree
 		
 		local _outdegree "_out`_degree'"
 		local _indegree "_in`_degree'"
-		local _isolates : word 2 of `generate'
+		//local _isolates : word 2 of `generate'
 		if "`_isolates'" == "" {
 			local _isolates "_isolate"
 		}
@@ -65,23 +66,24 @@ program nwdegree
 				gen `_isolates'`k' = (`_degree'`k' == 0)
 				//drop _degree
 			}
+			replace `_isolates'`k' = . if _n > `nodes_temp'
 		}
 	
 		mata: mata drop outdegree indegree degreeNet
+		
+		di "{hline 40}"
+		di "{txt}  Network name: {res}`netname'"
+		di "{hline 40}"
+		di "{txt}    Degree distribution"
+		if "`directed'" == "true"{
+			tab `_indegree'`k', `in'
+			tab `_outdegree'`k', `out'
+		}
+		else {
+			tab `_degree'`k', `options'
+		}
 		if "`more'" != "" & "`k'" != "`more'" {
 			local k = `k' + 1
 		}
-	}
-	
-	di "{hline 40}"
-	di "{txt}  Network name: {res}`netname'"
-	di "{hline 40}"
-	di "{txt}    Degree distribution"
-	if "`directed'" == "true"{
-		tab `_indegree'`k', `in'
-		tab `_outdegree'`k', `out'
-	}
-	else {
-		tab `_degree'`k', `options'
 	}
 end	

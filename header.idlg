@@ -1,0 +1,14 @@
+/* header.idlg -- header for all source dialogs */
+
+/* VERSION 1.1.1  14apr2006 */
+
+POSITION . . _dlgwd _dlght
+
+COPY copy1
+OK ok1, label("OK")
+CANCEL can1, label("Cancel")
+SUBMIT sub1, label("Submit")
+
+INCLUDE levels_list
+
+/* END:  header.idlg */

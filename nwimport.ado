@@ -1,14 +1,23 @@
 capture program drop nwimport
 program nwimport
-	syntax anything, type(string) [ name(string) clear nwclear xvars]
+	syntax anything, type(string) [ name(string) clear nwclear xvars *]
 	local fname `"`anything'"'
+	if strpos(`"`anything'"',`"""') == 0 {
+		local fname  `""`fname'""'
+	}
+	
+	local options_original `"`options'"'
+	
+	if "`name'" != "" {
+		local nameoff = "false"
+	}
 	
 	set more off
 	qui `clear'
 	qui `nwclear'
 	
 	if "`name'" == "" {
-		local fname_temp =  subinstr(`"`fname'"', char(34), "", .)
+		local fname_temp =  lower(subinstr(`"`fname'"', char(34), "", .))
 		local fnamerev = strreverse(`"`fname_temp'"')
 		local bslash = strpos(`"`fnamerev'"', "/")
 		local fslash = strpos(`"`fnamerev'"', "\")
@@ -17,7 +26,11 @@ program nwimport
 		local name = substr(`"`fname_temp'"', `=length(`"`fname_temp'"') - `slash' + 1', .)
 		local name = subinstr(`"`name'"',".net", "", .)
 		local name = subinstr(`"`name'"',".dat", "", .)
+		local name = subinstr(`"`name'"',".txt", "", .)
+		local name = subinstr(`"`name'"',".csv", "", .)
+		local name = subinstr(`"`name'"',".dta", "", .)
 		local name = subinstr(`"`name'"', char(34), "", .)
+		local name = substr(`"`name'"', 2, .)
 	}
 	
 	capture qui nwset
@@ -25,10 +38,15 @@ program nwimport
 		
 	local 0 `type'
 	syntax anything(name=import_type) [, *] 
-	_opts_oneof "pajek matrix edgelist gml graphml ucinet" "import_type" "`import_type'" 6556
+	_opts_oneof "pajek matrix edgelist compressed gml graphml ucinet" "import_type" "`import_type'" 6556
 	
+	local options `"`options_original'"'
+
 	if "`import_type'" == "matrix" {
 		capture _nwimport_matrix `fname', `options'
+	}
+	if "`import_type'" == "compressed" {
+		 capture _nwimport_compressed `"`fname'"', `options'
 	}
 	if "`import_type'" == "edgelist" {
 		 capture _nwimport_edgelist `fname', `options'
@@ -44,7 +62,9 @@ program nwimport
 	}
 	if "`import_type'" == "ucinet" {
 		  capture _nwimpdl `fname'
-		  local nameoff = r(nameoff)
+		  if "`nameoff'" == "" {
+			local nameoff = r(nameoff)
+		  }
 	}
 	local i = 1
 	capture qui nwset
@@ -83,7 +103,7 @@ program nwimport
 	}
 	else {
 		di 
-		di "{err}{it:Loading networks from file {bf:`fname'} failed}"
+		di `"{err}{it:Loading networks from file {bf:`fname'} failed}"'
 		error 6750
 	}
 end
@@ -367,7 +387,7 @@ program _nwimport_ucinet
 					forvalues i = 1/`nodes' {
 						local labs "`labs' `i'"
 					}
-				}-*
+				}
 				local k 1 
 				foreach var of varlist _all {
 					rename `var' net`k'
@@ -676,6 +696,20 @@ program _nwimport_edgelist
 		local name "network"
 	}
 
+	if (strpos(lower(`anything'), ".dta") != 0) | (strpos(lower(`anything'), ".DTA") != 0)  {
+		preserve
+		use `anything', clear
+		ds
+		local ego : word 1 of `r(varlist)'
+		local alter : word 2 of `r(varlist)'
+		local value : word 3 of `r(varlist)'
+		replace `alter' = `ego' if `alter' == .
+		drop if `ego' == .
+		nwfromedge `ego' `alter' `value', `undirected' `direcetd' `xvars' name(`name')
+		restore
+	}
+	else {
+	
 	preserve
 	clear
 	
@@ -748,8 +782,38 @@ program _nwimport_edgelist
 	}
 	nwfromedge _all, name(`name') `directed' `undirected' `xvars'
 	restore
+	}
 end
 
+
+capture program drop _nwimport_compressed
+program _nwimport_compressed
+	syntax anything, [name(string) delimiter(string) directed undirected xvars] 
+	if "`name'" == "" {
+		local name "network"
+	}
+	if "`delimiter'" == "" {
+		local delimiter = "comma"
+	}
+	
+	preserve
+	clear
+
+	import delimited `anything', delimiter(`delimiter') clear
+	rename v1 ego
+	
+	reshape long v, i(ego) j(j)
+	rename v alter
+
+	// needed to deal with isolates
+	replace alter = ego if alter == ""
+	
+	nwfromedge ego alter, `directed' `undirected' `xvars' name(`name')
+	restore
+	if "`xvars'" == "" {
+		nwload
+	}
+end
 
 
 
@@ -963,8 +1027,8 @@ end
 
 capture program drop _nwimpdl
 program _nwimpdl 
-	syntax anything
-	
+	syntax anything, [ netlistonly ]
+
 	local nodes = ""
 	local nets = "1"
 	local cols = ""
@@ -981,11 +1045,12 @@ program _nwimpdl
 	local labels_embedded ""
 	
 	local diagonal = ""
+	tempname importfile
 	
 	// parse header of .dl file
-	file open importfile using `anything', read
+	file open `importfile' using `anything', read
 	
-	file read importfile line
+	file read `importfile' line
 	local firstword : word 1 of `line'
 	local firstword = trim(lower("`firstword'"))
 
@@ -1062,7 +1127,6 @@ program _nwimpdl
 					local labels_on = 0
 					local netlabels_on = 1	
 					local nameoff = "true"
-					noi di "NN:`nameoff'"
 				}
 			}
 			if (lower("`oneword'") == "row" | lower("`oneword'") == "col") {
@@ -1080,7 +1144,7 @@ program _nwimpdl
 				}
 			}
 		}
-		file read importfile line
+		file read `importfile' line
 		local firstword : word 1 of `line'
 		local firstword = lower("`firstword'")
 	}
@@ -1102,27 +1166,31 @@ program _nwimpdl
 	
 	local format = lower("`format'")
 	
-	if lower("`format'") == "fullmatrix" {
-		capture _nwimpdl_fullmatrix, filehandler(importfile) labs(`labs') netlabs(`netlabs') nodes(`nodes') nets(`nets') diagonal(`diagonal') `rowlab_embedded' `collab_embedded'
-	}
-	if lower("`format'") == "nodelist1" {
-		qui  capture _nwimpdl_nodelist1, filehandler(importfile) labs(`labs') netlabs(`netlabs') nodes(`nodes') `labels_embedded' `rowlab_embedded' `collab_embedded'
-	}
-	if lower("`format'") == "rankedlist1" {
-		qui capture  _nwimpdl_nodelist1, rankedlist filehandler(importfile) labs(`labs') netlabs(`netlabs') nodes(`nodes') `labels_embedded' `rowlab_embedded' `collab_embedded'
-	}
-	if lower("`format'") == "edgelist1" {
-		qui capture _nwimpdl_nodelist1, edgelist filehandler(importfile) labs(`labs') netlabs(`netlabs') nodes(`nodes') `labels_embedded' `rowlab_embedded' `collab_embedded'
-	}
-	if lower("`format'") == "lowerhalf" {
-		if "`rowlabsembedded'" != "" {
-			di "{err}Ucinet {bf:row labels embedded} not supported together with format {bf:lowerhalf}"
+	if "`netlistonly'" == "" {
+		if lower("`format'") == "fullmatrix" {
+			capture _nwimpdl_fullmatrix, filehandler(`importfile') labs(`labs') netlabs(`netlabs') nodes(`nodes') nets(`nets') diagonal(`diagonal') `rowlab_embedded' `collab_embedded'
 		}
-		else {
-			capture _nwimpdl_lowerhalf, filehandler(importfile) labs(`labs') netlabs(`netlabs') nodes(`nodes') nets(`nets') diagonal(`diagonal') `rowlab_embedded' `collab_embedded'
+		if lower("`format'") == "nodelist1" {
+			qui  capture _nwimpdl_nodelist1, filehandler(`importfile') labs(`labs') netlabs(`netlabs') nodes(`nodes') `labels_embedded' `rowlab_embedded' `collab_embedded'
+		}
+		if lower("`format'") == "rankedlist1" {
+			qui capture  _nwimpdl_nodelist1, rankedlist filehandler(`importfile') labs(`labs') netlabs(`netlabs') nodes(`nodes') `labels_embedded' `rowlab_embedded' `collab_embedded'
+		}
+		if lower("`format'") == "edgelist1" {
+			qui capture _nwimpdl_nodelist1, edgelist filehandler(`importfile') labs(`labs') netlabs(`netlabs') nodes(`nodes') `labels_embedded' `rowlab_embedded' `collab_embedded'
+		}
+		if lower("`format'") == "lowerhalf" {
+			if "`rowlabsembedded'" != "" {
+				di "{err}Ucinet {bf:row labels embedded} not supported together with format {bf:lowerhalf}"
+			}
+			else {
+				capture _nwimpdl_lowerhalf, filehandler(`importfile') labs(`labs') netlabs(`netlabs') nodes(`nodes') nets(`nets') diagonal(`diagonal') `rowlab_embedded' `collab_embedded'
+			}
 		}
 	}
-	capture file close importfile
+	mata: st_global("r(netlabs)", "`netlabs'")
+	
+	capture file close `importfile'
 	local sformat "fullmatrix nodelist1 egelist1 lowerhalf"
 	local f : list format & sformat
 	if "`f'" == "" {

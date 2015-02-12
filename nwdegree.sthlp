@@ -16,7 +16,7 @@
 {cmdab: nwdegree} 
 [{it:{help netlist}}]
 [{cmd:,}
-{opt generate}({it:{help varname:var1 var2}})
+{opt generate}({it:{help varname:varname}})
 {opt isolates}
 {opt valued}
 {opt in}({it:{help tabulate_oneway##tabulate1_options:tabulate_opt}})
@@ -27,12 +27,12 @@
 {synoptset 25 tabbed}{...}
 {synopthdr}
 {synoptline}
-{synopt:{opt generate}({it:{help varname:var1 var2}})}Generate variables for {it:degree} and {it:isolates}; 
-default:{it: var1 = _degree, var2 = _isolates}{p_end}
-{synopt:{opt isolates}}Generate variable for network isolates{p_end}
+{synopt:{opt generate}({it:{help varname}})}Generate variable {bf:varname} for degree of nodes (undirected network). For directed networks, generate {bf:{it:_out}varname} for outdegree and and {bf:{it:_in}varname} for indegree; 
+default:{it: varname = _degree}{p_end}
+{synopt:{opt isolates}}Generate variable for network isolates; overwrite variable {it:_isolate}{p_end}
 {synopt:{opt valued}}Consider tie values; calculate {it:strength} instead of {it:degree}{p_end}
 {synopt:{opt in}({it:{help tabulate_oneway##tabulate1_options:tabulate_opt}})}Options used for tabulating {it:indegree}{p_end}
-{synopt:{opt out}({it:{help tabulate_oneway##tabulate1_options:tabulate_opt}})}Options used for tabulating {it:indegree}{p_end}
+{synopt:{opt out}({it:{help tabulate_oneway##tabulate1_options:tabulate_opt}})}Options used for tabulating {it:outdegree}{p_end}
 {synopt:{it:{help tabulate_oneway##tabulate1_options:tabulate_opt}}}Options used for tabulating {it:degree}{p_end}
 {synoptline}
 {p2colreset}{...}

@@ -6,6 +6,7 @@
 {col 5}{hline}
 {p2colset 5 32 34 2}{p2col:{bf:{help _extract_valuelabels }}}{err}no help file yet{txt}{p_end}
 {p2col:{bf:{help _nwdeploy }}}{err}no help file yet{txt}{p_end}
+{p2col:{bf:{help _nwdialog }}}{err}no help file yet{txt}{p_end}
 {p2col:{bf:{help _nwevalnetexp }}}{err}no help file yet{txt}{p_end}
 {p2col:{bf:{help _nwnodeid }}}Returns the nodeid of a node given its node label{p_end}
 {p2col:{bf:{help _nwnodelab }}}Returns the nodelab of a node given its nodeid{p_end}
@@ -41,18 +42,20 @@
 {p2col:{bf:{help nwgeodesic }}}Calculate shortest paths between nodes{p_end}
 {p2col:{bf:{help nwhomophily }}}Generate a homophily network{p_end}
 {p2col:{bf:{help nwimport }}}Import network{p_end}
+{p2col:{bf:{help nwinstall }}}{err}no help file yet{txt}{p_end}
 {p2col:{bf:{help nwissymmetric }}}Check if network is symmetric{p_end}
 {p2col:{bf:{help nwkatz }}}Calculate Katz centrality{p_end}
 {p2col:{bf:{help nwkeep }}}Keep a network (or only certain nodes){p_end}
 {p2col:{bf:{help nwkeepnodes }}}Keep nodes of a network{p_end}
 {p2col:{bf:{help nwlattice }}}Generate a lattice network{p_end}
 {p2col:{bf:{help nwload }}}Load a network as Stata variables{p_end}
-{p2col:{bf:{help nwmovie }}}{err}no help file yet{txt}{p_end}
+{p2col:{bf:{help nwmovie }}}Animate a sequence of networks{p_end}
 {p2col:{bf:{help nwname }}}Check name and change meta-information of a network{p_end}
 {p2col:{bf:{help nwneighbor }}}Extract the network neighbors of a node{p_end}
 {p2col:{bf:{help nwpath }}}Calculate paths between nodes{p_end}
 {p2col:{bf:{help nwpermute }}}Generate permutation of a network{p_end}
 {p2col:{bf:{help nwplot }}}Plot a network{p_end}
+{p2col:{bf:{help nwplotmatrix }}}Plot a network as sociomatrix{p_end}
 {p2col:{bf:{help nwpref }}}Generate a preferential-attachment network{p_end}
 {p2col:{bf:{help nwqap }}}Multivariate QAP regression{p_end}
 {p2col:{bf:{help nwrandom }}}Generate a random network{p_end}
@@ -65,7 +68,8 @@
 {p2col:{bf:{help nwsave }}}Save networks in file{p_end}
 {p2col:{bf:{help nwset }}}Declare data to be network data{p_end}
 {p2col:{bf:{help nwsmall }}}Generate a small-world network{p_end}
-{p2col:{bf:{help nwsociomatrix }}}{err}no help file yet{txt}{p_end}
+{p2col:{bf:{help nwsort }}}Sort network nodes{p_end}
+{p2col:{bf:{help nwsubset }}}Subset a network{p_end}
 {p2col:{bf:{help nwsummarize }}}Summarize a network{p_end}
 {p2col:{bf:{help nwsym }}}Symmetrize network{p_end}
 {p2col:{bf:{help nwsync }}}Sync network with Stata variables{p_end}

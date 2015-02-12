@@ -1,0 +1,95 @@
+/*
+	insheet
+
+*!  VERSION 1.1.4  09sep2011
+
+*/
+
+VERSION 9.0
+SYNCHRONOUS_ONLY
+
+HELP hlp1, view("help nwimport")
+POSITION . . 500 300
+OK ok1,	label("OK")
+CANCEL	can1, label("Cancel")
+SUBMIT	sub1, label("Submit")
+RESET	res1
+
+SCRIPT PREINIT
+BEGIN
+	program initialize
+END
+
+DIALOG main,label("nwimport - Import Ucinet file") 
+BEGIN
+  TEXT     tx_using 10 10 200 30,		///
+	label("Ucinet network filename:")
+
+  FILE     fi_using	@ +20 450	.,		///
+	filter("Ucinet (*.dat)|*.dat|All (*.*)|*.*")	///
+	defext(raw)  ///
+	error("Ucinet network filename")				///
+	label("Browse...") ///
+	onchange("program repop")
+ 
+  TEXT     tx_vl 10 +40 @	.,		///
+	label("New network names: (optional)")
+
+  EDIT     ed_name	10 +20	450	.,		///
+	label("Optional new variable names")  default("")
+ 
+  CHECKBOX ck_nwclear 10 +30 @ .,		///
+	option(nwclear) nomem label("Replace networks in memory") ///
+	onclickon("program repop")
+ 
+  CHECKBOX ck_xvars	250	@ @	.,		///
+	option(xvars) nomem label("No Stata variables")
+END
+
+
+PROGRAM initialize
+BEGIN
+	put "do nwimport.ado"
+	stata immediate
+	put "do _nwdialog.ado"
+	stata immediate
+	main.ed_name.setvalue "xx"
+	//put "di hallo"
+	//stata immediate
+	//.main.ed_name.setvalue "xx"
+	//put "do _nwdialog.ado"
+	//stata hidden immediate
+	//put "_nwimpdl "
+	//put  fi_using
+	//put ", netlistonly"
+	//stata immediate
+	//put "_nwrepopulateedit `r(netlabs)'"
+	//stata immediate
+END
+
+PROGRAM repop
+BEGIN
+	put "_nwimpdl "
+	put  main.fi_using
+	put ", netlistonly"
+	stata immediate
+	put "return list"
+	stata immediate
+	put "_nwrepopulateedit `r(netlabs)'"
+	stata immediate
+END
+
+PROGRAM command
+BEGIN
+	put "nwimport "
+	require main.fi_using
+	put `"""' main.fi_using `"""'
+	beginoptions
+		option main.ck_nwclear
+		option main.ck_xvars
+		put "type(ucinet)"
+		put "name("
+		put main.ed_name
+		put ")"
+	endoptions
+END

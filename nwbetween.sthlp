@@ -17,13 +17,15 @@
 [{it:{help netlist}}]
 [{cmd:,}
 {opt generate}({it:{help varname}})
-{opt nosym}]
+{opt nosym}
+{opt standardize}]
 
 {synoptset 25 tabbed}{...}
 {synopthdr}
 {synoptline}
 {synopt:{opt generate}({it:{help varname}})}variable name for betweenness centrality; default = {it:_between}{p_end}
 {synopt:{opt nosym}}do not symmetrize network before calculation of shortest paths{p_end}
+{synopt:{opt standardize}}standardize centrality scores{p_end}
 
 
 {title:Description}
@@ -50,6 +52,15 @@ Formally, betweenness centrality of node {it:i} on graph {it:g} is defined as:
 {pstd}
 where, {it:sigma_st} is the total number of shortest paths from node {it:s} to node {it:t} and {sigma_st(i)} is the number of those 
 paths that pass through node {i}.
+
+{pstd}
+For the standardized betweenness centrality:
+
+{pmore}
+Directed network: {it:Between_i_std(g) = Between_i(g) / ((N-1)*(N-2))}
+
+{pmore}
+Undirected network: {it:Between_i_std(g) = Between_i(g) / ((N-1)*(N-2)/2)}
 
 {pstd}
 The Stata variable {it:varname} is overwritten. In case, betweenness centrality is calculated

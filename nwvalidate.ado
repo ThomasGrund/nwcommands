@@ -5,7 +5,7 @@
 
 capture program drop nwvalidate
 program nwvalidate
-	syntax anything(name=netname)
+	syntax anything(name=netname) [, self(string) ]
 	
 	local netname = strtoname("`netname'",1)
 	local valid = "false"
@@ -41,7 +41,7 @@ program nwvalidate
 			forvalues i = `k'/$nwtotal {
 				scalar onename = "\$nwname_`i'"
 				local localname `=onename'
-				if ("`checkname'" == "`localname'") {
+				if ("`checkname'" == "`localname'" & "`self'" != "`checkname'") {
 					local valid = "false"
 				}
 			}

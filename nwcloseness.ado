@@ -11,6 +11,8 @@ program nwcloseness
 	version 9
 	syntax [anything(name=netname)] [, GENerate(string) *]	
 	_nwsyntax `netname', max(9999)
+	_nwsetobs
+	
 	if `networks' > 1 {
 		local k = 1
 	}
@@ -20,8 +22,10 @@ program nwcloseness
 	if (`gencount' != 3) {
 		local generate = "_closeness _farness _nearness"
 	}
+	local generate_all ""
 	
-	foreach netname_temp in `netname' {
+	set more off
+	qui foreach netname_temp in `netname' {
 		qui nwgeodesic `netname_temp', name(_tempgeodesic) `options'
 		nwname _tempgeodesic
 		nwtomata _tempgeodesic, mat(geodesic)
@@ -30,7 +34,7 @@ program nwcloseness
 		
 		if `r(mindistance)' < 0 {
 			mata: far = J(rows(geodesic), 1, .)
-			di "{txt}Warning: network not connected; specify {bf:unconnected()} to obtain results.
+			noi di "{txt}Warning: network {bf:`netname_temp'} not connected; specify {bf:unconnected()} to obtain results.
 		}
 		
 		_nwsyntax_other `netname_temp'
@@ -47,18 +51,21 @@ program nwcloseness
 		qui gen `_farness'`k' = .
 		qui capture drop `_nearness'`k'
 		qui gen `_nearness'`k' =.
-	
-		if _N < = `othernodes' {
-			set obs `othernodes'
-		}
 		
 		mata: st_store((1::`othernodes'),"`_closeness'`k'",closeness)
 		mata: st_store((1::`othernodes'),"`_farness'`k'",far)
 		mata: st_store((1::`othernodes'),"`_nearness'`k'",nearness)
 	
+		local generate_all "`generate_all' `_closeness'`k' `_farness'`k' `_nearness'`k'"
 		mata: mata drop closeness far nearness geodesic
 		nwdrop _tempgeodesic
 		
-		local k = `k' + 1
+		local k = `k' + 1	
 	}
+	mata: st_rclear()
+	di "{hline 40}"
+	di "{txt}  Network name: {res}`netname'"
+	di "{hline 40}"
+	di "{txt}    Closeness centrality"
+	sum `generate_all'
 end

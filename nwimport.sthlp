@@ -40,6 +40,8 @@
 		{p_end}
 {p2col:{cmd: edgelist}}network is given as an {help nwimport##edgelist:edgelist} (e.g. Excel, txt)
 		{p_end}
+{p2col:{cmd: compressed}}network is given as a {help nwimport##compressed:compressed edgelist} (e.g. txt, CSV)
+		{p_end}
 {p2col:{cmd: gml}}network is given in {browse "http://gephi.github.io/users/supported-graph-formats/gml-format/":GML file format}
 	{p_end}
 {p2col:{cmd: graphml}}network is given in {browse "http://gephi.github.io/users/supported-graph-formats/graphml-format/":GraphML file format}
@@ -54,9 +56,10 @@ Imports networks from popular network file formats. The following network format
 {pmore}{help nwimport##ucinet:- Ucinet}{p_end}
 {pmore}{help nwimport##pajek:- Pajek}{p_end}
 {pmore}{help nwimport##matrix:- Raw adjacency matrix}{p_end}
-{pmore}{help nwimport##matrix:- Raw edgelist}{p_end}
-{pmore}{help nwimport##matrix:- GML}{p_end}
-{pmore}{help nwimport##matrix:- GraphML}{p_end}
+{pmore}{help nwimport##edgelist:- Raw edgelist}{p_end}
+{pmore}{help nwimport##compressed:- Compressed edgelist}{p_end}
+{pmore}{help nwimport##gml:- GML}{p_end}
+{pmore}{help nwimport##graphml:- GraphML}{p_end}
 
 {pstd}
 Can also be used to import networks from the internet:
@@ -179,7 +182,7 @@ and/or column names can be included as well. This import option can be used to l
 {title:Import raw edgelist}
 
 {pstd}
-This imports networks in {help nwfromedge##edgelist:raw edgelist format}. As delimiters "tab" "," ";" and " " are allowed. When two columns are given
+This imports networks in {help nwfromedge##edgelist:raw edgelist format}. Data can already be in Stata-dta format. Otherwise, delimiters "tab" "," ";" and " " are allowed. When two columns are given
 a non-valued network is loaded, when three columns are given a valued network is loaded. In case edgelist data has already been entered/opened
 in Stata, {help nwfromedge} generates a network. Node labels can be embedded in the edgelist.
 
@@ -192,7 +195,27 @@ in Stata, {help nwfromedge} generates a network. Node labels can be embedded in 
 
 {phang}
 {bf:Example 2:}{p_end}
-	peter,thomas,4
-	thomas,susan,8
-	suan,thomas,8
-	peter,goeff,1
+	peter,thomas,1
+	thomas,susan,4
+	susan,thomas3
+	geoff,john,2
+
+{marker compressed}{...}
+{title:Import compressed edgelist}
+
+{pstd}
+This imports networks in compressed edgelist format. As delimiter "," is allowed. 
+
+{phang}
+{bf:Example 1:}{p_end}
+	AS,MI,NY,TX
+	TX,CA
+	IL,AL,SD
+	AL,MI,CA,NY
+
+{phang}
+{bf:Example 2:}{p_end}
+	peter,thomas,mathilde,tim
+	thomas,susan
+	susan
+	geoff,john,michael

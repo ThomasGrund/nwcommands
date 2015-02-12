@@ -1,0 +1,47 @@
+VERSION 10
+
+INCLUDE _std_mlarge
+INCLUDE header_gr_child
+INCLUDE gr_orientation
+
+HELP hlp1, view("help marker_label_options")
+
+DIALOG labels, title("Node labels")
+BEGIN
+	TEXT     tx_llab1	20	30	280	., label("Size:") 		
+	COMBOBOX cb_lsize	80 30 100	., dropdownlist contents(textsizes)	
+	TEXT     tx_llab2	20	50	280	., label("Position:") 		
+	COMBOBOX cb_lpos	80 50 100	., dropdownlist contents(clockpos)
+	TEXT     tx_llab3	20	70	280	., label("Angle:") 		
+	COMBOBOX cb_langle	80 70 100	., dropdownlist contents(angles)
+	TEXT     tx_llab4	20	90	280	., label("Color:") 		
+	COMBOBOX cb_lcol	80 90 100	., dropdownlist contents(colors)
+	TEXT     tx_llab5	20	110	280	., label("Gap:") 	
+	SPINNER sp_dig1 80 110 50 ., label("dig1") default(1) nomemory
+    TEXT    tx_lab6 130 110 10	., label(".") 		
+    SPINNER sp_dig2 140 110 50 ., label("dig1") default(0) nomemory
+	TEXT     tx_llab6	20	130	280	., label("Overwrite maker_label_options:")  		
+	EDIT ed_lother	200 130 200	., label("other") tooltip("Overwrite marker_label_options directly")
+END
+
+PROGRAM command
+BEGIN
+	if labels.cb_lsize {
+		put " mlabsize(" labels.cb_lsize ")"
+	}
+	if labels.cb_lpos {
+		put " mlabposition(" labels.cb_lpos ")"
+	}
+	if labels.cb_langle {
+		put " mlabangle(" labels.cb_langle ")"
+	}
+	if labels.cb_lcol {
+		put " mlabcolor(" labels.cb_lcol ")"
+	}
+	
+	put " mlabgap(" labels.sp_dig1 "." labels.sp_dig2 ")"
+
+	if labels.ed_lother {
+		put " " labels.ed_lother
+	}
+END

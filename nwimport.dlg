@@ -1,0 +1,120 @@
+VERSION 10
+
+INCLUDE _std_mlarge
+INCLUDE header
+HELP hlp1, view("help nwimport")
+RESET res1
+
+DIALOG main, title("Import network")
+BEGIN
+	TEXT tx_type 50 20 200 ., label("Network file format:")
+	COMBOBOX cb_type 50 40 200 .,  dropdownlist contents(filetypes) onselchangelist(filetypes_action)
+	TEXT tx_file 50 70 250 ., label("Import network file:")
+	FILE fl_pajek 50 90 350 ., label("File") filter("Pajek|*.net|All files|*.*")
+	FILE fl_ucinet 50 90 350 ., label("File") filter("Ucinet|*.dat|All files|*.*")
+	FILE fl_matrix 50 90 350 ., label("File") filter("Text .txt|*.txt|Comma-separated .csv|*.csv|Excel .xlsx|*.xlsx|Excel-old .xls|*.xls|All files|*.*")	
+	FILE fl_edge 50 90 350 ., label("File") filter("Stata .dta|*.dta|Text .txt|*.txt|Comma-separated .csv|*.csv|Excel .xlsx|*.xlsx|Excel-old .xls|*.xls|All files|*.*")	
+	FILE fl_compressed 50 90 350 ., label("File") filter("Text|*.txt|Comma-separated|All files|*.*")	
+	FILE fl_all 50 90 400 ., label("File") filter("All files|*.*")	
+	TEXT tx_name 50 140 200 ., label("New name(s) of network(s):")
+	EDIT ed_name 50 160 200 ., nomemory
+	GROUPBOX gb_direct 260 140 150 100, label("Arc/Edge detection:")		 
+	RADIO rb_automatic 270 160 220 ., first label("automatic")
+	RADIO rb_directed 270 180 220 ., middle label("force directed")
+	RADIO rb_undirected 270 200 220 ., last label("force undirected ")
+	CHECKBOX ck_nwclear 50 200 200 100, label("Replace networks in memory") 
+END
+
+LIST filetypes
+BEGIN
+      "Pajek NET format"
+      "Ucinet DL format"
+      "Raw Matrix"
+      "Raw Edgelist"
+      "Raw Compressed Edgelist"
+      "GML"
+      "GraphML"         
+END
+
+LIST filetypes_action
+BEGIN
+	script format_pajek
+	script format_ucinet
+	script format_matrix
+	script format_edge
+	script format_compressed
+	script format_all
+	script format_all
+END
+
+SCRIPT format_off
+BEGIN
+	main.fl_pajek.hide
+	main.fl_ucinet.hide
+	main.fl_matrix.hide
+	main.fl_compressed.hide
+	main.fl_all.hide
+END
+
+SCRIPT format_matrix
+BEGIN
+	script format_off
+	main.fl_matrix.show
+END
+
+SCRIPT format_edge
+BEGIN
+	script format_off
+	main.fl_edge.show
+END
+
+SCRIPT format_compressed
+BEGIN
+	script format_off
+	main.fl_compressed.show
+END
+
+SCRIPT format_all
+BEGIN
+	script format_off
+	main.fl_all.show
+END
+
+SCRIPT format_pajek
+BEGIN
+	script format_off
+	main.fl_pajek.show
+END
+
+SCRIPT format_ucinet
+BEGIN
+	script format_off
+	main.fl_ucinet.show
+END
+
+PROGRAM command
+BEGIN
+	if main.cb_type.iseq("Pajek NET format") {
+		require main.fl_pajek
+		put "nwimport " main.fl_pajek ", type(pajek)"
+	}
+	if main.cb_type.iseq("Raw Edgelist") {
+		require main.fl_edge
+		put "nwimport " main.fl_edge ", type(edgelist)"
+	}
+
+	if main.ed_name.isneq("") {
+		put " name(" main.ed_name ")"
+	}
+	if main.rb_undirected {
+		put " undirected"
+	}
+	if main.rb_directed {
+		put " directed"
+	}
+	if main.ck_nwclear {
+		put " nwclear"
+	}
+	stata 
+	
+END

@@ -1,0 +1,168 @@
+VERSION 10
+
+
+SYNCHRONOUS_ONLY
+INCLUDE _std_mlarge
+DEFINE _dlght   250
+INCLUDE header
+
+HELP hlp1, view("help nwplotmatrix")
+RESET res1
+
+SCRIPT PREINIT
+BEGIN
+	program initialize
+	
+	legend.rb_off.seton
+	
+	create STRING legendOptions
+	create STRING tievalueOptions
+	create STRING patches_colorOptions
+
+END
+
+SCRIPT labelsShowProp
+BEGIN
+	main.vr_label.hide
+	main.tx_label.show
+END
+
+SCRIPT labelsShowAll
+BEGIN
+	main.vr_label.show
+	main.tx_label.show
+END
+
+SCRIPT labelsHide
+BEGIN
+	main.vr_label.hide
+	main.tx_label.hide
+END
+
+DIALOG main, tabtitle("Network")
+BEGIN
+  TEXT     tx_var	10	10	100	., label("Network:") 		
+  COMBOBOX cb_var	+60	@	240	., dropdownlist contents(netlist) 
+  
+  TEXT tx_sort 10 40 80 ., label("Sort by:")
+  VARNAME vr_sort 75 40 120 ., label("SortVar")
+  
+  GROUPBOX gb_lb 210 70 270 180, label("Node labels:") 
+  RADIO  rb_nolabel 230  90 220 ., first  label("No labels") onclickon("script labelsHide")
+  RADIO  rb_addnet  @ +20   @ ., middle label("Add labels saved with network")  onclickon("script labelsShowProp")
+  RADIO  rb_addvar  @ +20   @ ., last label("Add labels from variable") onclickon("script labelsShowAll")		
+  VARNAME vr_label 330 +30 110 ., label("LabelVar") 
+  TEXTBOX tx_label 230 +30 200 50, label("Change properties under Y-axis and X-axis ") 
+  
+  GROUPBOX gb_col 10 70 200 110, label("Color:") 
+  BUTTON bu_col 30 100 170 ., label("Change patch colors") onpush(program patches_getColorOptions)
+  TEXT tx_back 30 130 75 ., label("Background:")
+  TEXT tx_line 30 150 75 ., label("Line:")
+  COMBOBOX cb_back	105 130 100 	., dropdownlist contents(colors) 
+  COMBOBOX cb_line 105	150	100	., dropdownlist contents(colors) 
+  
+  CHECKBOX cx_nodich 10 190 150 ., label("Do not dichotomize")
+  CHECKBOX cx_tie 10 210 100 ., label("Tie values") option(tievalue) onclickon(main.bu_tie.show) onclickoff(main.bu_tie.hide)
+  BUTTON bu_tie 110 210 100 ., label("Properties") onpush(program ties_getOptions)
+END
+
+
+INCLUDE ifin
+INCLUDE gr_yaxis
+INCLUDE gr_xaxis
+INCLUDE gr_titles
+INCLUDE gr_legend
+INCLUDE gr_overall
+
+LIST netlist
+BEGIN
+	// intentionally empty
+	// this list will be populated by _nwdialog.ado
+END
+
+
+PROGRAM initialize
+BEGIN
+	put "_nwdialog nwplotmatrix"
+	
+	stata hidden immediate
+END
+
+PROGRAM ties_getOptions
+BEGIN
+	call create CHILD nw_nodes_labels AS ties_opt
+	call ties_opt.setExitString tievalueOptions
+	call ties_opt.settitle "Tie label properties"
+END
+
+PROGRAM patches_getColorOptions
+BEGIN
+	call create CHILD nw_patches_color AS patches_color
+	call patches_color.setExitString patches_colorOptions
+	call patches_color.settitle "Patch color properties"
+END 
+
+
+PROGRAM get_tieOptions
+BEGIN
+	if main.cx_nodich.iseq(1) {
+		put " nodichotomize"
+	}
+	if main.cx_tie.iseq(1) {
+		put " tievalue"
+	}
+	if tievalueOptions {
+		put " tievalueopt(" tievalueOptions ")"
+	}
+END
+
+PROGRAM get_patchesOptions
+BEGIN
+	if patches_colorOptions {
+		put " colorpalette(" patches_colorOptions ")" 
+	}
+	if main.cb_back {
+		put " background(" main.cb_back ")"
+	}
+	if main.cb_line {
+		put " lcolor(" main.cb_line ")"
+	}
+END
+
+PROGRAM main_outputLabels
+BEGIN
+	if main.rb_addnet {
+		put " lab"
+	}
+	if main.rb_addvar {
+		require main.vr_label
+		put " label(" main.vr_label ")"
+	}
+	if main.vr_sort {
+		put " sortby(" main.vr_sort ")"
+	}
+END
+
+PROGRAM command
+BEGIN
+	put "nwplotmatrix " main.cb_var
+	put " " /program ifin_output
+    beginoptions
+		if main.rb_nolabel.isneq(1) {
+			put " " /program main_outputLabels
+		}
+		put " " /program get_patchesOptions
+		put " " /program get_tieOptions
+		put " " /program gr_yaxis_output
+		put " " /program gr_xaxis_output
+		put " " /program gr_titles_output
+		put " " /program gr_legend_output 
+		put " " /program gr_overall_output
+	endoptions	
+	stata
+END
+
+
+
+
+

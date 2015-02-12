@@ -39,14 +39,14 @@ program nwuse
 			}
 
 			if "`f'" != "matrix" & "`f'" != "edgelist" {
-				di "{err}file {bf:`webname'.dta} has the wrong format."
+				di "{err}File {bf:`webname'.dta} has the wrong format. Cannot find network meta-information."
 				error 6702	
 			}
 		}
 	}
 	
 	if _rc != 0 {
-		di "{err}file {bf:`webname'.dta} has the wrong format."
+		di "{err}File {bf:`webname'.dta} has the wrong format. Cannot find network meta-information."
 		error 6702
 	}
 

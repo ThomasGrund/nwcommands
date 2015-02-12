@@ -37,8 +37,8 @@ program _nwsyntax
 	
 	capture nwunab _temp : `anything', max(`max') `min'
 	if _rc != 0 {
-		if _rc == 111 {
-			di "{err}network `anything' not found"
+		if _rc == 111 | _rc == 198 {
+			di "{err}network {bf:`anything'} not found"
 			error 6001
 		}
 		if _rc == 102 {

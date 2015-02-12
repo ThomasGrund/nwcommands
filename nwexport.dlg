@@ -1,0 +1,87 @@
+VERSION 10
+
+SYNCHRONOUS_ONLY
+INCLUDE _std_mlarge
+INCLUDE header
+HELP hlp1, view("help nwexport")
+RESET res1
+
+SCRIPT PREINIT
+BEGIN
+	program initialize
+	main.cb_netname.repopulate
+END
+
+LIST netlist
+BEGIN
+	// intentionally empty
+	// this list will be populated by _nwdialog.ado
+END
+
+DIALOG main, title("Export network")
+BEGIN
+	TEXT     tx_netname	50	20	100	., label("Network:") 		
+	COMBOBOX cb_netname	+110	@	200	., dropdownlist contents(netlist)
+	TEXT tx_type 50 50 100 ., label("Export file format:")
+	COMBOBOX cb_type 160 50 200 .,  dropdownlist contents(filetypes) onselchangelist(filetypes_action)
+	TEXT tx_file 50 80 250 ., label("Export file name:")
+	FILE fl_pajek 50 100 350 ., label("File") filter("Pajek|*.net|All files|*.*")
+	FILE fl_ucinet 50 100 350 ., label("File") filter("Ucinet|*.dat|All files|*.*")
+	CHECKBOX ck_replace 50 160 200 100, label("Replace data") 
+END
+
+LIST filetypes
+BEGIN
+      "Pajek NET format"
+      "Ucinet DL format"        
+END
+
+LIST filetypes_action
+BEGIN
+	script format_pajek
+	script format_ucinet
+END
+
+PROGRAM initialize
+BEGIN
+	put "_nwdialog nwexport"
+	stata hidden immediate
+	main.cb_netname.repopulate
+END
+
+SCRIPT format_off
+BEGIN
+	main.fl_pajek.hide
+	main.fl_ucinet.hide
+END
+
+SCRIPT format_pajek
+BEGIN
+	script format_off
+	main.fl_pajek.show
+END
+
+SCRIPT format_ucinet
+BEGIN
+	script format_off
+	main.fl_ucinet.show
+END
+
+PROGRAM command
+BEGIN
+	require main.cb_netname
+	put "nwexport " main.cb_netname 
+	if main.cb_type.iseq("Pajek NET format") {
+		require main.fl_pajek
+		put ", type(pajek) fname(" main.fl_pajek ")"
+	}
+	if main.cb_type.iseq("Ucinet DL format") {
+		require main.fl_ucinet
+		put ", type(ucinet)"
+	}
+	if main.ck_replace {
+		put " replace fname(" main.fl_ucinet ")"
+	}
+	stata 
+	
+END

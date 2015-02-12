@@ -43,26 +43,26 @@
 		{p_end}
 	
 
-{synoptset 30 tabbed}{...}
+{synoptset 35 tabbed}{...}
 {p2col:{it:node_options}}Description{p_end}
 {marker node_options}{...}
 {p2line}
 {synopt:{opt size}({it:{help varname}} [,{it:{help nwplot##node_sub:node_sub}}])}size of the nodes{p_end}
-{p2col:{opth sizebin(int)}}finetune size of nodes{p_end}
-{p2col:{opth nodefactor(float)}}multiply all node sizes by a factor{p_end}
 {p2col:{opt color}({it:{help varname}} [,{it:{help nwplot##node_sub:node_sub}}])}color of the nodes{p_end}
-{p2col:{opt colorpalette}({it:{help colorstyle}}...)}list with colorstyles; change colorpalette{p_end}
 {p2col:{opt symbol}({it:{help varname}} [,{it:{help nwplot##node_sub:node_sub}}])}symbol of the nodes{p_end}
-{p2col:{opt symbolpalette}({it:{help symbolstyle}}...)}list with symbolstyles; change symbolpalette{p_end}
+{p2col:{opth nodefactor(float)}}multiply all node sizes by a factor{p_end}
 
 
-{synoptset 30 tabbed}{...}
+{synoptset 35 tabbed}{...}
 {p2col:{it:node_sub}}Description{p_end}
 {marker node_sub}{...}
 {p2line}
 {p2col:{opt norescale}}no automatic rescale{p_end}
 {p2col:{opt legendoff}}no legend for this attribute{p_end}
 {p2col:{opt forcekeys}({it:{help int}}...)}list of keys to be used in the legend{p_end}
+{p2col:{opt colorpalette}({it:{help colorstyle}}...)}list with colorstyles; change colorpalette{p_end}
+{p2col:{opt symbolpalette}({it:{help symbolstyle}}...)}list with symbolstyles; change symbolpalette{p_end}
+{p2col:{opth sizebin(int)}}finetune size of nodes{p_end}
 
 
 {synoptset 35 tabbed}{...}
@@ -78,14 +78,22 @@
 {p2col:{it:edge_options}}Description{p_end}
 {marker edge_options}{...}
 {p2line}
-{p2col:{opth edgesize(netname)}}use edge values of other network to change width of edges; network needs to have the right dimensions{p_end}
+{p2col:{opt edgesize}({it:{help netname}} [,{it:{help nwplot##edge_sub:edge_sub}}])}use edge values of other network to change width of edges; network needs to have the right dimensions{p_end}
+{p2col:{opt edgecolor}({it:{help netname}} [,{it:{help nwplot##edge_sub:edge_sub}}])}use edge values of other network to change color of edges; network needs to have the right dimensions{p_end}
 {p2col:{opth edgefactor(float)}}multiply all edge sizes by a factor{p_end} 
-{p2col:{opth edgecolor(netname)}}use edge values of other network to change color of edges; network needs to have the right dimensions{p_end}
+
+
+{synoptset 35 tabbed}{...}
+{p2col:{it:edgesub_sub}}Description{p_end}
+{marker edge_sub}{...}
+{p2line}
+{p2col:{opt legendoff}}no legend for this attribute{p_end}
+{p2col:{opt forcekeys}({it:{help int}}...)}list of keys to be used in the legend{p_end}
 {p2col:{opt edgecolorpalette}({it:{help colorstyle}}...)}list with colorstyles; change edgecolorpalette{p_end}
-{p2col:{opt edgepatternpalette}({it:{help linepatternstyle}}...)}list with linestyles; the same network as in edgecolor is used to display different line patterns{p_end}
+{p2col:{opt edgepatternpalette}({it:{help linepatternstyle:pattern}}...)}list with linestyles; the same network as in edgecolor is used to display different line patterns{p_end}
+
 	
-	
-{synoptset 30 tabbed}{...}
+{synoptset 35 tabbed}{...}
 {p2col:{it:arrow_options}}Description{p_end}
 {marker arrow_options}{...}
 {p2line}
@@ -97,48 +105,7 @@
 {p2col:{opth arrowbarbfactor(float)}}control look of arrow{p_end}
 
 
-{synoptset 30 tabbed}{...}
-{p2col:{it:layout_options}}Description{p_end}
-{marker layout_options}{...}
-{p2line}
-{p2col:{cmd: layout}([{it:{help nwplot##layoutstyle:layoutstyle}}] [,{it:{help nwplot##layout_sub:layout_sub}}])}change the overall layout/arrangement of nodes{p_end}
-{p2col:{opt nodexy}({it:{help varname:xvar} {help varname:yvar}})}use variables to force coordinates of nodes{p_end}
-{p2col:{opt generate}({it:{help newvarname:newxvar} {help newvarname:newyvar}})}export coordinates of nodes{p_end}
-
-
-{synoptset 30 tabbed}{...}
-{p2col:{it:layout_sub}}Description{p_end}
-{marker layout_sub}{...}
-{p2line}
-{p2col:{opt lgc}}only plot largest component{p_end}
-{p2col:{opth iterations(int)}}only relevant for layout = mds; maximum number of iterations in the multidimensional scaling procedure, default = 1000{p_end}
-{p2col:{opth columns(int)}}only relevant for layout = grid; number of columns to be plotted in grid layout {p_end}
-
-
-{synoptset 30 tabbed}{...}
-{p2col:{it:other_options}}Description{p_end}
-{marker other_options}{...}
-{p2line}
-{p2col:{opth aspectratio(float)}}height/width ratio{p_end}
-{p2col:{opt lineopt}({it:{help line:options}})}send options directly to all line plots used to display arcs{p_end}
-{p2col:{opt scatteropt}({it:{help scatter:options}})}send options directly to all scatter plots used to display nodes {p_end}
-{p2col:{opt legendopt}({it:{help legend_options:options}})}send options directly to the legend{p_end} 
-
-
-{synoptset 30 tabbed}{...}
-{marker layoutstyle}{...}
-{p2col:{it:layoutstyle}}{p_end}
-{p2line}
-{p2col:{cmd: mds}}modern multidimensional scaling; default when nodes < 50{p_end}
-{p2col:{cmd: mdsclassical}}classical multidimensional scaling; default when nodes > 50{p_end}
-{p2col:{cmd: circle}}circle layout
-		{p_end}
-{p2col:{cmd: grid}}grid layout
-		{p_end}
-{p2col:{cmd: _layoutfunction}}advanced user-written layout function (see {help nwplot##layoutfunction:here}).
-		{p_end}
-		
-{synoptset 30 tabbed}{...}
+{synoptset 35 tabbed}{...}
 {marker arcstyle}{...}
 {p2col:{it:arcstyle}}{p_end}
 {p2line}
@@ -149,6 +116,51 @@
 {p2col:{cmd: straight}}plots all arcs as straight lines
 		{p_end}
 
+		
+{synoptset 35 tabbed}{...}
+{p2col:{it:layout_options}}Description{p_end}
+{marker layout_options}{...}
+{p2line}
+{p2col:{cmd: layout}([{it:{help nwplot##layoutstyle:layoutstyle}}] [,{it:{help nwplot##layout_sub:layout_sub}}])}change the overall layout/arrangement of nodes{p_end}
+{p2col:{opt nodexy}({it:{help varname:xvar} {help varname:yvar}})}use variables to force coordinates of nodes{p_end}
+{p2col:{opt generate}({it:{help newvarname:newxvar} {help newvarname:newyvar}})}export coordinates of nodes{p_end}
+
+
+{synoptset 35 tabbed}{...}
+{p2col:{it:layout_sub}}Description{p_end}
+{marker layout_sub}{...}
+{p2line}
+{p2col:{opt lgc}}only plot largest component{p_end}
+{p2col:{opth iterations(int)}}only relevant for layout = mds; maximum number of iterations in the multidimensional scaling procedure, default = 1000{p_end}
+{p2col:{opth columns(int)}}only relevant for layout = grid; number of columns to be plotted in grid layout {p_end}
+{p2col:{opt norescale}}only relevant for layout = nodexy; do not rescale coordinates{p_end}
+
+
+{synoptset 35 tabbed}{...}
+{p2col:{it:other_options}}Description{p_end}
+{marker other_options}{...}
+{p2line}
+{p2col:{opth aspectratio(float)}}height/width ratio{p_end}
+{p2col:{opt lineopt}({it:{help line:options}})}send options directly to all line plots used to display arcs{p_end}
+{p2col:{opt scatteropt}({it:{help scatter:options}})}send options directly to all scatter plots used to display nodes {p_end}
+{p2col:{opt legendopt}({it:{help legend_options:options}})}send options directly to the legend{p_end} 
+
+
+{synoptset 35 tabbed}{...}
+{marker layoutstyle}{...}
+{p2col:{it:layoutstyle}}{p_end}
+{p2line}
+{p2col:{cmd: mds}}modern multidimensional scaling; default when nodes < 50{p_end}
+{p2col:{cmd: mdsclassical}}classical multidimensional scaling; default when nodes > 50{p_end}
+{p2col:{cmd: circle}}circle layout
+		{p_end}
+{p2col:{cmd: grid}}grid layout
+		{p_end}
+{p2col:{cmd: nodexy}}use coordinates given in {opt nodexy()}; only needed to send options.
+		{p_end}
+{p2col:{cmd: _layoutfunction}}advanced user-written layout function (see {help nwplot##layoutfunction:here}).
+		{p_end}
+		
 		
 {title:Description}
 
@@ -207,10 +219,10 @@ can be changed as well.
 
 	{cmd:. webnwuse glasgow, nwclear}
 	{cmd:. nwplot glasgow1, color(smoke1)}
-	{cmd:. nwplot, color(smoke1) colorpalette(red yellow cyan)}
+	{cmd:. nwplot, color(smoke1, colorpalette(red yellow cyan))}
  
 	{cmd:. nwplot glasgow1, symbol(sport1)}
-	{cmd:. nwplot glasgow1, symbol(sport1) symbolpalette(T S)}
+	{cmd:. nwplot glasgow1, symbol(sport1, symbolpalette(T S))}
 
 	{cmd:. nwplot glasgow1, size(alcohol1)}
 	{cmd:. nwplot, size(alcohol1, forcekeys1(1 5 10 20))}

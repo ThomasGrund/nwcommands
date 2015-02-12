@@ -22,7 +22,7 @@
 {cmd:nwgen} {it:{help newnetname}} {cmd:=} {it:netfcn2}({it:arguments}) [{cmd:,} {it:options}]
 
 {p 8 17 2}
-{cmd:nwgen} {it:{help newnetname}} {cmd:=} {it:{help netexp}} [{cmd:,} {it:options}]
+{cmd:nwgen} {it:{help newnetname}} {cmd:=} {it:{help netexp}} [{help if}] [{cmd:,} {it:options}]
 		
 {pstd}
 where the {it:options} are also {it:fcn} dependent. 
@@ -154,7 +154,7 @@ The command can also be used to generate networks. There are two ways to do this
 {p_end}
 {pmore2}Generate a lattice network (see {help nwlattice}).
 
-{phang2}{opth path(netname)}, {opth ego(nodeid)} {alter(nodeid) [{opth length(int)} {opt sym} {opt xvars}] 
+{phang2}{opth path(netname)}, {opth ego(nodeid)} {opth alter(nodeid)} [{opth length(int)} {opt sym} {opt xvars}] 
 {p_end}
 {pmore2}Generate a network of paths between nodes (see {help nwpath}).
 

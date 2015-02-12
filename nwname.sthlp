@@ -21,7 +21,7 @@
 {opth newname(newnetname)}
 {opt newdirected(boolean)}
 {opt newvars}({it:{help varname:var1 var2...})}
-{opt newlabs}({it:lab1 lab2...})}
+{opt newlabs}({it:lab1 lab2...})
 {opth newlabsfromvar(varname)}
 ]
 

@@ -1,7 +1,7 @@
 capture program drop _nwsetobs
 program _nwsetobs
 	syntax [anything(name=netname)] 
-	_nwsyntax `netname', max(9999)
+	_nwsyntax _all, max(9999)
 	local othernetname `netname'
 	
 	local maxnodes = 0

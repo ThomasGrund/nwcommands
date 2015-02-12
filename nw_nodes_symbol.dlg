@@ -1,0 +1,74 @@
+VERSION 10
+
+INCLUDE _std_mlarge
+INCLUDE header_gr_child
+INCLUDE gr_orientation
+
+DIALOG nodes_symbolopt, title("Node symbol")
+BEGIN
+	GROUPBOX gb_sym 10 10 380 130, label("Overwrite symbol palette")
+	TEXT     tx_sym1	20	30	280	., label("Symbol 1:") 		
+	COMBOBOX cb_sym1	80 30 100	., dropdownlist contents(symbols)
+	TEXT     tx_sym2	20	50	280	., label("Symbol 2:") 		
+	COMBOBOX cb_sym2	80 50 100	., dropdownlist contents(symbols)
+	TEXT     tx_sym3	20	70	280	., label("Symbol 3:") 		
+	COMBOBOX cb_sym3	80 70 100	., dropdownlist contents(symbols)
+	TEXT     tx_sym4	20	90	280	., label("Symbol 4:") 		
+	COMBOBOX cb_sym4	80 90 100	., dropdownlist contents(symbols)
+	TEXT     tx_sym5	210	30	280	., label("Symbol 5:") 		
+	COMBOBOX cb_sym5	270 30 100	., dropdownlist contents(symbols)
+	TEXT     tx_sym6	210	50	280	., label("Symbol 6:") 		
+	COMBOBOX cb_sym6	270 50 100	., dropdownlist contents(symbols)
+	TEXT     tx_sym7	210	70	280	., label("Symbol 7:") 		
+	COMBOBOX cb_sym7	270 70 100	., dropdownlist contents(symbols)
+	TEXT     tx_sym8	210	90	280	., label("Symbol 8:") 		
+	COMBOBOX cb_sym8	270 90 100	., dropdownlist contents(symbols)
+	CHECKBOX ck_res 270 110 100 100, label("Rescale off") option(norescale)
+	GROUPBOX gb_lgd 10 160 380 70, label("Symbol legend")
+	TEXT     tx_keys	20	190	280	., label("Force keys:") 	
+	EDIT ed_keys 110 190 150 .,	nomemory
+	CHECKBOX ck_lgd 270 190 100 100, onclickoff(nodes_symbolopt.ed_keys.show) onclickon(nodes_symbolopt.ed_keys.hide) label("Legend off") option(legendoff)
+END
+
+PROGRAM command
+BEGIN
+	put " symbolpalette("
+	if nodes_symbolopt.cb_sym1 {
+		put nodes_symbolopt.cb_sym1 " "
+	}
+	if nodes_symbolopt.cb_sym2 {
+		put nodes_symbolopt.cb_sym2 " "
+	}
+	if nodes_symbolopt.cb_sym3 {
+		put nodes_symbolopt.cb_sym3 " "
+	}
+	if nodes_symbolopt.cb_sym4 {
+		put nodes_symbolopt.cb_sym4 " "
+	}
+	if nodes_symbolopt.cb_sym5 {
+		put nodes_symbolopt.cb_sym5 " "
+	}
+	if nodes_symbolopt.cb_sym6 {
+		put nodes_symbolopt.cb_sym6 " "
+	}
+	if nodes_symbolopt.cb_sym7 {
+		put nodes_symbolopt.cb_sym7 " "
+	}
+	if nodes_symbolopt.cb_sym8 {
+		put nodes_symbolopt.cb_sym8 " "
+	}
+	put ")"
+	if nodes_symbolopt.ed_keys {
+		put " forcekeys("
+		put nodes_symbolopt.ed_keys
+		put ")"
+	}	
+	
+	if nodes_symbolopt.ck_res {
+		put " norescale"
+	}
+	
+	if nodes_symbolopt.ck_lgd {
+		put " legendoff"
+	}
+END

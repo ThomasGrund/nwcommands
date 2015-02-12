@@ -36,23 +36,25 @@ duplicates the node labels and the Stata variables of the original network.
 {pstd}
 For example:
 
-		{bf:. webnwuse gang, nwclear}
-		{bf:. nwduplicate gang}
-		{bf:. nwname gang_copy}
-		{bf:. return list}
+	{bf:. webnwuse gang, nwclear}
+	{bf:. nwduplicate gang}
+	{bf:. nwname gang_copy}
+	{bf:. return list}
 	
 {pstd}
 produces a network called {it:gang_copy}. The same could be done with:
 
-		{bf:. webnwuse gang, nwclear}
-		{bf:. nwgenerate gang_copy = gang}
-		{bf:. nwname gang_copy}
-		{bf:. return list}
+	{bf:. webnwuse gang, nwclear}
+	{bf:. nwgen gang_copy = gang}
+	{bf:. nwname gang_copy}
+	{bf:. return list}
 
 {pstd}
-However, when {bf:nwgenerate} is used, the node labels in {it:gang_copy} are not the same as in network {it:gang} (see the different values for {bf:r(labs)} and {bf:r(vars)} in the 
-two examples above. 
+However, when {help nwgen} is used, the node labels in {it:gang_copy} are not the same as in network {it:gang} (see the different values for {bf:r(labs)} and {bf:r(vars)} in the 
+two examples above. This is because {help nwgen} can be much more complicated and ultimately copies the adjacency matrix it derives from a {help netexp:network expression} to a
+new network.
+	
 	
 {title:See also}
 
-	{help nwgenerate}
+	{help nwgenerate}, {help nwsubset}

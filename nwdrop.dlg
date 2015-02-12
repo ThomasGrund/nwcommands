@@ -1,0 +1,52 @@
+VERSION 11.0
+
+SYNCHRONOUS_ONLY
+INCLUDE _std_medium
+INCLUDE header
+HELP hlp1, view("help nwdrop")
+RESET res1
+
+SCRIPT PREINIT
+BEGIN
+	program initialize
+	
+	create STRING nextNet
+END
+
+
+DIALOG main, label("nwdrop/nwkeep - Drop or keep networks or nodes") tabtitle("Main")
+BEGIN
+	GROUPBOX gb_main 20 20 250 200, label("Drop or keep networks/nodes")
+	RADIO rb_dropnodes 30 40 200 ., label("Drop nodes") first
+	RADIO rb_keepnodes 30 60 200 ., label("Keep nodes") middle
+	RADIO rb_dropnet 30 80 200 ., label("Drop networks") middle
+	RADIO rb_keepnet 30 100 200 ., label("Drop networks") last
+	//EDIT ed_net 30 140 200 ., label("cbNet")
+	COMBOBOX cb_net 30 140 200 ., label("cbNet") contents(netlist)
+	BUTTON bu_add 280 140 100 ., label("Add") onpush(script addEntry)
+
+END
+
+LIST netlist
+BEGIN
+	// intentionally empty
+	// this list will be populated by _nwdialog.ado
+END
+
+SCRIPT addEntry
+BEGIN
+	
+	//put "test"
+	//stata hidden immediate
+	main.cb_net.insert "test"
+	//stata immediate
+	//main.cb_net.repopulate
+END
+
+
+PROGRAM initialize
+BEGIN
+	put "_nwdialog nwdrop"
+	stata hidden immediate
+END
+

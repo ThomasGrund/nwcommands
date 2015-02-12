@@ -1,11 +1,11 @@
  capture program drop _nwdeploy
 program _nwdeploy
-	syntax ,[author(string) version(string) email(string) other(string)]
+	syntax ,version(string) [author(string)  email(string) other(string)]
 
 	set more off
 	tempname deploy_ado
 	file open `deploy_ado' using nwcommands-ado.pkg, replace write
-	file write `deploy_ado' "v 3" _n
+	file write `deploy_ado' "v `version'" _n
 	file write `deploy_ado' "d nwcommands-ado. Social Network Analysis Using Stata" _n
 	file write `deploy_ado' "d Thomas U. Grund and Peter Hedstrom, Linkoping University, www.liu.se/ias" _n
 	file write `deploy_ado' "d email: contact@nwcommands.org" _n

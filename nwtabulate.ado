@@ -1,23 +1,12 @@
 capture program drop nwtabulate
 program nwtabulate
-	syntax [anything(name=something)] [, twoway *]
-	
-	local c : word count `something'
-	if `c' > 2 {
-		di "{err}Only two networks or one network and one attribute can be used."
-		exit
-	}
-
-	local n1: word 1 of `something'
-	local n2: word 2 of `something'
-	
-	// check for variable input
-	capture confirm variable `something'
-	if (_rc == 0 | "`twoway'" != "" | `c' == 2) {
-		nwtab2 `something', `options'
-	}
-	else {	
+	syntax [anything(name=something)] [, twoway  *]
+	capture _nwsyntax `something'
+	if _rc == 0 & "`twoway'" == "" {
 		nwtab1 `something', `options'
+	}
+	else {
+		nwtab2 `something', `options'
 	}
 end
 
@@ -58,58 +47,73 @@ program nwtab2
 			ssc install tabplot
 		}
 	}
-	local num : word count `something'
-		if (`num' > 2 | `num' == 0){
-		di "{err}wrong number of arguments"
-		err 6055
-	}
-
-	local pos = `num' - 1
-	local arg1 = word("`something'", `pos') 
-	_nwsyntax `arg1'
-	local netname1 = "`netname'"
-	local directed1 = "`directed'"
-	local undirected_all = ("`directed'" == "false")
-	local nodes1 = "`nodes'"
 	
-	qui nwname `netname1'
-	local edgelabs1 `r(edgelabs)'
-	local arg2 = word("`something'", `num')
-	
-	capture confirm variable `arg2'
+	capture _nwsyntax `something', max(9999) name(something)
+	// two networks
 	if _rc == 0 {
-		local nwtabletype = "variable"
-	}
-	else {	
-		_nwsyntax `arg2'
+		local nwtabletype = "network"
+		local netname1 : word 1 of `something'
+		local directed1 = "`directed'"
+		local undirected_all = ("`directed'" == "false")
+		local nodes1 = "`nodes'"
+		qui nwname `netname1'
+		local edgelabs1 `r(edgelabs)'
+	
+		local num : word count `something'
+		if `num' < 2 {
+			nwcurrent
+			local netname2 = r(current)
+		}
+		else {
+			local netname2 : word 2 of `something'
+		}
+		_nwsyntax `netname2'
 		local netname2 = "`netname'"
 		local directed2 = "`directed'"
-		local nwtabletype = "network"
 		if "`directed2'" == "true" {
 			local undirected_all = 0
 		}
 		qui nwname `netname2'
 		local edgelabs2 `r(edgelabs)'
-	}	
+		
+		if `undirected_all' == 1 {
+			local undirected = "forcedirected"
+		}
+	}
+	// check for network and variable
 	
-	if `undirected_all' == 1 {
-		local undirected = "forcedirected"
+	else {
+		local nwtabletype = "variable"
+		foreach entry in `something' {
+			capture _nwsyntax `entry'
+			if _rc == 0 {
+				local netname1 = "`netname'"
+			}
+			capture confirm variable `entry'
+			if _rc == 0 {
+				local attribute1 = "`entry'"
+			}
+			if "`netname1'" == "" {
+				nwcurrent
+				local netname1 = r(current)
+			}
+		}
 	}
 	
 	preserve
 	if "`nwtabletype'" == "variable" {
-		local attrlab : value label `arg2'
-		qui nwtoedge `netname1', fromvars(`arg2') tovars(`arg2') full `undirected'
+		local attrlab : value label `attribute1'
+		qui nwtoedge `netname1', fromvars(`attribute1') tovars(`attribute1') full `undirected'
 		qui keep if `netname1' > 0 
-		local tabn1 = "from_`arg2'"
-		local tabn2 = "to_`arg2'"
+		local tabn1 = "from_`attribute1'"
+		local tabn2 = "to_`attribute1'"
 		capture label val `tabn1' `attrlab'
 		capture label val `tabn2' `attrlab'
 		
 		di
-		local ident = max(length("`netname1'"), length("`arg2'")) + 20
+		local ident = max(length("`netname1'"), length("`attribute1'")) + 20
 		di "{txt}   Network:  {res}`netname1'{txt}{col `ident'}Directed: {res}`directed1'{txt}"
-		di "{txt}   Attribute:  {res}`arg2'{txt}"
+		di "{txt}   Attribute:  {res}`attribute1'{txt}"
 		
 		if "`undirected'" != "" {
 			//qui keep if _fromid <= _toid
@@ -162,7 +166,7 @@ program nwtab2
 	local tab_r = r(r)
 	local tab_c = r(c)
 	if "`plot'" != "" {
-		tabplot `tabn1' `tabn2', title(`netname1') horizontal plotregion(margin(b = 0)) `plotoptions'
+		tabplot `tabn1' `tabn2', horizontal plotregion(margin(b = 0)) `plotoptions'
 	}
 	
 	mata: table = st_matrix("tableres")

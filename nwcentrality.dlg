@@ -1,0 +1,295 @@
+VERSION 10
+
+INCLUDE _std_small
+//INCLUDE _std_small /* this INCLUDES _small.idlg, which defines
+//                     _dlgwd = 350 and _dlght = 200 */
+//INCLUDE header  
+SYNCHRONOUS_ONLY
+HELP hlp1, view("help nwsummarize")
+OK ok1,	label("OK")
+CANCEL	can1, label("Cancel")
+SUBMIT	sub1, label("Submit")
+RESET	res1
+POSITION 10 10 400 350
+
+SCRIPT PREINIT
+BEGIN
+	program initialize
+END
+
+DIALOG main, title("Node centrality")
+BEGIN
+  TEXT     tx_net	20	20	100	., label("Network:") 		
+  COMBOBOX cb_net	100	20	180	., contents(netlist)  dropdownlist
+  TEXT tx_cent 20 50 100 . , label("Centrality:")
+  COMBOBOX cb_cent  100 50 180 ., dropdownlist contents(centrality) onselchangelist(centralityActions)
+  
+  TEXT tx_var 40 120 150 . , label("Variable name:")
+  EDIT ed_var 40 140 150 .
+  
+  
+  // Degree centrality
+  GROUPBOX gb_deg 20 100 350 200, label("Degree centrality:")
+  CHECKBOX cx_valued 40 190 300 ., label("Do not dichotomize") option(valued)
+  CHECKBOX cx_isolates 40 170 300 ., label("Generate variable for isolates") option(isolates)
+  CHECKBOX cx_nofreq 40 210 300 ., label("Do not display frequencies") option(nofreq)
+  CHECKBOX cx_plot 40 230 300 ., label("Produce a bar chart of degree distribution") option(plot)
+  CHECKBOX cx_sort 40 250 300 ., label("Display the table in descending order of degree ") option(sort)
+  
+  // Betweenness centrality
+  GROUPBOX gb_betw 20 100 350 130, label("Betweenness centrality:")
+  CHECKBOX cx_nosym 40 170 300 ., label("Do not symmetrize") option(nosym)
+
+  // Evcent centrality
+  // -> cx_nosym
+  GROUPBOX gb_eigenvector 20 100 350 130, label("Eigenvector centrality:")
+	
+  // Katz centrality
+  GROUPBOX gb_katz 20 100 350 130, label("Katz centrality:")
+  TEXT    tx_katz1	40	200	100	., label("Penalization:") 		
+  SPINNER sp_katz1 110 200 50 ., label("dig1") default(1) nomemory
+  TEXT    tx_katz2 155 200 10	., label(".") 		
+  SPINNER sp_katz2 165 200 50 ., label("dig2") default(0) nomemory
+  
+  // Closeness centrality
+  GROUPBOX gb_close 20 100 350 150, label("Closeness centrality:")
+  TEXT tx_close 40 120 100 . , label("Closeness:")
+  EDIT ed_close 40 140 100 .
+  TEXT tx_farness 150 120 100 . , label("Farness:")
+  EDIT ed_farness 150 140 100 .
+  TEXT tx_nearness 260 120 100 . , label("Nearness:")
+  EDIT ed_nearness 260 140 100 .
+  CHECKBOX cx_unconnected 40 190 350 ., label("Assign value to unconnected") onclickon(main.cb_unconnected.show) onclickoff(main.cb_unconnected.hide)		
+  COMBOBOX cb_unconnected 60 210 100 ., label("dig1") default(max) dropdownlist contents(closenessUnconnected) nomemory
+END
+
+LIST netlist
+BEGIN
+	// intentionally empty
+	// this list will be populated by _nwdialog.ado
+END
+
+
+LIST closenessUnconnected
+BEGIN
+	max
+	1
+	2
+	3
+	4
+	5
+	6
+	7
+	8
+	9
+	10
+	11
+	12
+	13
+	14
+	15
+	16
+	17
+	18
+	19
+	20
+	99
+END
+
+
+LIST centrality
+BEGIN
+	Degree
+	Betweenness
+	Eigenvector
+	Katz
+	Closeness
+END
+
+
+LIST centralityActions
+BEGIN
+	script degreeOptions
+	script betweennessOptions
+	script eigenvectorOptions
+	script katzOptions
+	script closenessOptions
+END
+
+SCRIPT allOptionsOff
+BEGIN
+	main.gb_deg.hide
+	main.gb_betw.hide
+	main.gb_eigenvector.hide
+	main.gb_katz.hide
+	main.gb_close.hide
+	
+	main.cx_valued.hide
+	main.cx_isolates.hide
+	main.cx_nofreq.hide
+	main.cx_plot.hide
+	main.cx_sort.hide
+	main.cx_nosym.hide
+	main.tx_katz1.hide
+	main.tx_katz2.hide
+	main.sp_katz1.hide
+	main.sp_katz2.hide
+	main.tx_close.hide
+	main.ed_close.hide
+	main.tx_farness.hide
+	main.ed_farness.hide
+	main.tx_nearness.hide
+	main.ed_nearness.hide
+	main.cb_unconnected.hide
+	main.cx_unconnected.hide
+END
+
+SCRIPT degreeOptions
+BEGIN
+	script allOptionsOff
+	main.ed_var.show
+	main.tx_var.show
+	main.ed_var.setvalue "_degree
+	main.gb_deg.show
+	main.cx_valued.show
+	main.cx_isolates.show
+	main.cx_nofreq.show
+	main.cx_plot.show
+	main.cx_sort.show
+END
+
+SCRIPT betweennessOptions
+BEGIN
+	script allOptionsOff
+	main.ed_var.show
+	main.tx_var.show
+	main.ed_var.setvalue "_between"
+	main.gb_betw.show
+	main.cx_nosym.show
+END
+
+SCRIPT eigenvectorOptions
+BEGIN
+	script allOptionsOff
+	main.ed_var.show
+	main.tx_var.show
+	main.ed_var.setvalue "_evcent"
+	main.gb_eigenvector.show
+	main.cx_nosym.show
+END
+
+SCRIPT katzOptions
+BEGIN
+	script allOptionsOff
+	main.tx_var.show
+	main.ed_var.show
+	main.ed_var.setvalue "_katz"
+	main.gb_katz.show
+	main.cx_nosym.show
+	main.tx_katz1.show
+	main.tx_katz2.show
+	main.sp_katz1.show
+	main.sp_katz2.show	
+END
+
+SCRIPT closenessOptions
+BEGIN
+	script allOptionsOff
+	main.cx_nosym.show
+	main.ed_var.hide
+	main.tx_var.hide
+	main.ed_close.show
+	main.tx_close.show
+	main.ed_farness.show
+	main.tx_farness.show
+	main.ed_nearness.show
+	main.tx_nearness.show
+	main.ed_close.setvalue "_closeness"
+	main.ed_farness.setvalue "_farness"
+	main.ed_nearness.setvalue "_nearness"
+	main.cx_unconnected.show
+	main.gb_close.show
+END
+
+PROGRAM initialize
+BEGIN
+	put "_nwdialog nwcentrality"
+	stata hidden immediate
+END
+
+PROGRAM degree_centrality
+BEGIN
+	if main.cb_cent.iseq("Degree") {
+		put "nwdegree "
+		put main.cb_net ", "
+		if main.ed_var.isneq("") {
+			put "generate(" main.ed_var ") "
+		}
+		option main.cx_valued
+		option main.cx_sort
+		option main.cx_nofreq
+		option main.cx_isolates
+	}
+END
+
+PROGRAM betweenness_centrality
+BEGIN
+	if main.cb_cent.iseq("Betweenness") {
+		put "nwbetween "
+		put main.cb_net ", "
+		if main.ed_var.isneq("") {
+			put "generate(" main.ed_var ") "
+		}
+		option main.cx_nosym
+	}
+END
+
+PROGRAM eigenvector_centrality
+BEGIN
+	if main.cb_cent.iseq("Eigenvector") {
+		put "nwevcent "
+		put main.cb_net ", "
+		if main.ed_var.isneq("") {
+			put "generate(" main.ed_var ") "
+		}
+		option main.cx_nosym
+	}
+END
+
+PROGRAM katz_centrality
+BEGIN
+	if main.cb_cent.iseq("Katz") {
+		put "nwkatz "
+		put main.cb_net ", "
+		if main.ed_var.isneq("") {
+			put "generate(" main.ed_var ") "
+		}
+		option main.cx_nosym
+		put " alpha(" 	main.sp_katz1 "." main.sp_katz2 ")"
+	}
+END
+
+PROGRAM closeness_centrality
+BEGIN
+	if main.cb_cent.iseq("Closeness") {
+		put "nwcloseness "
+		put main.cb_net ", "
+		put "generate(" main.ed_close " " main.ed_farness " " main.ed_nearness ") "
+		option main.cx_nosym
+		if main.cb_unconnected {
+			put " unconnected(" main.cb_unconnected ")"
+		}
+	}
+END
+
+
+
+PROGRAM command
+BEGIN
+	put " " /program degree_centrality
+	put " " /program betweenness_centrality
+	put " " /program eigenvector_centrality
+	put " " /program katz_centrality
+	put " " /program closeness_centrality
+	stata
+END

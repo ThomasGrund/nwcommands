@@ -1,0 +1,32 @@
+VERSION 10
+
+INCLUDE _std_mlarge
+INCLUDE header_gr_child
+INCLUDE gr_orientation
+
+DIALOG nodes_sizeopt, title("Node size")
+BEGIN
+	GROUPBOX gb_sym 10 10 380 90, label("Size options")
+	CHECKBOX ck_res 30 30 100 100, label("Rescale off") option(norescale)
+	GROUPBOX gb_lgd 10 120 380 70, label("Size legend")
+	TEXT     tx_keys	20	150	280	., label("Force keys:") 	
+	EDIT ed_keys 110 150 150 .,	nomemory
+	CHECKBOX ck_lgd 270 150 100 100, label("Legend off") option(legendoff) onclickoff(nodes_sizeopt.ed_keys.enable) onclickon(nodes_sizeopt.ed_keys.disable)
+END
+
+PROGRAM command
+BEGIN
+	if nodes_sizeopt.ed_keys / nodes_sizeopt.ed_keys.isenabled() {
+		put " forcekeys("
+		put nodes_sizeopt.ed_keys
+		put ")"
+	}	
+	
+	if nodes_sizeopt.ck_res {
+		put " norescale"
+	}
+	
+	if nodes_sizeopt.ck_lgd {
+		put " legendoff"
+	}
+END

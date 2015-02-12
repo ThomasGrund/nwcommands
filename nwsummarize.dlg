@@ -1,0 +1,54 @@
+VERSION 10
+
+INCLUDE _std_small
+//INCLUDE _std_small /* this INCLUDES _small.idlg, which defines
+//                     _dlgwd = 350 and _dlght = 200 */
+//INCLUDE header  
+SYNCHRONOUS_ONLY
+HELP hlp1, view("help nwsummarize")
+OK ok1,	label("OK")
+CANCEL	can1, label("Cancel")
+SUBMIT	sub1, label("Submit")
+RESET	res1
+POSITION 10 10 370 150
+
+SCRIPT PREINIT
+BEGIN
+	program initialize
+END
+
+DIALOG main, title("nwsummarize - Summarize a network")
+BEGIN
+  TEXT     tx_var	10	10	100	.,	///
+	label("Network:") 		
+  COMBOBOX cb_var	+60	@	240	.,	///
+  	dropdownlist contents(netlist) 
+  RADIO  rb_sum 70  50 170 ., first  label("Only summary")
+  RADIO  rb_mat  @ +20   @ ., middle label("Add adjacency matrix") 
+  RADIO  rb_only  @ +20   @ ., last label("Only adjacency matrix")
+END
+
+LIST netlist
+BEGIN
+	// intentionally empty
+	// this list will be populated by _nwdialog.ado
+END
+
+
+PROGRAM initialize
+BEGIN
+	put "_nwdialog nwsummarize"
+	stata hidden immediate
+END
+
+PROGRAM command
+BEGIN
+	put "nwsummarize " main.cb_var
+	if main.rb_mat {
+		put ", mat"
+	}
+	if main.rb_only {
+		put ", matonly"
+	}
+	stata
+END

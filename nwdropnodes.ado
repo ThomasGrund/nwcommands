@@ -64,7 +64,6 @@ program nwdropnodes
 		}
 	}
 	
-
 	foreach onevar in `vars' {
 		local i = `i' + 1
 		local onelab : word `i' of `labs'
@@ -77,29 +76,29 @@ program nwdropnodes
 	}
 		
 	// generate new matrix and replace network with this new matrix
-	nwtomata `netname', mat(keepnet)
-	mata: keepvector = `keepmat'
-	mata: keepnet = select(keepnet, keepvector)
-	mata: keepvector = keepvector'
-	mata: keepnet = select(keepnet, keepvector)
-	
-	nwreplacemat `netname', newmat(keepnet) `netonly'
-	nwname `netname', newlabs(`newlabs') newvars(`newvars')
-	
+	tempname keepnet
+	tempname keepvector
+	nwtomata `netname', mat(`keepnet')
+	mata: `keepvector' = `keepmat'
+	mata: `keepnet' = select(`keepnet', `keepvector')
+	mata: `keepvector' = `keepvector''
+	mata: `keepnet' = select(`keepnet', `keepvector')
+	nwreplacemat `netname', newmat(`keepnet') `netonly' labs(`newlabs') vars(`newvars')
+
 	// deal with attributes that should be synced with the smaller network
 	if "`attributes'" != "" {
 		foreach attr of varlist `attributes' {
 			mata: attr = st_data((1,`nodes'), st_varindex("`attr'"))
-			mata: subattr = select(attr, keepvector')
-			mata: st_view(attrview=.,(1,sum(keepvector)), "`attr'")
+			mata: subattr = select(attr, `keepvector'')
+			mata: st_view(attrview=.,(1,sum(`keepvector')), "`attr'")
 			replace `attr' = .
 			mata: attrview[.,.] = subattr
 		}
 		mata: mata drop attr subattr
 	}
-	mata: mata drop keepnet keepvector
+	mata: mata drop `keepnet' `keepvector'
 	mata: st_rclear()
-	//nwcompressobs
+	nwcompressobs
 end
 
 

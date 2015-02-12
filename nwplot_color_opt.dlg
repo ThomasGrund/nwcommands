@@ -1,0 +1,51 @@
+VERSION 10
+
+INCLUDE _std_mlarge
+INCLUDE header_gr_child
+INCLUDE gr_orientation
+
+DIALOG nodes_colopt, title("Node color")
+BEGIN
+	GROUPBOX gb_col 10 10 380 130, label("Overwrite color palette")
+	TEXT     tx_col1	20	30	280	., label("Color 1:") 		
+	COMBOBOX cb_col1	80 30 100	., dropdownlist contents(colors)
+	TEXT     tx_col2	20	50	280	., label("Color 2:") 		
+	COMBOBOX cb_col2	80 50 100	., dropdownlist contents(colors)
+	TEXT     tx_col3	20	70	280	., label("Color 3:") 		
+	COMBOBOX cb_col3	80 70 100	., dropdownlist contents(colors)
+	TEXT     tx_col4	20	90	280	., label("Color 4:") 		
+	COMBOBOX cb_col4	80 90 100	., dropdownlist contents(colors)
+	TEXT     tx_col5	210	30	280	., label("Color 5:") 		
+	COMBOBOX cb_col5	270 30 100	., dropdownlist contents(colors)
+	TEXT     tx_col6	210	50	280	., label("Color 6:") 		
+	COMBOBOX cb_col6	270 50 100	., dropdownlist contents(colors)
+	TEXT     tx_col7	210	70	280	., label("Color 7:") 		
+	COMBOBOX cb_col7	270 70 100	., dropdownlist contents(colors)
+	TEXT     tx_col8	210	90	280	., label("Color 8:") 		
+	COMBOBOX cb_col8	270 90 100	., dropdownlist contents(colors)
+	CHECKBOX ck_res 270 110 100 100, label("Rescale off") option(norescale)
+	GROUPBOX gb_lgd 10 160 380 70, label("Color legend")
+	TEXT     tx_keys	20	190	280	., label("Force keys:") 	
+	EDIT ed_keys 110 190 150 .,	nomemory
+	CHECKBOX ck_lgd 270 190 100 100, label("Legend off") option(legendoff)
+END
+
+PROGRAM command
+BEGIN
+	put " colorpalette("
+	put nodes_colopt.cb_col1 nodes_colopt.cb_col2 nodes_colopt.cb_col3 nodes_colopt.cb_col4 nodes_colopt.cb_col5 nodes_colopt.cb_col6 nodes_colopt.cb_col7 nodes_colopt.cb_col8
+	put ")"
+	if nodes_colopt.ed_keys {
+		put " forcekeys("
+		put nodes_colopt.ed_keys
+		put ")"
+	}	
+	
+	if nodes_colopt.ck_res {
+		put " norescale"
+	}
+	
+	if nodes_colopt.ck_lgd {
+		put " legendoff"
+	}
+END

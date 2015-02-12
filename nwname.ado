@@ -38,6 +38,11 @@ program nwname
 		}
 	}
 
+	if "`netname'" == "" & "`id'" != "-1" {
+		scalar onename = "\$nwname_`id'"
+		local netname = onename
+	}
+	
 	mata: st_numscalar("r(id)", `id')
 	if ("`id'" == "-1") {
 		di "{err}{it:network} {bf:`netname'} not found"
@@ -62,9 +67,9 @@ program nwname
 		
 		local cnewlabs : word count `newlabs'
 		local cnewvars : word count `newvars'
-		
+				
 		if ("`newname'" != "") {
-			nwvalidate `newname'
+			 nwvalidate `newname', self(`netname')
 			global nwname_`id' = "`r(validname)'"
 			local thisname = "`r(validname)'"
 			if "`r(validname)'" != "`r(tryname)'" {
@@ -144,7 +149,7 @@ program nwname
 		local shortenedlabs ""
 		forvalues i = 1 / `onesize' {
 			local onelab : word `i' of `thislabs'
-			local shortenedlabs `"`shortenedlabs `onelab'"'
+			local shortenedlabs `"`shortenedlabs' `onelab'"'
 		}
 		local thislabs `shortenedlabs'
 	}

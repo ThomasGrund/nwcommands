@@ -1,0 +1,32 @@
+VERSION 10
+
+INCLUDE _std_mlarge
+INCLUDE header_gr_child
+INCLUDE gr_orientation
+
+DIALOG edges_sizeopt, title("Edge size")
+BEGIN
+	GROUPBOX gb_sym 10 10 380 90, label("Size options")
+	CHECKBOX ck_res 30 30 100 100, label("Rescale off") option(norescale)
+	GROUPBOX gb_lgd 10 120 380 70, label("Size legend")
+	TEXT     tx_keys	20	150	280	., label("Force keys:") 	
+	EDIT ed_keys 110 150 150 .,	nomemory
+	CHECKBOX ck_lgd 270 150 100 100, label("Legend off") option(legendoff) onclickoff(edges_sizeopt.ed_keys.show) onclickon(edges_sizeopt.ed_keys.hide)
+END
+
+PROGRAM command
+BEGIN
+	if edges_sizeopt.ed_keys {
+		put " forcekeys("
+		put edges_sizeopt.ed_keys
+		put ")"
+	}	
+	
+	if edges_sizeopt.ck_res {
+		put " norescale"
+	}
+	
+	if edges_sizeopt.ck_lgd {
+		put " legendoff"
+	}
+END

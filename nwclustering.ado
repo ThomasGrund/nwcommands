@@ -10,12 +10,13 @@ program nwclustering
 	set more off
 
 	_nwsyntax `netname', max(9999)
+	_nwsetobs
+		
 	if `networks' > 1 {
 		local k = 1
 	}
-	_nwsetobs `netname'
-	
-	foreach netname_temp in `netname' {
+
+	qui foreach netname_temp in `netname' {
 		_nwsyntax_other `netname_temp'
 		nwtomata `netname_temp', mat(onenet)
 	

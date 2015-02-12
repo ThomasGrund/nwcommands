@@ -5,31 +5,49 @@
 
 capture program drop nwkeep 
 program nwkeep
-	syntax [anything(name=netname)][if/] [in/],[ attributes(string)]
+	syntax [anything(name=netname)][if/] [in/],[ attributes(varlist)]
+	
 	_nwsyntax `netname', max(9999)
+	local nets `networks'
 	local keepnets = "`netname'"
 
 	_nwsyntax _all, max(9999)
-	foreach k in `keepnets' {
-		local netname : subinstr local netname "`k'" "", all word
-	}	
-	
-	if "`if'" == "" & "`in'" == "" {
-		nwdrop `netname'
+	local netname : list netname - keepnets
+
+	if "`if'" == "" & "`in'" == "" & "`netname'" != ""{
+		nwdrop `netname', attributes(`attributes')
 		nwcompressobs
-		exit
 	}
-	else {
+    else {
 		local netname "`keepnets'"
 
-		if "`if'" != "" {
-			local if "if (!(`if'))"
+		foreach keepnet in `keepnets' {
+			nwname `keepnet'
+			local id = r(id)
+			local nodes = r(nodes)
+			local z = `z' + 1
+		
+			if ("`if'" != "" | "`in'" != ""){
+				tempvar keepnode
+				gen `keepnode' = 0
+				if "`if'" != "" {
+					replace `keepnode' = 1 if `if'
+				}
+				if "`in'" != "" {
+					replace `keepnode' = 1 in `in'
+				}
+			
+				mata: keepnode = st_data((1,`nodes'), st_varindex("`keepnode'"))
+			
+				if (`z' != `nets') {
+					nwkeepnodes `keepnet', keepmat(keepnode) `netonly'
+				}
+				else {
+					nwkeepnodes `keepnet', keepmat(keepnode) `netonly' attributes(`attributes')
+				}
+				mata: mata drop keepnode
+			}
 		}
-	
-		if "`in'" != "" {
-			local in "in (!(`in'))"
-		}
-		nwdrop `netname' `if' `in', attributes(`attributes') 
 	}
 end
 	

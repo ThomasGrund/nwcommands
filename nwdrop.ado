@@ -11,36 +11,35 @@ program nwdrop
 
 	local nets `networks'
 	local z = 0
-	qui foreach dropnet in `netname' {
+    foreach dropnet in `netname' {
 		nwname `dropnet'
 		local id = r(id)
 		local nodes = r(nodes)
 		local z = `z' + 1
 		
 		// only drop nodes 
-		if ("`if'" != "" | "`in'" != ""){
+		qui if ("`if'" != "" | "`in'" != ""){
 			tempvar keepnode
 			gen `keepnode' = 1
-			if "`if'" != "" {
+		    if "`if'" != "" {
 				replace `keepnode' = 0 if `if'
-				if ("`reverseif'"!= ""){
-					recode `keepnode' (0=1) (1=0)
-				}
+				tab `keepnode'
+				//if ("`reverseif'"!= ""){
+				//	recode `keepnode' (0=1) (1=0)
+				//}
 			}
 			if "`in'" != "" {
 				replace `keepnode' = 0 in `in'
 			}
-			
+		
 			mata: keepnode = st_data((1,`nodes'), st_varindex("`keepnode'"))
 			
-			// WHY DID I INCLUDE THIS? IT MESSES WITH NWPLOT (MDS)
-			// make sure that attributes are only included for dropping one network
-			//if (`z' != `nets') {
-			//	nwdropnodes `dropnet', keepmat(keepnode) `netonly'
-			//}
-			//else {
-				nwdropnodes `dropnet', keepmat(keepnode) `netonly' attributes(`attributes')
-			//}
+			if (`z' != `nets') {
+			 nwdropnodes `dropnet', keepmat(keepnode) `netonly'
+			}
+			else {
+				 nwdropnodes `dropnet', keepmat(keepnode) `netonly' attributes(`attributes')
+			}
 			mata: mata drop keepnode
 		}
 		

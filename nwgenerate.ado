@@ -5,14 +5,35 @@ program nwgenerate
 	if "`options'" != "" {
 		local options = substr("`options'", 2,.)
 	}
+
 	gettoken netname netexp: arg, parse("=")
+	local netexp: subinstr local netexp "if" "#"
+	
 	gettoken dump opts: arg, parse(",") bind
 	if "`opts'" != "" {
 		local 0 `opts'
-		syntax [, xvars vars(string)]
+		syntax [, xvars vars(string) replace]
 	}
 	local netname = trim("`netname'")
 	
+
+	// replace the network if it exists already
+	if (strpos("`options'", "replace")!=0){
+		capture nwdrop `netname'
+		local options ""
+	}
+		
+	capture _nwsyntax_other `netname'
+	if _rc == 0 {
+		di "{err}Network {bf:`netname'} already exists. Change {it:netname} or specify option {bf:replace}.{txt}"
+		error 6099
+	}
+	
+	// if condition
+	gettoken netexp ifcond: netexp, parse("#")
+	local ifcond: subinstr local ifcond "#" "if"
+	
+		
 	// check if network or variable should be created
 	
 	gettoken job jobrest: netexp, parse("(")
@@ -20,18 +41,13 @@ program nwgenerate
 	local job = substr("`job'", 2,.)
 	local selectjob : word 1 of `job'
 	local selectjob "`selectjob'("
-	local nwgenopt "duplicate( dyadprob( geodesic( homophily( lattice( path( permute( pref( random( reach( ring( small( transpose( evcent( context( degree( outdegree( indegree( isolates( components( lgc( clustering( closeness( farness( nearness( between("
+	local nwgenopt "duplicate( dyadprob( geodesic( subset( homophily( lattice( path( permute( pref( random( reach( ring( small( transpose( evcent( context( degree( outdegree( indegree( isolates( components( lgc( clustering( closeness( farness( nearness( between("
 	local whichjob : list  nwgenopt & selectjob
 	local netfcn : word count `whichjob'
 	
+
 	// no varfcn or netfcn
 	qui if `netfcn' == 0 {
-	
-		local 0 `
-		// replace the network if it exists already
-		if (strpos("`options'", "replace")!=0){
-			capture nwdrop `netname'
-		}
 	
 		capture nwname `netname'
 		if _rc == 0 {
@@ -45,6 +61,7 @@ program nwgenerate
 			local netexp "(`netexp')"
 		}
 	
+
 		// evaluate network expression
 		_nwevalnetexp `netexp' % _genmat
 		local nodes = r(nodes)
@@ -56,15 +73,20 @@ program nwgenerate
 		}
 	
 		nwrandom `nodes', prob(0) name(`netname') `undirected' `options' `xvars' `vars'
-		nwreplacemat `netname', newmat(_genmat)
+		nwreplacemat `netname', newmat(_genmat) `vars'
 	
 		mata: st_rclear()
 		nwname `netname'
 		mata: st_global("r(netexp)", "`netexp'")
 		mata: mata drop _genmat
+		
+		if "`ifcond'" != "" {
+			nwkeep `netname' `ifcond'
+		}
 	}
+	
 	// generate variable or network based on function
-	 else  {
+	qui else  {
 		// get whatever is inside parenthesis
 		local start = strpos("`netexp'", "(")
 		local length = (strpos("`netexp'",")")) - `start' - 1
@@ -75,20 +97,30 @@ program nwgenerate
 		
 		// nwduplicate shortcut
 		if "`whichjob'" == "duplicate(" {
+			_nwsyntax `subopt', max(9999) name("othername")
 			nwduplicate `subopt', name(`netname') `options'
-		}				
+		}	
+		
+		// nwduplicate shortcut
+		if "`whichjob'" == "subset(" {
+			_nwsyntax `subopt', max(9999) name("othername")
+			nwsubset `subopt' `ifcond', name(`netname') `options'
+		}
 
 		// nwdyadprob shortcut
 		if "`whichjob'" == "dyadprob(" {
+			_nwsyntax `subopt', max(9999) name("othername")
 			nwdyadprob `subopt', name(`netname') `options'
 		}	
 		
 		// nwgeodesic shortcut
 		if "`whichjob'" == "geodesic(" {
+			_nwsyntax `subopt', max(9999) name("othername")
 			nwgeodesic `subopt', name(`netname') `options'
 		}
 		// nwgeodesic shortcut
 		if "`whichjob'" == "homophily(" {
+			_nwsyntax `subopt', max(9999) name("othername")
 			nwhomophily `subopt', name(`netname') `options'
 		}
 		// nwlattice shortcut
@@ -97,10 +129,12 @@ program nwgenerate
 		}	
 		// nwlattice shortcut
 		if "`whichjob'" == "path(" {
+			_nwsyntax `subopt', max(9999) name("othername")
 			nwpath `subopt', name(`netname') `options'
 		}
 		// nwlattice shortcut
 		if "`whichjob'" == "permute(" {
+			_nwsyntax `subopt', max(9999) name("othername")
 			nwpermute `subopt', name(`netname') `options'
 		}	
 		// nwpref shortcut
@@ -113,6 +147,7 @@ program nwgenerate
 		}	
 		// nwreach shortcut
 		if "`whichjob'" == "reach(" {
+			_nwsyntax `subopt', max(9999) name("othername")
 			nwreach `subopt', name(`netname') `options'
 		}	
 		// nwring shortcut
@@ -125,6 +160,7 @@ program nwgenerate
 		}
 		// nwtranspose shortcut
 		if "`whichjob'" == "transpose(" {
+			_nwsyntax `subopt', max(9999) name("othername")
 			nwtranspose `subopt', name(`netname') `options'
 		}	
 		
@@ -152,10 +188,10 @@ program nwgenerate
 		
 		// nwcomponents shortcuts
 		if "`whichjob'" == "components(" {
-			nwcomponents `subopt', gen(`netname') `options'
+			qui nwcomponents `subopt', gen(`netname') `options'
 		}
 		if "`whichjob'" == "lgc(" {
-			nwcomponents `subopt', gen(`netname') lgc `options'
+			qui nwcomponents `subopt', gen(`netname') lgc `options'
 		}
 		
 		// nwdegree shortcuts
@@ -208,6 +244,8 @@ program nwgenerate
 		}
 		
 	}
+
+	capture nwdrop _temp*
 end
 
 	

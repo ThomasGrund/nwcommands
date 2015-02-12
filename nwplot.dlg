@@ -1,0 +1,456 @@
+VERSION 10
+
+
+SYNCHRONOUS_ONLY
+INCLUDE _std_mlarge
+DEFINE _dlght   250
+INCLUDE header
+
+HELP hlp1, view("help nwplot")
+RESET res1
+
+SCRIPT PREINIT
+BEGIN
+	program initialize
+END
+
+SCRIPT nodes_PREINIT
+BEGIN
+	create STRING nodes_colorOptions
+	create STRING nodes_symbolOptions
+	create STRING nodes_sizeOptions
+	create STRING labelOptions
+	create STRING edges_colorOptions
+	create STRING edges_patternOptions
+	create STRING edges_sizeOptions
+END
+
+SCRIPT labelsShowProp
+BEGIN
+	main.vr_label.hide
+	main.bu_label.show
+END
+
+SCRIPT labelsShowAll
+BEGIN
+	main.vr_label.show
+	main.bu_label.show
+END
+
+SCRIPT labelsHide
+BEGIN
+	main.vr_label.hide
+	main.bu_label.hide
+END
+
+DIALOG main, tabtitle("Network")
+BEGIN
+  TEXT     tx_var	10	10	100	., label("Network:") 		
+  COMBOBOX cb_var	+60	@	240	., dropdownlist contents(netlist) 
+  GROUPBOX gb_lb 210 50 270 130, label("Node labels:") 
+  RADIO  rb_nolabel 230  70 220 ., first  label("No labels") onclickon("script labelsHide")
+  RADIO  rb_addnet  @ +20   @ ., middle label("Add labels saved with network")  onclickon("script labelsShowProp")
+  RADIO  rb_addvar  @ +20   @ ., last label("Add labels from variable") onclickon("script labelsShowAll")		
+  VARNAME vr_label 330 +30 110 ., label("LabelVar") 
+  BUTTON bu_label 230 @ 80 ., onpush("program labels_getOptions") label("Properties")  
+  GROUPBOX gb_lay 15 50 190 200, label("Layout:") 
+  TEXT tx_lay 30 70 140 ., label("Layout style:")
+  TEXT tx_grid 50 90 100 ., label("Columns:") 
+  COMBOBOX cb_layout 110 70 80 ., contents(layoutstyle) dropdownlist onselchangelist(layoutstyle_actions)
+  SPINNER sp_grid 110 90 50 . ,min(1) default(5)
+  TEXT tx_nodex 50 90 100 ., label("X-Coord:") 
+  TEXT tx_nodey 50 110 100 ., label("Y-Coord:") 
+  VARNAME vr_nodex 110 90 80 ., label("X-Coord")
+  VARNAME vr_nodey 110 110 80 ., label("Y-Coord") 
+  CHECKBOX cx_norescalexy 110 130 150 ., label("Rescale off") option("norescale")
+  TEXT tx_iter 50 90 100 ., label("Iterations:") 
+  SPINNER sp_iter 110 90 50 . ,min(20) default(200)
+  //CHECKBOX cx_lgc 50 140 190 ., label("Large component")
+  CHECKBOX cx_exp 30 160 190 ., label("Export coordinates") onclickoff(script exportOff) onclickon(script exportOn)
+  TEXT tx_enodex 50 180 100 ., label("X-Coord:") 
+  TEXT tx_enodey 50 200 100 ., label("Y-Coord:") 
+  EDIT ed_enodex 110 180 80 ., label("excoord")
+  EDIT ed_enodey 110 200 80 ., label("eycoord")
+  CHECKBOX cx_lgc 30 230 250 ., label("Largest component only") 
+END
+
+SCRIPT exportOff
+BEGIN
+	main.tx_enodex.hide
+	main.tx_enodey.hide
+	main.ed_enodex.hide
+	main.ed_enodey.hide
+END
+
+SCRIPT exportOn
+BEGIN
+	main.tx_enodex.show
+	main.tx_enodey.show
+	main.ed_enodex.show
+	main.ed_enodey.show
+END
+
+DIALOG nodes, tabtitle("Nodes")
+BEGIN
+  CHECKBOX cx_color 40 20 10 ., label("") onclickoff(nodes.vr_color.disable) onclickon(nodes.vr_color.enable)
+  TEXT    tx_color	55	20	100	., label("Node color:") 		
+  VARNAME vr_color  135 20 110	., label("color")
+  BUTTON  bu_color  250 20 80 ., onpush("program nodes_getColorOptions") label("Properties")
+  CHECKBOX cx_symbol 40 60 10 ., label("") onclickoff(nodes.vr_symbol.disable) onclickon(nodes.vr_symbol.enable) 
+  TEXT    tx_symbol	55	60	100	., label("Node symbol:") 		
+  VARNAME vr_symbol 135	60 110	., label("symbol")
+  BUTTON bu_symbol 250 60 80 ., onpush("program nodes_getSymbolOptions") label("Properties") 
+  CHECKBOX cx_size 40 100 10 ., label("") onclickoff(nodes.vr_size.disable) onclickon(nodes.vr_size.enable)
+  TEXT    tx_size	55	100	100	., label("Node size:") 		
+  VARNAME vr_size 135	100 110	., label("size")
+  BUTTON bu_size 250 100 80 ., onpush("program nodes_getSizeOptions") label("Properties") 
+  TEXT    tx_factor1	55	140	100	., label("Node factor:") 		
+  SPINNER sp_dig1 125 140 50 ., label("dig1") default(1) nomemory
+  TEXT    tx_factor2 170 140 10	., label(".") 		
+  SPINNER sp_dig2 180 140 50 ., label("dig2") default(0) nomemory
+END
+
+DIALOG edges, tabtitle("Edges/Arrows")
+BEGIN
+  GROUPBOX gb_edge 10 5 420 120, label("Edges")
+  CHECKBOX cx_color 30 20 10 ., label("") onclickoff(edges.cb_color.disable) onclickon(edges.cb_color.enable)
+  TEXT    tx_color	45	20	100	., label("Edge color:") 		
+  COMBOBOX cb_color	115	20	165	., dropdownlist contents(netlist) default("")
+  BUTTON  bu_color  300 20 80 ., onpush("program edges_getColorOptions") label("Properties")
+  TEXT    tx_pattern	30	45	100	., label("Edge pattern:") 		
+  TEXT tx_pattern2 120	45	180	., label("(same as color)")
+  BUTTON  bu_pattern  300 45 80 ., onpush("program edges_getPatternOptions") label("Properties")
+  TEXT    tx_size	30	70	100	., label("Edge size:") 
+  BUTTON  bu_size  300 70 80 ., onpush("program edges_getSizeOptions") label("Properties")
+  COMBOBOX cb_size	100	70	180	., dropdownlist contents(netlist) default("")
+  TEXT    tx_factor1 30	95	100	., label("Edge factor:") 		
+  SPINNER sp_dig1 100 95 35 ., label("dig1") default(1) nomemory
+  TEXT    tx_factor2 132 95 5	., label(".") 		
+  SPINNER sp_dig2 140 95 35 ., label("dig2") default(0) nomemory
+  GROUPBOX gb_arc 10 140 200 130, label("Style")
+  GROUPBOX gb_arrow 230 140 200 130, label("Arrows")
+  
+  TEXT    tx_style	30	160	100	., label("Curve:") 		
+  COMBOBOX cb_style	80	160	100	., dropdownlist contents(arcstyle)
+  TEXT    tx_bend1 30 185	100	., label("Bend:") 		
+  SPINNER sp_bend1 80 185 35 ., label("bend1") default(1) nomemory
+  TEXT    tx_bend2 112 185 5	., label(".") 		
+  SPINNER sp_bend2 120 185 35 ., label("bend2") default(0) nomemory 
+  TEXT    tx_splines 30 210	100	., label("Splines:") 		
+  SPINNER sp_splines 80 210 60 ., label("bend1") default(10) nomemory
+  TEXT    tx_arrow1 250 160	100	., label("Arrow factor:") 		
+  SPINNER sp_arrow1 330 160 35 ., label("arrow1") default(1) nomemory
+  TEXT    tx_arrow2 362 160 5	., label(".") 		
+  SPINNER sp_arrow2 370 160 35 ., label("arrow2") default(0) nomemory 
+  TEXT    tx_gap1 250 185	100	., label("Arrow gap:") 		
+  SPINNER sp_gap1 330 185 35 ., label("gap1") default(0) nomemory
+  TEXT    tx_gap2 362 185 5	., label(".") 		
+  SPINNER sp_gap2 370 185 35 ., label("gap2") default(0) nomemory 
+  TEXT    tx_barb1 250 210	100	., label("Barb factor:") 		
+  SPINNER sp_barb1 330 210 35 ., label("barb1") default(1) nomemory
+  TEXT    tx_barb2 362 210 5	., label(".") 		
+  SPINNER sp_barb2 370 210 35 ., label("barb2") default(0) nomemory 
+END
+ 
+INCLUDE ifin
+INCLUDE gr_titles
+INCLUDE gr_legend
+INCLUDE gr_overall
+
+LIST netlist
+BEGIN
+	// intentionally empty
+	// this list will be populated by _nwdialog.ado
+END
+
+
+LIST layoutstyle
+BEGIN
+	" "
+	mds
+	mdsclassical
+	circle
+	grid
+	nodexy
+END
+
+LIST layoutstyle_actions
+BEGIN
+	script layoutsub_off
+	script layoutsub_mds
+	script layoutsub_off
+	script layoutsub_off
+	script layoutsub_grid
+	script layoutsub_nodexy
+END
+
+SCRIPT layoutsub_off
+BEGIN
+	main.tx_grid.hide
+	main.sp_grid.hide
+	main.tx_nodex.hide
+	main.tx_nodey.hide
+	main.vr_nodex.hide
+	main.vr_nodey.hide
+	main.tx_iter.hide
+	main.sp_iter.hide
+	main.cx_norescalexy.hide
+END
+
+SCRIPT layoutsub_mds
+BEGIN
+	script layoutsub_off
+	main.tx_iter.show
+	main.sp_iter.show
+END
+
+SCRIPT layoutsub_nodexy
+BEGIN
+	script layoutsub_off
+	main.tx_nodex.show
+	main.tx_nodey.show
+	main.vr_nodex.show
+	main.vr_nodey.show
+	main.cx_norescalexy.show
+END
+
+SCRIPT layoutsub_grid
+BEGIN
+	script layoutsub_off
+	main.tx_grid.show
+	main.sp_grid.show
+END
+
+LIST arcstyle
+BEGIN
+	automatic
+	curved
+	straight
+END
+
+PROGRAM initialize
+BEGIN
+	put "_nwdialog nwplot"
+	stata hidden immediate
+END
+
+PROGRAM labels_getOptions
+BEGIN
+	call create CHILD nw_nodes_labels AS labels_opt
+	call labels_opt.setExitString labelOptions
+	call labels_opt.settitle "Node label properties"
+END
+
+PROGRAM edges_getColorOptions
+BEGIN
+	call create CHILD nw_edges_color AS edges_color
+	call edges_color.setExitString edges_colorOptions
+	call edges_color.settitle "Edge color properties"
+END
+
+PROGRAM edges_getPatternOptions
+BEGIN
+	call create CHILD nw_edges_pattern AS edges_pattern
+	call edges_pattern.setExitString edges_patternOptions
+	call edges_pattern.settitle "Edge pattern properties"
+END
+
+PROGRAM edges_getSizeOptions
+BEGIN
+	call create CHILD nw_edges_size AS edges_size
+	call edges_size.setExitString edges_sizeOptions
+	call edges_size.settitle "Edge size properties"
+END
+
+PROGRAM nodes_getColorOptions
+BEGIN
+	call create CHILD nw_nodes_color AS nodes_color
+	call nodes_color.setExitString nodes_colorOptions
+	call nodes_color.settitle "Node color properties"
+END
+
+PROGRAM nodes_getSymbolOptions
+BEGIN
+	call create CHILD nw_nodes_symbol AS nodes_symbol
+	call nodes_symbol.setExitString nodes_symbolOptions
+	call nodes_symbol.settitle "Node symbol properties"
+END
+
+PROGRAM nodes_getSizeOptions
+BEGIN
+	call create CHILD nw_nodes_size AS nodes_size
+	call nodes_size.setExitString nodes_sizeOptions
+	call nodes_size.settitle "Node size properties"
+END
+
+PROGRAM command
+BEGIN
+	put "nwplot " main.cb_var
+	put " " /program ifin_output
+    beginoptions
+		if main.rb_nolabel.isneq(1) {
+			put " " /program main_outputLabels
+		}
+		put " " /program main_outputLayout
+		put " " /program nodes_outputColor
+		put " " /program nodes_outputSymbol
+		put " " /program nodes_outputSize
+		put " " /program nodes_outputFactor
+		put " " /program edges_outputColor
+		put " " /program edges_outputSize
+		put " " /program edges_outputPattern
+		put " " /program edges_outputFactor
+		put " " /program edges_outputStyle
+		put " " /program edges_outputArrow
+		put " " /program gr_titles_output
+		put " " /program gr_legend_output
+		put " " /program gr_overall_output
+	endoptions	
+	stata
+END
+
+PROGRAM main_outputLabels
+BEGIN
+	if main.rb_addnet {
+		put " lab"
+	}
+	if main.rb_addvar {
+		require main.vr_label
+		put " label(" main.vr_label ")"
+	}
+	
+	if labelOptions {
+		put " labelopt(" labelOptions ")"
+	}
+END
+
+PROGRAM main_outputLayout
+BEGIN
+	if main.cb_layout.isneq(" ") | main.cx_lgc.iseq(1) {
+		put " layout(" main.cb_layout ","
+		put " iterations(" main.sp_iter ")"
+		put " columns(" main.sp_grid ")"
+		if main.cx_lgc {
+			put " lgc"
+		}
+		if main.cx_norescalexy {
+			put " norescale"
+		}
+		put ")"
+	}
+	require main.vr_nodex
+	require main.vr_nodey
+	if main.cb_layout.iseq("nodexy") {
+		put " nodexy(" main.vr_nodex " " main.vr_nodey ")"
+	}
+END
+
+PROGRAM nodes_outputFactor
+BEGIN
+	if nodes.sp_dig1.isneq(1) |  nodes.sp_dig2.isneq(0) {
+		put " nodefactor(" nodes.sp_dig1 "." nodes.sp_dig2 ")"
+	}
+END
+
+PROGRAM edges_outputFactor
+BEGIN
+	if edges.sp_dig1.isneq(1) | edges.sp_dig2.isneq(0) {
+		put " edgefactor(" edges.sp_dig1 "." edges.sp_dig2 ")"
+	}
+END
+
+PROGRAM edges_outputStyle
+BEGIN
+	if edges.cb_style.isneq("automatic") {
+		put " arcstyle(" edges.cb_style ")"
+	}
+	if edges.sp_bend1.isneq(1) |  edges.sp_bend2.isneq(0) {
+		put " arcbend(" edges.sp_bend1 "." edges.sp_bend2 ")"
+	}
+	if edges.sp_splines.isneq(10) {
+		put " arcsplines(" edges.sp_splines ")"
+	}
+END
+
+PROGRAM edges_outputArrow
+BEGIN
+	if edges.sp_arrow1.isneq(1) | edges.sp_arrow2.isneq(0) {
+		put " arrowfactor(" edges.sp_arrow1 "." edges.sp_arrow2 ")"
+	}
+	if edges.sp_gap1.isneq(0) |  edges.sp_gap2.isneq(0) {
+		put " arrowgap(" edges.sp_gap1 "." edges.sp_gap2 ")"
+	}
+	if edges.sp_barb1.isneq(1) |  edges.sp_barb2.isneq(0) {
+		put " arrowbarbfactor(" edges.sp_barb1 "." edges.sp_barb2 ")"
+	}
+END
+
+PROGRAM edges_outputColor
+BEGIN
+	if edges.cb_color.isneq(" ")  & edges.cb_color.isenabled(){
+		put "edgecolor(" edges.cb_color
+		if edges_colorOptions {
+			put ", " edges_colorOptions
+		}
+		put ")"
+	}
+END
+
+PROGRAM edges_outputSize
+BEGIN
+	if edges.cb_size.isneq(" ") & edges.cb_size.isenabled(){
+		put "edgesize(" edges.cb_size
+		if edges_sizeOptions {
+			put ", " edges_sizeOptions
+		}
+		put ")"
+	}
+END
+
+PROGRAM edges_outputPattern
+BEGIN
+	if edges_patternOptions.isneq("") & edges.cb_color.isenabled(){
+		put " edgepatternpalette("  edges_patternOptions ")"
+	}
+END
+
+PROGRAM nodes_outputColor
+BEGIN
+	if nodes.vr_color  & nodes.vr_color.isenabled() {
+		put " color("
+		put nodes.vr_color
+		put ","
+		if nodes_colorOptions {
+			put nodes_colorOptions
+		}
+		put ")"
+	}
+END
+
+PROGRAM nodes_outputSymbol
+BEGIN
+	if nodes.vr_symbol & nodes.vr_symbol.isenabled()   {
+		put " symbol("
+		put nodes.vr_symbol
+		put ","
+		if nodes_symbolOptions {
+			put nodes_symbolOptions
+		}
+		put ")"
+	}
+END
+
+PROGRAM nodes_outputSize
+BEGIN
+	if nodes.vr_size  & nodes.vr_size.isenabled() {
+		put " size("
+		put nodes.vr_size
+		put ","
+		if nodes_sizeOptions {
+			put nodes_sizeOptions
+		}
+		put ")"
+	}
+END
+
+

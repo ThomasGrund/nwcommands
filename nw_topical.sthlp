@@ -1,5 +1,5 @@
 {smcl}
-{* *! version 1.0.6 20jan2015}{...}
+{* *! version 4 12feb2015}{...}
 {phang}
 {help nwcommands:NW-2 topical} {hline 2} 
 {hline 2} Topical list of network commands
@@ -72,6 +72,7 @@
 {p2col:    {bf:{help nwreach }}}Calculate reachability network{p_end}
 {p2col:    {bf:{help nwring }}}Generate a ring-lattice network{p_end}
 {p2col:    {bf:{help nwsmall }}}Generate a small-world network{p_end}
+{p2col:    {bf:{help nwsubset }}}Subset a network{p_end}
 {p2col:    {bf:{help nwtranspose }}}Transpose a network{p_end}
 {marker information}{...}
 
@@ -101,6 +102,8 @@
 {p2col:    {bf:{help nwrename }}}Rename network{p_end}
 {p2col:    {bf:{help nwreplace }}}Replace network{p_end}
 {p2col:    {bf:{help nwreplacemat }}}Replace network with Mata matrix{p_end}
+{p2col:    {bf:{help nwsort }}}Sort network nodes{p_end}
+{p2col:    {bf:{help nwsubset }}}Subset a network{p_end}
 {marker analysis}{...}
 
 {col 8}   {c TLC}{hline 24}{c TRC}
@@ -146,7 +149,9 @@
 {col 8}{hline 3}{c RT}       {it:Visualization}{col 36}{c LT}{hline}
 {col 8}   {c BLC}{hline 24}{c BRC}
 {p2colset 12 35 36 2}
+{p2col:    {bf:{help nwmovie }}}Animate a sequence of networks{p_end}
 {p2col:    {bf:{help nwplot }}}Plot a network{p_end}
+{p2col:    {bf:{help nwplotmatrix }}}Plot a network as sociomatrix{p_end}
 {marker programming}{...}
 
 {col 8}   {c TLC}{hline 24}{c TRC}
@@ -165,11 +170,11 @@
 {p2colset 12 35 36 2}
 {p2col:{bf:{help _extract_valuelabels }}}{err}no help file yet{txt}{p_end}
 {p2col:{bf:{help _nwdeploy }}}{err}no help file yet{txt}{p_end}
+{p2col:{bf:{help _nwdialog }}}{err}no help file yet{txt}{p_end}
 {p2col:{bf:{help _nwevalnetexp }}}{err}no help file yet{txt}{p_end}
 {p2col:{bf:{help _nwsetobs }}}{err}no help file yet{txt}{p_end}
 {p2col:{bf:{help _nwsyntax_other }}}{err}no help file yet{txt}{p_end}
 {p2col:{bf:{help _opts_oneof }}}{err}no help file yet{txt}{p_end}
 {p2col:{bf:{help nwergm }}}{err}no help file yet{txt}{p_end}
-{p2col:{bf:{help nwmovie }}}{err}no help file yet{txt}{p_end}
-{p2col:{bf:{help nwsociomatrix }}}{err}no help file yet{txt}{p_end}
+{p2col:{bf:{help nwinstall }}}{err}no help file yet{txt}{p_end}
 {p2col:{bf:{help nwtostata }}}{err}no help file yet{txt}{p_end}
