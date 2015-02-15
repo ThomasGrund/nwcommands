@@ -3,19 +3,19 @@ program nwinstall
 	syntax [, permanently remove downloadoff]
 	
 	tempname fh1 fh2
-					
+	
+	set more off
 	if "`remove'" != "" {
 		window menu clear
 		window menu refresh
 	}
 	else {
-		run nwinstall_dlg.do
-		
 		if "`downdloadoff'" == "" {
 			capture ado uninstall "nwcommands-dlg"
 			net from "http://nwcommands.org"
 			net install "nwcommands-dlg", all
 		}
+		run nwinstall_dlg.do
 	}
 		
 		

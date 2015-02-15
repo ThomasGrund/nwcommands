@@ -1,13 +1,16 @@
 *! Date        : 24aug2014
 *! Version     : 1.0
-*! Author      : Thomas Grund, Linköping University
+*! Author      : Thomas Grund, Linkoping University
 *! Email	   : contact@nwcommands.org
 
 capture program drop nwvalue	
 program nwvalue
 	local netname ="`0'"
 	
-	gettoken netname exp : netname, parse("=")
+	gettoken netname opts : netname, parse(",")
+	
+	local 0 `opts'
+	syntax [, mata(string) matrix(string)]
 	
 	// a specific entries are given
 	local ego = strpos("`netname'","[") 
@@ -58,6 +61,18 @@ program nwvalue
 		mata: subnet = onenet
 		mata: st_numscalar("r(rows)", rows(subnet))
 		mata: st_numscalar("r(cols)", cols(subnet))
-		mata: st_global("r(mata)", "subnet")
+		mata: st_matrix("r(values)", subnet)
+		if "`matrix'" != "" {
+			mata: st_matrix("r(`matrix')", subnet)
+			mata: mata drop subnet
+		}
+		else { 
+			if "`mata'" == "" {
+				local mata "values"
+			}
+			mata: `mata' = subnet
+			mata: st_global("r(mata)", "`mata'")
+			mata: mata drop subnet
+		}
 	}
 end
