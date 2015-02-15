@@ -18,7 +18,7 @@
 
 
 		*! Date        : 15feb2014
-		*! Version     : 1.1.2
+		*! Version     : 1.1.3
 		*! Authors     : Thomas U. Grund 
 		*! Contact     : thomas.u.grund@gmail.com
 		*! Web         : {browse "http://nwcommands.org"}
