@@ -9,22 +9,22 @@ RESET res1
 SCRIPT PREINIT
 BEGIN
 	program initialize
-	
-	create STRING nextNet
 END
 
-
-DIALOG main, label("nwdrop/nwkeep - Drop or keep networks or nodes") tabtitle("Main")
+DIALOG main, label("nwdrop/nwkeep - Drop or keep networks/nodes") tabtitle("Main")
 BEGIN
-	GROUPBOX gb_main 20 20 250 200, label("Drop or keep networks/nodes")
-	RADIO rb_dropnodes 30 40 200 ., label("Drop nodes") first
-	RADIO rb_keepnodes 30 60 200 ., label("Keep nodes") middle
-	RADIO rb_dropnet 30 80 200 ., label("Drop networks") middle
-	RADIO rb_keepnet 30 100 200 ., label("Drop networks") last
-	//EDIT ed_net 30 140 200 ., label("cbNet")
-	COMBOBOX cb_net 30 140 200 ., label("cbNet") contents(netlist)
-	BUTTON bu_add 280 140 100 ., label("Add") onpush(script addEntry)
-
+	GROUPBOX gb_main 20 20 370 70, label("")
+	RADIO rb_drop 30 40 200 ., nomem label("Drop networks") first onclickon(script detailsOff)
+	RADIO rb_keep 30 60 200 ., nomem label("Keep networks") middle onclickon(script detailsOff)
+	RADIO rb_dropnodes 170 40 200 ., nomem label("Drop nodes") middle onclickon(script detailsOn)
+	RADIO rb_keepnodes 170 60 200 ., nomem label("Keep nodes") last onclickon(script detailsOn)
+	TEXT tx_net1 30 100 200 200, label("Selected networks:")
+	COMBOBOX cb_net 30 120 270  ., nomem dropdown  label("cbNet") contents(netlist) append
+	TEXT  tx_if	50 150 200 ., label("If: (expression)")
+    EXP   ex_if	140 150 230 ., label("Create...")
+	TEXT  tx_att	50 180 200 ., label("Attributes:")
+	VARLIST vr_att 140 180 230 ., nomem label("Attributes") 
+	CHECKBOX cx_netonly 140 210 200 ., label("Leave Stata variables untouched")
 END
 
 LIST netlist
@@ -33,20 +33,61 @@ BEGIN
 	// this list will be populated by _nwdialog.ado
 END
 
-SCRIPT addEntry
+LIST netlist_append
 BEGIN
-	
-	//put "test"
-	//stata hidden immediate
-	main.cb_net.insert "test"
-	//stata immediate
-	//main.cb_net.repopulate
+	// left empty
 END
 
+SCRIPT detailsOff
+BEGIN
+	main.tx_if.hide
+	main.ex_if.hide
+	main.vr_att.hide
+	main.tx_att.hide
+END
+
+SCRIPT detailsOn
+BEGIN
+	main.tx_if.show
+	main.ex_if.show
+	main.vr_att.show
+	main.tx_att.show
+END
 
 PROGRAM initialize
 BEGIN
 	put "_nwdialog nwdrop"
 	stata hidden immediate
 END
+
+PROGRAM command
+BEGIN
+	if main.rb_dropnodes {
+		put " nwdrop " main.cb_net
+		require main.ex_if
+	}
+	if main.rb_drop {
+		put " nwdrop " main.cb_net
+	}
+	if main.rb_keepnodes {
+		put " nwkeep " main.cb_net
+		require main.ex_if
+	}
+	if main.rb_keep {
+		put " nwkeep " main.cb_net
+	}
+	if main.ex_if {
+		ifexp main.ex_if
+	}
+	if main.vr_att | main.cx_netonly {
+		put ", " 
+		if main.vr_att {
+			put "attributes(" main.vr_att ") "
+		}
+		if main.cx_netonly {
+			put "netonly"
+		}
+	}
+END
+
 

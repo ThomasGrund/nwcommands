@@ -15,6 +15,9 @@
 {cmdab: nwvalue} 
 [{it:{help netname}}]
 {it:{help nwvalue##nwsubset:nwsubset}}
+[{cmd:,}
+{opth mata(string)}
+{opth matrix(string)}]
 
 {marker nwsubset}
 {pstd}where {it:nwsubset} is a valid {help m2_subscripts:subscript} of the underlying Mata matrix. For example,
@@ -24,13 +27,20 @@
 {pmore}{cmd:mynet[(2::4,(3::4)]}{p_end}
 {pmore}{cmd:mynet[|(2,3)\(4,4)|]}{p_end}
 
-		
+
+{synoptset 20 tabbed}{...}
+{synopthdr}
+{synoptline}
+{synopt:{opth mata(string)}}return values as Mata matrix; default = {it:values}{p_end}
+{synopt:{opth matrix(string)}}return values as Stata matrix{p_end}
+	
+	
 {title:Description}
 
 {pstd}
 When {it: nwsubset} refers to a single tie, e.g. mynet[i,j], the command returns the scalar {it:r(value)}
 with the value of the tie between node {it:i} and node {it:j}. When {it: subset} refers to more than one tie, 
-e.g. mynet[(i::k),j], the command returns a Mata matrix with the name stored in {it:r(mata)} that holds
+e.g. mynet[(i::k),j], the command returns a matrix. By default, it creates a Mata matrix {it:values} that holds
 the tie values of the network subset. 
 
 

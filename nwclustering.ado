@@ -38,13 +38,14 @@ program nwclustering
 		mata: st_numscalar("r(cluster_overall)",(sum(c[,2]) / sum(c[,3])))
 		mata: mata drop c
 		local k = `k' + 1
+		
+		noi di "{hline 40}"
+		noi di "{txt}  Network name: {res}`othername'"
+		noi di "{hline 40}"
+		noi di "{txt}    Average clustering coefficient: {res}`r(cluster_avg)'"
+		noi di "{txt}    Overall clustering coefficient: {res}`r(cluster_overall)'"
+		noi di " "
 	}
-
-	di "{hline 40}"
-	di "{txt}  Network name: {res}`othername'"
-	di "{hline 40}"
-	di "{txt}    Average clustering coefficient: {res}`r(cluster_avg)'"
-	di "{txt}    Overall clustering coefficient: {res}`r(cluster_overall)'"
 end
 
 

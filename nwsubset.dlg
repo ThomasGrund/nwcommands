@@ -1,0 +1,68 @@
+VERSION 10
+
+INCLUDE _std_small  
+SYNCHRONOUS_ONLY
+HELP hlp1, view("help nwsubset")
+OK ok1,	label("OK")
+CANCEL	can1, label("Cancel")
+SUBMIT	sub1, label("Submit")
+RESET	res1
+POSITION 10 10 370 150
+
+SCRIPT PREINIT
+BEGIN
+	program initialize
+END
+
+DIALOG main, title("nwsubset - Generate subnetwork")
+BEGIN
+  TEXT     tx_var	20	20	100	., label("Network:") 		
+  COMBOBOX cb_var	130	20	200	.,dropdown contents(netlist) nomem
+  TEXT tx_new 20 80 110 ., label("New network name:")
+  EDIT ed_new 130 80 200 ., default("") nomem
+  TEXT  tx_if	20 50 200 ., label("If: (expression)")
+  EXP   ex_if	130 50 200 ., label("Create...")
+  CHECKBOX cx_replace 50 110 200 ., label("Replace existing network") onclickon(script replaceExisting) onclickoff(script noreplaceExisting)
+END
+
+LIST netlist
+BEGIN
+	// intentionally empty
+	// this list will be populated by _nwdialog.ado
+END
+
+SCRIPT replaceExisting
+BEGIN
+	main.ed_new.hide
+	main.tx_new.hide
+END
+
+SCRIPT noreplaceExisting
+BEGIN
+	main.ed_new.show
+	main.tx_new.show
+END
+
+PROGRAM initialize
+BEGIN
+	put "_nwdialog nwsubset"
+	stata hidden immediate
+END
+
+PROGRAM command
+BEGIN
+	put "nwsubset " main.cb_var
+	if main.ex_if {
+		ifexp main.ex_if
+	}
+	if main.ed_new | main.cx_replace {
+		put ","
+	}
+	if main.ed_new {
+		put " name(" main.ed_new ")"
+	}
+	if main.cx_replace {
+		put " replace"
+	}
+	stata
+END

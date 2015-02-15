@@ -15,8 +15,10 @@
 {cmdab: nwsym} 
 [{it:{help netname}}]
 [{cmd:,}
-{cmd:name}({it:{help newnetname}})
-{cmd:noreplace}]
+{opt mode}({it:{help nwsym##mode:mode}})
+{opth name(newntename)}
+{opth vars(newvarlist)}
+{opt noreplace}]
 
 {synoptset 20 tabbed}{...}
 {synopthdr}

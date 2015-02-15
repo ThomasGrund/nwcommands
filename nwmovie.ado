@@ -4,7 +4,7 @@
 
 capture program drop nwmovie
 program nwmovie
-	syntax anything(name=netname), [z(integer 1) switchtitle(string) switchnetwork(string) switchcolor(string) switchsymbol(string) switchedgecolor(string) imagick(string) eps keepfiles width(integer 750) height(integer 500) fname(string) explosion(string) titles(string) delay(string) size(varlist) color(string) symbol(varlist) edgecolor(string) edgesize(string) frames(integer 10) *]
+	syntax anything(name=netname), [z(integer 1) layout(string) switchtitle(string) switchnetwork(string) switchcolor(string) switchsymbol(string) switchedgecolor(string) imagick(string) eps keepfiles width(integer 750) height(integer 500) fname(string) explosion(integer 5) labels(string) titles(string) delay(string) sizes(varlist) colors(string) symbols(varlist) edgecolors(string) edgesizes(string) frames(integer 10) *]
 
 	local old_options `options'
 	
@@ -23,7 +23,10 @@ program nwmovie
 	if "`switchtitle'" == "" {
 		local switchtitle = "half"
 	}
-	
+	// rule out layout_sub_options
+	if "`layout'" != "" {
+		gettoken layout l1: layout, parse(",")
+	}
 	_opts_oneof "start end half" "switchnetwork" "`switchnetwork'" 6556
 	_opts_oneof "start end half" "switchcolor" "`switchcolor'" 6556
 	_opts_oneof "start end half" "switchsymbol" "`switchsymbol'" 6556
@@ -52,15 +55,37 @@ program nwmovie
 	
 	// make movie
 	_nwsyntax `netname', max(999) min(2)
+	local all_nets "`netname'"
+	
+	local sizeCheck = 0
+	qui foreach onenet in `all_nets' {
+		_nwsyntax_other `onenet'
+		if `sizeCheck' == 0 {
+			local sizeCheck = `othernodes'
+		}
+		else {
+			if `sizeCheck' != `othernodes' {
+				noi di "{err}Networks need to be of the same size"
+				error 6055
+			}
+		}
+	}
+	_nwsyntax `all_nets', max(999) min(2)
 	local k : word count `netname'
 	
 	// check and clean networks as edgecolor and edgesize
-	_nwsyntax_other `edgesize', exactly(`networks') nocurrent
+	local 0 `edgesizes'
+	syntax [anything(name=edgesizes)], [*]
+	local edgesizeopt `options'
+	_nwsyntax_other `edgesizes', exactly(`networks') nocurrent
 	local edgesize_check "`othernetname'"
-	local othernetname = ""
-	_nwsyntax_other `edgecolor', exactly(`networks') nocurrent
-	local edgecolor_check "`othernetname'"
 	
+	local 0 `edgecolors'
+	syntax [anything(name=edgecolors)], [*]
+	local edgecoloropt `options'
+	local othernetname = ""
+	_nwsyntax_other `edgecolors', exactly(`networks') nocurrent
+	local edgecolor_check "`othernetname'"
 	
 	capture drop _c1_* 
 	capture drop _c2_*
@@ -69,28 +94,28 @@ program nwmovie
 	set more off
 	local applysize = 0
 	
-	if ("`size'" != ""){
-		local 0 `size'
+	if ("`sizes'" != ""){
+		local 0 `sizes'
 		syntax [varlist(default=none)], [*]
-		local size `varlist'
+		local sizes `varlist'
 		local sizeopt `options'	
-		local s : word count `size'
+		local s : word count `sizes'
 		if `s' != `k' {
-			di "{err}Option {bf:size()} needs to have as many variables as networks to be plotted"
+			di "{err}Option {bf:sizes()} needs to have as many variables as networks to be plotted"
 		}
 	}
-	if ("`color'" != ""){
-		local 0 `color'
+	if ("`colors'" != ""){
+		local 0 `colors'
 		syntax [varlist(default=none)], [*]
-		local color `varlist'
+		local colors `varlist'
 		local coloropt `options'	
-		local s : word count `color'
+		local s : word count `colors'
 		if `s' != `k' {
-			di "{err}Option {bf:color()} needs to have as many variables as networks to be plotted"
+			di "{err}Option {bf:colors()} needs to have as many variables as networks to be plotted"
 		}
 		
 		local color_uniquevalues ""
-		foreach color_time in `color' {
+		foreach color_time in `colors' {
 			tempvar temp
 			capture encode `color_time', gen(`temp')
 			if _rc == 0 {
@@ -107,17 +132,17 @@ program nwmovie
 		}
 	}
 		
-	if ("`symbol'" != ""){
-		local 0 `symbol'
+	if ("`symbols'" != ""){
+		local 0 `symbols'
 		syntax [varlist(default=none)], [*]
-		local symbol `varlist'
+		local symbols `varlist'
 		local symbolopt `options'
-		local s : word count `symbol'
+		local s : word count `symbols'
 		if `s' != `k' {
-			di "{err}option {bf:symbol()} needs to have as many variables as networks to be plotted"
+			di "{err}option {bf:symbols()} needs to have as many variables as networks to be plotted"
 		}
 		local symbol_uniquevalues ""
-		foreach symbol_time in `color' {
+		foreach symbol_time in `symbols' {
 			tempvar temp
 			capture encode `symbol_time', gen(`temp')
 			if _rc == 0 {
@@ -140,8 +165,8 @@ program nwmovie
 	if "`delay'" == "" {
 		local delay = 10
 	}
-	if "`explosion'" == "" {
-		local explosion = 50
+	if `explosion' < 1 {
+		local explosion = 1
 	}
 	
 	if "`fname'" == "" {
@@ -151,56 +176,72 @@ program nwmovie
 	local kplus = `k' + 1
 	
 	// Prepare titles
-	gettoken title_text title_opt : titles, parse(",") bind	
+	gettoken title_text title_opt : titles, parse(",")  quotes
 	forvalues i = 1/`kplus' {
-		gettoken title_next title_text : title_text, bind
-		local title_`i' = substr("`title_next'",2,`=length("`title_next'") - 2')
+		gettoken title_next title_text : title_text, parse("|") 
+		local title_text = substr(`"`title_text'"',2,.)
+		local title_`i' = "`title_next'"
 	}
 
 	// Prepare frames
 	forvalues i = 1/`k' {		
 		local next = `i' + 1
-		if ("`size'" != ""){
-			local firstsize: word `i' of `size'
-			local secondsize: word `next' of `size'
+		if ("`titles'" != ""){
+			local firsttitle_pos = `i'
+			local secondtitle_pos = `i' + 1
+			local firsttitle `title_`firsttitle_pos''
+			local secondtitle `title_`secondtitle_pos''
+			local titlecmd1 `"title("`firsttitle'" `title_opt') "'
+			local titlecmd2 `"title("`secondtitle'" `title_opt') "'
+			local titlecmd3`"size(`frame_size', norescale `sizeopt')"'
 		}
-		if ("`color'" != ""){
-			local firstcol: word `i' of `color'
-			local secondcol: word `next' of `color'
+		if ("`sizes'" != ""){
+			local firstsize: word `i' of `sizes'
+			local secondsize: word `next' of `sizes'
+			local sizecmd1 `"size(`firstsize', norescale `sizeopt')"'
+			local sizecmd2 `"size(`secondsize', norescale `sizeopt')"'
+			local sizecmd3 `"size(`frame_size', norescale `sizeopt')"'
 		}
-		if ("`symbol'" != ""){
-			local firstsymb: word `i' of `symbol'
-			local secondsymb: word `next' of `symbol'
+		if ("`colors'" != ""){
+			local firstcol: word `i' of `colors'
+			local secondcol: word `next' of `colors'
+			local colorcmd1 `"color(`firstcol', norescale forcekeys(`color_uniquevalues') `coloropt' )"'
+			local colorcmd2 `"color(`secondcol', norescale forcekeys(`color_uniquevalues') `coloropt' )"'
+			local colorcmd3 `"color(``thirdcol'', norescale forcekeys(`color_uniquevalues') `coloropt' )"'
 		}
-		if ("`edgesize'" != "")  {
+		if ("`symbols'" != ""){
+			local firstsymb: word `i' of `symbols'
+			local secondsymb: word `next' of `symbols'
+			local symbolcmd1 `"symbol(`firstsymb', norescale forcekeys(`symbol_uniquevalues') `symbolopt')"'
+			local symbolcmd2 `"symbol(`secondsymb', norescale forcekeys(`symbol_uniquevalues') `symbolopt')"'
+			local symbolcmd3 `"symbol(``thirdsymb'', norescale forcekeys(`symbol_uniquevalues') `symbolopt')"'
+		}
+		if ("`edgesizes'" != "")  {
 			local firstedgesize : word `i' of `edgesize_check'
 			local secondedgesize : word `next' of `edgesize_check'
-		}
-		if ("`edgecolor'" != "")  {
-			local firstedgecol : word `i' of `edgecolor_check'
-			local secondedgecol : word `next' of `edgecolor_check'
+			local edgesizecmd1 `"edgesize(`firstedgesize', legendoff)"'
+			local edgesizecmd2 `"edgesize(`secondedgesize', legendoff)"'
+			local edgesizecmd3 `"edgesize(_frame_edgesize, legendoff)"'
 		}
 
-		local firsttitle_pos = `i'
-		local secondtitle_pos = `i' + 1
-		local firsttitle `title_`firsttitle_pos''
-		local secondtitle `title_`secondtitle_pos''
+		if ("`edgecolors'" != "" | "`edgecoloropt'" != "")  {
+			local firstedgecol : word `i' of `edgecolor_check'
+			local secondedgecol : word `next' of `edgecolor_check'
+			local edgecolorcmd1 `"edgecolor(`firstedgecol', `edgecoloropt')"'
+			local edgecolorcmd2 `"edgecolor(`secondedgecol', `edgecoloropt')"'
+			local edgecolorcmd3  `"edgecolor(``thirdedgecol'', `edgecoloropt')"'
+		}
 
 		local first : word `i' of `netname'
 		local second : word `next' of `netname'
 		local expnum = `i' * 100
 		local st = string(`z',"%05.0f")
-					
+		
 		noi di "{txt}Processing network {bf:`first'}"
-		noi di `i'
-		noi nwset
 		if `i' == 1 {
-			noi di "h1"
-			noi di `"nwplot `first', generate(_c1_x _c1_y) size(`firstsize', norescale `sizeopt') symbol(`firstsymb', norescale forcekeys(`symbol_uniquevalues') `symbolopt') color(`firstcol', norescale forcekeys(`color_uniquevalues') `coloropt' ) edgesize(`firstedgesize') edgecolor(`firstedgecol') title("`firsttitle'"`title_opt') `options'"'
-
-			noi nwplot `first', generate(_c1_x _c1_y) size(`firstsize', norescale `sizeopt') symbol(`firstsymb', norescale forcekeys(`symbol_uniquevalues') `symbolopt') color(`firstcol', norescale forcekeys(`color_uniquevalues') `coloropt' ) edgesize(`firstedgesize') edgecolor(`firstedgecol') title("`firsttitle'"`title_opt') `options'
+		    nwplot `first', generate(_c1_x _c1_y) `sizecmd1' `symbolcmd1' `colorcmd1'  `edgesizecmd1' `edgecolorcmd1' `titlecmd1' `options'
+			
 			capture graph export `"`c(pwd)'/first`st'.`pic'"', replace `picopt'
-			noi di "h2"
 			if _rc != 0 {
 				di "{err}No writing right for working directory. Try changing the working directory.{txt}"
 				error
@@ -208,24 +249,19 @@ program nwmovie
 			}
 		}
 		else {
-			noi di "h3"
-			noi nwplot `first', generate(_c1_x _c1_y) size(`firstsize', norescale `sizeopt') symbol(`firstsymb', norescale forcekeys(`symbol_uniquevalues') `symbolopt') color(`firstcol',  norescale forcekeys(`color_uniquevalues') `coloropt') edgesize(`firstedgesize') edgecolor(`firstedgecol') title("`secondtitle'"`title_opt') `options'	
+			noi nwplot `first', generate(_c1_x _c1_y) `sizecmd1' `symbolcmd1' `colorcmd1'  `edgesizecmd1' `edgecolorcmd1' `titlecmd1'  `options'	
 			qui graph export `"`c(pwd)'/frame`st'.`pic'"', replace `picopt'
 		}
-		noi di "h5"
 		local st = string(`z',"%05.0f")
 		qui graph export `"`c(pwd)'/frame`st'.`pic'"', replace `picopt'
-		noi nwset
-		qui nwplot `second', generate(_c2_x _c2_y) size(`secondsize', norescale `sizeopt') symbol(`secondsymb', norescale forcekeys(`symbol_uniquevalues') `symbolopt') color(`secondcol',  norescale forcekeys(`color_uniquevalues') `coloropt') edgesize(`secondedgesize') edgecolor(`secondedgecol') title("`secondtitle'"`title_opt') `options'	
-		di "h6"
+		qui nwplot `second', generate(_c2_x _c2_y) `sizecmd2' `symbolcmd2'  `colorcmd2' `edgesizecmd2' `edgecolorcmd2' `titlecmd2' `options'	
 		local expnum = (`z' + `frames' + 2)
 		local st = string(`expnum',"%05.0f")
 		qui graph export `"`c(pwd)'/frame`st'.`pic'"', replace `picopt'
 		local z = `z' + 2
-		
 
-		forvalues j = 1/`frames' {
-			di "h7"
+		qui forvalues j = 1/`frames' {
+
 			// Network switch
 			if "`switchnetwork'" == "start" {
 				local framenet "second"
@@ -239,7 +275,7 @@ program nwmovie
 					local framenet "first"	
 				}
 			}
-			
+
 			// Color switch
 			if "`switchcolor'" == "start" {
 				local thirdcol "secondcol"
@@ -253,8 +289,6 @@ program nwmovie
 					local thirdcol "firstcol"	
 				}
 			}
-			
-			di "h8"
 
 			// Symbol switch
 			if "`switchsymbol'" == "start" {
@@ -269,9 +303,7 @@ program nwmovie
 					local thirdsymb "firstsymb"	
 				}
 			}
-			
-			di "h9"
-			
+
 			// Edgecolor switch
 			if "`switchedgecolor'" == "start" {
 				local thirdedgecol "secondedgecol"
@@ -299,9 +331,8 @@ program nwmovie
 					local thirdtitle "firsttitle"	
 				}
 			}
-			
-			di "h10"
-			
+
+
 			if (mod(`j',5) == 0) noi display "   ...frame `j'/`frames'"
 			local st = string(`z',"%05.0f")
 			local f = `frames' + 1
@@ -317,35 +348,26 @@ program nwmovie
 			if "`nodexy'" != "" {
 				local nx = ""
 			}
-			
-			di "h11"
 	
 			if ("`size'" != "" | "`edgesize'" != ""){
 				if "`edgesize'" != "" {
-					di "nwgenerate _frame_edgesize = round(`firstedgesize' - `steepness' * (`firstedgesize' - `secondedgesize'))"
-
-					qui nwgenerate _frame_edgesize = round(`firstedgesize' - `steepness' * abs(`firstedgesize' - `secondedgesize')))
+					nwgenerate _frame_edgesize = round(`firstedgesize' - `steepness' * (`firstedgesize' - `secondedgesize'))
 				}
 				if "`size'" != "" {
 					tempvar frame_size
 					qui gen `frame_size' = `firstsize' - `steepness' * (`firstsize' - `secondsize')
-					
-					di `"nwplot ``framenet'', `nx'  symbol(``thirdsymb'', norescale forcekeys(`symbol_uniquevalues') `symbolopt') color(``thirdcol'', norescale forcekeys(`color_uniquevalues') `coloropt' ) size(`frame_size', norescale `sizeopt') edgesize(_frame_edgesize) edgecolor(``thirdedgecol'') title("``thirdtitle''"`title_opt') `options'"'
-					qui nwplot ``framenet'', `nx'  symbol(``thirdsymb'', norescale forcekeys(`symbol_uniquevalues') `symbolopt') color(``thirdcol'', norescale forcekeys(`color_uniquevalues') `coloropt' ) size(`frame_size', norescale `sizeopt') edgesize(_frame_edgesize) edgecolor(``thirdedgecol'') title("``thirdtitle''"`title_opt') `options'
+					qui nwplot ``framenet'', `nx'  `symbolcmd3'  `colorcmd3' `sizecmd3' `edgesizecmd3' `edgecolorcmd3' `titlecmd3'  `options'
 				}
 				else {
-					di `"nwplot ``framenet'', `nx'  symbol(``thirdsymb'', norescale forcekeys(`symbol_uniquevalues') `symbolopt') color(``thirdcol'',  norescale forcekeys(`color_uniquevalues') `coloropt' ) edgesize(_frame_edgesize) edgecolor(``thirdedgecol'') title("``thirdtitle''"`title_opt') `options'"'
-			
-					qui nwplot ``framenet'', `nx'  symbol(``thirdsymb'', norescale forcekeys(`symbol_uniquevalues') `symbolopt') color(``thirdcol'',  norescale forcekeys(`color_uniquevalues') `coloropt' ) edgesize(_frame_edgesize) edgecolor(``thirdedgecol'') title("``thirdtitle''"`title_opt') `options'
+					qui nwplot ``framenet'', `nx'  `symbolcmd3' `colorcmd3' `edgesizecmd3' `edgecolorcmd3' `titlecmd3'  `options'
 				}
 			}
 			else{
-				qui nwplot ``framenet'', `nx'  symbol(``thirdsymb'', norescale forcekeys(`symbol_uniquevalues') `symbolopt') color(``thirdcol'', norescale forcekeys(`color_uniquevalues') `coloropt' ) edgecolor(``thirdedgecolor'') title("``thirdtitle''"`title_opt') `options' 
+				qui nwplot ``framenet'', `nx'  `symbolcmd3' `colorcmd3'  `edgecolorcmd3' `title(cmd3' `options' 
 			}
 			capture nwdrop _frame_edgesize
-			
-			di "h12"
-			qui graph export `"`c(pwd)'/frame`st'.`pic'"', replace `picopt' 
+
+			qui graph export `"{txt}`c(pwd)'/frame`st'.`pic'"', replace `picopt'
 			capture drop _frame_x _frame_y 
 			capture drop `frame_size' `frame_edgesize'
 			local z = `z' + 1
@@ -355,12 +377,13 @@ program nwmovie
 			capture drop _c1_* _c2_*
 		}
 	}
+	
 	// get last frame to pause for some time before re-looping
 	local st = string(`z',"%05.0f")
 	if "`nodexy'" == "" {
 		local nx "nodexy(_c2_x _c2_y)"
 	}
-	qui nwplot `second', `nx'  size(`secondsize', norescale `sizeopt') symbol(`secondsymb', norescale forcekeys(`symbol_uniquevalues') `symbolopt') color(`secondcol', norescale forcekeys(`color_uniquevalues') `coloropt') edgesize(`secondedgesize') edgecolor(`secondedgecol') title("`secondtitle'" `title_opt') `options'
+	qui nwplot `second', `nx'  `sizecmd2' `symbolcmd2' `colorcmd2'  `edgesizecmd2' `edgecolorcmd2' `titlecmd2' `options'
 	capture drop _c1_* _c2_*
 	qui graph export `"`c(pwd)'/last`st'.`pic'"', replace `picopt'	
 	

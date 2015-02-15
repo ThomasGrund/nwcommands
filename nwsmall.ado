@@ -1,6 +1,6 @@
 capture program drop nwsmall
 program nwsmall
-	syntax anything(name=nodes), k(integer) [ ntimes(integer 1) vars(string) stub(string) name(string) prob(real 0) shortcuts(integer 0) undirected noreplace xvars]
+	syntax anything(name=nodes), k(integer) [ ntimes(integer 1) vars(string) stub(string) name(string) prob(string) shortcuts(string) undirected noreplace xvars]
 	
 	local directed = ("`undirected'" == "")
 	

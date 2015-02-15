@@ -1,0 +1,92 @@
+
+VERSION 10.0
+SYNCHRONOUS_ONLY
+INCLUDE _std_large
+INCLUDE _ht350
+INCLUDE header
+
+HELP hlp1, view("help nwhomophily")
+RESET res1
+
+SCRIPT PREINIT
+BEGIN
+		program initialize
+END
+
+SCRIPT POSTINIT
+BEGIN
+		main.ed_new.setvalue "_same"
+END
+
+DIALOG main, title("nwexpand - Expand from variable")
+BEGIN
+	
+	CHECKBOX cx_nodes 320 50 100 ., label("Fix nodes:") onclickon(main.sp_nodes.show) onclickoff(main.sp_nodes.hide)
+	SPINNER sp_nodes 410 50 50 ., label("Nodes") default(10) max(9999) option(nodes)
+	
+	TEXT tx_var 50 30 150 . , label("Variable (required):")
+	VARNAME vn_var 50 50 230 ., label("Variable")
+
+	TEXT  tx_if	50 70 200 ., label("If: (expression)")
+    EXP   ex_if	50 90 230 ., label("Create...")
+	
+	TEXT tx_exp 50 120 200 . , label("Expand mode:")
+	COMBOBOX cb_exp 50 140 170 ., label("Mode") onselchangelist(expandaction) contents(expandmode) dropdownlist option(mode)
+	
+	INCLUDE nw_newnet_opt
+
+END
+
+LIST expandmode
+BEGIN
+	same
+	dist
+	distinv
+	absdist
+	absdistinv
+	sender
+	receiver
+END
+
+LIST expandaction
+BEGIN
+	main.ed_new.setvalue "_same"
+	main.ed_new.setvalue  "_dist"
+	main.ed_new.setvalue "_distinv"
+	main.ed_new.setvalue "_absdist"
+	main.ed_new.setvalue  "_absdistinv"
+	main.ed_new.setvalue  "_sender"
+	main.ed_new.setvalue  "_receiver"
+END
+
+LIST netlist
+BEGIN
+	// intentionally empty
+	// this list will be populated by _nwdialog.ado
+END
+
+PROGRAM initialize
+BEGIN
+	put "_nwdialog nwhomophily"
+	stata hidden immediate
+END
+
+PROGRAM command
+BEGIN
+	require main.vn_var
+	put "nwexpand " main.vn_var
+		if main.ex_if {
+		ifexp main.ex_if
+	}
+	beginoptions
+		if main.cx_nodes {
+			optionarg main.sp_nodes
+		}
+		optionarg main.cb_exp
+		option main.cx_xvars
+		optionarg main.ed_new
+		optionarg main.ed_labs 
+		optionarg main.ed_vars
+	endoptions
+	stata
+END

@@ -1,5 +1,6 @@
-v 1.1.0
+v 1.1.2
 d nwcommands Social Network Analysis Using Stata
 d Program by Thomas Grund, Linkoping University, IAS 
 p nwcommands-hlp Social Network Analysis Using Stata - Help Files
 p nwcommands-ado Social Network Analysis Using Stata - Core
+p nwcommands-dlg Social Network Analysis Using Stata - Dialogs

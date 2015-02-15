@@ -1,0 +1,72 @@
+VERSION 10
+
+INCLUDE _std_small
+SYNCHRONOUS_ONLY
+HELP hlp1, view("help nwsym")
+OK ok1,	label("OK")
+CANCEL	can1, label("Cancel")
+SUBMIT	sub1, label("Submit")
+RESET	res1
+POSITION 10 10 360 180
+
+SCRIPT PREINIT
+BEGIN
+	program initialize
+END
+
+DIALOG main, title("nwsym - Symmetrize network")
+BEGIN
+  TEXT     tx_var	20	20	100	.,	label("Network:") 		
+  COMBOBOX cb_var	80	20	210	.,	dropdown contents(netlist) nomem append
+  TEXT tx_add 20 50 70 ., label("Mode:") 
+  COMBOBOX cb_mode 80 50 100 ., content(mode) nomem dropdownlist default("max")
+  CHECKBOX cx_new 80 80 200 ., label("Generate new network") onclickon(script generateOn) onclickoff(script generateOff)
+  TEXT tx_new 80 110 150 ., label("New network name:")
+  EDIT ed_new 80 130 150 ., default("") nomem
+END
+
+SCRIPT generateOn 
+BEGIN
+	main.tx_new.show
+	main.ed_new.show
+END
+
+SCRIPT generateOff
+BEGIN
+	main.tx_new.hide
+	main.ed_new.hide
+END
+
+LIST mode
+BEGIN
+	max
+	min
+END
+
+LIST netlist
+BEGIN
+	// intentionally empty
+	// this list will be populated by _nwdialog.ado
+END
+
+
+PROGRAM initialize
+BEGIN
+	put "_nwdialog nwsym"
+	stata hidden immediate
+END
+
+PROGRAM command
+BEGIN
+	put "nwsym " main.cb_var
+	put ", mode("  main.cb_mode ")"
+	if main.cx_new {
+		if main.ed_new.isneq("") {
+			put " noreplace name(" main.ed_new ")"
+		}
+		if main.ed_new.iseq("") {
+			put " noreplace"
+		}
+	}
+	stata
+END

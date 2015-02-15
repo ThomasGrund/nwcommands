@@ -1,8 +1,12 @@
 capture program drop nwexpand	
 program nwexpand
-	syntax varlist(min=1 max=1),[ stub(string) mode(string) vars(string) nodes(integer 0) xvars name(string) noreplace]
+	syntax varlist(min=1 max=1) [if],[ stub(string) mode(string) vars(string) nodes(integer 0) xvars name(string) noreplace]
 	
-
+	preserve
+	if "`if'" != "" {
+		qui keep `if'
+	}
+	
 	// check if this is the first network in this Stata session
 	if "$nwtotal" == "" {
 		global nwtotal = 0
@@ -21,6 +25,11 @@ program nwexpand
 		if (`nodes'==0){
 			error 6200
 		}
+	}
+	
+	if `nodes' > `=_N' {
+		di "{err}Not enough observations for variable {bf:`varlist'}."
+		error 6200
 	}
 		
 	// generate valid network name and valid varlist
@@ -76,6 +85,7 @@ program nwexpand
 	}
 	capture mata: mata drop expnet 
 	capture mata: mata drop attr
+	restore
 end
 	
 capture mata mata drop distMat()

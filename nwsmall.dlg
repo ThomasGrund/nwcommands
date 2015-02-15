@@ -1,0 +1,101 @@
+/*
+  tabulate2
+
+*!  VERSION 1.1.2  23jan2013
+
+*/
+
+VERSION 10.0
+SYNCHRONOUS_ONLY
+INCLUDE _std_medium
+INCLUDE _ht350
+INCLUDE header
+
+HELP hlp1, view("help nwsmall")
+RESET res1
+
+SCRIPT PREINIT
+BEGIN
+		program initialize
+END
+
+SCRIPT POSTINIT
+BEGIN
+		main.ed_new.setvalue "_small"
+END
+
+DIALOG main, title("nwrandom - Generate Small-World network")
+BEGIN
+	
+	TEXT tx_nodes 50 30 100 ., label("Number of nodes:")
+	SPINNER sp_nodes 160 30 50 ., label("Nodes") default(10) max(9999)
+	
+	TEXT tx_nets 220 30 130 ., label("Number of networks:")
+	SPINNER sp_nets 350 30 50 ., label("Networks") default(1) option(ntimes) max(999)
+	
+	TEXT tx_neigh 50 60 100 . , label("Node neighbors (k):")
+	SPINNER sp_neigh 160 60 50 ., label("Neighbors") default(2)
+	
+	GROUPBOX gb_ties 280 60 100 100, label("Arc/edge")
+	RADIO rb_directed 290 90 100 ., label("Directed") first
+	RADIO rb_undirected 290 110 120 ., label("Undirected") last option(undirected)
+	
+	RADIO rb_prob 50 90 150 ., label("Rewire probability   .") first onclickoff(script rewireProbOff) onclickon(script rewireProbOn)
+	SPINNER sp_prob1 180 90 40 ., label("prob1") nomem option(prob)	
+	RADIO rb_short 50 110 150 ., label("Network shortcuts")  last onclickoff(script rewireShortOff) onclickon(script rewireShortOn)
+	SPINNER sp_short 180 110 40 ., label("shortcut") nomem option(shortcuts)
+	
+	INCLUDE nw_newnet_opt
+END
+
+SCRIPT rewireProbOff
+BEGIN
+	main.sp_prob1.disable
+END
+
+SCRIPT rewireShortOff
+BEGIN
+	main.sp_short.disable
+END
+
+SCRIPT rewireProbOn
+BEGIN
+	main.sp_prob1.enable
+END
+
+SCRIPT rewireShortOn
+BEGIN
+	main.sp_short.enable
+END
+
+LIST netlist
+BEGIN
+	// intentionally empty
+	// this list will be populated by _nwdialog.ado
+END
+
+PROGRAM initialize
+BEGIN
+	put "_nwdialog nwsmall"
+	stata hidden immediate
+END
+
+PROGRAM command
+BEGIN
+
+	put "nwsmall " main.sp_nodes 
+	beginoptions
+		put " k(" main.sp_neigh ")"
+		if main.sp_prob1.isenabled() {
+			put " prob(." main.sp_prob1 ")" 
+		}
+		optionarg main.sp_short
+		optionarg main.sp_nets
+		option main.rb_undirected
+		option main.cx_xvars
+		optionarg main.ed_new
+		optionarg main.ed_labs 
+		optionarg main.ed_vars
+	endoptions
+	stata
+END

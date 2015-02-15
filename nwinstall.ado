@@ -1,6 +1,6 @@
 capture program drop nwinstall
 program nwinstall
-	syntax [, permanently remove]
+	syntax [, permanently remove downloadoff]
 	
 	tempname fh1 fh2
 					
@@ -10,9 +10,12 @@ program nwinstall
 	}
 	else {
 		run nwinstall_dlg.do
-		/*capture ado uninstall "nwcommands-dlg"
-		net from "http://nwcommands.org"
-		net install "nwcommands-dlg", all*/
+		
+		if "`downdloadoff'" == "" {
+			capture ado uninstall "nwcommands-dlg"
+			net from "http://nwcommands.org"
+			net install "nwcommands-dlg", all
+		}
 	}
 		
 		

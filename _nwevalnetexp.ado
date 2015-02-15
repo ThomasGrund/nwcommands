@@ -231,6 +231,7 @@ program _nwevalnetexp
 				local exp = subinword("`exp'", "`x'", "stataVar_`stataVars'",.)
 			}
 			
+			/*
 			// word is neither number, operator, nor network or variable
 			if (`found' == 0) {
 				if (strpos("`x'","_nw") == 1){
@@ -241,7 +242,7 @@ program _nwevalnetexp
 				}
 				local errorOccued = "errorNetwork"
 				continue, break
-			}
+			}*/
 		}
 	}
 	

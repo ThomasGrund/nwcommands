@@ -20,9 +20,9 @@ END
 DIALOG main, title("nwsummarize - Summarize a network")
 BEGIN
   TEXT     tx_var	10	10	100	.,	///
-	label("Network:") 		
+	label("Networks:") 		
   COMBOBOX cb_var	+60	@	240	.,	///
-  	dropdownlist contents(netlist) 
+  	dropdown contents(netlist) append nomem
   RADIO  rb_sum 70  50 170 ., first  label("Only summary")
   RADIO  rb_mat  @ +20   @ ., middle label("Add adjacency matrix") 
   RADIO  rb_only  @ +20   @ ., last label("Only adjacency matrix")

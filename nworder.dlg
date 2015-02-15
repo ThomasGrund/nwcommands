@@ -1,0 +1,157 @@
+
+VERSION 11.0
+SYNCHRONOUS_ONLY
+INCLUDE _std_medium
+DEFINE _dlght 300
+INCLUDE header
+
+HELP hlp1, view("help nworder")
+RESET res1
+
+
+SCRIPT PREINIT
+BEGIN
+	program initialize
+END
+
+SCRIPT POSTINIT_PROGRAM
+BEGIN
+        if __MESSAGE {
+                call main.vl_vars.setvalue class __MESSAGE.value
+        }
+END
+
+DIALOG main, label("nworder - Reorder networks in dataset")              ///
+        tabtitle("Main")
+BEGIN
+  TEXT tx_vars          _lft    _top    _iwd    .,                      ///
+        label("Networks to reorder:")
+  COMBOBOX vl_vars       @       _ss     _iwd    .,                      ///
+        label("Networks to reorder") dropdown nomem append contents(netlist)
+  GROUPBOX gb_action    @       _ls     _iwd    _ht14,                  ///
+        label("New position")
+  RADIO rb_first        _ilft   _mls    _ibwd   ., first                ///
+        onclickon(program alpha_sequential_ck)                          ///
+        onclickoff(program alpha_sequential_ck)                         ///
+        option(first)                                                   ///
+        label("Place networks to reorder at the beginning of the dataset")
+  RADIO rb_last         @       _ss     @       .,                      ///
+        onclickon(program alpha_sequential_ck)                          ///
+        onclickoff(program alpha_sequential_ck)                         ///
+        option(last) nomemory                                           ///
+        label("Place networks to reorder at the end of the network")
+  RADIO rb_before       _ilft   _ss     _ibwd   .,                      ///
+        onclickon(program main_before_ck)                               ///
+        onclickoff(program main_before_ck)                              ///
+        label("Place networks to reorder before specified network")
+  COMBOBOX vn_before     _indent2 _ss    _vnwd   .,                      ///
+        option(before)  dropdown contents(netlist)  nomem                            ///
+        label("Place networks to reorder before specified network")
+  RADIO rb_after        _ilft   _mls    _ibwd   ., last                 ///
+        onclickon(program main_after_ck)                                ///
+        onclickoff(program main_after_ck)                               ///
+        label("Place networks to reorder after specified network")
+  COMBOBOX vn_after      _indent2 _ss    _vnwd   .,                      ///
+        option(after)  dropdown contents(netlist) nomem     					      ///
+        label("Place networks to reorder after specified network")
+  CHECKBOX ck_alpha     _lft    +45     _ibwd   .,                      ///
+        onclickon(program alpha_sequential_ck)                          ///
+        onclickoff(program alpha_sequential_ck)                         ///
+        option(alphabetic)                                              ///
+        label("Sort networks alphabetically")
+  CHECKBOX ck_sequential @      _ms     @       .,                      ///
+        onclickon(program alpha_sequential_ck)                          ///
+        onclickoff(program alpha_sequential_ck)                         ///
+        option(sequential)                                              ///
+        label("Alphabetize netlist keeping numbers sequential")
+END
+
+LIST netlist
+BEGIN
+	// intentionally empty
+	// this list will be populated by _nwdialog.ado
+END
+
+
+PROGRAM initialize
+BEGIN
+	put "_nwdialog nworder"
+	stata hidden immediate
+END
+
+PROGRAM main_before_ck
+BEGIN
+        call program alpha_sequential_ck
+        if main.rb_before {
+                call main.vn_before.enable
+        }
+        else {
+                call main.vn_before.disable
+        }
+END
+
+PROGRAM main_after_ck
+BEGIN
+        call program alpha_sequential_ck
+        if main.rb_after {
+                call main.vn_after.enable
+        }
+        else {
+                call main.vn_after.disable
+        }
+END
+
+PROGRAM alpha_sequential_ck
+BEGIN
+        if (!main.ck_alpha | !main.ck_sequential) {
+                call main.tx_vars.setlabel "Variables to reorder:"
+        }
+        if (main.ck_alpha) {
+                call main.tx_vars.setlabel "Variables to reorder:  (leave empty for all
+>  variables)"
+                call main.ck_sequential.disable 
+        }
+        if (!main.ck_alpha) {
+                call main.ck_sequential.enable
+        }
+        if (main.ck_sequential) {
+                call main.tx_vars.setlabel "Variables to reorder:  (leave empty for all
+>  variables)"
+                call main.ck_alpha.disable
+        }
+        if (!main.ck_sequential) {
+                call main.ck_alpha.enable
+        }
+END
+
+PROGRAM command
+BEGIN
+        put "nworder "
+        if (main.ck_alpha | main.ck_sequential) {
+                varlist [main.vl_vars]
+                if (main.vl_vars.iseq("")) {
+                        put "_all"      
+                }
+        }
+        else {
+                varlist main.vl_vars
+        }
+
+        beginoptions
+                if main.rb_before {
+                        require main.vl_vars
+                        //require main.vn_before
+                        optionarg main.vn_before
+                }
+                if main.rb_after {
+                        require main.vl_vars
+                        //require main.vn_after
+                        optionarg main.vn_after
+                }
+                option main.rb_first
+                option main.rb_last
+                option main.ck_sequential
+                option main.ck_alpha
+        endoptions
+END
+

@@ -17,12 +17,13 @@
 [{ifin}]
 [{cmd:,}
 {opth attr:ibutes(varlist)}
+{opt netonly}]
 
 {synoptset 20 tabbed}{...}
 {synopthdr}
 {synoptline}
 {synopt:{opth attr:ibutes(varlist)}}Attribute variables that are included in the keep{p_end}
-{synopt:{opt netonly}}Only keep the network, but leaves all Stata variables untouched{p_end}
+{synopt:{opt netonly}}Only keep the network, but leave all Stata variables untouched{p_end}
 
 {synoptline}
 {p2colreset}{...}

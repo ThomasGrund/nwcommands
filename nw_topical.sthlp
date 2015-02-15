@@ -1,5 +1,5 @@
 {smcl}
-{* *! version 3 12feb2015}{...}
+{* *! version  15feb2015}{...}
 {phang}
 {help nwcommands:NW-2 topical} {hline 2} 
 {hline 2} Topical list of network commands
@@ -81,11 +81,13 @@
 {col 8}   {c BLC}{hline 24}{c BRC}
 {p2colset 12 35 36 2}
 {p2col:    {bf:{help nwcurrent }}}Report and set current network{p_end}
+{p2col:    {bf:{help nwds }}}List networks matching name patterns{p_end}
 {p2col:    {bf:{help nwdyads }}}Dyad census{p_end}
 {p2col:    {bf:{help nwissymmetric }}}Check if network is symmetric{p_end}
 {p2col:    {bf:{help nwname }}}Check name and change meta-information of a network{p_end}
 {p2col:    {bf:{help nwsummarize }}}Summarize a network{p_end}
 {p2col:    {bf:{help nwtabulate }}}{p_end}
+{p2col:    {bf:{help nwtriads }}}Triad census of the network{p_end{p_end}
 {marker manipulation}{...}
 
 {col 8}   {c TLC}{hline 24}{c TRC}
@@ -98,12 +100,14 @@
 {p2col:    {bf:{help nwkeep }}}Keep a network (or only certain nodes){p_end}
 {p2col:    {bf:{help nwkeepnodes }}}Keep nodes of a network{p_end}
 {p2col:    {bf:{help nwname }}}Check name and change meta-information of a network{p_end}
+{p2col:    {bf:{help nworder }}}Reorder networks in dataset{p_end}
 {p2col:    {bf:{help nwrecode }}}Recode network{p_end}
 {p2col:    {bf:{help nwrename }}}Rename network{p_end}
 {p2col:    {bf:{help nwreplace }}}Replace network{p_end}
-{p2col:    {bf:{help nwreplacemat }}}Replace network with Mata matrix{p_end}
+{p2col:    {bf:{help nwreplacemat }}}Replace network with Stata or Mata matrix{p_end}
 {p2col:    {bf:{help nwsort }}}Sort network nodes{p_end}
 {p2col:    {bf:{help nwsubset }}}Subset a network{p_end}
+{p2col:    {bf:{help nwtranspose }}}Transpose a network{p_end}
 {marker analysis}{...}
 
 {col 8}   {c TLC}{hline 24}{c TRC}
@@ -136,7 +140,19 @@
 {p2colset 12 35 36 2}
 {p2col:    {bf:{help nwclear }}}Clear all networks and variables from memory{p_end}
 {p2col:    {bf:{help nwcurrent }}}Report and set current network{p_end}
-{p2col:    {bf:{help nwds }}}List networks matching name patterns{p_end}
+{marker analysis}{...}
+
+{col 8}   {c TLC}{hline 24}{c TRC}
+{col 8}{hline 3}{c RT}       {it:Utilities}{col 36}{c LT}{hline}
+{col 8}   {c BLC}{hline 24}{c BRC}
+{p2colset 12 35 36 2}
+{p2col:    {bf:{help nwinstall }}}Install Stata menu/dialogs{p_end}
+{marker utilities}{...}
+
+{col 8}   {c TLC}{hline 24}{c TRC}
+{col 8}{hline 3}{c RT}       {it:Utilities}{col 36}{c LT}{hline}
+{col 8}   {c BLC}{hline 24}{c BRC}
+{p2colset 12 35 36 2}
 {p2col:    {bf:{help nwload }}}Load a network as Stata variables{p_end}
 {p2col:    {bf:{help nwsync }}}Sync network with Stata variables{p_end}
 {p2col:    {bf:{help nwtomata }}}Return adjacency matrix of network{p_end}
@@ -171,10 +187,11 @@
 {p2col:{bf:{help _extract_valuelabels }}}{err}no help file yet{txt}{p_end}
 {p2col:{bf:{help _nwdeploy }}}{err}no help file yet{txt}{p_end}
 {p2col:{bf:{help _nwdialog }}}{err}no help file yet{txt}{p_end}
+{p2col:{bf:{help _nwdialog_append }}}{err}no help file yet{txt}{p_end}
+{p2col:{bf:{help _nwdialog_lablist }}}{err}no help file yet{txt}{p_end}
 {p2col:{bf:{help _nwevalnetexp }}}{err}no help file yet{txt}{p_end}
 {p2col:{bf:{help _nwsetobs }}}{err}no help file yet{txt}{p_end}
 {p2col:{bf:{help _nwsyntax_other }}}{err}no help file yet{txt}{p_end}
 {p2col:{bf:{help _opts_oneof }}}{err}no help file yet{txt}{p_end}
 {p2col:{bf:{help nwergm }}}{err}no help file yet{txt}{p_end}
-{p2col:{bf:{help nwinstall }}}{err}no help file yet{txt}{p_end}
 {p2col:{bf:{help nwtostata }}}{err}no help file yet{txt}{p_end}

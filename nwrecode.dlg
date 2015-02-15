@@ -1,0 +1,179 @@
+VERSION 10
+
+INCLUDE _std_small  
+SYNCHRONOUS_ONLY
+INCLUDE _std_large
+INCLUDE _ht310
+INCLUDE header
+
+
+SCRIPT PREINIT
+BEGIN
+	program initialize
+END
+
+DIALOG main, tabtitle("Main") title("nwrecode - Recode tie values")
+BEGIN
+  TEXT     tx_var	10	10	100	.,	///
+	label("Networks:") 		
+  COMBOBOX cb_var	+60	@	240	.,	///
+  	dropdown contents(netlist) append nomem
+TEXT     tx_rule         @         _ls        _comb4_1 .,             /*
+        */label("Choose rule formats to edit or construct your own rules:")/*
+        */
+  BUTTON   bu_rule         _lft4_4   @          _cwd4_1  .,             /*
+        */label("Examples...")                                          /*
+        */push("script help_me")
+  TEXT    tx_req           _lft      _ms        _iwd     .,label("Required:")
+  COMBOBOX cb_rul1         _lft      _ss        _iwd     .,             /*
+        */label("Choose rule formats to edit or construct your own rules")/*
+                */contents(rules) dropdown append                       /*
+                */
+  TEXT     tx_opt          @         _ms        @        .,label("Optional:")
+  COMBOBOX cb_rul2         @         _ss        @        .,             /*
+        */label("Choose rule formats to edit or construct your own rules")/*
+                */contents(rules) dropdown append                       /*
+                */
+  COMBOBOX cb_rul3         @         _ms        @        .,             /*
+        */label("Choose rule formats to edit or construct your own rules")/*
+                */contents(rules) dropdown append                       /*
+                */
+  COMBOBOX cb_rul4         @         _ms        @        .,             /*
+        */label("Choose rule formats to edit or construct your own rules")/*
+                */contents(rules) dropdown append                       /*
+                */
+  COMBOBOX cb_rul5         @         _ms        @        .,             /*
+        */label("Choose rule formats to edit or construct your own rules")/*
+                */contents(rules) dropdown append                       /*
+                */
+  COMBOBOX cb_rul6         @         _ms        @        .,             /*
+        */label("Choose rule formats to edit or construct your own rules")/*
+                */contents(rules) dropdown append                       /*
+                */
+  COMBOBOX cb_rul7         @         _ms        @        .,             /*
+        */label("Choose rule formats to edit or construct your own rules")/*
+                */contents(rules) dropdown append                       /*
+                */
+END
+
+DIALOG opt, label("") /*
+                */ tabtitle("Options")
+BEGIN
+  /*--+----1----+----2----+----3----+----4----+----5----+----6----+----7----+*/
+  GROUPBOX gb_gen          _lft      _top       _iwd     _ht11h,        /*
+        */label("Create new networks or replace existing ones?")
+  RADIO    rb_rep          _indent   _ms        _ibwd    .,             /*
+                */label("Replace existing networks") /*
+                */first                                                 /*
+                */clickon(script rep_on)                                /*
+                */option("NONE")
+  DEFINE holdx @x
+  RADIO    rb_gen          @         _ms        @        .,             /*
+                */label("Generate new networks:")                      /*
+                */clickon(script gen_on)                                /*
+                */option("NONE")
+  EDIT     ed_gen          _indent2  _ss        _inwd    .,             /*
+                */label("Generate new networks") option(generate)
+  RADIO    rb_pre          holdx     _ms        _ibwd    .,             /*
+                */label("Generate new networks with this prefix:")     /*
+                */option("NONE")                                        /*
+                */clickon(script pre_on)                                /*
+                */last
+  EDIT     ed_pre          _indent2  _ss        _vnwd    .,             /*
+                */label("Generate new networks with prefix")           /*
+                */default("new_")                                       /*
+                */max(32) option(prefix)
+  CHECKBOX ck_test          _lft      _ls        _iwd        .,             /*
+                */label("Test that rules are invoked and do not overlap")/*
+                */option("test")
+END
+
+
+LIST netlist
+BEGIN
+	// intentionally empty
+	// this list will be populated by _nwdialog.ado
+END
+
+SCRIPT help_me
+BEGIN
+  view help recode_rules##|_new
+END
+
+SCRIPT rep_on
+BEGIN
+  opt.ed_gen.disable
+  opt.ed_pre.disable
+END
+
+SCRIPT gen_on
+BEGIN
+  opt.ed_gen.enable
+  opt.ed_pre.disable
+END
+
+SCRIPT pre_on
+BEGIN
+  opt.ed_gen.disable
+  opt.ed_pre.enable
+END
+
+LIST rules
+BEGIN
+  (# = #)
+  (#/# = #)
+  (# # = #)
+  (#/# # = #)
+  (nonmissing = #)
+  (missing = #)
+  (else = #)
+  (# = # "label")
+  (#/# = # "label")
+  (# # = # "label")
+  (#/# # = # "label")
+  (nonmissing = # "label")
+  (missing = # "label")
+  (else = # "label")
+END
+
+
+
+
+PROGRAM initialize
+BEGIN
+	put "_nwdialog nwrecode"
+	stata hidden immediate
+END
+
+PROGRAM command
+BEGIN
+        put "nwrecode " main.cb_var
+        put " "
+        require main.cb_rul1
+        put main.cb_rul1
+        put " "
+        put main.cb_rul2
+        put " "
+        put main.cb_rul3
+        put " "
+        put main.cb_rul4
+        put " "
+        put main.cb_rul5
+        put " "
+        put main.cb_rul6
+        put " "
+        put main.cb_rul7
+        beginoptions
+                if opt.rb_gen {
+                        require opt.ed_gen
+                        optionarg opt.ed_gen
+                }
+                if opt.rb_pre {
+                        require opt.ed_pre
+                        optionarg opt.ed_pre
+                }
+                option opt.ck_test
+        endoptions
+		stata
+END
+

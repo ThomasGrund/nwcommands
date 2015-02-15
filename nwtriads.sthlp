@@ -1,9 +1,7 @@
 {smcl}
 {* *! version 1.0.0  3sept2014}{...}
-{marker topical}
+{marker topic}
 {helpb nw_topical##information:[NW-2.4] Information}
-{cmd:help nwtriads}
-{hline}
 
 {title:Title}
 
@@ -16,12 +14,12 @@
 
 {p 8 17 2}
 {cmdab: nwtriads} 
-[{help netname}]
+[{help netlist}]
 
 {title:Description}
 
 {pstd}
-Returns the triad census of the network. This is a way to characertize a network based on its triads.
+Returns the triad census of the network (or a list of networks). This is a way to characertize a network based on its triads.
 
 {pstd}
 Each unique triad (triple of nodes {it:i}, {it:j}, and {it:k})
@@ -53,7 +51,7 @@ in a directed network can be one of the following:
 {title:Examples}
 	
 	{cmd:. webnwuse glasgow}
-	{com}. nwtriads
+	{com}. nwtriads glasgow3
 {res}
 {txt}    Triad census: {res} glasgow3{txt}
 

@@ -100,3 +100,8 @@ execute more slowly.
 {phang2}{cmd:. webnwuse florentine}{p_end}
 {phang2}{cmd:. nwsort wealth}
 
+
+{title:See also}
+
+	{help nwpermute}, {help sort}
+

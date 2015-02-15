@@ -1,0 +1,52 @@
+VERSION 10
+
+INCLUDE _std_small
+//INCLUDE _std_small /* this INCLUDES _small.idlg, which defines
+//                     _dlgwd = 350 and _dlght = 200 */
+//INCLUDE header  
+SYNCHRONOUS_ONLY
+HELP hlp1, view("help nwcomponents")
+OK ok1,	label("OK")
+CANCEL	can1, label("Cancel")
+SUBMIT	sub1, label("Submit")
+RESET	res1
+POSITION 10 10 370 150
+
+SCRIPT PREINIT
+BEGIN
+	program initialize
+END
+
+DIALOG main, title("nwcomponents - Components of networks")
+BEGIN
+  TEXT     tx_var	20	20	100	.,	///
+	label("Networks:") 		
+  COMBOBOX cb_var	+70	20	240	.,	///
+  	dropdown contents(netlist) append nomem
+  TEXT tx_new 20 50 200 ., label("Generate new variable with this prefix:")
+  EDIT ed_new 230 50 100 ., default("_component") nomem
+  CHECKBOX cx_lgc 50 100 200 ., label("Calculate largest component") onclickoff(main.ed_new.setvalue "_component") onclickon(main.ed_new.setvalue "_lgc")
+END
+
+LIST netlist
+BEGIN
+	// intentionally empty
+	// this list will be populated by _nwdialog.ado
+END
+
+
+PROGRAM initialize
+BEGIN
+	put "_nwdialog nwcomponents"
+	stata hidden immediate
+END
+
+PROGRAM command
+BEGIN
+	put "nwcomponents " main.cb_var
+	put ", generate(" main.ed_new ")"
+	if main.cx_lgc {
+		put " lgc"
+	}
+	stata
+END

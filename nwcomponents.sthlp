@@ -13,7 +13,7 @@
 
 {p 8 17 2}
 {cmdab: nwcomponents} 
-{it:{help netlist}}
+[{it:{help netlist}}]
 [, {opt lgc}
 {opth generate(newvarname)}]
 

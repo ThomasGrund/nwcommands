@@ -1,0 +1,97 @@
+/*
+  tabulate2
+
+*!  VERSION 1.1.2  23jan2013
+
+*/
+
+VERSION 10.0
+SYNCHRONOUS_ONLY
+INCLUDE _std_medium
+INCLUDE header
+
+HELP hlp1, view("help nwtab1")
+RESET res1
+
+SCRIPT PREINIT
+BEGIN
+		program initialize
+END
+
+
+DIALOG main, label("nwtab1 - One-way table") tabtitle("Main")
+BEGIN
+  TEXT     tx_var    _lft      _top      195       .,                   /*
+                */ label("Network:")                       /*
+                */
+  COMBOBOX  vn_var   @         _ss       _vnwd     .,                   /*
+                */ label("Network")    contents(netlist) nomem   dropdownlist                         /*
+                */
+  CHECKBOX ck_miss   _lft      _ls       _iwd      .,                   /*
+                */ label("Treat missing values like other values")      /*
+                */ option("missing")                                    /*
+                */
+  CHECKBOX ck_nofreq @         _ms       @         .,                   /*
+                */ label("Do not display frequencies")                  /*
+                */ option("nofreq")                                     /*
+                */
+  CHECKBOX ck_plot   @         _ms       @         .,                   /*
+        */ label("Produce a bar chart of the relative frequencies")     /*
+                */ option("plot")                                       /*
+                */
+  CHECKBOX ck_sort   @         _ms       @         .,                   /*
+        */ label("Display the table in descending order of frequency")  /*
+                */ option("sort")                                       
+     
+END
+
+
+DIALOG adv, label("") tabtitle("Advanced")
+BEGIN
+  TEXT     tx_matcel _lft      _top       _iwd      .,                   /*
+                */ label("Generate a matrix with the cell frequencies:")/*
+                */
+  EDIT     ed_matcel _lft      _ss       _vnwd     .,                   /*
+                */ label("Matrix of cell frequencies")                  /*
+                */ max(32)                                              /*
+                */ option("matcell")                                    /*
+                */
+
+  TEXT     tx_matrow _lft      _ls       _iwd      .,                   /*
+                */ label("Generate a matrix with the row values:")      /*
+                */
+  EDIT     ed_matrow _lft      _ss       _vnwd     .,                   /*
+                */ label("Matrix of row values")                        /*
+                */ max(32)                                              /*
+                */ option("matrow")                                     /*
+                */
+
+END
+
+
+LIST netlist
+BEGIN
+	// intentionally empty
+	// this list will be populated by _nwdialog.ado
+END
+
+PROGRAM initialize
+BEGIN
+	put "_nwdialog nwtabulate1"
+	stata hidden immediate
+END
+
+
+PROGRAM command
+BEGIN
+        put "nwtabulate " main.vn_var
+        beginoptions
+                option main.ck_miss
+                option main.ck_nofreq
+                option main.ck_plot
+                option main.ck_sort
+                optionarg adv.ed_matcel
+                optionarg adv.ed_matrow
+        endoptions
+END
+

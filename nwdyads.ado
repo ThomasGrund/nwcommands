@@ -1,9 +1,9 @@
 capture program drop nwdyads
 program nwdyads
 	version 9
-	syntax [anything(name=netname)], [ triad ]
+	syntax [anything(name=netlist)],
 	
-	_nwsyntax `netname', max(1)
+	_nwsyntax `netlist', max(9999) name(netlist)
 	
 	if "`mode'" == "" {
 		local mode = "dyad"
@@ -11,6 +11,8 @@ program nwdyads
 	
 	mata: st_rclear()
 	
+	local netname ""
+	foreach netname in `netlist' {
 	// Dyad census of directed network
 	if ("`directed'" == "true" ) {
 		nwtomata `netname', mat(censusMat)
@@ -33,6 +35,7 @@ program nwdyads
 		di "{txt}{ralign 10:Mutual}{col 12}{c |}{ralign 10:Asym}{col 24}{c |}{ralign 10:Null}"
 		di "{hline 11}{c +}{hline 11}{c +}{hline 11}"
 		di "{res}{ralign 10:`r(_100)'}{col 12}{c |}{ralign 10:`r(_010)'}{col 24}{c |}{ralign 10:`r(_001)'}"
+		di " "
 	}
 	
 	// Dyad census for undirected network
@@ -52,8 +55,10 @@ program nwdyads
 		di "{txt}{ralign 10:Mutual}{col 12}{c |}{ralign 10:Null}"
 		di "{hline 11}{c +}{hline 11}"
 		di "{res}{ralign 10:`r(_100)'}{col 12}{c |}{ralign 10:`r(_001)'}"
+		di " "
 	}
 	mata: st_global("r(name)", "`netname'")
+	}
 end
 	
 	

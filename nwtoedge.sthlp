@@ -37,8 +37,7 @@
 {opth toid(newvarname)}
 {opth link(newvarname)}
 {opt forceundirected}
-{opt forcedirected}
-{opt full}]
+{opt forcedirected}]
 
 		
 {synoptset 20 tabbed}{...}
@@ -66,8 +65,8 @@ receiving node {it:j}. Lastly, a variable {it:netname} (unless {opt link()} is s
 dyad pair ({it:i},{it:j}).
 
 {pstd}
-The command produces a dataset of dyads. Option {opt full} generates entries for all dyads (including the ones
-with tie value 0). By default, only entries are produced for dyads with values != 0 and for individual nodes.
+The command produces a dataset of dyads. For undirected networks with {it:n} nodes, {it:(n x (n-1)) / 2 + n} entries are generated. For
+directed networks (or when option {opt forcedirected} is used, the command produces {it:(n x n)} entries.
 
 {pstd}
 One can also specify which attribute variables should be included in the new dataset. Option {opt fromvars()} 

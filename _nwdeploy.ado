@@ -1,13 +1,13 @@
  capture program drop _nwdeploy
 program _nwdeploy
-	syntax ,version(string) [author(string)  email(string) other(string)]
+	syntax ,[author(string)  email(string) other(string)]
 
 	set more off
 	tempname deploy_ado
 	file open `deploy_ado' using nwcommands-ado.pkg, replace write
-	file write `deploy_ado' "v `version'" _n
+	file write `deploy_ado' "v 3" _n
 	file write `deploy_ado' "d nwcommands-ado. Social Network Analysis Using Stata" _n
-	file write `deploy_ado' "d Thomas U. Grund and Peter Hedstrom, Linkoping University, www.liu.se/ias" _n
+	file write `deploy_ado' "d Thomas U. Grund, Linkoping University, www.liu.se/ias" _n
 	file write `deploy_ado' "d email: contact@nwcommands.org" _n
 	local d = lower(subinstr(c(current_date)," ","",.))
 	file write `deploy_ado' "d Distribution-Date: `d'" _n
@@ -159,7 +159,7 @@ program _nwdeploy
 	file open deploy_hlp using nwcommands-hlp.pkg, replace write
 	file write deploy_hlp "v 3" _n
 	file write deploy_hlp "d nwcommands-hlp. Social Network Analysis Using Stata - Help Files" _n
-	file write deploy_hlp "d Thomas U. Grund and Peter Hedstrom, Linkoping University, www.liu.se/ias" _n
+	file write deploy_hlp "d Thomas U. Grund, Linkoping University, www.liu.se/ias" _n
 	file write deploy_hlp "d email: contact@nwcommands.org" _n
 	local d = lower(subinstr(c(current_date)," ","",.))
 	file write deploy_hlp "d Distribution-Date: `d'" _n
@@ -171,6 +171,24 @@ program _nwdeploy
 	file close deploy_hlp
 	
 	
+	file open deploy_dlg using nwcommands-dlg.pkg, replace write
+	file write deploy_dlg "v 3" _n
+	file write deploy_dlg "d nwcommands-hlp. Social Network Analysis Using Stata - Dialog Boxes" _n
+	file write deploy_dlg "d Thomas U. Grund, Linkoping University, www.liu.se/ias" _n
+	file write deploy_dlg "d email: contact@nwcommands.org" _n
+	local d = lower(subinstr(c(current_date)," ","",.))
+	file write deploy_dlg "d Distribution-Date: `d'" _n
+	
+	local dlgfiles : dir "`c(pwd)'" files "*.dlg"
+	foreach file in `dlgfiles' {
+		file write deploy_dlg "f `file'" _n
+	}
+	local idlgfiles : dir "`c(pwd)'" files "*.idlg"
+	foreach file in `idlgfiles' {
+		file write deploy_dlg "f `file'" _n
+	}
+	file write deploy_dlg  "f nwinstall_dlg.do"
+	file close deploy_dlg
 	
 end
 

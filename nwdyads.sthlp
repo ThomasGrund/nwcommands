@@ -14,12 +14,12 @@
 
 {p 8 17 2}
 {cmdab: nwdyads} 
-[{it:{help netname}}]
+[{it:{help netlist}}]
 
 {title:Description}
 
 {pstd}
-Returns the dyad census of a network. This is a way to characterize a network based on its dyads.
+Returns the dyad census of a network (or a list of networks). This is a way to characterize a network based on its dyads.
 
 {pstd}
 In directed network, each dyad (pair of nodes {it:i} and {it:j}) can be one of the following:
@@ -47,7 +47,7 @@ In undirected network, each dyad (pair of nodes {it:i} and {it:j}) can be one of
 {title:Examples}
 	
 	{cmd:. webnwuse florentine}
-	{com}. nwdyads
+	{com}. nwdyads flomarriage
 	{res}
 	{txt}    Dyad census: {res} flomarriage{txt}
 
@@ -56,7 +56,7 @@ In undirected network, each dyad (pair of nodes {it:i} and {it:j}) can be one of
 	{res}{ralign 10:20}{col 20}{c |}{ralign 10:100}
 
 	{com}. webnwuse glasgow
-	{com}. nwdyads
+	{com}. nwdyads glasgow3
 	{res}
 	{txt}    Dyad census: {res} glasgow3{txt}
 

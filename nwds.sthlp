@@ -1,7 +1,7 @@
 {smcl}
-{* *! version 1.0.4  18nov2014}{...}
+{* *! version 1.0.0  3sept2014}{...}
 {marker topic}
-{helpb nw_topical##utilities:[NW-2.7] Utilities}
+{helpb nw_topical##information:[NW-2.4] Information}
 
 {p2colset 9 15 19 2}{...}
 {p2col :{cmd:nwds} {hline 2} List networks matching name patterns}

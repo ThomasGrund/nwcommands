@@ -26,7 +26,7 @@
 {synoptset 20 tabbed}{...}
 {synopthdr}
 {synoptline}
-{synopt:{opt mat}({it:matamatrix})}Mata matrix with tie probabilities{p_end}
+{synopt:{opt mat}({it:matrix})}Stata or Mata matrix with tie probabilities{p_end}
 {synopt:{opth density(float)}}density of the new network{p_end}
 {synopt:{opth name(netname)}}name of the new random network{p_end}
 {synopt:{opt xvars}}do not generate Stata variables{p_end}
@@ -38,7 +38,7 @@
 {pstd}
 {cmd:nwdyadprob} generates a random network where each tie {it:x_ij} has the 
 probability {it:p_ij} to exist. The values for {it:p_ij} are derived either 1) from the edge values
-in network {help netname} and the {it:density} (if given) or 2) from a Mata matrix specified in {bf:mat()}. The command can be used to create
+in network {help netname} and the {it:density} (if given) or 2) from a Stata/Mata matrix specified in {bf:mat()}. The command can be used to create
 all sorts of networks.
 
 {pstd}

@@ -1,0 +1,78 @@
+VERSION 10
+
+INCLUDE _std_small
+SYNCHRONOUS_ONLY
+HELP hlp1, view("help nwaddnodes")
+OK ok1,	label("OK")
+CANCEL	can1, label("Cancel")
+SUBMIT	sub1, label("Submit")
+RESET	res1
+POSITION 10 10 480 220
+
+SCRIPT PREINIT
+BEGIN
+	program initialize
+END
+
+DIALOG main, title("nwaddnodes - Add nodes to a network")
+BEGIN
+  TEXT     tx_var	20	20	100	.,	label("Network:") 		
+  COMBOBOX cb_var	90	20	160	.,	dropdown contents(netlist) nomem
+  TEXT tx_add 270 20 100 ., label("Add nodes:")
+  SPINNER sp_add 350 20 50 ., default(0) nomem
+  GROUPBOX gb_new 20 60 400 80, label("Characteristics of new nodes:")
+  TEXT tx_labs 50 80 200 ., label("Labels of new nodes:")
+  EDIT ed_labs 180 80 200 ., default("") nomem
+  TEXT tx_vars 50 110 200 ., label("Labels of new nodes:")
+  EDIT ed_vars 180 110 200 ., default("") nomem
+  CHECKBOX cx_new 50 150 200 ., label("Generate new network") onclickon(script generateOn) onclickoff(script generateOff)
+  TEXT tx_new 90 170 150 ., label("New network name:")
+  EDIT ed_new 210 170 150 ., default("") nomem
+END
+
+SCRIPT generateOn 
+BEGIN
+	main.tx_new.show
+	main.ed_new.show
+END
+
+SCRIPT generateOff
+BEGIN
+	main.tx_new.hide
+	main.ed_new.hide
+END
+
+
+LIST netlist
+BEGIN
+	// intentionally empty
+	// this list will be populated by _nwdialog.ado
+END
+
+
+PROGRAM initialize
+BEGIN
+	put "_nwdialog nwaddnodes"
+	stata hidden immediate
+END
+
+PROGRAM command
+BEGIN
+	put "nwaddnodes " main.cb_var
+	put ", newnodes("  main.sp_add ")"
+	if main.ed_vars {
+		put " vars(" main.ed_vars ")"
+	}
+	if main.ed_labs {
+		put " labs(" main.ed_labs ")"
+	}
+	if main.cx_new {
+		if main.ed_new.isneq("") {
+			put " generate(" main.ed_new ")"
+		}
+		if main.ed_new.iseq("") {
+			put " generate(" main.cb_var "_add)"
+		}
+	}
+	stata
+END

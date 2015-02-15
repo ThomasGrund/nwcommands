@@ -6,7 +6,7 @@
 capture program drop nwpref
 program nwpref
 	version 9
-	syntax anything(name=nodes) [, ntimes(integer 1) vars(string) stub(string) name(string) m0(integer 2) m(integer 2) prob(real 0) undirected xvars noreplace]
+	syntax anything(name=nodes) [, labs(string) ntimes(integer 1) vars(string) stub(string) name(string) m0(integer 2) m(integer 2) prob(real 0) undirected xvars noreplace]
 	set more off
 	
 	if `nodes' <= 1 {
@@ -26,7 +26,7 @@ program nwpref
 		local name "pref"
 	}
 	if "`stub'" == "" {
-		local stub "net"
+		local stub "pref"
 	}
 	nwvalidate `name'
 	local prefname = r(validname)
@@ -45,13 +45,13 @@ program nwpref
 			if mod(`i', 25) == 0 {
 				di in smcl as txt "...`i'"
 			}
-			nwpref `nodes', m0(`m0') m(`m') prob(`prob') name(`name'_`i') stub(`stub') `xvars' `undirected'
+			nwpref `nodes', m0(`m0') m(`m') prob(`prob') name(`name'_`i') stub(`stub') `xvars' `undirected' vars(`vars') labs(`labs')
 		}
 		exit
 	}
 	
 	mata: newmat = prefattach(`nodes',`m0',`m',`prob',`directed')
-	nwset, mat(newmat) vars(`prefvars') name(`prefname') `undirected' 
+	nwset, mat(newmat) vars(`prefvars') name(`prefname') `undirected' labs(`labs')
 	nwload `prefname', `xvars' 
 	
 	

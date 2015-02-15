@@ -1,6 +1,6 @@
 capture program drop nwlattice
 program nwlattice
-	syntax anything(name=dims) , [xwrap ywrap name(string) stub(string) xvars undirected noreplace ntimes(integer 1)]
+	syntax anything(name=dims) , [xwrap ywrap name(string) labs(string) vars(string) stub(string) xvars undirected noreplace ntimes(integer 1)]
 	version 9
 	set more off
 	
@@ -22,7 +22,7 @@ program nwlattice
 		local name "lattice"
 	}
 	if "`stub'" == "" {
-		local stub "net"
+		local stub "lattice"
 	}
 	nwvalidate `name'
 	local latticename = r(validname)
@@ -41,7 +41,7 @@ program nwlattice
 			if mod(`i', 25) == 0 {
 				di in smcl as txt "...`i'"
 			}
-			nwlattice `cols' `rows', name(`name'_`i') stub(`stub') `xvars' `undirected'
+			nwlattice `cols' `rows', name(`name'_`i') stub(`stub') `xvars' `undirected' labs(`labs') vars(`latticevars')
 		}
 		exit
 	}
@@ -49,9 +49,7 @@ program nwlattice
 	
 	// Generate network	
 	mata: newmat = J(`nodes',`nodes', 0)
-	local vars ""
 	forvalues i = 1/`nodes' {
-		local vars "`vars' lattice`i'"
 		local right = `i' + 1
 		local left = `i' - 1
 		
@@ -80,7 +78,7 @@ program nwlattice
 		
 	}
 	
-	nwset, mat(newmat) vars(`vars') name(`name') `undirected'
+	nwset, mat(newmat) vars(`latticevars') name(`name') `undirected' labs(`labs') 
 	nwload `randomname', `xvars'
 	mata: mata drop newmat 
 end

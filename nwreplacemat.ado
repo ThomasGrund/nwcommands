@@ -4,6 +4,11 @@ program nwreplacemat
 	syntax anything(name=netname), newmat(string) [vars(string) labs(string) nosync netonly]
 	_nwsyntax `netname', max(1)
 	
+	capture mat list `newmat'
+	if _rc == 0 {
+		mata: `newmat' = st_matrix("`newmat'")
+	}
+	
 	mata: st_numscalar("r(matrows)", rows(`newmat'))
 	mata: st_numscalar("r(matcols)", cols(`newmat'))
 	local matrows = r(matrows)

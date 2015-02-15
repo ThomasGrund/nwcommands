@@ -105,7 +105,7 @@ program nwpath
 	di "{hline 40}"
 	di "{txt}    Ego                  : {res}`ego' (`ego_lab')"
 	di "{txt}    Alter                : {res}`alter' (`alter_lab')"
-	di "{txt}    Shortest path length : {res}`r(path_length)'"
+	di "{txt}    Shortest path length : {res}`r(path_shortest)'"
 	di "{txt}    Selected length      : {res}`r(path_length)'"
 	di "{hline 40}"
 	capture matrix temp_mat = r(paths_matrix)

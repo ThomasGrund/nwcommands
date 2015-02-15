@@ -1,0 +1,53 @@
+
+VERSION 10.0
+SYNCHRONOUS_ONLY
+INCLUDE _std_medium
+INCLUDE _ht350
+INCLUDE header
+
+HELP hlp1, view("help nwduplicate")
+RESET res1
+
+SCRIPT PREINIT
+BEGIN
+		program initialize
+END
+
+SCRIPT POSTINIT
+BEGIN
+		main.ed_new.setvalue "_duplicate"
+END
+
+DIALOG main, title("nwduplicate - Duplicate network")
+BEGIN
+	
+	TEXT tx_net 50 40 140 ., label("Network:") 
+	COMBOBOX cb_net 50 60 250 ., dropdownlist label("Network") contents(netlist) nomem
+
+	INCLUDE nw_newnet_opt
+END
+
+
+LIST netlist
+BEGIN
+	// intentionally empty
+	// this list will be populated by _nwdialog.ado
+END
+
+PROGRAM initialize
+BEGIN
+	put "_nwdialog nwduplicate"
+	stata hidden immediate
+END
+
+PROGRAM command
+BEGIN
+	put "nwduplicate " main.cb_net
+	beginoptions
+		option main.cx_xvars
+		optionarg main.ed_new
+		optionarg main.ed_labs 
+		optionarg main.ed_vars
+	endoptions
+	stata
+END

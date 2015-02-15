@@ -96,70 +96,70 @@ program nwgenerate
 		/////////
 		
 		// nwduplicate shortcut
-		if "`whichjob'" == "duplicate(" {
+		qui if "`whichjob'" == "duplicate(" {
 			_nwsyntax `subopt', max(9999) name("othername")
 			nwduplicate `subopt', name(`netname') `options'
 		}	
 		
 		// nwduplicate shortcut
-		if "`whichjob'" == "subset(" {
+		qui if "`whichjob'" == "subset(" {
 			_nwsyntax `subopt', max(9999) name("othername")
 			nwsubset `subopt' `ifcond', name(`netname') `options'
 		}
 
 		// nwdyadprob shortcut
-		if "`whichjob'" == "dyadprob(" {
+		qui if "`whichjob'" == "dyadprob(" {
 			_nwsyntax `subopt', max(9999) name("othername")
 			nwdyadprob `subopt', name(`netname') `options'
 		}	
 		
 		// nwgeodesic shortcut
-		if "`whichjob'" == "geodesic(" {
+		qui if "`whichjob'" == "geodesic(" {
 			_nwsyntax `subopt', max(9999) name("othername")
 			nwgeodesic `subopt', name(`netname') `options'
 		}
 		// nwgeodesic shortcut
-		if "`whichjob'" == "homophily(" {
+		qui if "`whichjob'" == "homophily(" {
 			_nwsyntax `subopt', max(9999) name("othername")
 			nwhomophily `subopt', name(`netname') `options'
 		}
 		// nwlattice shortcut
-		if "`whichjob'" == "lattice(" {
+		qui if "`whichjob'" == "lattice(" {
 			nwlattice `subopt', name(`netname') `options'
 		}	
 		// nwlattice shortcut
-		if "`whichjob'" == "path(" {
+		qui if "`whichjob'" == "path(" {
 			_nwsyntax `subopt', max(9999) name("othername")
 			nwpath `subopt', name(`netname') `options'
 		}
 		// nwlattice shortcut
-		if "`whichjob'" == "permute(" {
+		qui if "`whichjob'" == "permute(" {
 			_nwsyntax `subopt', max(9999) name("othername")
 			nwpermute `subopt', name(`netname') `options'
 		}	
 		// nwpref shortcut
-		if "`whichjob'" == "permute(" {
+		qui if "`whichjob'" == "permute(" {
 			nwpref `subopt', name(`netname') `options'
 		}	
 		// nwrandom shortcut
-		if "`whichjob'" == "random(" {
+		qui if "`whichjob'" == "random(" {
 			nwrandom `subopt', name(`netname') `options'
 		}	
 		// nwreach shortcut
-		if "`whichjob'" == "reach(" {
+		qui if "`whichjob'" == "reach(" {
 			_nwsyntax `subopt', max(9999) name("othername")
 			nwreach `subopt', name(`netname') `options'
 		}	
 		// nwring shortcut
-		if "`whichjob'" == "ring(" {
+		qui if "`whichjob'" == "ring(" {
 			nwring `subopt', name(`netname') `options'
 		}	
 		// nwsmall shortcut
-		if "`whichjob'" == "small(" {
+		qui if "`whichjob'" == "small(" {
 			nwsmall `subopt', name(`netname') `options'
 		}
 		// nwtranspose shortcut
-		if "`whichjob'" == "transpose(" {
+		qui if "`whichjob'" == "transpose(" {
 			_nwsyntax `subopt', max(9999) name("othername")
 			nwtranspose `subopt', name(`netname') `options'
 		}	
@@ -168,20 +168,20 @@ program nwgenerate
 		/////////
 		
 		// nwclustering shortcuts
-		if "`whichjob'" == "clustering(" {
+		qui if "`whichjob'" == "clustering(" {
 			nwclustering `subopt', gen(`netname') `options'
 		}
 		
 		// nwcloseness shortcuts
-		if "`whichjob'" == "closeness(" {
+		qui if "`whichjob'" == "closeness(" {
 			tempvar _t1 _t2
 			nwcloseness `subopt', gen(`netname' `_t1' `_t2') `options'
 		}
-		if "`whichjob'" == "farness(" {
+		qui if "`whichjob'" == "farness(" {
 			tempvar _t1 _t2
 			nwcloseness `subopt', gen(`_t1' `netname' `_t2') `options'
 		}
-		if "`whichjob'" == "nearness(" {
+		qui if "`whichjob'" == "nearness(" {
 			tempvar _t1 _t2
 			nwcloseness `subopt', gen(`_t1' `_t2' `netname') `options'
 		}
@@ -195,12 +195,13 @@ program nwgenerate
 		}
 		
 		// nwdegree shortcuts
-		if "`whichjob'" == "isolates(" {
+		qui if "`whichjob'" == "isolates(" {
 			tempvar _t1 
-			nwdegree `subopt', isolates gen(`_t1'  `netname') `options'
+			nwdegree `subopt', isolates gen(`_t1') `options'
+			rename _isolate `netname' 
 			capture drop *`_t1'
 		}
-		if "`whichjob'" == "indegree(" {
+		qui if "`whichjob'" == "indegree(" {
 			tempvar _t1 
 			nwdegree `subopt', gen(`netname' `_t1') `options'
 			capture confirm variable _in`netname'
@@ -209,7 +210,7 @@ program nwgenerate
 				drop _out`netname'
 			}
 		}
-		if "`whichjob'" == "outdegree(" {
+		qui if "`whichjob'" == "outdegree(" {
 			tempvar _t1
 			nwdegree `subopt', gen(`netname' `_t1') `options'
 			capture confirm variable _out`netname'
@@ -218,7 +219,7 @@ program nwgenerate
 				drop _in`netname'
 			}
 		}
-		if "`whichjob'" == "degree(" {
+		qui if "`whichjob'" == "degree(" {
 			tempvar _t1
 			nwdegree `subopt', gen(`netname' `_t1') `options'
 			capture confirm variable _out`netname'

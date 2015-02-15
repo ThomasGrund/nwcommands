@@ -51,7 +51,7 @@
 		{p_end}
 {p2col:{cmd: sd}}standard deviation of {help varname} over network neighbors
 		{p_end}
-{p2col:{cmd: meanego}}mean of {help varname} over network neighbors; default
+{p2col:{cmd: meanego}}mean of {help varname} over network neighbors and ego)
 		{p_end}
 {p2col:{cmd: maxego}}maximum of {help varname} over network neighbors and ego
 		{p_end}

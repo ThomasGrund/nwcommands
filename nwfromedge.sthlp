@@ -22,6 +22,7 @@
 {opth name(newnetname)}
 {opt xvars}
 {opth vars(newvarlist)}
+{opt labs}({it:lab1 lab2 ...})
 {opt undirected}
 {opt directed}]
 

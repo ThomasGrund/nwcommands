@@ -1,0 +1,81 @@
+
+VERSION 10.0
+SYNCHRONOUS_ONLY
+INCLUDE _std_medium
+INCLUDE header
+
+HELP hlp1, view("help nwcontext")
+RESET res1
+
+SCRIPT PREINIT
+BEGIN
+		program initialize
+END
+
+
+DIALOG main, title("nwcontext - Create Context")
+BEGIN
+	
+	TEXT tx_net 50 40 140 ., label("Network:") 
+	COMBOBOX cb_net 50 60 250 ., dropdownlist label("Network") contents(netlist) nomem
+	TEXT tx_var 50 80 200 ., label("Variable:")
+	VARNAME vr_var 50 100 140 ., nomem label("Variable") option(attribute)
+	
+	TEXT tx_stat 50 120 140 ., label("Statistic:")
+	COMBOBOX cb_stat 50 140 140 ., contents(statistic) dropdownlist option(stat) nomem
+	
+	TEXT tx_mode 210 120 140 ., label("Neighbor mode:")
+	COMBOBOX cb_mode 210 140 140 ., contents(mode) option(mode) dropdownlist nomem
+	
+	TEXT tx_generate 50 170 140 ., label("New variable:")
+	EDIT ed_generate 50 190 140 ., default("_context") nomem option(generate)
+	
+END
+
+
+LIST statistic
+BEGIN
+	mean
+	max
+	min
+	sum
+	sd
+	meanego
+	maxego
+	minego
+	sumego
+	sdego
+END
+
+
+LIST mode
+BEGIN
+	outgoing
+	incoming
+	both
+END
+
+LIST netlist
+BEGIN
+	// intentionally empty
+	// this list will be populated by _nwdialog.ado
+END
+
+PROGRAM initialize
+BEGIN
+	put "_nwdialog nwcontext"
+	stata hidden immediate
+END
+
+PROGRAM command
+BEGIN
+	require main.vr_var
+	put "nwcontext " main.cb_net
+	beginoptions
+		optionarg main.vr_var
+		optionarg main.cb_stat 
+		optionarg main.cb_mode
+		optionarg main.ed_generate
+	endoptions
+	stata
+END

@@ -6,7 +6,7 @@
 {title:Title}
 
 {p2colset 9 22 22 2}{...}
-{p2col :nwreplacemat {hline 2} Replace network with Mata matrix}
+{p2col :nwreplacemat {hline 2} Replace network with Stata or Mata matrix}
 {p2colreset}{...}
 
 
@@ -22,7 +22,7 @@
 {synoptset 20 tabbed}{...}
 {synopthdr}
 {synoptline}
-{synopt:{opt newmat}({it:matname})}name of a Mata matrix{p_end}
+{synopt:{opt newmat}({it:matname})}name of a Stata or Mata matrix{p_end}
 {synopt:{opt nosync}}do not sync Stata variables; by default Stata variables are synced (see {help nwsync}){p_end}
 
 {title:Description}
@@ -31,7 +31,7 @@
 {cmd:nwreplacemat} changes a network by replacing the adjacency matrix of the network with an existing Mata matrix. 
 
 {pstd}
-The command checks of the Mata matrix {it:matname} has the correct dimensions.
+The command checks if the Stata/Mata matrix {it:matname} has the correct dimensions.
 
 {pstd}
 By default, the command also checks if the new adjacency matrix is symmetric and if yes, it alters the 

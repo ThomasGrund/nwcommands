@@ -11,6 +11,7 @@ program nwplot
 	local layout = "" 
 	syntax [anything(name=netname)][if/] [in/], [ lab  labelopt(string) _layoutfunction(string) arrows edgesize(string) ASPECTratio(string) components(string) arcstyle(string) arcbend(string) arcsplines(integer 10) nodexy(varlist numeric min=2 max=2) edgeforeground(string) GENerate(string) colorpalette(string) edgecolorpalette(string) edgepatternpalette(string) symbolpalette(string) lineopt(string) scatteropt(string) legendopt(string) size(string) color(string) symbol(string) edgecolor(string) label(varname) nodefactor(string) sizebin(string) edgefactor(string) arrowfactor(string) arrowgap(string) arrowbarbfactor(string) layout(string) iterations(integer 1000) scheme(string) * ]
 
+	
 	// filter out lgc
 	local 0 "`layout'"
 	syntax [anything(name=something)], [ lgc *]
@@ -25,6 +26,7 @@ program nwplot
 
 	syntax [anything(name=netname)][if/] [in/], [ lab  labelopt(string) _layoutfunction(string) arrows edgesize(string) ASPECTratio(string) components(string) arcstyle(string) arcbend(string) arcsplines(integer 10) nodexy(varlist numeric min=2 max=2) edgeforeground(string) GENerate(string) colorpalette(string) edgecolorpalette(string) edgepatternpalette(string) symbolpalette(string) lineopt(string) scatteropt(string) legendopt(string) size(string) color(string) symbol(string) edgecolor(string) label(varname) nodefactor(string) sizebin(string) edgefactor(string) arrowfactor(string) arrowgap(string) arrowbarbfactor(string) layout(string) iterations(integer 1000) scheme(string) * ]
 	_nwsyntax `netname', max(1)
+	local masternetname "`netname'"
 	
 	if "`if_lgc'" != "" {
 		local if = "`if_lgc'"
@@ -62,6 +64,7 @@ program nwplot
 	}
 
      if "`if'"!="" {
+		local ifmaster "if `if'"
 		capture nwdrop __temp_if
 		nwduplicate `netname', name(__temp_if)
 		nwdrop __temp_if if (!(`if'))
@@ -211,6 +214,11 @@ program nwplot
 	//
 	///////////////////
 	
+	preserve
+	if "`ifmaster'" != "" {
+		keep `ifmaster'
+	}
+	
 	// Color of nodes
 	local colorkeys ""
 	local colororder ""
@@ -219,7 +227,7 @@ program nwplot
 		local 0 = "`color'"
 		syntax [varlist(min=1 max=1)] [, norescale forcekeys(string) legendoff colorpalette(string) *]
 		tempvar color_numeric
-		capture encode `varlist', gen(`color_numeric')
+		capture encode `varlist' , gen(`color_numeric')
 		if _rc == 0 {
 			local varlist "`color_numeric'"
 		}
@@ -286,6 +294,7 @@ program nwplot
 		local colororder = ""
 		local colorlabels = ""
 	}
+	
 	
 	// Symbol of nodes
 	local symbolkeys ""
@@ -435,6 +444,7 @@ program nwplot
 		local sizekeys = ""
 	}
 	
+	restore
 
 	// Label of nodes
 	qui if ("`label'" != ""){
@@ -463,12 +473,21 @@ program nwplot
 	nwtomata `netname', mat(plotmat)
 	mata: M = (plotmat + plotmat') :/ (plotmat + plotmat')
 	mata: _editmissing(M,0)
-	
 	// Get edgesize network data
 	if "`edgesize'" != "" {
+		if "`edgesize'" == "," {
+			nwrandom `nodes', prob(1) name(__temp_edgesize_dummy)
+			local edgesize "__temp_edgesize_dummy,"
+			if strpos("`edgesize_options'", "legendoff") == 0 {
+				local edgesize_options `"`edgesize_options' legendoff"'
+			}
+		}
 		local 0 "`edgesize'`edgesize_options'"
-		di "OOO: `0'"
-		syntax anything [, forcekeys(string) legendoff ]
+		capture noi syntax [anything] [, forcekeys(string) legendoff ]
+		if _rc != 0 {
+			nwdrop __temp*
+			error 6088
+		}
 		
 		// check and clean networks as edgecolor and edgesize
 		local edgesizekeys_legendoff "`legendoff'"
@@ -514,9 +533,22 @@ program nwplot
 	}
 	
 	// Get edgecolor network data
-	if "`edgecolor'" != "" {
+	if "`edgecolor'" != ""  {
+		if "`edgecolor'" == "," {
+			nwrandom `nodes', prob(0) name(__temp_edgecol_dummy)
+			noi nwset
+			//nwreplace __temp_egdecol_dummy = .
+			local edgecolor "__temp_edgecol_dummy,"
+			if strpos("`edgecolor_options'", "legendoff") == 0 {
+				local edgecolor_options `"`edgecolor_options' legendoff"'
+			}
+		}
 		local 0 "`edgecolor'`edgecolor_options'"
-		syntax anything [, forcekeys(string) legendoff edgecolorpalette(string) edgepatternpalette(string)]
+		capture noi syntax [anything] [, forcekeys(string) legendoff edgecolorpalette(string) edgepatternpalette(string)]
+		if _rc != 0 {
+			nwdrop __temp*
+			error 6088
+		}
 		
 		// check and clean network 
 		local edgecolorkeys_legendoff "`legendoff'"
@@ -552,7 +584,7 @@ program nwplot
 	else {
 		mata: edgecolormat = J(`nodes',`nodes',0)
 	}
-	
+
 	local edgecolororder = ""
 	local edgecolorlabels = ""	
 	local keysused_edgecolor : word count `edgecolorkeys'
@@ -638,20 +670,18 @@ program nwplot
 	if ("`layout'"== "mds"){
 		mata: Coord = netplotmds(M, `iterations')
 	}
-	
+
     qui if ("`layout'"=="mdsclassical"  ){
 		
 		// Coordinates matrix to be populated
 		mata: Coord = J(`nodes', 2, 0)
 		mata: Coord[.,1] = J(`nodes', 1, 1.5) 
-		
 		// Deal with isolates
 		tempvar _isolates
-		nwgen `_isolates' = isolates(`netname')		
+		nwgen `_isolates' = isolates(`netname')	
 		count if `_isolates' == 1
 		local isol = `r(N)'
 		local nonisol = `nodes' - `isol'
-		
 		
 		// Get number of components
 		tempvar _component
@@ -694,7 +724,6 @@ program nwplot
 			di "{txt}only the {bf:5} largest components are displayed"
 			local components = 5
 		}
-
 		
 		// Go through all (non-isolates) components (that should be plotted in boxes) from large to small
 		qui forvalues i = 1/`components' {
@@ -801,7 +830,7 @@ program nwplot
 	mata: st_store((1::rows(ncolor)),("ncolor"), ncolor[.,.])
 	mata: st_store((1::rows(ncolor)),("nsymbol"), nsymbol[.,.])
 	mata: st_sstore((1::rows(nlabel)),("nlabel"), nlabel[.,.])
-
+	
 	local binfactor = 1/`sizebin'
 	qui replace nsize = (ceil(nsize * `binfactor'))* `sizebin'
 	qui tab nsize, matrow(nsizerow)
@@ -828,7 +857,7 @@ program nwplot
 	local colorkeys_num = 0
 	local symbolkeys_num = 0
 	local colorkeys_num : word count `colorkeys'
-	local symbolkeys_num : word count `symbolkeys'
+	local symbolkeys_num : word count `symbolkeys'	
 	local sizekeys_num : word count `sizekeys'
 	local edgesizekeys_num : word count `edgesizekeys'
 	local edgecolorkeys_num : word count `edgecolorkeys'
@@ -894,7 +923,7 @@ program nwplot
 	
 	// Ghost plots for node color
 	if "`colorkeys_legendoff'" == "" {
-		if `colorkeys_num' > 1 {	
+		if `colorkeys_num' >= 1 {	
 			local ckey = 0
 			foreach i in `colorkeys' {
 				_getcolorstyle, i(`i') j(0) colorpalette(`colorpalette') symbolpalette(`symbolpalette') scheme(`scheme')
@@ -909,7 +938,7 @@ program nwplot
 	
 	// Ghost plots for node symbol
 	if "`symbolkeys_legendoff'" == "" {
-		if `symbolkeys_num' > 1 {	
+		if `symbolkeys_num' >= 1 {	
 			local skey = 0
 			foreach j in `symbolkeys' {
 				_getcolorstyle, i(0) j(`j') colorpalette(`colorpalette') symbolpalette(`symbolpalette') scheme(`scheme')
@@ -1069,6 +1098,8 @@ program nwplot
 	capture mat drop nsymblrow
 	capture mat drop colorkeysmap
 	capture mata drop symbolkeysmap
+	
+	nwload `masternetname', labelonly
 end
 	
 capture program drop _getvaluelabel

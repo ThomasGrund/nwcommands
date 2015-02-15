@@ -1,0 +1,72 @@
+/*
+  tabulate2
+
+*!  VERSION 1.1.2  23jan2013
+
+*/
+
+VERSION 10.0
+SYNCHRONOUS_ONLY
+INCLUDE _std_medium
+INCLUDE _ht350
+INCLUDE header
+
+HELP hlp1, view("help nwtoedge")
+RESET res1
+
+SCRIPT PREINIT
+BEGIN
+		program initialize
+END
+
+DIALOG main, title("nwtoedge - Transform network to edgelist")
+BEGIN
+	TEXT tx_net 50 20 170 ., label("Networks:") 
+	COMBOBOX cb_net 50 40 300 ., label("Networks") nomem contents(netlist) dropdown append
+	
+	TEXT tx_from 50 60 250 ., label("From variables (optional):")
+	VARLIST vn_from 50 80 300 ., label("fromvars") nomem option(fromvars)
+	
+	TEXT tx_to 50 100 250 ., label("To variables (optional):")
+	VARLIST vn_to 50 120 300 ., label("tovars") nomem optio(tovars)
+	
+	TEXT tx_fromid 50 160 80 ., label("From (optional)")
+	EDIT ed_fromid 50 180 100 ., label("From") nomem option(fromid)
+	TEXT tx_toid 170 160 80 ., label("To (optional)")
+	EDIT ed_toid 170 180 100 ., label("To") nomem	option(toid)
+	TEXT tx_valueid 290 160 120 ., label("Value (optional)")
+	EDIT ed_valueid 290 180 100 ., label("Value") nomem option(link)
+
+	GROUPBOX gb_ties 50 230 340 60, label("Create arc/edge")
+	RADIO rb_auto 70 250 100 ., label("automatic") first
+	RADIO rb_undir 160 250 110 ., label("force undirected") middle option(forceundirected)
+	RADIO rb_direct 280 250 100 ., label("force directed") last option(forcedirected)
+
+END
+
+LIST netlist
+BEGIN
+	// intentionally empty
+	// this list will be populated by _nwdialog.ado
+END
+
+PROGRAM initialize
+BEGIN
+	put "_nwdialog nwtoedge"
+	stata hidden immediate
+END
+
+PROGRAM command
+BEGIN
+	put "nwtoedge " main.cb_net 
+	beginoptions
+		option main.rb_undir
+		option main.rb_direct
+		optionarg main.ed_fromid
+		optionarg main.ed_toid
+		optionarg main.ed_valueid
+		optionarg main.vn_from 
+		optionarg main.vn_to
+	endoptions
+	stata
+END

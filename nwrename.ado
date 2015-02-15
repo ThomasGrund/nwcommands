@@ -1,17 +1,23 @@
 capture program drop nwrename
 program nwrename
-	version 9
-	syntax anything
-		
-	if (wordcount("`anything'") != 2) {
-		di "{err}Wrong number of networks."
-		//adjust error code
-		error 6000
+	
+	local renameCmd `0'
+	
+	preserve
+	drop _all
+	_nwsyntax _all, max(9999)
+	foreach onenet in `netname' {
+		gen `onenet' = .
 	}
-	
-	local oldnet = word("`anything'", 1)
-	local newnet = word("`anything'", 2)
-	nwname `oldnet', newname(`newnet')
+	rename `renameCmd', r
+	local oldnames "`r(oldnames)'"
+	local newnames "`r(newnames)'"
+	restore
+	local i = 1
+	foreach onenet in `oldnames' {
+		local newname : word `i' of `newnames'
+		nwname `onenet', newname(`newname')
+		local i = `i' + 1
+	}
 end
-	
-	
+

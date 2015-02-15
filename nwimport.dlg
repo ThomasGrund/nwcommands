@@ -52,6 +52,7 @@ BEGIN
 	main.fl_pajek.hide
 	main.fl_ucinet.hide
 	main.fl_matrix.hide
+	main.fl_edge.hide
 	main.fl_compressed.hide
 	main.fl_all.hide
 END
@@ -98,9 +99,29 @@ BEGIN
 		require main.fl_pajek
 		put "nwimport " main.fl_pajek ", type(pajek)"
 	}
+	if main.cb_type.iseq("Ucinet DL format") {
+		require main.fl_ucinet
+		put "nwimport " main.fl_ucinet ", type(ucinet)"
+	}
 	if main.cb_type.iseq("Raw Edgelist") {
 		require main.fl_edge
 		put "nwimport " main.fl_edge ", type(edgelist)"
+	}
+	if main.cb_type.iseq("Raw Matrix") {
+		require main.fl_matrix
+		put "nwimport " main.fl_matrix ", type(matrix)"
+	}
+	if main.cb_type.iseq("Raw Compressed Edgelist") {
+		require main.fl_compressed
+		put "nwimport " main.fl_compressed ", type(compressed)"
+	}
+	if main.cb_type.iseq("GML") {
+		require main.fl_all
+		put "nwimport " main.fl_all ", type(gml)"
+	}
+	if main.cb_type.iseq("GraphML") {
+		require main.fl_all
+		put "nwimport " main.fl_all ", type(graphml)"
 	}
 
 	if main.ed_name.isneq("") {

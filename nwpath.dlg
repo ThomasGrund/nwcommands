@@ -1,0 +1,99 @@
+VERSION 10
+
+INCLUDE _std_small
+SYNCHRONOUS_ONLY
+HELP hlp1, view("help nwgeodesic")
+OK ok1,	label("OK")
+CANCEL	can1, label("Cancel")
+SUBMIT	sub1, label("Submit")
+RESET	res1
+POSITION 10 10 400 250
+
+SCRIPT PREINIT
+BEGIN
+	create BOOLEAN isLoading
+	isLoading.settrue
+	program initialize
+END
+
+SCRIPT POSTINIT
+BEGIN
+	.isLoading.setfalse
+	program getLabels
+END
+
+DIALOG main, title("nwgeodesic - Shortest paths")
+BEGIN
+	TEXT     tx_var	20	20	100	.,	label("Network:") 		
+	COMBOBOX cb_var	80	20	150	., dropdown contents(netlist) nomem onselchange(program getLabels)
+	TEXT tx_ego 50 50 100 ., label("Ego")
+	LISTBOX cb_egolab 20 70 100 ., contents(lablist) label("Ego") nomem
+	TEXT tx_alter 170 50 100 ., label("Alter")
+	LISTBOX cb_alterlab 140 70 100 ., contents(lablist) label("Alter") nomem
+	RADIO rb_shortest 260 70 100 ., label("Shortest path") first onclickon(main.sp_length.hide)
+	RADIO rb_length 260 90 100 ., label("Path of length") last onclickon(main.sp_length.show)
+	SPINNER sp_length 280 110 50 ., label("Length") default(1) option(length)
+	CHECKBOX cx_new 20 200 110 ., label("Save as network:") onclickon(main.ed_new.show) onclickoff(main.ed_new.hide)
+	EDIT ed_new 140 200 100 ., default("_path") nomem option(generate)
+	CHECKBOX cx_sym 20 180 250 ., label("Calculate paths on symmetrized network") option(sym)
+END
+
+LIST netlist
+BEGIN
+	// intentionally empty
+	// this list will be populated by _nwdialog.ado
+END
+
+LIST lablist
+BEGIN
+	// left empty
+END
+
+
+PROGRAM initialize
+BEGIN
+	put "_nwdialog nwpath"
+	stata hidden immediate
+END
+
+SCRIPT test
+BEGIN
+	//program updateLablist
+	//script main.cb_egolab.repopulate
+END
+
+PROGRAM getLabels
+BEGIN
+	if main.cb_var & ! isLoading {
+		put "_nwdialog_lablist nwpath " main.cb_var
+		stata hidden 
+	}
+END
+
+SCRIPT generateOn 
+BEGIN
+	main.tx_new.show
+	main.ed_new.show
+END
+
+SCRIPT generateOff
+BEGIN
+	main.tx_new.hide
+	main.ed_new.hide
+END
+
+
+PROGRAM command
+BEGIN
+	put "nwpath " main.cb_var 
+	require main.cb_egolab
+	require main.cb_alterlab
+	beginoptions
+		put " ego(" main.cb_egolab ")"
+		put " alter(" main.cb_alterlab ")"
+		option main.cx_sym
+		optionarg main.sp_length
+		optionarg main.ed_new
+	endoptions
+	stata
+END

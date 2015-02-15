@@ -1,0 +1,44 @@
+VERSION 11.0
+
+SYNCHRONOUS_ONLY
+INCLUDE _std_medium
+INCLUDE header
+HELP hlp1, view("help nwrename")
+RESET res1
+
+SCRIPT PREINIT
+BEGIN
+	program initialize
+END
+
+DIALOG main, label("nwrename - Rename groups of networks") tabtitle("Main")
+BEGIN
+	TEXT tx_net 30 30 200 ., label("Existing network names:")
+	COMBOBOX cb_net 30 50 350  ., nomem dropdown  label("cbNet") contents(netlist) append
+	TEXT tx_new 30 80 200 ., label("New network names:")
+	EDIT ed_new 30 100 350  ., nomem default("")
+END
+
+LIST netlist
+BEGIN
+	// intentionally empty
+	// this list will be populated by _nwdialog.ado
+END
+
+
+PROGRAM initialize
+BEGIN
+	put "_nwdialog nwrename"
+	stata hidden immediate
+END
+
+PROGRAM command
+BEGIN
+	require main.cb_net
+	require main.ed_new
+	put " nwrename (" main.cb_net ")"
+	put "(" main.ed_new ")"
+	stata
+END
+
+

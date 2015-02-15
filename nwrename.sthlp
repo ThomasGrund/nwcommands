@@ -12,8 +12,18 @@
 
 {title:Syntax}
 
+{pstd}
+Rename a single network
+
 {p 8 16 2}
 {opt nwrename} {it:old_netname} {it:new_netname}
+
+
+{pstd}
+Rename groups networks
+
+{p 8 16 2}
+{opt nwrename} ({it:old1 old2 ...}) ({it:new1 new2 ...})
 
 
 {marker description}{...}

@@ -99,6 +99,10 @@ syntax [varlist (default=none)][, clear nwclear nooutput name(string) vars(strin
 			}
 			// mat is given
 			else {
+				capture mat list `mat'
+				if _rc == 0 {
+					mata: `mat' = st_matrix("`mat'")
+				}
 				mata: onenet = `mat' 
 				mata: st_numscalar("msize", rows(`mat'))
 				local size = msize

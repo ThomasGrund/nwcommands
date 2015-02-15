@@ -1,0 +1,107 @@
+/*
+  tabulate2
+
+*!  VERSION 1.1.2  23jan2013
+
+*/
+
+VERSION 9.0
+SYNCHRONOUS_ONLY
+INCLUDE _std_medium
+INCLUDE header
+
+HELP hlp1, view("help nwtab2")
+RESET res1
+
+SCRIPT PREINIT
+BEGIN
+        main.ck_first.hide
+		program initialize
+END
+
+PROGRAM POSTINIT_PROGRAM
+BEGIN
+        if __MESSAGE.iseq("-exact-") {
+                call script main_exact_seton
+        }
+END
+
+DIALOG main, label("nwtab2 - Two-way table with measures of association") tabtitle("Main")
+BEGIN
+  /*--+----1----+----2----+----3----+----4----+----5----+----6----+----7----+*/
+  TEXT     tx_var1   _lft      _top      _cwd1     .,                   /*
+                */ label("Network:")                               /*
+                */
+  COMBOBOX  vn_var1   @         _ss       _vnwd     .,                   /*
+                */ label("Network")    contents(netlist) nomem   dropdownlist                         /*
+                */
+  TEXT     tx_var2   _lft2     _top      _cwd1     .,                   /*
+                */ label("Variable:")                            /*
+                */
+  VARNAME  vn_var2   @         _ss       _vnwd     .,                   /*
+                */ label("Variable")                           /*
+                */
+
+  DEFINE _y _ls
+  INCLUDE _tab2
+END
+
+
+DIALOG adv, label("") tabtitle("Advanced")
+BEGIN
+  /*--+----1----+----2----+----3----+----4----+----5----+----6----+----7----+*/
+  TEXT     tx_matcel _lft      _top      _iwd      .,                   /*
+                */ label("Generate a matrix with the cell frequencies:")/*
+                */
+  EDIT     ed_matcel _lft      _ss       _vnwd     .,                   /*
+                */ label("Matrix of cell frequencies")                  /*
+                */ max(32)                                              /*
+                */ option("matcell")                                    /*
+                */
+
+  TEXT     tx_matrow _lft      _ls       _iwd      .,                   /*
+                */ label("Generate a matrix with the row values:")      /*
+                */
+  EDIT     ed_matrow _lft      _ss       _vnwd     .,                   /*
+                */ label("Matrix of row values")                        /*
+                */ max(32)                                              /*
+                */ option("matrow")                                     /*
+                */
+
+  TEXT     tx_matcol _lft      _ls       _iwd      .,                   /*
+                */ label("Generate a matrix with the column values:")   /*
+                */
+  EDIT     ed_matcol _lft      _ss       _vnwd     .,                   /*
+                */ label("Matrix of column values")                     /*
+                */ max(32)                                              /*
+                */ option("matcol")                                     /*
+                */
+
+END
+
+LIST netlist
+BEGIN
+	// intentionally empty
+	// this list will be populated by _nwdialog.ado
+END
+
+PROGRAM initialize
+BEGIN
+	put "_nwdialog nwtabulate2var"
+	stata hidden immediate
+END
+
+INCLUDE _tab2_pr
+
+PROGRAM command
+BEGIN
+	require main.vn_var1 main.vn_var2
+        put "nwtabulate "  main.vn_var1 " " main.vn_var2
+        beginoptions
+                put /program _tab2_opts_output
+                optionarg adv.ed_matcel
+                optionarg adv.ed_matrow
+                optionarg adv.ed_matcol
+        endoptions
+END
+

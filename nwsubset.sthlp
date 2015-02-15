@@ -20,7 +20,8 @@
 [{it:{help if}}]
 [,
 {opt name}({it:{help newnetname}})
-{opt xvars}]
+{opt xvars}
+{opt replace}]
 
 
 {synoptset 20 tabbed}{...}
@@ -28,6 +29,7 @@
 {synoptline}
 {synopt:{opt name}({it:{help newnetname}})}name of the new network{p_end}
 {synopt:{opt xvars}}do not generate/overwrite Stata variables{p_end}
+{synopt:{opt replace}}replace existing network{p_end}
 
 
 {title:Description}
@@ -43,7 +45,7 @@ For example:
 	{bf:. nwsubset gang if _n < 10}
 
 {pstd}
-Notice that something similar could be achieved with {help nwgen}:
+This generates a new network called {it:gang_sub}. Notice that something similar could be achieved with {help nwgen}:
 
 	{bf:. webnwuse gang, nwclear}
 	{bf:. nwgen gang_sub = gang if _n < 10}	

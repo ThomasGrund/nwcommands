@@ -14,12 +14,12 @@
 
 {help nw_programming:{col 14}{bf:[NW-5]}{...}{col 31}{bf:Network programming}}
 
+{help nwinstall:{col 14}{bf:[NW-6]}{...}{col 31}{bf:Install Stata menus/dialogs}}
 
 
-
-		*! Date        : 15dec2014
-		*! Version     : 1.0.5
-		*! Authors     : Thomas U. Grund and Peter Hedstrom
+		*! Date        : 15feb2014
+		*! Version     : 1.1.2
+		*! Authors     : Thomas U. Grund 
 		*! Contact     : thomas.u.grund@gmail.com
 		*! Web         : {browse "http://nwcommands.org"}
 		*! Bugs        : {browse "mailto:bug@nwcommands.org"}

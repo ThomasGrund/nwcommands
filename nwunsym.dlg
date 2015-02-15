@@ -1,0 +1,40 @@
+VERSION 10
+
+INCLUDE _std_small
+SYNCHRONOUS_ONLY
+HELP hlp1, view("help nwname")
+OK ok1,	label("OK")
+CANCEL	can1, label("Cancel")
+SUBMIT	sub1, label("Submit")
+RESET	res1
+POSITION 10 10 350 100
+
+SCRIPT PREINIT
+BEGIN
+	program initialize
+END
+
+DIALOG main, title("nwname - Unsymmetrize networks")
+BEGIN
+  TEXT     tx_var	20	20	100	.,	label("Network:") 		
+  COMBOBOX cb_var	80	20	250	.,	dropdown contents(netlist) append nomem
+END
+
+LIST netlist
+BEGIN
+	// intentionally empty
+	// this list will be populated by _nwdialog.ado
+END
+
+
+PROGRAM initialize
+BEGIN
+	put "_nwdialog nwunsym"
+	stata hidden immediate
+END
+
+PROGRAM command
+BEGIN
+	put "nwname " main.cb_var ", newdirected(true)"  
+	stata
+END

@@ -1,0 +1,60 @@
+VERSION 10
+
+INCLUDE _std_small
+SYNCHRONOUS_ONLY
+HELP hlp1, view("help nwpermute")
+OK ok1,	label("OK")
+CANCEL	can1, label("Cancel")
+SUBMIT	sub1, label("Submit")
+RESET	res1
+POSITION 10 10 350 180
+
+SCRIPT PREINIT
+BEGIN
+	program initialize
+END
+
+DIALOG main, title("nwpermute - Permute a network")
+BEGIN
+  TEXT     tx_var	20	20	100	.,	label("Network:") 		
+  COMBOBOX cb_var	80	20	210	.,	dropdownlist contents(netlist) nomem 
+  CHECKBOX cx_new 80 80 200 ., label("Generate new network") onclickon(script generateOn) onclickoff(script generateOff)
+  TEXT tx_new 100 100 50 ., label("Name:")
+  EDIT ed_new 140 100 150 ., default("") nomem option(name)
+  CHECKBOX cx_xvars 80 50 200 ., label("Do not change Stata variables") option(xvars)
+END
+
+LIST netlist
+BEGIN
+	// intentionally empty
+	// this list will be populated by _nwdialog.ado
+END
+
+
+PROGRAM initialize
+BEGIN
+	put "_nwdialog nwpermute"
+	stata hidden immediate
+END
+
+SCRIPT generateOn 
+BEGIN
+	main.tx_new.show
+	main.ed_new.show
+END
+
+SCRIPT generateOff
+BEGIN
+	main.tx_new.hide
+	main.ed_new.hide
+END
+
+PROGRAM command
+BEGIN
+	put "nwpermute " main.cb_var 
+	beginoptions
+		option main.cx_xvars
+		optionarg main.ed_new
+	endoptions
+	stata
+END

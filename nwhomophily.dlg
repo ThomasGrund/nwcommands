@@ -1,0 +1,107 @@
+
+VERSION 10.0
+SYNCHRONOUS_ONLY
+INCLUDE _std_large
+INCLUDE _ht350
+INCLUDE header
+
+HELP hlp1, view("help nwhomophily")
+RESET res1
+
+SCRIPT PREINIT
+BEGIN
+		program initialize
+END
+
+SCRIPT POSTINIT
+BEGIN
+		main.ed_new.setvalue "_homophily"
+END
+
+DIALOG main, title("nwhomophily - Generate Homophily Network")
+BEGIN
+	
+	TEXT tx_nodes 50 30 100 ., label("Number of nodes:")
+	SPINNER sp_nodes 160 30 50 ., label("Nodes") default(10) max(9999) option(nodes)
+	
+	TEXT tx_density 290 30 130 ., label("Density:  .")
+	SPINNER sp_density 350 30 50 ., label("Networks") default(1) max(999)
+	
+	TEXT tx_var 50 60 150 . , label("Variables (required):")
+	VARLIST vn_var 50 80 200 ., label("Variables")
+	
+	TEXT tx_hom 50 100 200 . , label("Homophily parameters (required):")
+	EDIT ed_hom 50 120 200 ., label("Parameters") option(homophily) numonly
+
+	TEXT tx_exp 50 140 200 . , label("Expand mode:")
+	COMBOBOX cb_exp 50 160 200 ., label("Mode") contents(expandmode) dropdownlist option(mode)
+	
+	INCLUDE nw_newnet_opt
+	
+	GROUPBOX gb_ties 290 60 160 100, label("Arc/edge")
+	RADIO rb_directed 310 90 100 ., label("Directed") first
+	RADIO rb_undirected 310 110 120 ., label("Undirected") last option(undirected)
+	
+END
+
+SCRIPT rewireProbOff
+BEGIN
+	main.sp_prob1.disable
+END
+
+SCRIPT rewireShortOff
+BEGIN
+	main.sp_short.disable
+END
+
+SCRIPT rewireProbOn
+BEGIN
+	main.sp_prob1.enable
+END
+
+SCRIPT rewireShortOn
+BEGIN
+	main.sp_short.enable
+END
+
+LIST expandmode
+BEGIN
+	same
+	dist
+	distinv
+	absdist
+	absdistinv
+	sender
+	receiver
+END
+
+LIST netlist
+BEGIN
+	// intentionally empty
+	// this list will be populated by _nwdialog.ado
+END
+
+PROGRAM initialize
+BEGIN
+	put "_nwdialog nwhomophily"
+	stata hidden immediate
+END
+
+PROGRAM command
+BEGIN
+	require main.vn_var
+	require main.ed_hom
+	put "nwhomophily " main.vn_var
+	beginoptions
+		optionarg main.sp_nodes
+		put " homophily(" main.ed_hom ")"
+		put " density(." main.sp_density ")"
+		optionarg main.cb_exp
+		option main.rb_undirected
+		option main.cx_xvars
+		optionarg main.ed_new
+		optionarg main.ed_labs 
+		optionarg main.ed_vars
+	endoptions
+	stata
+END

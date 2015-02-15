@@ -54,11 +54,12 @@ with the network to the left of the {cmd:-} and ending with the network
 > to
 the right of the {cmd:-} are to be returned.
 
-
 {pstd}
 Many commands understand the keyword {cmd:_all} to mean all networks.
 Some commands default to using all networks if none are specified.
 
+{pstd}
+The networks in the dataset can be reordered with {help nworder}.
 
 
 {marker examples}{...}
@@ -76,4 +77,4 @@ Some commands default to using all networks if none are specified.
 
 {title:See also}
 
-   {help netname}, {help nwsummarize}
+   {help netname}, {help nwsummarize}, {help nworder}

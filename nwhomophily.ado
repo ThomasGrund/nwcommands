@@ -29,6 +29,12 @@ program def nwhomophily
 			local nodes = min(`temp',`nodes')
 		}
 	}
+	else {
+		if `nodes' > `=_N' {
+			di "{err}Not enough observations of variables: {bf:`varlist'}{txt}"
+			error 6044
+		}
+	}
 	
 	// generate valid network name and valid varlist
 	if "`name'" == "" {
@@ -52,7 +58,7 @@ program def nwhomophily
 		local onehom = word("`homophily'",`i')
 		local onemode = word("`mode'",`i')
 		
-		nwexpand `onevar', mode(`onemode') name(_tempexpand)
+		nwexpand `onevar' if _n <= `nodes', mode(`onemode') name(_tempexpand)
 		nwtomata _tempexpand, mat(`__temp')
 		nwdrop _tempexpand
 		

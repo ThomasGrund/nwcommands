@@ -1,0 +1,86 @@
+VERSION 10
+
+INCLUDE _std_small
+SYNCHRONOUS_ONLY
+HELP hlp1, view("help nwgeodesic")
+OK ok1,	label("OK")
+CANCEL	can1, label("Cancel")
+SUBMIT	sub1, label("Submit")
+RESET	res1
+POSITION 10 10 350 250
+
+SCRIPT PREINIT
+BEGIN
+	program initialize
+END
+
+DIALOG main, title("nwgeodesic - Shortest paths")
+BEGIN
+  TEXT     tx_var	20	20	100	.,	label("Network:") 		
+  COMBOBOX cb_var	80	20	210	.,	dropdown contents(netlist) nomem append
+  TEXT tx_new 20 50 110 ., label("Save as network:")
+  EDIT ed_new 120 50 150 ., default("_geodesic") nomem option(name)
+  CHECKBOX cx_xvars 80 110 200 ., label("Do not change Stata variables") option(xvars)
+  CHECKBOX cx_nosym 80 90 200 ., label("Do not symmetrize") option(nosym)
+  
+  GROUPBOX gb_unc 30 150 250 100, label("Unconnected paths")
+  RADIO rb_minus 50 170 160 ., label("Unnconnected = -1") first onclickon(script spinnerOff)
+  RADIO rb_max 50 190 160 ., label("Unnconnected = max - 1") middle onclickon(script spinnerOff)
+  RADIO rb_num 50 210 160 ., label("Unnconnected = ") last onclickon(script spinnerOn)
+  SPINNER sp_num 170 210 50 ., label("Unconnected path length") option(unconnected)
+  
+   
+END
+
+LIST netlist
+BEGIN
+	// intentionally empty
+	// this list will be populated by _nwdialog.ado
+END
+
+
+PROGRAM initialize
+BEGIN
+	put "_nwdialog nwgeodesic"
+	stata hidden immediate
+END
+
+SCRIPT generateOn 
+BEGIN
+	main.tx_new.show
+	main.ed_new.show
+END
+
+SCRIPT generateOff
+BEGIN
+	main.tx_new.hide
+	main.ed_new.hide
+END
+
+SCRIPT spinnerOff
+BEGIN
+	main.sp_num.hide
+END
+
+SCRIPT spinnerOn 
+BEGIN
+	main.sp_num.show
+END
+
+
+PROGRAM command
+BEGIN
+	put "nwgeodesic " main.cb_var 
+	beginoptions
+		option main.cx_xvars
+		option main.cx_nosym
+		optionarg main.ed_new
+		if main.rb_num {
+			optionarg main.sp_num
+		}
+		if main.rb_max {
+			put " unconnected(max) "
+		}
+	endoptions
+	stata
+END

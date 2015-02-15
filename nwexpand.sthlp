@@ -14,7 +14,7 @@
 
 {p 8 17 2}
 {cmdab: nwexpand} 
-{it:{help varname}}
+{it:{help varname}} [{it:{help if}}]
 {cmd:,}
 [{opt mode}({it:{help nwexpand##expand_mode:mode}})
 {opth nodes(int)}

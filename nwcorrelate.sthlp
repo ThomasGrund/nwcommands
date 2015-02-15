@@ -51,7 +51,7 @@ This command is the network version of {help correlate}. It can be used in two d
 2) Correlate one network and one variable
 
 {pstd}
-The option {bf:permuatation()} creates {help nwqap:QAP permutations} of the first network and 
+The option {bf:permutation()} creates {help nwqap:QAP permutations} of the first network and 
 generates a distribution of correlation coefficients under the null-hypothesis that there is
 no correlation. In practice, rows and columns of {help netname} are reshuffled and the correlation 
 coefficient is calculated again and again. Based on this distribution a {it:p-value} and a confidence

@@ -1,11 +1,13 @@
 *! Date        : 24aug2014
 *! Version     : 1.0
-*! Author      : Thomas Grund, Linköping University
+*! Author      : Thomas Grund, Linkoping University
 *! Email	   : contact@nwcommands.org
 
 capture program drop nwdyadprob
 program nwdyadprob
-	syntax [anything(name=weightnet)],  [ density(string) mat(string) name(string) vars(string) xvars undirected]
+	syntax [anything(name=weightnet)],  [ density(real 0) mat(string) name(string) vars(string) xvars undirected]
+	
+	_nwsyntax `weightnet', name(weightnet)
 	
 	// Install gsample if needed
 	capture which gsample
@@ -25,7 +27,12 @@ program nwdyadprob
 	
 	// Generate network from weight network
 	preserve
-	if "`mat'" != "" {
+	qui if "`mat'" != "" {
+		capture mat list `mat'
+		if _rc == 0 {
+			noi mata: `mat' = st_matrix("`mat'")
+		}
+	
 		capture mata: `mat'
 		if _rc == 0 {
 			mata: st_numscalar("r(validmata)", (rows(`mat') == cols(`mat')))
@@ -46,7 +53,7 @@ program nwdyadprob
 		}
 	}
 	else {
-		nwtoedge `weightnet', full forcedirected
+		qui nwtoedge `weightnet', full forcedirected
 	}
 	
 	// Generate valid network name and valid varlist
@@ -67,19 +74,19 @@ program nwdyadprob
 		local homovars "`vars'"
 	}
 	
-	if "`undirected'" != "" {
+	qui if "`undirected'" != "" {
 		replace `weightnet' = 0 if _toid <= _fromid
 	}
 	
-	if "`density'" != "" {
+	qui if "`density'" != "" {
 		local ties = `nodes' * (`nodes' -1) * `density'
-		gen _nonzero = (`weightnet' > 0)
+		qui gen _nonzero = (`weightnet' > 0)
 		qui sum _nonzero
 		if `r(sum)' < `ties' {
 			di "{err}Not enough non-zero weights to generate `ties' ties"
 			exit
 		}
-	
+		qui drop if _fromid == _toid
 		gsample `ties' [aweight=`weightnet'], generate(link) wor
 	}
 	else {

@@ -7,6 +7,7 @@ capture program drop _nwnodelab
 program _nwnodelab
 	syntax [anything(name=netname)], nodeid(integer) [detail]
 	_nwsyntax `netname'
+	nwname `netname'
 
 	if `nodeid' > `nodes' {
 		mata: st_rclear()

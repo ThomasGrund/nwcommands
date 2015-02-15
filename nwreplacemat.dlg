@@ -1,0 +1,52 @@
+
+VERSION 10.0
+SYNCHRONOUS_ONLY
+HELP hlp1, view("help nwsummarize")
+OK ok1,	label("OK")
+CANCEL	can1, label("Cancel")
+SUBMIT	sub1, label("Submit")
+RESET	res1
+POSITION 10 10 350 150
+
+
+SCRIPT PREINIT
+BEGIN
+		program initialize
+END
+
+
+DIALOG main, title("nwreplacemat - Replace retwork")
+BEGIN
+	
+	TEXT tx_net 40 30 140 ., label("Network:") 
+	COMBOBOX cb_net 160 30 150 ., dropdownlist label("Network") contents(netlist) nomem
+	
+	TEXT tx_matrix 40 60 150 ., label("Replace with matrix:") 
+	COMBOBOX cb_matrix 160 60 150 ., dropdownlist label("Matrix") contents(matrix) nomem option(newmat)
+
+	CHECKBOX cx_nosync 40 90 200 ., label("Do not sync Stata variables") option(nosync)
+END
+
+
+LIST netlist
+BEGIN
+	// intentionally empty
+	// this list will be populated by _nwdialog.ado
+END
+
+PROGRAM initialize
+BEGIN
+	put "_nwdialog nwreplacemat"
+	stata hidden immediate
+END
+
+PROGRAM command
+BEGIN
+	require main.cb_matrix
+	put "nwreplacemat " main.cb_net
+	beginoptions
+		optionarg main.cb_matrix
+		option main.cx_nosync
+	endoptions
+	stata
+END

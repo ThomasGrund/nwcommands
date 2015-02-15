@@ -1,0 +1,7 @@
+	TEXT tx_new 50 +50 170 ., label("New netname (prefix):") 
+	EDIT ed_new 50 +20 170 ., label("Netname") default("_network") option(name)
+	TEXT tx_labs 50 +20 250 ., label("New node labels (optional):") 
+	EDIT ed_labs 50 +20 340 ., label("Labels") option(labs)
+	TEXT tx_vars 50 +20 250 ., label("New Stata variables (optional):")
+	EDIT ed_vars 50 +20 340 ., label("Variables") option(vars)
+	CHECKBOX cx_xvars 50 +20 300 ., label("Do not generate Stata variables") option(xvars)

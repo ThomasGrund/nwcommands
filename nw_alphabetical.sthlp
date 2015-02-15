@@ -7,6 +7,8 @@
 {p2colset 5 32 34 2}{p2col:{bf:{help _extract_valuelabels }}}{err}no help file yet{txt}{p_end}
 {p2col:{bf:{help _nwdeploy }}}{err}no help file yet{txt}{p_end}
 {p2col:{bf:{help _nwdialog }}}{err}no help file yet{txt}{p_end}
+{p2col:{bf:{help _nwdialog_append }}}{err}no help file yet{txt}{p_end}
+{p2col:{bf:{help _nwdialog_lablist }}}{err}no help file yet{txt}{p_end}
 {p2col:{bf:{help _nwevalnetexp }}}{err}no help file yet{txt}{p_end}
 {p2col:{bf:{help _nwnodeid }}}Returns the nodeid of a node given its node label{p_end}
 {p2col:{bf:{help _nwnodelab }}}Returns the nodelab of a node given its nodeid{p_end}
@@ -42,7 +44,7 @@
 {p2col:{bf:{help nwgeodesic }}}Calculate shortest paths between nodes{p_end}
 {p2col:{bf:{help nwhomophily }}}Generate a homophily network{p_end}
 {p2col:{bf:{help nwimport }}}Import network{p_end}
-{p2col:{bf:{help nwinstall }}}{err}no help file yet{txt}{p_end}
+{p2col:{bf:{help nwinstall }}}Install Stata menu/dialogs{p_end}
 {p2col:{bf:{help nwissymmetric }}}Check if network is symmetric{p_end}
 {p2col:{bf:{help nwkatz }}}Calculate Katz centrality{p_end}
 {p2col:{bf:{help nwkeep }}}Keep a network (or only certain nodes){p_end}
@@ -52,6 +54,7 @@
 {p2col:{bf:{help nwmovie }}}Animate a sequence of networks{p_end}
 {p2col:{bf:{help nwname }}}Check name and change meta-information of a network{p_end}
 {p2col:{bf:{help nwneighbor }}}Extract the network neighbors of a node{p_end}
+{p2col:{bf:{help nworder }}}Reorder networks in dataset{p_end}
 {p2col:{bf:{help nwpath }}}Calculate paths between nodes{p_end}
 {p2col:{bf:{help nwpermute }}}Generate permutation of a network{p_end}
 {p2col:{bf:{help nwplot }}}Plot a network{p_end}
@@ -63,7 +66,7 @@
 {p2col:{bf:{help nwrecode }}}Recode network{p_end}
 {p2col:{bf:{help nwrename }}}Rename network{p_end}
 {p2col:{bf:{help nwreplace }}}Replace network{p_end}
-{p2col:{bf:{help nwreplacemat }}}Replace network with Mata matrix{p_end}
+{p2col:{bf:{help nwreplacemat }}}Replace network with Stata or Mata matrix{p_end}
 {p2col:{bf:{help nwring }}}Generate a ring-lattice network{p_end}
 {p2col:{bf:{help nwsave }}}Save networks in file{p_end}
 {p2col:{bf:{help nwset }}}Declare data to be network data{p_end}

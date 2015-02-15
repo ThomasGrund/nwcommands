@@ -40,7 +40,7 @@ program nwuse
 
 			if "`f'" != "matrix" & "`f'" != "edgelist" {
 				di "{err}File {bf:`webname'.dta} has the wrong format. Cannot find network meta-information."
-				error 6702	
+				error 6703	
 			}
 		}
 	}
@@ -105,7 +105,7 @@ program nwuse
 		drop _running
 		
 	}
-	nwload
+	//nwload
 end
 
 

@@ -21,6 +21,7 @@
 {opth ntimes(int)}
 {opt name}({it:{help newnetname}})
 {opt vars}({it:{help newvarlist}})
+{opt labs}({it:lab1 lab2 ...})
 {opt xvars}]
 
 {synoptset 20 tabbed}{...}
@@ -33,6 +34,7 @@
 {synopt:{opth ntimes(int)}}number of random networks to be generated; default = 1{p_end}
 {synopt:{opt name}({it:{help newnetname}})}name of the new random network; default = {it:random}{p_end}
 {synopt:{opt vars}({it:{help newvarlist}})}new variables that are used for the network{p_end}
+{synopt:{opt labs}({it:lab1 lab2 ...})}overwrite node labels{p_end}
 {synopt:{opt xvars}}do not generate Stata variables{p_end}
 
 
