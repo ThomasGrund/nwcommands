@@ -1,3 +1,0 @@
-"x"
-"1" "Error in terms.formula(form) : invalid model formula
-"

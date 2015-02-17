@@ -182,5 +182,4 @@
 {p2col:{bf:{help _nwsetobs }}}{err}no help file yet{txt}{p_end}
 {p2col:{bf:{help _nwsyntax_other }}}{err}no help file yet{txt}{p_end}
 {p2col:{bf:{help _opts_oneof }}}{err}no help file yet{txt}{p_end}
-{p2col:{bf:{help nwreciprocity }}}{err}no help file yet{txt}{p_end}
 {p2col:{bf:{help nwtostata }}}{err}no help file yet{txt}{p_end}

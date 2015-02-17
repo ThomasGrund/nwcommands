@@ -62,7 +62,6 @@ f nwpref.ado
 f nwqap.ado
 f nwrandom.ado
 f nwreach.ado
-f nwreciprocity.ado
 f nwrecode.ado
 f nwrename.ado
 f nwreplace.ado
@@ -89,17 +88,8 @@ f nwvalidate.ado
 f nwvalidvars.ado
 f nwvalue.ado
 f webnwuse.ado
-f ergdata.dta
 f florentine.dta
 f gang.dta
-f glasgow.dta
-f glasgow_edge.dta
-f hpotter.dta
-f klas12b.dta
-f klas12b_original.dta
-f stockholm.dta
-f usstates.dta
-f gang_pajek.net
 f scheme-s1network.scheme
 f scheme-s2network.scheme
 f scheme-s3network.scheme

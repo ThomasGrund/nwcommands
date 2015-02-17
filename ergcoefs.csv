@@ -1,5 +1,0 @@
-"","Estimate","Std. Error","MCMC %","p-value"
-"edges",-1.117,0.129,.,0
-"nodematch.Birthplace",0.332,0.136,.,0.015
-"nodematch.Prison",0.064,0.129,.,0.617
-"absdiff.Age",-0.103,0.029,.,0
