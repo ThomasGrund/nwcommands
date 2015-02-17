@@ -18,7 +18,7 @@
 {it:{help netname:netname2}}
 [
 {opth permutations(int)}
-{opt saving}
+{opth save(filename)}
 {it:{help kdensity:kdensity_options}}]
 
 {p 8 17 2}
@@ -28,7 +28,7 @@
 {opth attribute(varname)}
 [{opt mode}({it:{help nwexpand##expand_mode:expand_mode}})
 {opth permutations(int)}
-{opt saving}
+{opth save(filename)}
 {it:{help kdensity:kdensity_options}}]
 
 {synoptset 30 tabbed}{...}
@@ -36,7 +36,7 @@
 {synoptline}
 {synopt:{opt mode}({it:{help nwexpand##expand_mode:expand_mode})}}expand mode{p_end}
 {synopt:{opt permutations(integer)}}number of QAP permuations{p_end}
-{synopt:{opt saving}}saves QAP permuations{p_end}
+{synopt:{opth save(filename)}}save QAP permuation results in file{p_end}
 
 
 {title:Description}

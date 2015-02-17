@@ -34,8 +34,7 @@ BEGIN
 	GROUPBOX gb_prob 50 60 160 100, label("Ties/density")
 	RADIO rb_prob 70 90 100 ., label("Tie probability") first
 	RADIO rb_density 70 110 120 ., label("Network density") last
-	TEXT tx_spin 140 130 10 . , label(".")
-	SPINNER sp_prob2 150 130 50 ., label("prob")	
+	EDIT ed_prob 150 130 50 ., label("prob") numonly default("0.01")
 	
 	INCLUDE nw_newnet_opt
 END
@@ -58,10 +57,10 @@ BEGIN
 	put "nwrandom " main.sp_nodes 
 	beginoptions
 		if main.rb_prob {
-			put " prob(." main.sp_prob2 ")"
+			put " prob(" main.ed_prob ")"
 		}
 		if main.rb_density {
-			put " density(." main.sp_prob2 ")"
+			put " density(" main.ed_prob ")"
 		}
 		
 		optionarg main.sp_nets

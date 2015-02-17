@@ -20,12 +20,9 @@ program nwplotmatrix
 	if substr(`"`xlabel'"',1,1) == "," {
 		local xlabel = substr(`"`xlabel'"', 2,.)
 	}
-
 	preserve
-
 	nwduplicate `netname', name(__temp_sort) xvars
 	local netname "__temp_sort"
-	
 	tempvar  nodelab 
 	tempvar originalSorting
 

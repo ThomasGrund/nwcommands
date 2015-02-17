@@ -70,6 +70,9 @@ program nwgeodesic
 	}
 
 	nwset, name(`name') mat(distances) vars(`vars')	
+	if "`sym'" == "" {
+		nwname `name', newdirected("false")
+	}
 	nwcurrent
 	local geonet = r(current)
 	

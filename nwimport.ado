@@ -43,10 +43,10 @@ program nwimport
 	local options `"`options_original'"'
 
 	if "`import_type'" == "matrix" {
-		capture _nwimport_matrix `fname', `options'
+		 capture _nwimport_matrix `fname', `options'
 	}
 	if "`import_type'" == "compressed" {
-		 capture _nwimport_compressed `"`fname'"', `options'
+		 capture _nwimport_compressed `fname', `options'
 	}
 	if "`import_type'" == "edgelist" {
 		 capture _nwimport_edgelist `fname', `options'
@@ -493,6 +493,18 @@ program _nwimport_matrix
 			}
 		
 			insheet using `anything' `insheet_opt'
+			if `c(k)' == 1 {
+				split v1, parse(" ")
+				drop v1
+				foreach v of varlist _all {
+					if `v'[1] == "" {
+						noi di "`v'"
+						drop `v'
+					}
+				}
+				destring _all, replace
+			}
+			
 			if (`c(k)' == 1){
 				local success = 0
 			}

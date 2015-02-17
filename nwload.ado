@@ -33,8 +33,7 @@ program nwload
 	local localvars `=onevars'
 	scalar onelabs = "\$nwlabs_`id'"
 	local locallabs `"`=onelabs'"'
-		
-		
+	
 	if "`labelonly'" != "" {		
 
 		

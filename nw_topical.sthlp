@@ -1,5 +1,5 @@
 {smcl}
-{* *! version  15feb2015}{...}
+{* *! version  17feb2015}{...}
 {phang}
 {help nwcommands:NW-2 topical} {hline 2} 
 {hline 2} Topical list of network commands
@@ -121,6 +121,7 @@
 {p2col:    {bf:{help nwcontext }}}Create a context variable{p_end}
 {p2col:    {bf:{help nwcorrelate }}}Correlate networks and variables{p_end}
 {p2col:    {bf:{help nwdegree }}}Degree centrality and distribution{p_end}
+{p2col:    {bf:{help nwergm }}}Exponential Random Graph Model{p_end}
 {p2col:    {bf:{help nwevcent }}}Calculate eigenvector centrality{p_end}
 {p2col:    {bf:{help nwgen }}}Network extensions to generate{p_end}
 {p2col:    {bf:{help nwgenerate }}}{p_end}
@@ -140,19 +141,7 @@
 {p2colset 12 35 36 2}
 {p2col:    {bf:{help nwclear }}}Clear all networks and variables from memory{p_end}
 {p2col:    {bf:{help nwcurrent }}}Report and set current network{p_end}
-{marker analysis}{...}
-
-{col 8}   {c TLC}{hline 24}{c TRC}
-{col 8}{hline 3}{c RT}       {it:Utilities}{col 36}{c LT}{hline}
-{col 8}   {c BLC}{hline 24}{c BRC}
-{p2colset 12 35 36 2}
 {p2col:    {bf:{help nwinstall }}}Install Stata menu/dialogs{p_end}
-{marker utilities}{...}
-
-{col 8}   {c TLC}{hline 24}{c TRC}
-{col 8}{hline 3}{c RT}       {it:Utilities}{col 36}{c LT}{hline}
-{col 8}   {c BLC}{hline 24}{c BRC}
-{p2colset 12 35 36 2}
 {p2col:    {bf:{help nwload }}}Load a network as Stata variables{p_end}
 {p2col:    {bf:{help nwsync }}}Sync network with Stata variables{p_end}
 {p2col:    {bf:{help nwtomata }}}Return adjacency matrix of network{p_end}
@@ -193,5 +182,5 @@
 {p2col:{bf:{help _nwsetobs }}}{err}no help file yet{txt}{p_end}
 {p2col:{bf:{help _nwsyntax_other }}}{err}no help file yet{txt}{p_end}
 {p2col:{bf:{help _opts_oneof }}}{err}no help file yet{txt}{p_end}
-{p2col:{bf:{help nwergm }}}{err}no help file yet{txt}{p_end}
+{p2col:{bf:{help nwreciprocity }}}{err}no help file yet{txt}{p_end}
 {p2col:{bf:{help nwtostata }}}{err}no help file yet{txt}{p_end}

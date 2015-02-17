@@ -1,6 +1,6 @@
 *! Date        : 3sept2014
 *! Version     : 1.0
-*! Author      : Thomas Grund, Linköping University
+*! Author      : Thomas Grund, Linkoping University
 *! Email	   : contact@nwcommands.org
 
 capture program drop nwsave
@@ -13,7 +13,7 @@ program nwsave
 
 	
 	if "`format'" == "" {
-		local format = "matrix"
+		local format = "edgelist"
 	}
 	if (`=`nodes_all' + 20' > c(max_k_theory)){
 		local format = "edgelist" 
@@ -52,7 +52,7 @@ program nwsave
 			tempfile edgelist_`onenet'
 			nwtoedge `onenet'
 			rename `onenet' _`onenet'
-			save edgelist_`onenet', replace
+			save `edgelist_`onenet'', replace
 			merge m:m _fromid _toid using `edgelist_all', nogenerate
 			save `edgelist_all', replace
 		}

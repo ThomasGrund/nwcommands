@@ -9,13 +9,18 @@ program nwplot
 	set more off
 	local 0_original = `"`0'"'
 	local layout = "" 
-	syntax [anything(name=netname)][if/] [in/], [ lab  labelopt(string) _layoutfunction(string) arrows edgesize(string) ASPECTratio(string) components(string) arcstyle(string) arcbend(string) arcsplines(integer 10) nodexy(varlist numeric min=2 max=2) edgeforeground(string) GENerate(string) colorpalette(string) edgecolorpalette(string) edgepatternpalette(string) symbolpalette(string) lineopt(string) scatteropt(string) legendopt(string) size(string) color(string) symbol(string) edgecolor(string) label(varname) nodefactor(string) sizebin(string) edgefactor(string) arrowfactor(string) arrowgap(string) arrowbarbfactor(string) layout(string) iterations(integer 1000) scheme(string) * ]
-
+	syntax [anything(name=netname)][if/] [in/], [ ignorelgc lab  labelopt(string) _layoutfunction(string) arrows edgesize(string) ASPECTratio(string) components(string) arcstyle(string) arcbend(string) arcsplines(integer 10) nodexy(varlist numeric min=2 max=2) edgeforeground(string) GENerate(string) colorpalette(string) edgecolorpalette(string) edgepatternpalette(string) symbolpalette(string) lineopt(string) scatteropt(string) legendopt(string) size(string) color(string) symbol(string) edgecolor(string) label(varname) nodefactor(string) sizebin(string) edgefactor(string) arrowfactor(string) arrowgap(string) arrowbarbfactor(string) layout(string) iterations(integer 1000) scheme(string) * ]
+	local twowayopt `"`options'"'
 	
 	// filter out lgc
 	local 0 "`layout'"
 	syntax [anything(name=something)], [ lgc *]
 	tempvar lgc_var
+	
+	if "`ignorelgc'" != "" {
+		local lgc = ""
+	}
+	local ignorelgc = ""
 	
 	if "`lgc'" != "" {
 		nwgen `lgc_var' = lgc(`netname')
@@ -23,9 +28,14 @@ program nwplot
 	}
 	
 	local 0 = `"`0_original'"'
-
 	syntax [anything(name=netname)][if/] [in/], [ lab  labelopt(string) _layoutfunction(string) arrows edgesize(string) ASPECTratio(string) components(string) arcstyle(string) arcbend(string) arcsplines(integer 10) nodexy(varlist numeric min=2 max=2) edgeforeground(string) GENerate(string) colorpalette(string) edgecolorpalette(string) edgepatternpalette(string) symbolpalette(string) lineopt(string) scatteropt(string) legendopt(string) size(string) color(string) symbol(string) edgecolor(string) label(varname) nodefactor(string) sizebin(string) edgefactor(string) arrowfactor(string) arrowgap(string) arrowbarbfactor(string) layout(string) iterations(integer 1000) scheme(string) * ]
 	_nwsyntax `netname', max(1)
+	qui nwsummarize `netname'
+	if `r(density)' == 0 {
+		di "{txt}Network empty. Plotting does not make sense.{txt}"
+		exit
+	}
+	
 	local masternetname "`netname'"
 	
 	if "`if_lgc'" != "" {
@@ -47,7 +57,7 @@ program nwplot
 		nwkeep __temp_in in `in'
 		if "`edgecolor'" != "" {
 			nwgen __temp_edgecolor_in = `edgecolor'
-			local edgecolor "_temp_edgecolor_in"
+			local edgecolor "__temp_edgecolor_in"
 			if "`edgecolor'" != "`netname'" {
 				nwkeep __temp_edgecolor_in in `in'
 			}
@@ -71,7 +81,7 @@ program nwplot
 		if "`edgecolor'" != "" {
 			capture nwdrop _temp_edgecolor_if
 			nwgen __temp_edgecolor_if = `edgecolor'
-			local edgecolor "_temp_edgecolor_if"
+			local edgecolor "__temp_edgecolor_if"
 			if "`edgecolor'" != "`netname'" {
 				nwdrop __temp_edgecolor_if if (!(`if'))
 			}
@@ -86,10 +96,9 @@ program nwplot
 		}
 		
 		local netname "__temp_if"
-		_nwsyntax `netname', max(1)
 	}
+	_nwsyntax `netname', max(1)
 
-	
 	qui if "`lab'" != ""{
 		capture drop _nodelab
 		capture drop _nodeid
@@ -101,7 +110,7 @@ program nwplot
 	if _rc != 0 {
 		ssc install labellist
 	}
-	local twowayopt `"`options'"'
+
 		
 	if "`aspectratio'" == "" {
 		local aspectratio = 1
@@ -121,6 +130,9 @@ program nwplot
 		local nodefactor = 1
 	}
 	local nodefactor = `nodefactor' / 50
+	/*if `nodes' > 20 {
+		local nodefactor = `nodefactor' / 1.5
+	}*/
 	
 	if "`edgefactor'" == "" {
 		local edgefactor = 1
@@ -223,9 +235,16 @@ program nwplot
 	local colorkeys ""
 	local colororder ""
 	local colorlabels ""
-	if ("`color'" != "" & substr(trim("`color'"),1,1) != ","){
+	
+	if ("`color'" != ""){
 		local 0 = "`color'"
-		syntax [varlist(min=1 max=1)] [, norescale forcekeys(string) legendoff colorpalette(string) *]
+		syntax [varlist(default=none max=1)] [, norescale forcekeys(string) legendoff colorpalette(string) *]
+		if "`varlist'" == "" {
+			tempvar dummy_col
+			gen `dummy_col' = 1
+			local varlist "`dummy_col'"
+			local legendoff "legendoff"
+		}
 		tempvar color_numeric
 		capture encode `varlist' , gen(`color_numeric')
 		if _rc == 0 {
@@ -300,7 +319,7 @@ program nwplot
 	local symbolkeys ""
 	local symbolorder ""
 	local symbollabels ""
-	if ("`symbol'" != "" & substr(trim("`symbol'"),1,1) != ","){
+	if ("`symbol'" != ""){
 		// Check for known schemes without symbol support
 		if "`scheme'" == "" {
 			local scheme = c(scheme)
@@ -311,7 +330,13 @@ program nwplot
 		}
 		
 		local 0 = "`symbol'"
-		syntax [varlist(min=1 max=1)] [, norescale forcekeys(string) legendoff symbolpalette(string) *]
+		syntax [varlist(default=none max=1)] [, norescale forcekeys(string) legendoff symbolpalette(string) *]
+		if "`varlist'" == "" {
+			tempvar dummy_symb
+			gen `dummy_symb' = 1
+			local varlist "`dummy_symb'"
+			local legendoff "legendoff"
+		}
 		tempvar symbol_numeric
 		capture encode `varlist', gen(`symbol_numeric')
 		if _rc == 0 {
@@ -419,7 +444,7 @@ program nwplot
 				local sizekeys_size "`sizekeys_size' `= 0.04 * `szkey''"
 			}
 			mata: nsize = st_data((1,`nodes'),st_varindex("__size"))
-			mata: nsize = nsize :*20
+			mata: nsize = nsize :*40
 		}
 		local nodefactor = `nodefactor' / 20
 		capture drop __size
@@ -485,7 +510,7 @@ program nwplot
 		local 0 "`edgesize'`edgesize_options'"
 		capture noi syntax [anything] [, forcekeys(string) legendoff ]
 		if _rc != 0 {
-			nwdrop __temp*
+			nwdrop __temp_edgesize_dummy
 			error 6088
 		}
 		
@@ -536,7 +561,6 @@ program nwplot
 	if "`edgecolor'" != ""  {
 		if "`edgecolor'" == "," {
 			nwrandom `nodes', prob(0) name(__temp_edgecol_dummy)
-			noi nwset
 			//nwreplace __temp_egdecol_dummy = .
 			local edgecolor "__temp_edgecol_dummy,"
 			if strpos("`edgecolor_options'", "legendoff") == 0 {
@@ -546,10 +570,9 @@ program nwplot
 		local 0 "`edgecolor'`edgecolor_options'"
 		capture noi syntax [anything] [, forcekeys(string) legendoff edgecolorpalette(string) edgepatternpalette(string)]
 		if _rc != 0 {
-			nwdrop __temp*
+			nwdrop __temp_edgecolor_dummy
 			error 6088
 		}
-		
 		// check and clean network 
 		local edgecolorkeys_legendoff "`legendoff'"
 		local edgecolor "`anything'"
@@ -560,7 +583,6 @@ program nwplot
 		local othernetname = ""
 		qui nwsummarize `edgecolor'
 		local siznodes = r(nodes)
-
 		if `nodes' != `siznodes' {
 			di "{err}{it:network} {bf:`edgecolor'} needs to be of the same size as {it:network} {bf:`netname'}"
 			error 6056
@@ -841,6 +863,9 @@ program nwplot
 	// Prepare plots and legend
 	qui tab ncolor, matrow(ncolorrow)
 	local ncols = rowsof(ncolorrow)
+	if `ncols' == 0 { 
+		local ncols = 1
+	}
 	
 	qui tab nsymbol, matrow(nsymbolrow)
 	local symbs = rowsof(nsymbolrow)
@@ -1029,7 +1054,6 @@ program nwplot
 		}
 	}
 	
-	
 	// Prepare pc command to plot arcs/edges
 	local pccmd "||"
 	local pccmdforeground ""
@@ -1098,8 +1122,8 @@ program nwplot
 	capture mat drop nsymblrow
 	capture mat drop colorkeysmap
 	capture mata drop symbolkeysmap
-	
-	nwload `masternetname', labelonly
+
+	//qui nwload `masternetname', labelonly
 end
 	
 capture program drop _getvaluelabel

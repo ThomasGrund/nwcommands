@@ -34,7 +34,7 @@
 {p2col:{bf:{help nwduplicate }}}Duplicate a network{p_end}
 {p2col:{bf:{help nwdyadprob }}}Generate a network based on tie probabilities{p_end}
 {p2col:{bf:{help nwdyads }}}Dyad census{p_end}
-{p2col:{bf:{help nwergm }}}{err}no help file yet{txt}{p_end}
+{p2col:{bf:{help nwergm }}}Exponential Random Graph Model{p_end}
 {p2col:{bf:{help nwevcent }}}Calculate eigenvector centrality{p_end}
 {p2col:{bf:{help nwexpand }}}Expand variable to network{p_end}
 {p2col:{bf:{help nwexport }}}Export network as Pajek file{p_end}
@@ -63,6 +63,7 @@
 {p2col:{bf:{help nwqap }}}Multivariate QAP regression{p_end}
 {p2col:{bf:{help nwrandom }}}Generate a random network{p_end}
 {p2col:{bf:{help nwreach }}}Calculate reachability network{p_end}
+{p2col:{bf:{help nwreciprocity }}}{err}no help file yet{txt}{p_end}
 {p2col:{bf:{help nwrecode }}}Recode network{p_end}
 {p2col:{bf:{help nwrename }}}Rename network{p_end}
 {p2col:{bf:{help nwreplace }}}Replace network{p_end}

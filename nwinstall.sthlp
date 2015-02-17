@@ -1,7 +1,7 @@
 {smcl}
 {* *! version 1.0.0  3sept2014}{...}
 {marker topic}
-{helpb nw_topical##analysis:[NW-2.7] Utilities}
+{helpb nw_topical##utilities:[NW-2.7] Utilities}
 
 {title:Title}
 
@@ -16,7 +16,9 @@
 {cmdab: nwinstall} 
 [,
 {opt permanently}
-{opt remove }]
+{opt remove }
+{opt help}
+{opt all}]
 
 
 
@@ -24,7 +26,9 @@
 {synopthdr}
 {synoptline}
 {synopt:{opt permanently}}install the menu/dialogs permanently on your Stata{p_end}
-{synopt:{opt permutations(integer)}}remove the "Network Analysis" menu{p_end}
+{synopt:{opt remove}}remove the "Network Analysis" menu from your Stata{p_end}
+{synopt:{opt help}}download the help files{p_end}
+{synopt:{opt all}}download the help files and dialog boxes and install them permanently{p_end}
 
 
 {title:Description}
@@ -36,6 +40,12 @@ advanced functions are only available through Stata syntax (see {help nwcommands
 
 
 {title:Example}
+
+{pstd}
+I recommend you run this first after you installed the package "nwcommands-ado". It installs all help files and dialog boxes.
+
+	{cmd:. nwinstall, all}
+	
 
 {pstd}
 This installs a menu for the nwcommands:

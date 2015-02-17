@@ -10,7 +10,6 @@ program nwduplicate
 	}
 	nwvalidate `name'
 	local name = r(validname)
-	
 	nwname `netname'
 	nwgenerate `name' = `netname', `xvars' vars(`r(vars)') labs(`r(labs)')
 end

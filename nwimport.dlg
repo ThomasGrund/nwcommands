@@ -14,7 +14,7 @@ BEGIN
 	FILE fl_ucinet 50 90 350 ., label("File") filter("Ucinet|*.dat|All files|*.*")
 	FILE fl_matrix 50 90 350 ., label("File") filter("Text .txt|*.txt|Comma-separated .csv|*.csv|Excel .xlsx|*.xlsx|Excel-old .xls|*.xls|All files|*.*")	
 	FILE fl_edge 50 90 350 ., label("File") filter("Stata .dta|*.dta|Text .txt|*.txt|Comma-separated .csv|*.csv|Excel .xlsx|*.xlsx|Excel-old .xls|*.xls|All files|*.*")	
-	FILE fl_compressed 50 90 350 ., label("File") filter("Text|*.txt|Comma-separated|All files|*.*")	
+	FILE fl_compressed 50 90 350 ., label("File") filter("CSV files|*.csv")	
 	FILE fl_all 50 90 400 ., label("File") filter("All files|*.*")	
 	TEXT tx_name 50 140 200 ., label("New name(s) of network(s):")
 	EDIT ed_name 50 160 200 ., nomemory
@@ -30,8 +30,8 @@ BEGIN
       "Pajek NET format"
       "Ucinet DL format"
       "Raw Matrix"
+	  "Raw Compressed Edgelist"
       "Raw Edgelist"
-      "Raw Compressed Edgelist"
       "GML"
       "GraphML"         
 END
@@ -41,8 +41,8 @@ BEGIN
 	script format_pajek
 	script format_ucinet
 	script format_matrix
-	script format_edge
 	script format_compressed
+	script format_edge
 	script format_all
 	script format_all
 END

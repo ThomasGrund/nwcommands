@@ -40,10 +40,10 @@ BEGIN
 	RADIO rb_directed 290 90 100 ., label("Directed") first
 	RADIO rb_undirected 290 110 120 ., label("Undirected") last option(undirected)
 	
-	RADIO rb_prob 50 90 150 ., label("Rewire probability   .") first onclickoff(script rewireProbOff) onclickon(script rewireProbOn)
-	SPINNER sp_prob1 180 90 40 ., label("prob1") nomem option(prob)	
+	RADIO rb_prob 50 90 150 ., label("Rewire probability   ") first onclickoff(script rewireProbOff) onclickon(script rewireProbOn)
+	EDIT sp_prob1 180 90 40 ., default("0.05") label("prob1") nomem option(prob) numonly	
 	RADIO rb_short 50 110 150 ., label("Network shortcuts")  last onclickoff(script rewireShortOff) onclickon(script rewireShortOn)
-	SPINNER sp_short 180 110 40 ., label("shortcut") nomem option(shortcuts)
+	SPINNER sp_short 180 110 60 ., label("shortcut") nomem option(shortcuts)
 	
 	INCLUDE nw_newnet_opt
 END
@@ -87,7 +87,7 @@ BEGIN
 	beginoptions
 		put " k(" main.sp_neigh ")"
 		if main.sp_prob1.isenabled() {
-			put " prob(." main.sp_prob1 ")" 
+			put " prob(" main.sp_prob1 ")" 
 		}
 		optionarg main.sp_short
 		optionarg main.sp_nets

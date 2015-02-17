@@ -1,0 +1,2 @@
+vertices,edges,directed,numcoeff,coeff,iterations,estimate,aic,bic,samplesize,message
+54 , 315 , FALSE , 4 , edges nodematch.Birthplace nodematch.Prison absdiff.Age , 20 , MLE , 1496.07 , 1517.13 , 10000 , 

@@ -97,187 +97,24 @@ Basically, you can control the look of nodes, labels and edges just as with {hel
 can use {opt sizes(varlist)} to plot different node sizes for different points in time; {it:varlist} needs 
 to have as many variables as there are networks you want to animate. 
 
+{pstd}
+Because nodes and networks at different points can vary, all node- and edge-level
+options are automatically invoked with the option {bf:norescale}.
 
-
-	{cmd:. nwclear}
-	{cmd:. nwrandom 20, prob(.2)}
-	{cmd:. nwplot}
+	{cmd:. webnwuse klas12b}, nwclear
+	{cmd:. nwmovie _all}
 
 {pstd}
-One can change the layout where nodes should be plotted:
+One can change the attributes of nodes per time point.
 	
-	{cmd:. nwplot, layout(mds)}
-	{cmd:. nwplot, layout(circle)}
-	{cmd:. nwplot, layout(grid)}
-	{cmd:. nwplot, layout(grid, columns(20))}
+	{cmd:. nwmovie klas12b_wave1 klas12b_wave1, colors(delinq1 delin2)}
 
 {pstd}
-Or obtain coordinates from layout and plot with coordinates. The option {bf:nodexy} can be used to write your
-own network layout functions, return coordinates and plot a network with these coordinates.
-
-	{cmd:. nwplot, gen(xcoord ycoord)}
-	{cmd:. replace xcoord = .2 if _n < 5}
-	{cmd:. nwplot, nodexy(xcoord ycoord)}
-
-{pstd}
-Arrow heads are plotted when a network is directed. Furthermore, the command notices if a dyad is mutually or 
-asymmetrically connected (see {help nwdyads}). By default, asymmetrically connected dyads are represented as a straight line, whereas
-mutually connecetd dyads are represented as two curved lines. However, one can overwrite this and show all ties as 
-curved lines.
-
-	{cmd:. nwplot, arcstyle(automatic)}
-	{cmd:. nwplot, arcstyle(straight)}
-	{cmd:. nwplot, arcstyle(curved)}
-	{cmd:. nwplot, arcbend(0.3) arcsplines(20)} 
-
-{pstd}
-Almost all elements in a network plot can be easily made bigger or smaller using factors:
-
-	{cmd:. nwplot, nodefactor(2)}
-	{cmd:. nwplot, edgefactor(2)} 
-	{cmd:. nwplot, arrowfactor(4)}
-	{cmd:. nwplot, arrowbarbfactor(.2)}
-{phang2}	
-	{cmd:. nwplot, nodefactor(2) edgefactor(4) arrowfactor(2) arrowbarbfactor(.2)}{p_end}
-
-{pstd}
-Colors, symbols and size of nodes can be changed accoring to a {help varname}. Furthermore, the palettes used for display
-can be changed as well. 
-
-	{cmd:. webnwuse glasgow, nwclear}
-	{cmd:. nwplot glasgow1, color(smoke1)}
-	{cmd:. nwplot, color(smoke1, colorpalette(red yellow cyan))}
- 
-	{cmd:. nwplot glasgow1, symbol(sport1)}
-	{cmd:. nwplot glasgow1, symbol(sport1, symbolpalette(T S))}
-
-	{cmd:. nwplot glasgow1, size(alcohol1)}
-	{cmd:. nwplot, size(alcohol1, forcekeys1(1 5 10 20))}
- 
-	{cmd:. nwplot glasgow1, size(alcohol1) color(smoke1) symbol(sport1)}
-
-{pstd}
-The nwcommand come with two new schemes: s1network and s2network.
-
-	{cmd:. nwplot, scheme(s1network)}
-	{cmd:. nwplot, scheme(s2network)} 
-	{cmd:. nwplot, scheme(s2mono)}
-{phang2}
-	{cmd:. nwplot, size(alcohol3) color(smoke3) symbol(sport3) scheme(s1network)}{p_end}
-{phang2}	
-	{cmd:. nwplot, size(alcohol3) color(smoke3) symbol(sport3) scheme(economist)}{p_end}
-	{cmd:. set scheme s2network}
-
-{pstd}
-This example calculates the shortest path between two nodes (medici and peruzzi) and uses this path
-to color the edges of the original network and change the size of the edges on this path. 
-
-	{cmd:. webnwuse florentine, nwclear}
-	{cmd:. nwpath flomarriage, ego(medici) alter(peruzzi) generate(sp)}
-{phang2}	
-	{cmd:. nwplot flomarriage, label(_nodelab) edgecolor(sp_1, legendoff) edgesize(sp_1, legendoff) edgefactor(5)}
+Notice that the normal, time-invariant options from {help nwplot} can be used as well.
 	
-{pstd}
-Another example that changes the size and color of edges.
+	{cmd:. nwmovie klas12b_wave1 klas12b_wave1, color(sex)}
 
-	{cmd:. webnwuse gang, nwclear}
-	{cmd:. nwplot}
-	{cmd:. nwplot gang, edgesize(gang)} 
-	{cmd:. nwgenerate blood = (gang==4)}
-	{cmd:. nwplot blood}
-	{cmd:. nwplot gang, edgesize(gang) edgecolor(blood)}
-
-{pstd}
-This is how to control the legend of the plot. All options that can be used for twoway legends are valid.{p_end}
-	{phang2}
-	{cmd:. nwplot gang, size(Arrests, forcekeys(5 10 20)) legendopt(on pos(3) cols(1))}
-
-{pstd}
-Because nwplot uses twoway plots one can  use all general twoway options to e.g. control the title of a plot.
-
-{phang2}
-{cmd:. webnwuse florentine, nwclear}{p_end}
-{phang2}
-{cmd:. nwplot flomarriage, edgecolor(flobusiness) title("Florentine Marriages", color(red) size(huge))}
-{p_end}
-
-{pstd}
-Here, the nodes are plotted with the node labels saved with the network:
 	
-	{cmd:. nwplot flobusiness, lab}
-	
-{pstd}
-More generally, one can use any {it:varname} as node labels. The next example, does the same as the previous command, 
-but shows how one could use node labels stored elsewhere:
+{title:See also}
 
-	{cmd:. nwplot flobusiness, label(_nodelab)}
-
-{pstd}
-The look and feel of node labels is changed with labelopt():
-
-	{cmd:. nwplot flobusiness, label(_nodelab) labelopt(mlabsize(huge) mlabcolor(red))}
-	
-{pstd}
-The command draws on normal scatter plots to plot nodes. Once can send all sorts of options directly to these
-underlying scatter plots. Here, the color and symbol of nodes is overwritten.
-
-	{cmd:. nwplot flomarriage, scatteropt(mfcolor(green) msymbol(D))}
-	{cmd:. nwplot flomarriage, lineopt(lwidth(10) lcolor(green))}
-	
-
-{pstd}
-The next example shows how to only plot the largest component of the network.	
-
-	{cmd:. webnwuse glasgow, nwclear}
-	{cmd:. nwgen large = lgc(glasgow1)}
-	{cmd:. nwplot glasgow1 if large == 1}
-	
-{pstd}
-Alternative to display the largest component only:
-
-	{cmd:. webnsuse glasgow, nwclear}
-	{cmd:. nwplot glasgow1, layout(,lgc)}
-	
-
-{marker layoutfunction}{...}
-{title:Programming layout function}
-
-{pstd}
-One can use {bf:nwplot} together with user-written layout functions. In this way one can implement all sorts of network layout algorithms (e.g.
-Fruchtermann-Reingold, Kamadai-Kawai, and so on). Probably the easiest way to do this is:
-
-{pmore}
-1. Obtain adjacency matrix {it:matamatrix} of network with {help nwtomata:nwtomata, mat(matamatrix)}{p_end}
-
-{pmore}
-2. Implement desired layout function/program that calculates node coordinates with argument {it:matamatrix} and saves node coordinates in Stata variables {it:_myxcoord, _myycoord}.
-{p_end} 
-{pmore}
-3. Run nwplot with option {bf:nodexy(_myxcoord _myycoord) layout(nodexy)}
-
-{pstd}
-However, this method does not work together with {help nwmovie}. Here, network plots are generated for each frame in between network
-waves. A more sophisticated advanced programming solution is the following:
-
-{pmore}
-1. Write and load mata function that takes as first argument the adjacency matrix of the network (after that all sorts of arguments can follow).
-This function needs to return a matrix that has exactly {it:nodes} rows and two columns (one for x- and one for y-coordinate). 
-	
-		{com}capture mata : mata drop myrandom()
-		mata:
-		real matrix function myrandom(real matrix net) {
-			return(runiform(rows(net), 2))
-		}
-		end{txt}
-		
-{pmore}
-This little mata function returns random coordinates for each node.
-		
-{pmore}
-2. Run nwplot with option {bf:layout(_layoutfunction) _layoutfunction(myrandom)}. 
-
-{pstd}
-This solution is compatible with {help nwmovie}. Notice that when {bf:_layoutfunction()} is used, all {help nwplot##layout_sub:layout_sub} options are ignored.
-
-
-
+	{help nwplot}

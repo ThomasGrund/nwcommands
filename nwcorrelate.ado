@@ -5,7 +5,7 @@
 
 capture program drop nwcorrelate	
 program nwcorrelate
-syntax [anything(name=netnames)] [,  mode(string) ATTRibute(string) PERMutations(integer 1) SAVing *]
+syntax [anything(name=netnames)] [,  mode(string) ATTRibute(string) PERMutations(integer 1) SAVe(string asis) *]
 
 	_nwsyntax `netnames', max(2)
 	local netnames `netname'
@@ -87,9 +87,9 @@ syntax [anything(name=netnames)] [,  mode(string) ATTRibute(string) PERMutations
 		mata: st_numscalar("r(corr)", corr)
 		nwtostata, mat(corr_reps) gen(correlation)
 		gen observed = r(corr)
-		if "`saving'"!= "" {
+		if "`save'"!= "" {
 			di "QAP results saved as: `c(pwd)'/nwcorrelationqap.dta" 
-			save "`c(pwd)'/nwcorrelationqap.dta", replace
+			save "`save'", replace
 		}
 	
 		qui count

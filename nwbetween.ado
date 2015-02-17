@@ -12,7 +12,7 @@
 
 capture program drop nwbetween
 program nwbetween
-	syntax [anything(name=netname)], [GENerate(string) nosym standardize]
+	syntax [anything(name=netname)], [GENerate(string) nosym standardize outputoff]
 	_nwsyntax `netname', max(9999)
 	_nwsetobs
 	
@@ -42,10 +42,13 @@ program nwbetween
 			local generate "_between"
 		}
 		
+		
+		if "`outputoff'" == "" {
+		
 		local generate_all "`generate_all' `generate'`k'"
 		capture drop `generate'`k'
 		nwtostata, mat(C) gen(`generate'`k')
-		mata: mata drop betweennet C
+		mata: mata drop betweennet
 		qui nwname `netname_temp'
 		if "`standardize'" != "" {
 			if "`r(directed)'" == "true" {
@@ -55,9 +58,11 @@ program nwbetween
 				qui replace `generate'`k'   = `generate'`k'  / ((`nodes' - 1) * (`nodes' - 2) / 2)
 			}
 		}
+		}
 		local k = `k' + 1
 	}
 	mata: st_rclear()
+
 	
 	di "{hline 40}"
 	di "{txt}  Network name: {res}`netname'"
@@ -66,7 +71,11 @@ program nwbetween
 	if "`standardize'" != "" {
 		di "{txt}    (standardized)"
 	}
-	sum `generate_all'
+	if "`outputoff'" == "" {
+		sum `generate_all'
+	}
+	mata: st_numscalar("r(bw_central)", sum(J(`nodes',1,max(C)) :- C) / ((`nodes' - 2) * (`nodes' - 1) * (`nodes' - 1)))
+	mata: mata drop C
 end
 
 

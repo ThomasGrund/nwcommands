@@ -44,7 +44,6 @@ program nwuse
 			}
 		}
 	}
-	
 	if _rc != 0 {
 		di "{err}File {bf:`webname'.dta} has the wrong format. Cannot find network meta-information."
 		error 6702
@@ -84,10 +83,11 @@ program nwuse
 		if "`frmat'" == "edgelist"{
 			keep _fromid _toid `nname'
 			qui nwfromedge _fromid _toid `nname' if `nname' != . , name(`name') vars(`vars') labs(`labs') `undirected' `directed'
+		
 		}
 		if "`frmat'" == "matrix"{
 			local _netstub `vars'
-			nwset `_netstub', name(`name') vars(`vars') labs(`labs') `undirected'
+			qui nwset `_netstub', name(`name') vars(`vars') labs(`labs') `undirected'
 		}
 		restore
 	}

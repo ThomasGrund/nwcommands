@@ -29,7 +29,7 @@
 {synoptset 30 tabbed}{...}
 {synopthdr}
 {synoptline}
-{synopt:{opth permutations(int}}number of QAP permutations; default = 500{p_end}
+{synopt:{opth permutations(int)}}number of QAP permutations; default = 500{p_end}
 {synopt:{opt mode}({it:{help nwexpand##expand_mode:mode}})}modes for expanding variables to networks{p_end}
 {synopt:{opt type}({it:{help nwqap##regcmd:regcmd}})}regression command to be used for dyad dataset; default = {it:logit}{p_end}
 {synopt:{opt typeoptions(regoptions)}}options to be passed on to the regression command{p_end}

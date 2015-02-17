@@ -5,8 +5,12 @@
 
 capture program drop nwrandom
 program nwrandom
-	syntax anything(name=nodes), [ntimes(integer 1) Density(string) Prob(string) vars(string) labs(string) stub(string) name(string) undirected xvars noreplace * ]
+	syntax anything(name=nodes), [ntimes(integer 1) ties(string) Density(string) Prob(string) vars(string) labs(string) stub(string) name(string) undirected xvars noreplace * ]
 	version 9.0
+	
+	if "`ties'" != "" {
+		
+	}
 	set more off
 	// Check if this is the first network in this Stata session
 	if "$nwtotal" == "" {
@@ -53,7 +57,7 @@ program nwrandom
 		}
 		mata: for (i=1; i<=`nodes'; i++) newmat[i,i] = 0
 		mata: mata drop i
-			}
+	}
 	if ("`density'" != "") {
 		local ties = floor((`nodes' * (`nodes' -1)) * `density')
 		local n2 = `nodes'*`nodes'
@@ -65,9 +69,9 @@ program nwrandom
 		}
 		else {
 			mata: newmat = helper(`nodes', `ties')
-			mata: tiesDiag = sum(diagonal(newmat))
-			mata: st_numscalar("r(tiesdiag)", tiesDiag)
 		}
+		mata: tiesDiag = sum(diagonal(newmat))
+		mata: st_numscalar("r(tiesdiag)", tiesDiag)
 	}
 	
 	if ("`prob'"=="" & "`density'"==""){
@@ -80,7 +84,7 @@ program nwrandom
 	nwset, mat(newmat) vars(`randomvars') name(`randomname') `undirected'
 	
 	// correct for ties on diagonal
-	qui if ("`undirected'" != "" & "`density'" != ""){
+	if ("`density'" != ""){
 		forvalues i = 1/`tiesdiag' {
 			local found = 0
 			while (`found' == 0) {
@@ -90,11 +94,14 @@ program nwrandom
 				if r(value) == 0 {
 					local found = 1
 					nwreplace `randomname'[`rrow',`rcol']=1
+					if "`undirected'" != "" {
+						nwreplace `randomname'[`rcol',`rrow']=1
+					}
 					continue, break
 				}
 			}
 		}
-		nwsym `randomname'
+		//nwsym `randomname'
 	}
 
 	local wc : word count `labs'

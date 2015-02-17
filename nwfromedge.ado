@@ -46,7 +46,6 @@ program nwfromedge
 		gen `tovar' = `fromvar'
 		drop _stack	
 		save `dictionaryString', replace
-		save dict, replace
 		
 		sort `_nodeid'
 		keep if `_nodeid' != `_nodeid'[_n-1]
@@ -120,7 +119,7 @@ program nwfromedge
 	
 	putmata mata_value = `_value'
 	putmata mata_from = `fromvar'
-	putmata mata_to = `tovar'	
+	putmata mata_to = `tovar'
 	mata: onenet = _getAdjacency(mata_from, mata_to, mata_value, `maxNodes')
 	capture mata: mata drop mata_value 
 	capture mata: mata drop mata_from 
@@ -148,7 +147,6 @@ program nwfromedge
 
 	// Set the new network
 	nwset , mat(onenet) name(`edgename') vars(`edgevars') labs(`labs') edgelabs(`edgelabs')
-	
 	if "`xvars'" == "" {
 		qui drop _all
 		qui nwload

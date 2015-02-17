@@ -1,12 +1,42 @@
 *! Date        : 3sept2014
 *! Version     : 1.0.1
-*! Author      : Thomas Grund, Linköping University
+*! Author      : Thomas Grund, Linkoping University
 *! Email	   : contact@nwcommands.org
 
 capture program drop nwergm	
 program nwergm, sortpreserve
-syntax anything(name=netname), formula(string) [ ergmoptions(string) ergmdetail keepfiles detail gof gofoptions(string) mcmc mcmcoptions(string) * ]
+syntax anything(name=netname), formula(string) [ ergmoptions(string) rpath(string) ergmdetail keepfiles detail gof gofoptions(string) mcmc mcmcoptions(string) * ]
 	set more off
+	_nwsyntax `netname'
+	
+	local temp = strpos(`"`formula'"', "~")
+	if `temp' > 0 {
+		local formula = substr(`"`formula'"',`=`temp'+1',.)
+	}
+	
+	di `"`formula'"'
+	
+	di ="{txt}Checking for R installation..."
+	if "`rpath'" == "" {
+		// Check R installation
+		if c(os) == "MacOSX" {
+			nwergm_install_osx
+		}
+	
+		if c(os) == "Windows" {
+			nwergm_install_win
+		}
+		local rpath = "`r(rpath)'"
+	}
+	capture findfile R, path(`rpath')
+	if _rc == 0 {
+		di "{txt}...R found"
+		global rpath `rpath'/R
+	}
+	else {
+		di "{err}...R not found :-("
+		exit
+	}
 	
 	preserve
 	nwname `netname'
@@ -133,55 +163,9 @@ syntax anything(name=netname), formula(string) [ ergmoptions(string) ergmdetail 
 	// close file handler
 	file close `r_ergm'
 	
-	di ="{txt}Checking for R installation..."
-	
 	tempname rterm
-	
-	// Check for R installation
-	
-	// Check for third party profile 
-	capture findfile nwprofile.do
-	local found_R = 0
-	capture if (_rc == 0) {
-		file open nwprofile_handle using _nwprofile.do, read
-		file read nwprofile_handle line
-		di "Line: `line'"
-		while r(eof)==0 {
-			gettoken thirdparty third: line, parse("----")
-			local thirdfile = substr("`third'", 5,.)
-			if (trim("`thirdparty'") == "R") {
-				global rpath `thirdfile'
-				local found_R = 1
-			}
-			file read nwprofile_handle line
-		}
-        file close nwprofile_handle
-	}
-	
-	// R not found in nwprofile.do
-	if (`found_R' == 0){
-		di "{err}Stata could not find R on your computer."
-		di "Please specify in the dialog box where R can be found."
-		di 
-		di "If you have not installed R you need to do this first:"
-		di "{browse www.cran.r-project.org:    Click here to install R}"		
-		
-		capture window fopen rpath "Locate R" "R.exe|R.exe" 
-		capture file open nwprofile_handle using _nwprofile.do, write append
-		capture file write nwprofile_handle "R ---- $rpath" _n
-		capture file close nwprofile_handle
-	}
-
 	scalar correctfile = length("$rpath") 
-	
-	if (lower(substr("$rpath", correctfile , .)) != "r"){
-		di 
-		di "{err}Try again."
-		global rpath ""
-		exit
-	}
-	
-		
+			
 	di ="{txt}Running ERGM..."
 	
 	local rcode "ergrcode.r"
@@ -194,7 +178,8 @@ syntax anything(name=netname), formula(string) [ ergmoptions(string) ergmdetail 
 	local Rcommand "$rpath `mode' <`rcode'"
 	di "`Rcommand'"
 	shell `Rcommand'
-
+	
+	
 	//capture {
 	// open R result files and prepare Stata output
 	// get general estimation statistics from ergstats.csv
@@ -349,23 +334,23 @@ syntax anything(name=netname), formula(string) [ ergmoptions(string) ergmdetail 
 	// plot graphs
 	if "`gof'" !="" {
 		di "{txt}Plotting goodness-of-fit statistics"
-		capture nwergmplotgof, `options'
+		nwergmplotgof, `options'
 	}
 	
 	if "`mcmc'" !="" {
 		di "{txt}Plotting MCMC-diagnostics"
-		capture nwergmplotmcmc, `options'
+		nwergmplotmcmc, `options'
 	}
 	
 	if ("`keepfiles'" == ""){
 		if ("`c(os)'" == "Windows"){
 			//di "{txt}Delete temporary file"
-			shell erase erggof.csv ergmodel.csv ergcoefs.csv ergdata.dta ergcontrol.csv ergstats.csv ergcov.csv ergrcode.r ergerror.txt Rplots.pdf
+			capture shell erase erggof.csv ergmodel.csv ergcoefs.csv ergdata.dta ergcontrol.csv ergstats.csv ergcov.csv ergrcode.r ergerror.txt 
 		}
 	
 		if ("`c(os)'" != "Windows"){
 			//di "{txt}Delete temporary files"
-			shell rm erggof.csv ergmodel.csv ergcoefs.csv ergdata.dta ergcontrol.csv ergstats.csv ergcov.csv ergrcode.r ergerror.txt Rplots.pdf
+			capture shell rm erggof.csv ergmodel.csv ergcoefs.csv ergdata.dta ergcontrol.csv ergstats.csv ergcov.csv ergrcode.r ergerror.txt 
 		}
 	}
 end
@@ -374,7 +359,8 @@ capture program drop nwergmplotmcmc
 program nwergmplotmcmc
 syntax , [ *]
 	preserve
-	qui use "ergmcmc.dta", clear
+	capture qui use "ergmcmc.dta", clear
+	if _rc == 0 {
 	qui gen  v1 = _n * 100
 	local counter = 1
 	local graphlist = ""
@@ -387,6 +373,7 @@ syntax , [ *]
 		local counter = `counter' + 1
 	}
 	graph combine `graphlist', cols(2) title("MCMC-diagnostics") name(mcmcgraph, replace) `options'
+	}
 	restore
 end
 	
@@ -432,6 +419,106 @@ syntax , [ *]
 		graph combine degree espart dist, cols(2) title("goodness-of-fit") note(`"based on `r(max)' simulations"') name(gofgraph, replace) `options'
 	}
 	restore
+end
+
+
+capture program drop nwergm_install_win
+program nwergm_install_win
+
+	local p : environ PATH
+	tokenize `"`p'"', parse(";")
+	local rpath = ""
+	while "`1'" != "" & "`rpath'" == "" {
+		capture findfile R.exe, path("`1'")
+		if _rc == 0 {
+			local rpath = "`1'"
+			local rlow = lower("`rpath'")
+			local st = strpos(lower("`rpath'"), "windows")
+			if strpos("`rlow'", "windows") != 0 & "`rpath'" == "" {
+				local rpath = ""
+			}
+		}
+		macro shift
+	}	
+	if "`rpath'" == "" {
+		local rurl = "http://cran.r-project.org/bin/windows/base/R-3.1.2-win.exe"
+		di "{err}R not found."
+		di `"{err}Please install {browse "`rurl'":R from here first} or specify option {bf:rpath()}."'
+		exit
+	}
+	mata: st_global("r(rpath)", "`rpath'")
+end
+
+capture program drop nwergm_install_osx
+program nwergm_install_osx
+	
+	// check for R
+	local p = "`:environ PATH':/usr/local/bin:/usr/bin:/opt/local/bin:/bin:/usr/bin/R"
+	tokenize `"`p'"', parse(":")
+	local rpath = ""
+	while "`1'" != "" & "`rpath'" == "" {
+		capture findfile R, path("`1'")
+		if _rc == 0 {
+			local rpath = "`1'"
+		}
+		macro shift
+	}	
+	
+	
+	if "`rpath'" == "" {
+		local rurl = "http://cran.r-project.org/bin/macosx/"
+		di "{err}R not found."
+		di `"{err}Please install {browse "`rurl'": R from here first} or specify option {bf:rpath()}."'
+		error 6999
+	}
+	
+	/*
+	if "`impath'" == "" {
+		set more off
+		tempname nwmovie_sh
+		capture findfile nwmovie.command
+		if _rc != 0 {
+			file open `nwmovie_sh' using nwmovie.command, write
+			file write `nwmovie_sh' "if which brew >/dev/null; then" _n
+			file write `nwmovie_sh' `"echo "Homebrew found""' _n
+			file write `nwmovie_sh' "	else " _n
+			file write `nwmovie_sh' "	/bin/mkdir /usr/local " _n
+			file write `nwmovie_sh' "	curl -L https://github.com/Homebrew/homebrew/tarball/master  | tar xz --strip 1 -C /usr/local" _n
+			file write `nwmovie_sh' "fi" _n
+			file write `nwmovie_sh' "if which convert >/dev/null; then" _n
+			file write `nwmovie_sh' `"	echo "ImageMagic found""' _n
+			file write `nwmovie_sh' "else" _n
+			file write `nwmovie_sh' "	brew install ImageMagick" _n
+			file write `nwmovie_sh' "fi" _n
+			file write `nwmovie_sh' "if which gs >/dev/null; then" _n
+			file write `nwmovie_sh' `"	echo "Ghostscript found""' _n
+			file write `nwmovie_sh' "else"_n
+			file write `nwmovie_sh' "	brew install ghostscript" _n
+			file write `nwmovie_sh' "fi" _n
+			file write `nwmovie_sh' "exit"
+			file close `nwmovie_sh'
+		}
+		shell chmod u+x nwmovie.command
+		shell open /Applications/Utilities/Terminal.app/ nwmovie.command
+		
+		local p = "`:environ PATH':/usr/local/bin:/usr/bin:/opt/local/bin:/bin:"
+		tokenize `"`p'"', parse(":")
+		local impath = ""
+		while "`1'" != "" & "`impath'" == "" {
+			capture findfile convert, path("`1'")
+			if _rc == 0 {
+				local impath = "`1'"
+			}
+			macro shift
+		}
+	}
+	else {
+		di ""
+		di "{txt}Checking third party software:"
+		di "{txt}...ImageMagick found"
+	} */
+	
+	mata: st_global("r(rpath)", "`rpath'")
 end
 
 

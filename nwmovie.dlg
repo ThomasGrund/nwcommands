@@ -6,7 +6,7 @@ INCLUDE _std_mlarge
 DEFINE _dlght   250
 INCLUDE header
 
-HELP hlp1, view("help nwplot")
+HELP hlp1, view("help nwmovie")
 RESET res1
 
 SCRIPT PREINIT
@@ -23,6 +23,21 @@ BEGIN
 	create STRING edges_colorOptions
 	create STRING edges_patternOptions
 	create STRING edges_sizeOptions
+END
+
+SCRIPT POSTINIT
+BEGIN
+	main.cx_exp.hide
+	main.cx_lgc.hide
+	movie.fi_save.setvalue "mymovie"
+
+	/*nodes_colorOptions.setvalue ""
+	nodes_symbolOptions.setvalue ""
+	nodes_sizeOptions.setvalue ""
+	labelOptions.setvalue ""
+	edges_colorOptions.setvalue ""
+	edges_patternOptions.setvalue ""
+	edges_sizeOptions.setvalue ""*/
 END
 
 SCRIPT labelsShowProp
@@ -43,15 +58,15 @@ BEGIN
 	main.bu_label.hide
 END
 
-DIALOG main, tabtitle("Network")
+DIALOG main, tabtitle("Networks")
 BEGIN
-  TEXT     tx_var	10	10	100	., label("Network:") 		
-  COMBOBOX cb_var	+60	@	240	., dropdownlist contents(netlist) 
+  TEXT     tx_var	10	10	100	., label("Networks:") 		
+  COMBOBOX cb_var	+60	@	340	., nomem dropdown append contents(netlist) 
   GROUPBOX gb_lb 210 50 270 130, label("Node labels:") 
   RADIO  rb_nolabel 230  70 220 ., first  label("No labels") onclickon("script labelsHide")
   RADIO  rb_addnet  @ +20   @ ., middle label("Add labels saved with network")  onclickon("script labelsShowProp")
-  RADIO  rb_addvar  @ +20   @ ., last label("Add labels from variable") onclickon("script labelsShowAll")		
-  VARNAME vr_label 330 +30 110 ., label("LabelVar") 
+  RADIO  rb_addvar  @ +20   @ ., last label("Add labels from variables") onclickon("script labelsShowAll")		
+  VARLIST vr_label 330 +30 110 ., label("LabelVar") 
   BUTTON bu_label 230 @ 80 ., onpush("program labels_getOptions") label("Properties")  
   GROUPBOX gb_lay 15 50 190 200, label("Layout:") 
   TEXT tx_lay 30 70 140 ., label("Layout style:")
@@ -73,6 +88,36 @@ BEGIN
   CHECKBOX cx_lgc 30 230 250 ., label("Largest component only") 
 END
 
+DIALOG movie, tabtitle("Movie")
+BEGIN
+	FILE fi_save 50 50 350 ., label("GIF Save As") option(fname) save
+	FILE fi_imagick 50 80 350 ., label("ImageMagick") option(imagick) directory
+	TEXT tx_frames 50 110 80 ., label("Frames:")
+	SPINNER sp_frames 50 140 60 . , label("Frames") option(frames) default(10) nomem
+	TEXT tx_delay 180 110 80 ., label("Delay:") 
+	SPINNER sp_delay 180 140 60 ., label("Delay") option(delay) default(10) nomem
+	CHECKBOX cx_eps 70 170 200 . , label("Use EPS") option(eps) nomem
+	CHECKBOX cx_keepfile 70 190 200 ., label("Keep frame files") option(keepfiles) nomem
+END
+
+
+DIALOG switch, tabtitle("Switch")
+BEGIN
+	TEXT tx_swnet 50 50 150 ., label("Switch networks:")
+	TEXT tx_swcol 50 70 150 ., label("Switch colors:")
+	TEXT tx_swsym 50 90 150 ., label("Switch symbols:")
+	TEXT tx_swedge 50 110 150 ., label("Switch edgecolor:")
+	TEXT tx_swtitle 50 130 150 ., label("Switch title:")
+	
+	COMBOBOX cb_swnet 170 50 100 ., contents(switchstyle) option(switchnetwork) dropdownlist
+	COMBOBOX cb_swcol 170 70 100 ., contents(switchstyle) option(switchcolor) dropdownlist
+	COMBOBOX cb_swsym 170 90 100 ., contents(switchstyle) option(switchsymbol) dropdownlist
+	COMBOBOX cb_swedge 170 110 100 ., contents(switchstyle) option(switchedgecolor) dropdownlist
+	COMBOBOX cb_swtitle 170 130 100 ., contents(switchstyle) option(switchtitle) dropdownlist
+END
+
+
+
 SCRIPT exportOff
 BEGIN
 	main.tx_enodex.hide
@@ -89,21 +134,20 @@ BEGIN
 	main.ed_enodey.show
 END
 
-
 DIALOG nodes, tabtitle("Nodes")
 BEGIN
   CHECKBOX cx_color 40 20 10 ., label("") onclickoff(nodes.vr_color.disable) onclickon(nodes.vr_color.enable)
-  TEXT    tx_color	55	20	100	., label("Node color:") 		
-  VARNAME vr_color  135 20 110	., label("color")
-  BUTTON  bu_color  250 20 80 ., onpush("program nodes_getColorOptions") label("Properties")
+  TEXT    tx_color	55	20	100	., label("Node colors:") 		
+  VARLIST vr_color  155 20 210	., label("color")
+  BUTTON  bu_color  370 20 80 ., onpush("program nodes_getColorOptions") label("Properties")
   CHECKBOX cx_symbol 40 60 10 ., label("") onclickoff(nodes.vr_symbol.disable) onclickon(nodes.vr_symbol.enable) 
-  TEXT    tx_symbol	55	60	100	., label("Node symbol:") 		
-  VARNAME vr_symbol 135	60 110	., label("symbol")
-  BUTTON bu_symbol 250 60 80 ., onpush("program nodes_getSymbolOptions") label("Properties") 
+  TEXT    tx_symbol	55	60	100	., label("Node symbols:") 		
+  VARLIST vr_symbol 155	60 210	., label("symbol")
+  BUTTON bu_symbol 370 60 80 ., onpush("program nodes_getSymbolOptions") label("Properties") 
   CHECKBOX cx_size 40 100 10 ., label("") onclickoff(nodes.vr_size.disable) onclickon(nodes.vr_size.enable)
-  TEXT    tx_size	55	100	100	., label("Node size:") 		
-  VARNAME vr_size 135	100 110	., label("size")
-  BUTTON bu_size 250 100 80 ., onpush("program nodes_getSizeOptions") label("Properties") 
+  TEXT    tx_size	55	100	100	., label("Node sizes:") 		
+  VARLIST vr_size 155	100 210	., label("size")
+  BUTTON bu_size 370 100 80 ., onpush("program nodes_getSizeOptions") label("Properties") 
   TEXT    tx_factor1	55	140	100	., label("Node factor:") 		
   SPINNER sp_dig1 125 140 50 ., label("dig1") default(1) nomemory
   TEXT    tx_factor2 170 140 10	., label(".") 		
@@ -164,6 +208,14 @@ BEGIN
 END
 
 
+LIST switchstyle
+BEGIN
+	half
+	start
+	end
+END
+
+
 LIST layoutstyle
 BEGIN
 	" "
@@ -171,7 +223,6 @@ BEGIN
 	mdsclassical
 	circle
 	grid
-	nodexy
 END
 
 LIST layoutstyle_actions
@@ -181,7 +232,6 @@ BEGIN
 	script layoutsub_off
 	script layoutsub_off
 	script layoutsub_grid
-	script layoutsub_nodexy
 END
 
 SCRIPT layoutsub_off
@@ -221,17 +271,6 @@ BEGIN
 	main.sp_grid.show
 END
 
-SCRIPT resetOptions
-BEGIN
-	/*nodes_colorOptions.setvalue ""
-	nodes_symbolOptions.setvalue ""
-	nodes_sizeOptions.setvalue ""
-	labelOptions.setvalue ""
-	edges_colorOptions.setvalue ""
-	edges_patternOptions.setvalue ""
-	edges_sizeOptions.setvalue ""*/
-END
-
 LIST arcstyle
 BEGIN
 	automatic
@@ -241,7 +280,7 @@ END
 
 PROGRAM initialize
 BEGIN
-	put "_nwdialog nwplot"
+	put "_nwdialog nwmovie"
 	stata hidden immediate
 END
 
@@ -296,7 +335,8 @@ END
 
 PROGRAM command
 BEGIN
-	put "nwplot " main.cb_var
+	require main.cb_var
+	put "nwmovie " main.cb_var
 	put " " /program ifin_output
     beginoptions
 		if main.rb_nolabel.isneq(1) {
@@ -315,8 +355,21 @@ BEGIN
 		put " " /program gr_titles_output
 		put " " /program gr_legend_output
 		put " " /program gr_overall_output
+		
+		optionarg movie.fi_save
+		optionarg movie.fi_imagick
+		optionarg movie.sp_frames
+		optionarg movie.sp_delay
+		option movie.cx_eps
+		option movie.cx_keepfile
+		
+		optionarg switch.cb_swnet
+		optionarg switch.cb_swcol
+		optionarg switch.cb_swsym
+		optionarg switch.cb_swedge
+		optionarg switch.cb_swtitle
+		
 	endoptions	
-	//script resetOptions
 	stata
 END
 

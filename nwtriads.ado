@@ -13,6 +13,14 @@ program nwtriads
 	nwtomata `netname', mat(censusNet)
 	mata: A = censusNet :/censusNet
 	mata: _editmissing(A, 0)
+	mata: outdeg = rowsum(A)
+	mata: indeg = (colsum(A))'
+	mata: deg = outdeg + indeg
+	mata: delta1 = factorial(deg) 
+	mata: delta2 = (factorial(deg :- 2) :* 2)
+	mata: delta = (delta1 :/ delta2)
+	mata: pot = (sum(delta)) / 3
+	mata: mata drop delta delta1 delta2 deg outdeg indeg
 	mata: E = abs(censusNet) + abs(censusNet)'
 	mata: E = E :/ E
 	mata: _editmissing(E, 0)
@@ -51,7 +59,7 @@ program nwtriads
 	mata: x_120C = sum((C * C) :* M)
 	mata: st_numscalar("r(_120C)", x_120C)
 	mata: x_210 = sum((M * M) :* ((C + C') :/ 2))
-	mata: st_numscalar("r(_201)", x_201)
+	mata: st_numscalar("r(_210)", x_210)
 	mata: x_300 = sum(diagonal(M * M *M)) / 6
 	mata: st_numscalar("r(_300)", x_300)
 	mata: t201 = (M * M) :* Ecompl
@@ -65,17 +73,31 @@ program nwtriads
 	mata: st_numscalar("r(_111U)", x_111U)
 	mata: mata drop censusNet A C E M Ecompl
 	mata: st_global("r(name)", "`netname'")
+	local transTrip = 0 + `r(_030T)' + `r(_120D)' + `r(_120U)' + `r(_120C)' + `r(_210)' + `r(_300)'
+	mata: st_numscalar("r(pot_trip)", pot)
+	mata: st_numscalar("r(trans_trip)", `transTrip')
+	local transitivity = `r(trans_trip)' / `r(pot_trip)'
+	mata: st_numscalar("r(transitivity)", `transitivity')
+	mata: mata drop pot
 	
 	di
 	di "{txt}    Triad census: {res} `netname'{txt}"
 	di 
-	di "{txt}{ralign 10:003}{col 12}{c |}{ralign 10:012}{col 24}{c |}{ralign 10:021D}{col 36}{c |}{ralign 10:021U}{col 48}{c |}{ralign 10:021C}{col 60}{c |}{ralign 10:030T}{col 72}{c |}{ralign 10:030C}{col 84}{c |}"
-	di "{hline 11}{c +}{hline 11}{c +}{hline 11}{c +}{hline 11}{c +}{hline 11}{c +}{hline 11}{c +}{hline 11}{c +}"
-	di "{res}{ralign 10:`r(_003)'}{col 12}{c |}{ralign 10:`r(_012)'}{col 24}{c |}{ralign 10:`r(_021D)'}{col 36}{c |}{ralign 10:`r(_021U)'}{col 48}{c |}{ralign 10:`r(_021C)'}{col 60}{c |}{ralign 10:`r(_030T)'}{col 72}{c |}{ralign 10:`r(_030C)'}{col 84}{c |}"
+	di "{txt}{ralign 10:003}{col 12}{c |}{ralign 10:012}{col 24}{c |}{ralign 10:021D}{col 36}{c |}{ralign 10:021U}{col 48}{c |}"
+	di "{hline 11}{c +}{hline 11}{c +}{hline 11}{c +}{hline 11}{c +}"
+	di "{res}{ralign 10:`r(_003)'}{col 12}{c |}{ralign 10:`r(_012)'}{col 24}{c |}{ralign 10:`r(_021D)'}{col 36}{c |}{ralign 10:`r(_021U)'}{col 48}{c |}"
 	di
-	di "{txt}{ralign 10:120D}{col 12}{c |}{ralign 10:120U}{col 24}{c |}{ralign 10:120C}{col 36}{c |}{ralign 10:111D}{col 48}{c |}{ralign 10:111U}{col 60}{c |}{ralign 10:201}{col 72}{c |}{ralign 10:300}{col 84}{c |}"
-	di "{hline 11}{c +}{hline 11}{c +}{hline 11}{c +}{hline 11}{c +}{hline 11}{c +}{hline 11}{c +}{hline 11}{c +}"
-	di "{res}{ralign 10:`r(_120D)'}{col 12}{c |}{ralign 10:`r(_120U)'}{col 24}{c |}{ralign 10:`r(_120C)'}{col 36}{c |}{ralign 10:`r(_111D)'}{col 48}{c |}{ralign 10:`r(_111U)'}{col 60}{c |}{ralign 10:`r(_201)'}{col 72}{c |}{ralign 10:`r(_300)'}{col 84}{c |}"
+	di "{txt}{ralign 10:021C}{col 12}{c |}{ralign 10:030T}{col 24}{c |}{ralign 10:030C}{col 36}{c |}{ralign 10:102C}{col 48}{c |}"
+	di "{hline 11}{c +}{hline 11}{c +}{hline 11}{c +}{hline 11}{c +}"
+	di "{res}{ralign 10:`r(_021C)'}{col 12}{c |}{ralign 10:`r(_030T)'}{col 24}{c |}{ralign 10:`r(_030C)'}{col 36}{c |}{ralign 10:`r(_102)'}{col 48}{c |}"
+	di
+	di "{txt}{ralign 10:120D}{col 12}{c |}{ralign 10:120U}{col 24}{c |}{ralign 10:120C}{col 36}{c |}{ralign 10:111D}{col 48}{c |}"
+	di "{hline 11}{c +}{hline 11}{c +}{hline 11}{c +}{hline 11}{c +}"
+	di "{res}{ralign 10:`r(_120D)'}{col 12}{c |}{ralign 10:`r(_120U)'}{col 24}{c |}{ralign 10:`r(_120C)'}{col 36}{c |}{ralign 10:`r(_111D)'}{col 48}{c |}"
+	di
+	di "{txt}{ralign 10:111U}{col 12}{c |}{ralign 10:201}{col 24}{c |}{ralign 10:210}{col 36}{c |}{ralign 10:300}{col 48}{c |}"
+	di "{hline 11}{c +}{hline 11}{c +}{hline 11}{c +}{hline 11}{c +}"
+	di "{res}{ralign 10:`r(_111U)'}{col 12}{c |}{ralign 10:`r(_201)'}{col 24}{c |}{ralign 10:`r(_210)'}{col 36}{c |}{ralign 10:`r(_300)'}{col 48}{c |}"
 end
 	
 	

@@ -15,13 +15,15 @@ program nwrecode
 	local netname = substr("`arg'",1, `=`ruleStart'-1')
 	local rules = substr("`arg'",`ruleStart',.)
 
-	_nwsyntax `netname', max(9999)
+	_nwsyntax_other `netname', max(9999)
 	
 	preserve
 	tokenize `generate'
 	local i = 1
-	foreach onenet in `netname' {
-		nwtoedge `onenet'
+	foreach onenet in `othernetname' {
+		_nwsyntax `onenet'
+		local onedirected `directed'
+		nwtoedge `onenet', forcedirected
 		recode `onenet' `rules', `options'		
 		qui nwfromedge _fromid _toid `onenet', name(__temp_network)
 		nwtomata __temp_network, mat(recodeNet)
@@ -46,6 +48,7 @@ program nwrecode
 		capture nwdrop __temp_network
 		mata: mata drop recodeNet
 		local i = `i' + 1
+		nwname `onenet', newdirected(`onedirected')
 	}
 	restore
 end

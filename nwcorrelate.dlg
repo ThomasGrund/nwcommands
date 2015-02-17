@@ -1,0 +1,127 @@
+VERSION 10
+
+
+SYNCHRONOUS_ONLY
+INCLUDE _std_mlarge
+DEFINE _dlght   250
+INCLUDE header
+
+HELP hlp1, view("help nwcorrelate")
+RESET res1
+
+SCRIPT PREINIT
+BEGIN
+	program initialize
+	
+	legend.rb_off.seton
+	
+	create STRING legendOptions
+	create STRING tievalueOptions
+	create STRING patches_colorOptions
+
+END
+
+SCRIPT labelsShowProp
+BEGIN
+	main.vr_label.hide
+	main.tx_label.show
+END
+
+SCRIPT labelsShowAll
+BEGIN
+	main.vr_label.show
+	main.tx_label.show
+END
+
+SCRIPT labelsHide
+BEGIN
+	main.vr_label.hide
+	main.tx_label.hide
+END
+
+DIALOG main, tabtitle("Correlation")
+BEGIN
+  TEXT     tx_var1	30	10	100	., label("Network1:") 		
+  COMBOBOX cb_var1	30	30	150	., dropdownlist contents(netlist) 
+ 
+  TEXT     tx_var2	210	10	100	., label("Network2:") 		
+  COMBOBOX cb_var2	210	30	180	., dropdownlist contents(netlist) 
+  
+  CHECKBOX cx_perm 30 70 250 ., label("Run QAP permutations (and plot)") nomem onclickon(script permOn) onclickoff(script permOff)
+  SPINNER sp_perm 40 90 80 . ,label("Permutations") default(100) nomem option(permutations)
+  
+  FILE fi_save 150 90 230 ., label("Save As") save option(save) nomem
+  
+  TEXT tx_kernel 30 120 250 ., label("Add kdensity options (see help kdensity)")
+  EDIT ed_kernel 30 140 250 ., label("Kdensity") 
+END
+
+INCLUDE gr_yaxis
+INCLUDE gr_xaxis
+INCLUDE gr_titles
+INCLUDE gr_legend
+INCLUDE gr_overall
+
+SCRIPT permOff
+BEGIN
+	main.sp_perm.hide
+	main.fi_save.hide
+END
+
+SCRIPT permOn
+BEGIN
+	main.sp_perm.show
+	main.fi_save.show
+END
+
+
+LIST netlist
+BEGIN
+	// intentionally empty
+	// this list will be populated by _nwdialog.ado
+END
+
+LIST mode
+BEGIN
+	same
+	dist
+	distinv
+	absdist
+	absdistinv
+	sender
+	receiver
+END
+
+
+PROGRAM initialize
+BEGIN
+	put "_nwdialog nwcorrelate"
+	
+	stata hidden immediate
+END
+
+
+PROGRAM command
+BEGIN
+	//require main.cb_var1
+	//require main.cb_var2
+	put "nwcorrelate " main.cb_var1 " " main.cb_var2
+    beginoptions
+		optionarg main.sp_perm
+		optionarg main.fi_save
+		put main.ed_kernel
+		if main.sp_perm {
+			put " " /program gr_yaxis_output
+			put " " /program gr_xaxis_output
+			put " " /program gr_titles_output
+			put " " /program gr_legend_output 
+			put " " /program gr_overall_output
+		}
+	endoptions	
+	stata
+END
+
+
+
+
+

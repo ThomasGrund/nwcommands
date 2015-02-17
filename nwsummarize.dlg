@@ -10,7 +10,7 @@ OK ok1,	label("OK")
 CANCEL	can1, label("Cancel")
 SUBMIT	sub1, label("Submit")
 RESET	res1
-POSITION 10 10 370 150
+POSITION 10 10 370 210
 
 SCRIPT PREINIT
 BEGIN
@@ -24,8 +24,10 @@ BEGIN
   COMBOBOX cb_var	+60	@	240	.,	///
   	dropdown contents(netlist) append nomem
   RADIO  rb_sum 70  50 170 ., first  label("Only summary")
-  RADIO  rb_mat  @ +20   @ ., middle label("Add adjacency matrix") 
-  RADIO  rb_only  @ +20   @ ., last label("Only adjacency matrix")
+  RADIO  rb_mat  @ +20   @ ., middle label("Add adjacency matrix") option(mat)
+  RADIO  rb_only  @ +20   @ ., last label("Only adjacency matrix") option(matonly)
+  FILE fl_save @ +30 250 . , label("Save As") save option(save) filter("Stata .dta|*.dta")
+  CHECKBOX cx_detail @ +30 230 ., nomem label("Calculate additional measures") option(detail)
 END
 
 LIST netlist
@@ -44,11 +46,11 @@ END
 PROGRAM command
 BEGIN
 	put "nwsummarize " main.cb_var
-	if main.rb_mat {
-		put ", mat"
-	}
-	if main.rb_only {
-		put ", matonly"
-	}
+	beginoptions
+		option main.rb_mat
+		option main.rb_only
+		option main.cx_detail
+		optionarg main.fl_save
+	endoptions
 	stata
 END

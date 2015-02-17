@@ -15,8 +15,11 @@
 {p 8 17 2}
 {cmdab: nwsummarize} 
 [{it:{help netlist}}]
-[,{opt mat}
+[, 
+{opt mat}
 {opt matonly}
+{opt detail}
+{opth save(filename)}
 ]
 
 {synoptset 20 tabbed}{...}
@@ -24,6 +27,8 @@
 {synoptline}
 {synopt:{opt mat}}Display adjacency matrix of the network{p_end}
 {synopt:{opt matonly}}Only display adjacency matrix of the network{p_end}
+{synopt:{opt detail}}Calculate additional (time-consuming) network measures, e.g. centralization, transitivity{p_end}
+{synopt:{opth save(filename)}}Save network measures in file{p_end}
 {synoptline}
 {p2colreset}{...}
 
@@ -86,8 +91,10 @@
 	  {bf:r(arcs)}		number of arcs (directed network)
 	  {bf:r(edges_sum)}	sum of edge values (undirected network)	  
 	  {bf:r(arcs_sum)}	sum of arc values (directed network)
-	  {bf:r(denisty)}	network density
-
+	  {bf:r(density)}	network density
+	  {bf:r(reciprocity)}	network reciprocity
+	  {bf:r(transitivity)}	network transitivity
+	  
 	Macros
 	  {bf:r(directed)}	if network is directed or not (undirected)
 	  {bf:r(name)}		name of the network

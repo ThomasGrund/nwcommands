@@ -6,7 +6,7 @@
 capture program drop nwdegree
 program nwdegree
 	version 9
-	syntax [anything(name=netname)],[ isolates valued GENerate(string) in(string) out(string) *]
+	syntax [anything(name=netname)],[ isolates valued GENerate(string) in(string) outputoff out(string) *]
 	_nwsyntax `netname', max(9999)
 	_nwsetobs
 	
@@ -28,8 +28,8 @@ program nwdegree
 			mata: _editmissing(degreeNet,0)
 		}
 	
-		mata: outdegree = (colsum(degreeNet))'
-		mata: indegree = rowsum(degreeNet)
+		mata: outdegree = rowsum(degreeNet) 
+		mata: indegree =  (colsum(degreeNet))'
 	
 	
 		local _degree : word 1 of `generate'
@@ -47,6 +47,8 @@ program nwdegree
 		capture drop `_degree'`k'
 		capture drop `_outdegree'`k'
 		capture drop `_indegree'`k'
+		
+		if "`outputoff'" == "" {
 		
 		if ("`directed'" == "false"){
 			nwtostata, mat(outdegree) gen(`_degree'`k')
@@ -69,7 +71,6 @@ program nwdegree
 			replace `_isolates'`k' = . if _n > `nodes_temp'
 		}
 	
-		mata: mata drop outdegree indegree degreeNet
 		
 		di "{hline 40}"
 		di "{txt}  Network name: {res}`netname'"
@@ -85,5 +86,21 @@ program nwdegree
 		if "`more'" != "" & "`k'" != "`more'" {
 			local k = `k' + 1
 		}
+		
+		}
+		
+		if ("`directed'" == "false") {
+			mata: st_numscalar("r(dg_central)", sum(J(`nodes_temp',1,max(outdegree)) :- outdegree) / ((`nodes_temp' - 2) * (`nodes_temp' - 1)))
+			di 
+			di "{txt}   Degree centralization:: {res}`r(central)'"
+		}
+		else {
+			mata: st_numscalar("r(indg_central)", sum(J(`nodes_temp',1,max(indegree)) :- indegree) / ((`nodes_temp' - 1) * (`nodes_temp' - 1))) 
+			mata: st_numscalar("r(outdg_central)", sum(J(`nodes_temp',1,max(outdegree)) :- outdegree) / ((`nodes_temp' - 1) * (`nodes_temp' - 1)))
+			di 
+			di "{txt}   Indegree centralization:: {res}`r(in_central)'"
+			di "{txt}   Outdegree centralization:: {res}`r(out_central)'"
+		}
+		mata: mata drop outdegree indegree degreeNet
 	}
 end	

@@ -69,6 +69,8 @@
 	window menu append item "Network Analysis" "Oneway-Tabulate Network" "db nwtabulate2_net"	
 	window menu append item "Network Analysis" "Twoway-Tabulate Networks" "db nwtabulate2net"	
 	window menu append item "Network Analysis" "Twoway-Tabulate Network and Variable" "db nwtabulate2var"	
+	window menu append item "Network Analysis" "Correlate Two Networks" "db nwcorrelate"	
+	window menu append item "Network Analysis" "Correlate Network and Variable" "db nwcorrelateAttr"	
 		
 	window menu append separator "Network Analysis"
 	window menu append submenu "Network Analysis" "Visualize Networks"

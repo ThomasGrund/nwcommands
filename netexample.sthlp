@@ -10,11 +10,13 @@
 {p_end}
 {hline}
 
-        {help netexample##fgang:gang}{col 29}{stata "webnwuse gang":use} | {stata "sysdescribe gang.dta":describe}
+        {help netexample##gang:gang}{col 29}{stata "webnwuse gang":use} | {stata "sysdescribe gang.dta":describe}
         {help netexample##glasgow:glasgow}{col 29}{stata "webnwuse glasgow":use} | {stata "sysdescribe glasgow.dta":describe}
         {help netexample##florentine:florentine}{col 29}{stata "webnwuse florentine":use} | {stata "sysdescribe florentine.dta":describe}
-        {help netexample##stockholm:stockholm}{col 29}{stata "webnwuse stockholm":use} | {stata "sysdescribe stockholm.dta":describe}
-			
+        {help netexample##usstates:usstates}{col 29}{stata "webnwuse usstates":use} | {stata "sysdescribe usstates.dta":describe}
+        {help netexample##klas12b:klas12b}{col 29}{stata "webnwuse klas12b":use} | {stata "sysdescribe klas12b.dta":describe}
+        {help netexample##hpotter:hpotter}{col 29}{stata "webnwuse hpotter":use} | {stata "sysdescribe hpotter.dta":describe}
+		 
 {hline}
 
 {marker ucinet}{...}
@@ -48,9 +50,24 @@
 
 {pstd}
 This is a dataset of co-offending in a London-based youth gang. Data were collected by 
-James Densley and Thomas Grund. The data has been used in Grund & Densley (2013) and Grund & Densley (2014). Network ties
-indicate if individuals....
+James Densley and Thomas Grund. The data has been used in Grund & Densley (2012) and Grund & Densley (2014). 
 
+{pmore}
+Network tie values:
+
+		= 1 (hang out together)
+		= 2 (co-offend together)
+		= 3 (co-offend together, serious crime)
+		= 4 (co-offend together, serious crime, kin)
+		
+{pmore}
+{bf:References}
+
+{pmore}
+Grund, T. and Densley, J. (2014) Ethnic Homophily and Triad Closure: Mapping Internal Gang Structure Using Exponential Random Graph Models. Journal of Contemporary Criminal Justice. online first
+
+{pmore}
+Grund, T. and Densley, J. (2012) Ethnic Heterogeneity in the Activity and Structure of a Black Street Gang. European Journal of Criminology, Vol. 9, Issue 3, pp. 388-406.
 
 
 {marker glasgow}
@@ -102,16 +119,16 @@ The variables included are:
 {bf:References}
 
 {pmore}
-{it:Michell, L., and A. Amos 1997. Girls, pecking order and smoking. Social Science and Medicine, 44, 1861 - 1869.}
+Michell, L., and A. Amos 1997. Girls, pecking order and smoking. Social Science and Medicine, 44, 1861 - 1869.
 
 {pmore}
-{it:Pearson, M.A., and L. Michell. 2000. Smoke Rings: Social network analysis of friendship groups, smoking and drug-taking. Drugs: education, prevention and policy, 7, 21-37.}
+Pearson, M.A., and L. Michell. 2000. Smoke Rings: Social network analysis of friendship groups, smoking and drug-taking. Drugs: education, prevention and policy, 7, 21-37.
 
 {pmore}
-{it:Pearson, M., and P. West. 2003. Drifting Smoke Rings: Social Network Analysis and Markov Processes in a Longitudinal Study of Friendship Groups and Risk-Taking. Connections, 25(2), 59-76.}
+Pearson, M., and P. West. 2003. Drifting Smoke Rings: Social Network Analysis and Markov Processes in a Longitudinal Study of Friendship Groups and Risk-Taking. Connections, 25(2), 59-76.
 
 {pmore}
-{it:Pearson, Michael, Steglich, Christian, and Snijders, Tom. Homophily and assimilation among sport-active adolescent substance users. Connections 27(1), 47-63. 2006.}
+Pearson, Michael, Steglich, Christian, and Snijders, Tom. Homophily and assimilation among sport-active adolescent substance users. Connections 27(1), 47-63. 2006.
 
 
 
@@ -143,20 +160,138 @@ Substantively, the data include families who were locked in a struggle for polit
 {bf:References}
 
 {pmore}
-{it:Padgett, John F. 1994. Marriage and Elite Structure in Renaissance Florence, 1282-1500. Paper delivered to the Social Science History Association.}
+Padgett, John F. 1994. Marriage and Elite Structure in Renaissance Florence, 1282-1500. Paper delivered to the Social Science History Association.
 
 {pmore}
-{it:Breiger R. and Pattison P. (1986). Cumulated social roles: The duality of persons and their algebras, Social Networks, 8, 215-256.}
+Breiger R. and Pattison P. (1986). Cumulated social roles: The duality of persons and their algebras, Social Networks, 8, 215-256.
 
 
 
-{marker stockholm}
-{title:Stockholm data}
+
+{marker klas12b}
+{title:Klas12b data}
 
 {pstd}
-{bf:Networks:} ....
+{bf:Networks:} {it:klas12b_wave1, klas12b_wave2, klas12b_wave3, klas12b_wave4, klas12b_primary}{p_end}
 {pstd}
-{bf:Vertex attributes:} {it:....}.
-....
+{bf:Vertex attributes:}
+{it:delinq1, delinq3, delinq3, delinq4, alcohol2, alcohol3, alcohol4, sex age, ethnicity, age, religion, advice}
+
+{pstd}
+This data is about a friendship network in a Dutch school class. The data were collected between September 2003 and June 2004 by Andrea 
+Knecht, supervised by Chris Baerveldt, at the Department of Sociology of the University of Utrecht (NL). The entire study is reported in
+Knecht (2008). The project was funded by the Netherlands Organisation for Scientific Research NWO, grant 401-01-554.
+
+{pstd}
+The 26 students were followed over their first year at secondary school during which friendship networks as well as other data were assessed 
+at four time points at intervals of three months. There were 17 girls and 9 boys in the class, aged 11-13 at the beginning of the school
+year. Network data were assessed by asking students to indicate up to twelve classmates which they considered good friends.
+
+{pstd}
+Delinquency is defined as a rounded average over four types of minor delinquency (stealing, vandalism, graffiti, and fighting), measured in
+each of the four waves of data collection. The five-point scale ranged from `never' to `more than 10 times', and the distribution is highly
+skewed. In a range of 1-5, the mode was 1 at all four waves, the average rose over time from 1.4 to 2.0, and the value 5 was never observed.
+
+{pstd}
+Friendship networks at four waves {it:klas12b_wave1-4}:	
+
+	0 = no,
+	1 = yes,
+	9 = missing,
+	10 = not a member of the classroom (structural zero).
+	
+
+{pstd}
+Same primary school ({it:klas12b_primary}): 
+	
+	0 = no, 
+	1 = yes.
+	
+{pstd}
+{it:delinq1, delinq3, delinq3, delinq4}: Delinquency at waves 1, 2, 3 and 4; rounded average of four items (stealing, vandalizing, fighting, graffiti).{p_end}
+
+	1 = never, 
+	2 = once, 
+	3 = 2-4 times, 
+	4 = 5-10 times, 
+	5 = more than 10 times;
+	0 = missing.
+	
+{pstd}
+{it:alcohol2, alcohol3, alcohol4}: Alcohol use ("How often did you drink alcohol with friends in the last three months?"), but it refers only to waves 2-3-4. 
+
+	1 = never, 
+	2 = once, 
+	3 = 2-4 times, 
+	4 = 5-10 times, 
+	5 = more than 10 times;
+	0 = missing.
+
+{pstd}
+{it:sex (1 = girl, 2 = boy)}
+
+{pstd}
+{it:age (in years)}
+
+{pstd}
+{it:ethnicity}
+	
+	1 = Dutch, 
+	2 = other, 
+	0 = missing
+
+{pstd}	
+{it:religion}
+
+	1 = Christian, 
+	2 = non-religious, 
+	3 = non-Christian religion, 
+	0 = missing
+	
+{pstd}
+{it:advice} contains the variable "school advice", the assessment given at the end of primary school about the school capacities of the pupil
+
+	4 = low, 
+	8 = high, 
+	0 = missing
 
 
+{pmore}
+{bf:Reference}
+
+{pmore}
+Knecht, A., 2008. Friendship Selection and Friends' Influence. Dynamics of Networks and Actor Attributes in Early Adolescence. PhD dissertation, University of Utrecht.
+
+{pmore}
+Andrea Knecht, Tom A. B. Snijders, Chris Baerveldt, Christian E. G. Steglich, and Werner Raub. Friendship and Delinquency: Selection and Influence Processes in Early Adolescence, Social Development.
+http://dx.doi.org/10.1111/j.1467-9507.2009.00564.x.
+
+{pmore}
+Snijders, T.A.B., Steglich, C.E.G., and van de Bunt, G.G. (2010). Introduction to actor-based models for network dynamics. Social Networks, 32, 44-60.
+http://dx.doi.org/10.1016/j.socnet.2009.02.004.
+
+{pmore}
+Steglich, Christian, and Knecht, Andrea (2009), Die statistische Analyse dynamischer Netzwerkdaten. In: Christian Stegbauer and Roger Häußling (Eds.), Handbuch der Netzwerkforschung, Wiesbaden (Verlag für Sozialwissenschaften).
+
+
+
+
+
+{marker hpotter}
+{title:Harry Potter data}
+
+{pstd}
+{bf:Networks:} {it:hpbook1, hpbook1, hpbook2, hpbook3, hpbook4, hpbook5, hpbook6 }{p_end}
+{pstd}
+{bf:Vertex attributes:}
+{it:schoolyear, gender, and house}
+
+{pstd}
+Goele Bossaert and Nadine Meidert have coded the support ties between 64 characters in the well-known books about Harry Potter. They analyzed this by Siena; their findings were published in
+
+{pmore}
+{bf:Reference}
+
+{pmore}
+Goele Bossaert and Nadine Meidert (2013). 'We are only as strong as we are united, as weak as we are divided'. A dynamic analysis of the peer support networks in the Harry Potter books. Open Journal of Applied Sciences, Vol. 3 No. 2, pp. 174-185. 
+http://dx.doi.org/10.4236/ojapps.2013.32024

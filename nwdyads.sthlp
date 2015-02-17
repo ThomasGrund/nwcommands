@@ -25,24 +25,29 @@ Returns the dyad census of a network (or a list of networks). This is a way to c
 In directed network, each dyad (pair of nodes {it:i} and {it:j}) can be one of the following:
 
 {pmore}
-1) mutually connected: {it:M_ij = M_ji = 1}
+1) M: mutually connected: {it:M_ij = M_ji = 1}
 
 {pmore}
-2) asymmetrically connected: {it:M_ij = 1}, but {it:M_ji = 0} 
+2) A: asymmetrically connected: {it:M_ij = 1}, but {it:M_ji = 0} 
 
 {pmore}
-3) not connected at all: {it:M_ij = M_ji = 1}
+3) N: not connected at all: {it:M_ij = M_ji = 1}
 
 
 {pstd}
 In undirected network, each dyad (pair of nodes {it:i} and {it:j}) can be one of the following:
 
 {pmore}
-1) connected: {it:M_ij = M_ji = 1}
+1) M: connected: {it:M_ij = M_ji = 1}
 
 {pmore}
-2) unconnected:  {it:M_ij = M_ji = 0}
+2) N: unconnected:  {it:M_ij = M_ji = 0}
 
+{pstd}
+The command also returns the reciprocity of the network.
+
+{pmore}
+{it:reciprocity = M / (M + A)}
 
 {title:Examples}
 	
@@ -71,6 +76,7 @@ In undirected network, each dyad (pair of nodes {it:i} and {it:j}) can be one of
 	  {bf:r(_100)}	mutual dyads
 	  {bf:r(_010)}	asymmetric dyads
 	  {bf:r(_000)}	null dyads
+	  {bf:r(reciprocity)}	M / (M + A)
 	  
 	Macros:
 	  {bf:r(name)}	name of network

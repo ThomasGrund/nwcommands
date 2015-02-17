@@ -48,8 +48,8 @@
 {marker node_options}{...}
 {p2line}
 {synopt:{opt size}({it:{help varname}} [,{it:{help nwplot##node_sub:node_sub}}])}size of the nodes{p_end}
-{p2col:{opt color}({it:{help varname}} [,{it:{help nwplot##node_sub:node_sub}}])}color of the nodes{p_end}
-{p2col:{opt symbol}({it:{help varname}} [,{it:{help nwplot##node_sub:node_sub}}])}symbol of the nodes{p_end}
+{p2col:{opt color}([{it:{help varname}}] [,{it:{help nwplot##node_sub:node_sub}}])}color of the nodes{p_end}
+{p2col:{opt symbol}([{it:{help varname}}] [,{it:{help nwplot##node_sub:node_sub}}])}symbol of the nodes{p_end}
 {p2col:{opth nodefactor(float)}}multiply all node sizes by a factor{p_end}
 
 

@@ -1,8 +1,19 @@
 capture program drop nwinstall
 program nwinstall
-	syntax [, permanently remove downloadoff]
+	syntax [, permanently remove downloadoff help all]
 	
 	tempname fh1 fh2
+	
+	if "`all'" != "" {
+		local help = "help"
+		local permanently = "permanently"
+	}
+	
+	if "`help'" != "" {
+		capture ado uninstall "nwcommands-hlp"
+		net from "http://nwcommands.org"
+		net install "nwcommands-hlp", all
+	}
 	
 	set more off
 	if "`remove'" != "" {
@@ -10,7 +21,7 @@ program nwinstall
 		window menu refresh
 	}
 	else {
-		if "`downdloadoff'" == "" {
+		if "`downloadoff'" == "" {
 			capture ado uninstall "nwcommands-dlg"
 			net from "http://nwcommands.org"
 			net install "nwcommands-dlg", all
