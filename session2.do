@@ -1,3 +1,8 @@
+/////////////////////////////////////
+//
+// HYPOTHESIS TESTING
+//
+////////////////////////////////////
 
 /*
 Generate a distribution of 20 random networks with the same size and density
@@ -24,7 +29,13 @@ kdensity transitivity, xline(.1732522796352584) xscale(range(0 .2))
 
 
 
-nwergm gang, formula(edges + gwesp() + nodematch("ethnicity") + nodematch("prison") + absdiff("age") + absdiff("rankrev"))
+/////////////////////////////////////
+//
+// EXPONENTIAL RANDOM GRAPH MODELS
+//
+////////////////////////////////////
 
+nwergm gang, formula(edges + nodematch("Birthplace") + nodematch("Prison") + absdiff("Age")) gof 
 
+nwergm gang, formula(edges + gwesp(0.5, fixed=TRUE) + nodematch("Birthplace")) gof mcmc 
 

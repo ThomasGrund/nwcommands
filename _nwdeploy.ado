@@ -233,12 +233,16 @@ program getcmdtopic, rclass
 	}
 	else {
 		tempname cmdsthlp
-		file open `cmdsthlp' using `cmd'.sthlp, read		
+		file open `cmdsthlp' using `cmd'.sthlp, read
+		//file open `cmdsthlp' using nwergm.sthlp, read		
+
 		file read `cmdsthlp' line
 		local found = 0
 		while (r(eof)==0) {
 			local j = strpos(`"`line'"', "{marker topic}")
+			//di `"`line'"'
 			if (`j' >0) {
+				//local found 0
 				file read `cmdsthlp' line
                 gettoken topiclink cmdtopic : line, parse(":") 
 				local cmdtopic= substr(`"`cmdtopic'"', 2, `=length(`"`cmdtopic'"') - 2')

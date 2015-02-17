@@ -161,7 +161,6 @@ program nwgenerate
 		}	
 		// nwring shortcut
 		if "`whichjob'" == "ring(" {
-		noi di "nwring `subopt', name(`netname') `options'"
 			nwring `sub1', `sub2' name(`netname') `oldoptions'
 		}	
 		// nwsmall shortcut
@@ -207,6 +206,7 @@ program nwgenerate
 		}
 		if "`whichjob'" == "lgc(" {
 			noi _nwsyntax_other `sub1'
+			noi di "qui nwcomponents `sub1', `sub2' gen(`netname') lgc `options'"
 			qui nwcomponents `sub1', `sub2' gen(`netname') lgc `options'
 		}
 		
