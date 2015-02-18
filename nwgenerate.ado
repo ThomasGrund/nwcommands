@@ -7,6 +7,7 @@ program nwgenerate
 	}
 
 	gettoken netname netexp: arg, parse("=")
+	local netexp: subinstr local netexp "_if" "$$ff"
 	local netexp: subinstr local netexp "if" "#"
 	
 	gettoken dump opts: arg, parse(",") bind
@@ -29,10 +30,14 @@ program nwgenerate
 		error 6099
 	}
 	
+	local netexp: subinstr local netexp "_if" "$"	
 	// if condition
 	gettoken netexp ifcond: netexp, parse("#")
 	local ifcond: subinstr local ifcond "#" "if"
-		
+	local ifcond: subinstr local ifcond "$$ff" "_if"
+	local netexp: subinstr local netexp "$$ff" "_if"
+
+	
 	// check if network or variable should be created
 	
 	local netexp : subinstr local netexp "("  "( "	
@@ -87,7 +92,7 @@ program nwgenerate
 	}
 	
 	// generate variable or network based on function
-	qui else  {
+	else  {
 		// get whatever is inside parenthesis
 		local start = strpos("`netexp'", "(")
 		local length2 = length("`netexp'")
@@ -206,7 +211,6 @@ program nwgenerate
 		}
 		if "`whichjob'" == "lgc(" {
 			noi _nwsyntax_other `sub1'
-			noi di "qui nwcomponents `sub1', `sub2' gen(`netname') lgc `options'"
 			qui nwcomponents `sub1', `sub2' gen(`netname') lgc `options'
 		}
 		

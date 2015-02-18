@@ -27,7 +27,7 @@ program nwplotmatrix
 	tempvar originalSorting
 
 	// deal with if condition
-    capture qui  if "`if'" != "" {
+    if "`if'" != "" {
 		if "`label'" == "_nodeid" {
 			gen `nodelab' = _nodeid
 			local label "`nodelab'"
@@ -59,7 +59,7 @@ program nwplotmatrix
 		list `label'
 	}
 
-    nwsociomatrix_noif `netname', `options' `lab' label(`label') `nodichotomize' background(`background') ylabel(`labelopt' `ylabel') xlabel(`labelopt' `xlabel') legendopt(`legendopt') color(`colorpalette') lcolor(`lcolor') legend(`legend') `tievalue' tievalueopt(`tievalueopt')
+	nwsociomatrix_noif `netname', `options' `lab' label(`label') `nodichotomize' background(`background') ylabel(`labelopt' `ylabel') xlabel(`labelopt' `xlabel') legendopt(`legendopt') color(`colorpalette') lcolor(`lcolor') legend(`legend') `tievalue' tievalueopt(`tievalueopt')
 	
 	capture nwdrop __temp*
 	restore
@@ -96,7 +96,7 @@ program nwsociomatrix_noif
 		}
 		local split "split(`split')"
 	}
-	
+
 	mata: st_matrix("onenet", socionet)
 	nwname `netname'
 	matrix rownames onenet = `r(labs)'
@@ -184,8 +184,20 @@ if "`xnames'" == "" {
 	local xnames: colfullnames `mat'
 }
 
+local rowsmat = rowsof(`mat')
+local colsmat = colsof(`mat')
+local rowsname ""
+local colsname ""
+forvalues i =1 /`rowsmat' {
+	local rowsname "`rowsname' v`i'"
+}
+forvalues i =1 /`colsmat' {
+	local colsname "`colsname' v`i'"
+}
+mat rownames `mat' = `rowsname'
+mat colnames `mat' = `colsname'
 
-qui svmat `mat', names(matcol) 
+noi svmat `mat', names(matcol) 
 if "`split'" ~= "" _mkdata, s(`split') nc(`nx')
 else  _mkdata, nc(`nx')
 
@@ -199,6 +211,7 @@ if "`nodiag'"~="" {
  * put the numlist of values in split macro 
  *****************************************************/
 if "`split'"=="" local split "`r(split)'"
+
 
 /*Go through the colour cutoffs to create the legend list?*/
 local count 1

@@ -77,7 +77,7 @@ have both marriage and business ties.
 A more complicated network expression:
 
 	{bf:gen test = _n}
-	{bf:nwgen net = 2 * exp(flormarriage) / flobusiness * test}
+	{bf:nwgen net = 2 * exp(flomarriage) / flobusiness * test}
 	
 {pstd}
 Basically, one can do all sorts of calculations using network expressions. See

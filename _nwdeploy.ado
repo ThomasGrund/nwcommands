@@ -187,7 +187,6 @@ program _nwdeploy
 	foreach file in `idlgfiles' {
 		file write deploy_dlg "f `file'" _n
 	}
-	file write deploy_dlg  "f nwinstall_dlg.do"
 	file close deploy_dlg
 	
 end

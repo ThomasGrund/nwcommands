@@ -1071,6 +1071,8 @@ program _nwimpdl
 		di "{err}No valid {bf:.dl} file"
 		error 6099
 	}
+	
+	set more off
 	// parse header until data part
 	while  ("`firstword'" != "data:") {
 		local line : subinstr local line "=" " ", all
@@ -1203,8 +1205,9 @@ program _nwimpdl
 	mata: st_global("r(netlabs)", "`netlabs'")
 	
 	capture file close `importfile'
-	local sformat "fullmatrix nodelist1 egelist1 lowerhalf"
+	local sformat "fullmatrix nodelist1 edgelist1 lowerhalf"
 	local f : list format & sformat
+			
 	if "`f'" == "" {
 		di "{err}Ucinet format = {bf:`format'} not supported."
 	}	
