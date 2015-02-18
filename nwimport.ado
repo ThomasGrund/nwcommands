@@ -103,7 +103,7 @@ program nwimport
 	}
 	else {
 		di 
-		di `"{err}{it:Loading networks from file {bf:`fname'} failed}"'
+		noi di `"{err}{it:Loading networks from file {bf:`fname'} failed}"'
 		error 6750
 	}
 end
@@ -372,7 +372,7 @@ program _nwimport_ucinet
 				_insert_edge, from(`first') to(`second') value(`value')
 			}
 			if ("`mode'" == "data" &  strpos("fullmatrix edgelist1", "`data_format'") == 0) {
-				di "{err}format {bf:`data_format'} not supported"
+				noi di "{err}format {bf:`data_format'} not supported"
 				error 6705
 			}
 			
@@ -782,13 +782,13 @@ program _nwimport_edgelist
 	}
 	
 	if `success' == 0 {
-		di "{err}{it:edgelist} could not be loaded"
+		noi di "{err}{it:edgelist} could not be loaded"
 		restore
 		error 6704
 	}
 
 	if `c(k)' > 3 | `c(k)' < 2 {
-		di "{err}Something went wrong; data has more than three columns."
+		noi di "{err}Something went wrong; data has more than three columns."
 		restore
 		error 6704
 	}
@@ -1068,7 +1068,7 @@ program _nwimpdl
 
 	// check for .dl format
 	if "`firstword'" != "dl" {
-		di "{err}No valid {bf:.dl} file"
+		noi di "{err}No valid {bf:.dl} file"
 		error 6099
 	}
 	
@@ -1164,7 +1164,7 @@ program _nwimpdl
 	}
 
 	if "`rows'" != "`cols'" {
-		di "{err}Two-mode networks are not supported"
+		noi di "{err}Two-mode networks are not supported"
 		error 6088
 	}
 	
@@ -1195,7 +1195,7 @@ program _nwimpdl
 		}
 		if lower("`format'") == "lowerhalf" {
 			if "`rowlabsembedded'" != "" {
-				di "{err}Ucinet {bf:row labels embedded} not supported together with format {bf:lowerhalf}"
+				noi di "{err}Ucinet {bf:row labels embedded} not supported together with format {bf:lowerhalf}"
 			}
 			else {
 				capture _nwimpdl_lowerhalf, filehandler(`importfile') labs(`labs') netlabs(`netlabs') nodes(`nodes') nets(`nets') diagonal(`diagonal') `rowlab_embedded' `collab_embedded'
@@ -1209,7 +1209,7 @@ program _nwimpdl
 	local f : list format & sformat
 			
 	if "`f'" == "" {
-		di "{err}Ucinet format = {bf:`format'} not supported."
+		noi di "{err}Ucinet format = {bf:`format'} not supported."
 	}	
 	mata: st_global("r(nameoff)","`nameoff'")
 end

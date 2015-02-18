@@ -7,7 +7,11 @@ program nwmovie
 	syntax anything(name=netname), [z(integer 1) title(string) edgecolor(string) edgesize(string) size(string) symbol(string) color(string) switchtitle(string) switchnetwork(string) switchcolor(string) switchsymbol(string) switchedgecolor(string) imagick(string) eps keepfiles width(integer 750) height(integer 500) fname(string) explosion(integer 5) labels(string) titles(string) delay(string) sizes(varlist) colors(string) symbols(varlist) edgecolors(string) edgesizes(string) frames(integer 10) *]
 
 	_nwsyntax `netname', max(999) min(2)
-	  
+	 
+	if "`fname'" == "" {
+		local fname "`c(pwd)'/movie"
+	}
+	
 	local old_options `options'
 	if "`color'" != "" {
 		gettoken color1 colorpt1 : color, parse(",")
@@ -414,12 +418,16 @@ program nwmovie
 				tempvar frame_size
 				qui gen `frame_size' = `firstsize' - `steepness' * (`firstsize' - `secondsize')
 			}
+			
+			if "`edgecoloropt'" != "" {
+				local edgecomma ","
+			}
 			if "`edgesize'" != "" {
 				nwgenerate _frame_edgesize = round(`firstedgesize' - `steepness' * (`firstedgesize' - `secondedgesize'))
-				qui nwplot ``framenet'', ignorelgc `nx' symbol(``thirdsymb'', norescale `symbolopt')  color(``thirdcol'', norescale  `coloropt' ) size(`frame_size', norescale `sizeopt') edgesize(_frame_edgesize, legendoff) edgecolor(``thirdedgecol'', `edgecoloropt') title("``thirdtitle''" `title_opt')  `options'
+				qui nwplot ``framenet'', ignorelgc `nx' symbol(``thirdsymb'', norescale `symbolopt')  color(``thirdcol'', norescale  `coloropt' ) size(`frame_size', norescale `sizeopt') edgesize(_frame_edgesize, legendoff) edgecolor(``thirdedgecol'' `edgecomma' `edgecoloropt') title("``thirdtitle''" `title_opt')  `options'
 			}
 			else {
-				qui nwplot ``framenet'', ignorelgc `nx'  symbol(``thirdsymb'', norescale  `symbolopt') color(``thirdcol'', norescale  `coloropt' )  size(`frame_size', norescale  `sizeopt') edgecolor(``thirdedgecol'', `edgecoloropt') title("``thirdtitle''" `title_opt')  `options'
+				qui nwplot ``framenet'', ignorelgc `nx'  symbol(``thirdsymb'', norescale  `symbolopt') color(``thirdcol'', norescale  `coloropt' )  size(`frame_size', norescale  `sizeopt') edgecolor(``thirdedgecol'' `edgecomma' `edgecoloropt') title("``thirdtitle''" `title_opt')  `options'
 			}
 			
 			/*
@@ -469,7 +477,7 @@ program nwmovie
 
 
 	local lastdelay = `delay' * `frames'
-	local shellcmd = `""`impath'/convert" -delay `delay' -loop 0 `c(pwd)'/first*.`pic' `c(pwd)'/frame*.`pic' -delay `lastdelay' `c(pwd)'/last*.`pic' `c(pwd)'/`fname'.gif"'
+	local shellcmd `""`impath'/convert" -delay `delay' -loop 0 `c(pwd)'/first*.`pic' `c(pwd)'/frame*.`pic' -delay `lastdelay' `c(pwd)'/last*.`pic' `fname'.gif"'
 
 	
 	if c(os) == "MacOSX" {
@@ -478,7 +486,9 @@ program nwmovie
 	}
 	
 	if c(os) == "Windows" {
-		shell cmd /C `shellcmd'
+		nwmovie_install_win
+		shell "`r(impath)'/convert.exe" -delay 10 -loop 0 "`c(pwd)'/first*.png" "`c(pwd)'/frame*.png" -delay 20 "`c(pwd)'/last*.png" "`fname'.gif"
+		//shell convert -delay `delay' -loop 0 first*.`pic' frame*.`pic' -delay `lastdelay' last*.`pic' `fname'.gif
 		capture findfile `fname'.gif 
 		if _rc == 0 {
 			shell explorer `fname'.gif

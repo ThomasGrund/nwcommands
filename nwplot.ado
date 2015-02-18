@@ -98,7 +98,7 @@ program nwplot
 		local netname "__temp_if"
 	}
 	_nwsyntax `netname', max(1)
-
+	
 	qui if "`lab'" != ""{
 		capture drop _nodelab
 		capture drop _nodeid
@@ -692,34 +692,29 @@ program nwplot
 	if ("`layout'"== "mds"){
 		mata: Coord = netplotmds(M, `iterations')
 	}
-
     qui if ("`layout'"=="mdsclassical"  ){
-		
 		// Coordinates matrix to be populated
 		mata: Coord = J(`nodes', 2, 0)
 		mata: Coord[.,1] = J(`nodes', 1, 1.5) 
 		// Deal with isolates
 		tempvar _isolates
 		nwgen `_isolates' = isolates(`netname')	
-		count if `_isolates' == 1
+		qui count if `_isolates' == 1
 		local isol = `r(N)'
 		local nonisol = `nodes' - `isol'
 		
 		// Get number of components
 		tempvar _component
 		nwgen `_component' = components(`netname')
-		
 		if "`lgc'" != "" {
 			qui nwgen `_component' = lgc(`netname')
 			replace `_component' = 1 - `_component'
 			local components = 1
 		}
 		
-		
-		
 		local compnum = r(components)		
 		local compnum_nonisol = `compnum' - `isol'
-		tab `_component', matrow(comp_id) matcell(comp_freq)
+		qui tab `_component', matrow(comp_id) matcell(comp_freq)
 
 		mata: comp_id = st_matrix("comp_id")
 		mata: comp_freq = st_matrix("comp_freq")
@@ -732,7 +727,6 @@ program nwplot
 		local comp_nonisol = `r(comp_nonisol)'
 		mata: st_matrix("comp_freqid", comp_freqid)
 
-		
 		// Find overall layout
 		// Default = number of (non-isolates) components (undirected)
 		if "`components'" == "" {
