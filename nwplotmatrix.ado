@@ -59,7 +59,7 @@ program nwplotmatrix
 		list `label'
 	}
 
-	nwsociomatrix_noif `netname', `options' `lab' label(`label') `nodichotomize' background(`background') ylabel(`labelopt' `ylabel') xlabel(`labelopt' `xlabel') legendopt(`legendopt') color(`colorpalette') lcolor(`lcolor') legend(`legend') `tievalue' tievalueopt(`tievalueopt')
+	qui nwsociomatrix_noif `netname', `options' `lab' label(`label') `nodichotomize' background(`background') ylabel(`labelopt' `ylabel') xlabel(`labelopt' `xlabel') legendopt(`legendopt') color(`colorpalette') lcolor(`lcolor') legend(`legend') `tievalue' tievalueopt(`tievalueopt')
 	
 	capture nwdrop __temp*
 	restore

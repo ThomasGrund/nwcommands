@@ -477,26 +477,18 @@ program nwmovie
 
 
 	local lastdelay = `delay' * `frames'
-	local shellcmd `""`impath'/convert" -delay `delay' -loop 0 `c(pwd)'/first*.`pic' `c(pwd)'/frame*.`pic' -delay `lastdelay' `c(pwd)'/last*.`pic' `fname'.gif"'
+	local shellcmd `""`impath'/convert" -delay `delay' -loop 0 "`c(pwd)'/first*.`pic'" "`c(pwd)'/frame*.`pic'" -delay `lastdelay' "`c(pwd)'/last*.`pic'" "`fname'.gif""'
 
 	
 	if c(os) == "MacOSX" {
 		shell export PATH="$PATH:`:environ PATH':/usr/local/bin:/usr/bin:/opt/local/bin:/opt/ImageMagick/bin/:`imagick'/";`shellcmd'
-		shell open `fname'.gif -a /Applications/Safari.app/ 
+		shell open "`fname'.gif" -a /Applications/Safari.app/ 
 	}
 	
 	if c(os) == "Windows" {
 		nwmovie_install_win
 		shell "`r(impath)'/convert.exe" -delay 10 -loop 0 "`c(pwd)'/first*.png" "`c(pwd)'/frame*.png" -delay 20 "`c(pwd)'/last*.png" "`fname'.gif"
-		//shell convert -delay `delay' -loop 0 first*.`pic' frame*.`pic' -delay `lastdelay' last*.`pic' `fname'.gif
-		capture findfile `fname'.gif 
-		if _rc == 0 {
-			shell explorer `fname'.gif
-		}
-		else {
-			di "{err}Animation could not be created."
-			exit
-		}
+		shell explorer "`fname'.gif"
 	}
 	
 	if "`keepfiles'" == "" {
