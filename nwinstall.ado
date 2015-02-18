@@ -21,6 +21,9 @@ program nwinstall
 		window menu clear
 		window menu refresh
 		capture ado uninstall "nwcommands-dlg"
+		capture ado uninstall "nwcommands-ado"
+		capture ado uninstall "nwcommands-hlp"
+		local permanently "permanently'"
 	}
 	else {
 		if "`downloadoff'" == "" {
@@ -28,7 +31,7 @@ program nwinstall
 			net from "http://nwcommands.org"
 			net install "nwcommands-dlg", all
 		}
-		qui nwinstall_menu.ado
+		qui nwinstall_menu
 	}
 		
 		
