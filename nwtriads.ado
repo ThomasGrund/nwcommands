@@ -15,7 +15,7 @@ program nwtriads
 	mata: _editmissing(A, 0)
 	mata: outdeg = rowsum(A)
 	mata: indeg = (colsum(A))'
-	mata: deg = outdeg + indeg
+	mata: deg = (outdeg + indeg) / 2
 	mata: delta1 = factorial(deg) 
 	mata: delta2 = (factorial(deg :- 2) :* 2)
 	mata: delta = (delta1 :/ delta2)

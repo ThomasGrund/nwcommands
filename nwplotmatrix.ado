@@ -59,7 +59,7 @@ program nwplotmatrix
 		list `label'
 	}
 
-	capture nwsociomatrix_noif `netname', `options' `lab' label(`label') `nodichotomize' background(`background') ylabel(`labelopt' `ylabel') xlabel(`labelopt' `xlabel') legendopt(`legendopt') color(`colorpalette') lcolor(`lcolor') legend(`legend') `tievalue' tievalueopt(`tievalueopt')
+	nwsociomatrix_noif `netname', `options' `lab' label(`label') `nodichotomize' background(`background') ylabel(`labelopt' `ylabel') xlabel(`labelopt' `xlabel') legendopt(`legendopt') color(`colorpalette') lcolor(`lcolor') legend(`legend') `tievalue' tievalueopt(`tievalueopt')
 	
 	capture nwdrop __temp*
 	restore
@@ -70,7 +70,7 @@ end
 capture program drop nwsociomatrix_noif	
 program nwsociomatrix_noif
 	syntax [anything(name=netname)] [if] ,[ * sortby(varlist) lab label(varname) nodichotomize BAckground(string) ylabel(string) xlabel(string) legendopt(string asis) COlor(string) LColor(string) legend(string asis) tievalue tievalueopt(string) ]
-	
+
 	_nwsyntax `netname', max(1)
 
 	// Version test
@@ -281,6 +281,7 @@ local i 1
 		local blc = `"`lcolor'"'
 	}
 	
+	local i = 1
 	foreach c of local clevels {
 		qui count if  cb==`c'
 		if r(N)>0 {
@@ -292,10 +293,8 @@ local i 1
 			}
 			
 			capture local bcolor : word `=`i'-1' of `color'
-	   
 			if "`bcolor'" == "" {
 				local bc `""scheme p`=`i''area""'
-
 			}
 			else {
 				local bc `"`bcolor'"'

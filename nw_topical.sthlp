@@ -174,7 +174,6 @@
 {col 8}{hline 3}{c RT}       {it:Uncategorized}{col 36}{c LT}{hline}
 {col 8}   {c BLC}{hline 24}{c BRC}
 {p2colset 12 35 36 2}
-{p2col:{bf:{help nwtostata }}}{err}no help file yet{txt}{p_end}
 {p2col:{bf:{help _extract_valuelabels }}}{err}no help file yet{txt}{p_end}
 {p2col:{bf:{help _nwdeploy }}}{err}no help file yet{txt}{p_end}
 {p2col:{bf:{help _nwdialog }}}{err}no help file yet{txt}{p_end}
@@ -184,3 +183,4 @@
 {p2col:{bf:{help _nwsetobs }}}{err}no help file yet{txt}{p_end}
 {p2col:{bf:{help _nwsyntax_other }}}{err}no help file yet{txt}{p_end}
 {p2col:{bf:{help _opts_oneof }}}{err}no help file yet{txt}{p_end}
+{p2col:{bf:{help nwtostata }}}{err}no help file yet{txt}{p_end}
