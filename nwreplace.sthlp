@@ -67,7 +67,7 @@ network expression are performed element-by-element.
 For example, one can calculate the intersection of two networks.
 
 	{bf:webnwuse florentine, nwclear}
-	{bf:nwgen bus_marr = flormarriage * flobusiness}
+	{bf:nwgen bus_marr = flomarriage * flobusiness}
 	
 {pstd}
 This generates a new network {it:bus_marr}, which takes the values 1 when two Florentine families

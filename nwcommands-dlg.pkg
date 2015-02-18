@@ -2,7 +2,7 @@ v 3
 d nwcommands-hlp. Social Network Analysis Using Stata - Dialog Boxes
 d Thomas U. Grund, Linkoping University, www.liu.se/ias
 d email: contact@nwcommands.org
-d Distribution-Date: 17feb2015
+d Distribution-Date: 18feb2015
 f nw_edges_color.dlg
 f nw_edges_pattern.dlg
 f nw_edges_size.dlg
@@ -31,6 +31,7 @@ f nwhomophily.dlg
 f nwimport.dlg
 f nwimport_ucinet.dlg
 f nwlattice.dlg
+f nwload.dlg
 f nwmovie.dlg
 f nworder.dlg
 f nwpath.dlg
@@ -50,6 +51,7 @@ f nwsmall.dlg
 f nwsubset.dlg
 f nwsummarize.dlg
 f nwsym.dlg
+f nwsync.dlg
 f nwtabulate1.dlg
 f nwtabulate2net.dlg
 f nwtabulate2var.dlg
@@ -59,4 +61,3 @@ f nwunsym.dlg
 f header.idlg
 f nw_newnet_opt.idlg
 f nwnewnet.idlg
-f nwinstall_dlg.do

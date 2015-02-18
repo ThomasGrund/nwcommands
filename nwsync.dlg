@@ -1,0 +1,48 @@
+
+VERSION 10.0
+SYNCHRONOUS_ONLY
+INCLUDE _std_small
+INCLUDE _ht350
+INCLUDE header
+
+HELP hlp1, view("help nwsync")
+RESET res1
+
+SCRIPT PREINIT
+BEGIN
+		program initialize
+END
+
+
+DIALOG main, title("nwsync - Sync Network With Variables")
+BEGIN
+	
+	TEXT tx_net 50 40 140 ., label("Network:") 
+	COMBOBOX cb_net 50 60 250 ., dropdownlist label("Network") contents(netlist) nomem
+	CHECKBOX cx_from 50 90 350 ., label("Synchronize from Stata variables") option(fromstata) nomem
+	CHECKBOX cx_lab 50 120 350 ., label("Synchronize node labels") option(label) nomem
+
+END
+
+
+LIST netlist
+BEGIN
+	// intentionally empty
+	// this list will be populated by _nwdialog.ado
+END
+
+PROGRAM initialize
+BEGIN
+	put "_nwdialog nwsync"
+	stata hidden immediate
+END
+
+PROGRAM command
+BEGIN
+	put "nwsync " main.cb_net
+	beginoptions
+		option main.cx_from
+		option main.cx_lab		
+	endoptions
+	stata
+END

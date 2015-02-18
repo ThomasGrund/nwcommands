@@ -173,4 +173,4 @@ You can also send an email directly to {browse "mailto:thomas.u.grund@gmail.com"
 Please cite the software as: 
 
 {pmore}
-{bf:Thomas U. Grund and Peter Hedstrom (2014). nwcommands: Software tools for the Statistical Modeling of Network Data in Stata. URL http://nwcommands.org}
+{bf:Thomas U. Grund (2014). nwcommands: Software Tools for the Statistical Modeling of Network Data in Stata. URL http://nwcommands.org}

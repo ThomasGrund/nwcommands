@@ -60,6 +60,7 @@ Stata variables that represent the network.
 One can use {help nwload} and {help nwsync: nwsync, fromstata} to replace tie values in a network. For example,
 	
 	{cmd:. nwuse florentine, nwclear}
+	{cmd:. nwload flomarriage}
 	{cmd:. replace marriage_1 = 99 in 2}
 	{cmd:. nwsync flomarriage, fromstata}	
 
@@ -70,12 +71,18 @@ However, the preferred method to change the same tie value would be using {help 
 	{cmd:. nwreplace flomarriage[1,2] = 99 }
 
 {pstd}
-The command can also be used to sync the node labels attached to a networks (see also {help nwname}).
+The command can also be used to sync the node labels attached to a network (see also {help nwname}).
 
 	{cmd:. nwuse florentine, nwclear}
+	{cmd:. nwload flomarriage}
 	{cmd:. replace _nodelab = "Peter" in 9}
 	{cmd:. nwsync flomarriage, fromstata label}
 	
+{pstd}
+Notice that the last sync can also be done with
+
+	{cmd:. nwname flomarriage, newlabsfromvar(_nodelab)}
+
 	
 {title:See also}
 

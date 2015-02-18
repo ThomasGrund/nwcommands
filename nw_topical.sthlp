@@ -1,5 +1,5 @@
 {smcl}
-{* *! version  17feb2015}{...}
+{* *! version  18feb2015}{...}
 {phang}
 {help nwcommands:NW-2 topical} {hline 2} 
 {hline 2} Topical list of network commands
@@ -100,7 +100,6 @@
 {p2col:    {bf:{help nwkeep }}}Keep a network (or only certain nodes){p_end}
 {p2col:    {bf:{help nwkeepnodes }}}Keep nodes of a network{p_end}
 {p2col:    {bf:{help nwname }}}Check name and change meta-information of a network{p_end}
-{p2col:    {bf:{help nworder }}}Reorder networks in dataset{p_end}
 {p2col:    {bf:{help nwrecode }}}Recode network{p_end}
 {p2col:    {bf:{help nwrename }}}Rename network{p_end}
 {p2col:    {bf:{help nwreplace }}}Replace network{p_end}
@@ -115,6 +114,7 @@
 {col 8}   {c BLC}{hline 24}{c BRC}
 {p2colset 12 35 36 2}
 {p2col:    {bf:{help nwbetween }}}Calculate betweenness centrality{p_end}
+{p2col:    {bf:{help nwcentrality }}}Node centrality measures{p_end}
 {p2col:    {bf:{help nwcloseness }}}Calculate closeness centrality{p_end}
 {p2col:    {bf:{help nwclustering }}}Clustering coefficient{p_end}
 {p2col:    {bf:{help nwcomponents }}}Calculate network components / largest component{p_end}
@@ -143,6 +143,7 @@
 {p2col:    {bf:{help nwcurrent }}}Report and set current network{p_end}
 {p2col:    {bf:{help nwinstall }}}Install Stata menu/dialogs{p_end}
 {p2col:    {bf:{help nwload }}}Load a network as Stata variables{p_end}
+{p2col:    {bf:{help nworder }}}Reorder networks in dataset{p_end}
 {p2col:    {bf:{help nwsync }}}Sync network with Stata variables{p_end}
 {p2col:    {bf:{help nwtomata }}}Return adjacency matrix of network{p_end}
 {p2col:    {bf:{help nwunab }}}Unabbreviate network list{p_end}

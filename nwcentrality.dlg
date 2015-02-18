@@ -5,7 +5,7 @@ INCLUDE _std_small
 //                     _dlgwd = 350 and _dlght = 200 */
 //INCLUDE header  
 SYNCHRONOUS_ONLY
-HELP hlp1, view("help nwsummarize")
+HELP hlp1, view("help nwcentrality")
 OK ok1,	label("OK")
 CANCEL	can1, label("Cancel")
 SUBMIT	sub1, label("Submit")

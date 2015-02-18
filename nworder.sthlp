@@ -1,7 +1,7 @@
 {smcl}
-{* *! version 1.0.6  23aug2014 author: Thomas Grund}{...}
+{* *! version 1.0.1  10jan2015 author: Thomas Grund}{...}
 {marker topic}
-{helpb nw_topical##manipulation:[NW-2.5] Manipulation}
+{helpb nw_topical##utilities:[NW-2.7] Utilities}
 
 {title:Title}
 

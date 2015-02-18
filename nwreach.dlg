@@ -5,7 +5,7 @@ INCLUDE _std_medium
 INCLUDE _ht350
 INCLUDE header
 
-HELP hlp1, view("help nwdyadprob")
+HELP hlp1, view("help nwreach")
 RESET res1
 
 SCRIPT PREINIT

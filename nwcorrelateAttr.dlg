@@ -51,7 +51,7 @@ BEGIN
   COMBOBOX cb_mode 30 90 150 . , label("Expand") contents(mode) dropdownlist option(mode)
 
   CHECKBOX cx_perm 30 110 250 ., label("Run QAP permutations (and plot)") nomem onclickon(script permOn) onclickoff(script permOff)
-  SPINNER sp_perm 40 130 80 . ,label("Permutations") default(100) nomem option(permutations)
+  SPINNER sp_perm 40 130 80 . ,label("Permutations") default(100) nomem option(permutations) max(1000)
   
   FILE fi_save 150 130 230 ., label("Save As") save option(save) nomem
   
