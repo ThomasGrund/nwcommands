@@ -1,0 +1,32 @@
+VERSION 10
+
+INCLUDE _std_small
+SYNCHRONOUS_ONLY
+HELP hlp1, view("help nwsave")
+OK ok1,	label("OK")
+CANCEL	can1, label("Cancel")
+SUBMIT	sub1, label("Submit")
+RESET	res1
+POSITION 10 10 400 200
+
+SCRIPT PREINIT
+BEGIN
+	program initialize
+END
+
+DIALOG main, title("nwuse - Load Network Data")
+BEGIN
+  FILE  fi_use 50	50	280	., label("Load from") filter("Stata .dta|*.dta")
+  CHECKBOX cx_replace 50 80 200 ., label("Clear memory") option(nwclear)
+END
+
+
+PROGRAM command
+BEGIN
+	require main.fi_use
+	put "nwuse " main.fi_use
+	beginoptions
+		option main.cx_replace
+	endoptions
+	stata
+END

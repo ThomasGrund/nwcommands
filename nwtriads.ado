@@ -4,7 +4,7 @@ program nwtriads
 	syntax [anything(name=netname)]
 	
 	_nwsyntax `netname', max(1)
-	
+	local onedirected = "`directed'"
 	if "`mode'" == "" {
 		local mode = "dyad"
 	}
@@ -15,11 +15,15 @@ program nwtriads
 	mata: _editmissing(A, 0)
 	mata: outdeg = rowsum(A)
 	mata: indeg = (colsum(A))'
-	mata: deg = (outdeg + indeg) / 2
+	mata: deg = (outdeg + indeg)
+	mata: deg = deg/2
 	mata: delta1 = factorial(deg) 
 	mata: delta2 = (factorial(deg :- 2) :* 2)
 	mata: delta = (delta1 :/ delta2)
 	mata: pot = (sum(delta)) / 3
+	if "`onedirected'" == "true" {
+		mata: pot = pot * 4
+	}
 	mata: mata drop delta delta1 delta2 deg outdeg indeg
 	mata: E = abs(censusNet) + abs(censusNet)'
 	mata: E = E :/ E
@@ -87,7 +91,7 @@ program nwtriads
 	di "{hline 11}{c +}{hline 11}{c +}{hline 11}{c +}{hline 11}{c +}"
 	di "{res}{ralign 10:`r(_003)'}{col 12}{c |}{ralign 10:`r(_012)'}{col 24}{c |}{ralign 10:`r(_021D)'}{col 36}{c |}{ralign 10:`r(_021U)'}{col 48}{c |}"
 	di
-	di "{txt}{ralign 10:021C}{col 12}{c |}{ralign 10:030T}{col 24}{c |}{ralign 10:030C}{col 36}{c |}{ralign 10:102C}{col 48}{c |}"
+	di "{txt}{ralign 10:021C}{col 12}{c |}{ralign 10:030T}{col 24}{c |}{ralign 10:030C}{col 36}{c |}{ralign 10:102}{col 48}{c |}"
 	di "{hline 11}{c +}{hline 11}{c +}{hline 11}{c +}{hline 11}{c +}"
 	di "{res}{ralign 10:`r(_021C)'}{col 12}{c |}{ralign 10:`r(_030T)'}{col 24}{c |}{ralign 10:`r(_030C)'}{col 36}{c |}{ralign 10:`r(_102)'}{col 48}{c |}"
 	di
@@ -98,6 +102,8 @@ program nwtriads
 	di "{txt}{ralign 10:111U}{col 12}{c |}{ralign 10:201}{col 24}{c |}{ralign 10:210}{col 36}{c |}{ralign 10:300}{col 48}{c |}"
 	di "{hline 11}{c +}{hline 11}{c +}{hline 11}{c +}{hline 11}{c +}"
 	di "{res}{ralign 10:`r(_111U)'}{col 12}{c |}{ralign 10:`r(_201)'}{col 24}{c |}{ralign 10:`r(_210)'}{col 36}{c |}{ralign 10:`r(_300)'}{col 48}{c |}"
+	di 
+	di "{txt}     Transitivity: {res}`r(transitivity)'"
 end
 	
 	

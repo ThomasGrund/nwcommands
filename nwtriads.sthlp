@@ -14,7 +14,7 @@
 
 {p 8 17 2}
 {cmdab: nwtriads} 
-[{help netlist}]
+[{help netname}]
 
 {title:Description}
 

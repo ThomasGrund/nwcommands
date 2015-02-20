@@ -6,7 +6,7 @@
 {title:Title}
 
 {p2colset 9 14 22 2}{...}
-{p2col :nwsave  {hline 2} Save networks in file}
+{p2col :nwsave  {hline 2} Save network data in file}
 {p2colreset}{...}
 
 {title:Syntax}
@@ -24,8 +24,6 @@
 {synopthdr}
 {synoptline}
 {synopt:{cmd: format}({it:{help nwsave##save_format:save_format}})}saves network either as matrix or as edgelist{p_end}
-
-{synopt:{opt vars}({it:{help newvarlist}})}new variables that are used for the network{p_end}
 
 
 {synoptset 20 tabbed}{...}

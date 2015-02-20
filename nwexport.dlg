@@ -25,8 +25,8 @@ BEGIN
 	TEXT tx_type 50 50 100 ., label("Export file format:")
 	COMBOBOX cb_type 160 50 200 .,  dropdownlist contents(filetypes) onselchangelist(filetypes_action)
 	TEXT tx_file 50 80 250 ., label("Export file name:")
-	FILE fl_pajek 50 100 350 ., label("File") filter("Pajek|*.net|All files|*.*")
-	FILE fl_ucinet 50 100 350 ., label("File") filter("Ucinet|*.dat|All files|*.*")
+	FILE fl_pajek 50 100 350 ., label("File") filter("Pajek|*.net|All files|*.*") save
+	FILE fl_ucinet 50 100 350 ., label("File") filter("Ucinet|*.dat|All files|*.*") save
 	CHECKBOX ck_replace 50 160 200 100, label("Replace data") 
 END
 

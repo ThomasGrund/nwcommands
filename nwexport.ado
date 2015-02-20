@@ -72,6 +72,7 @@ program _nwexport_pajek
 		}
 	
 	}
+	file write `expfile' "" _newline
 	file close `expfile'	
 	restore
 end

@@ -40,7 +40,7 @@ program nwload
 		capture drop _nodelab
 		capture drop _nodeid
 		capture drop _nodevar
-		
+
 		if `=_N' < `nodes' {
 			set obs `nodes'
 		}

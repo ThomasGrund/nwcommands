@@ -9,7 +9,12 @@ program nwmovie
 	_nwsyntax `netname', max(999) min(2)
 	 
 	if "`fname'" == "" {
-		local fname "`c(pwd)'/movie"
+		if c(os) == "Windows" {
+			local fname "`c(pwd)'\movie"
+		}
+		if c(os) == "MacOSX" {
+			local fname "`c(pwd)'/movie"
+		}
 	}
 	
 	local old_options `options'
@@ -487,8 +492,8 @@ program nwmovie
 	
 	if c(os) == "Windows" {
 		nwmovie_install_win
-		shell "`r(impath)'/convert.exe" -delay 10 -loop 0 "`c(pwd)'/first*.png" "`c(pwd)'/frame*.png" -delay 20 "`c(pwd)'/last*.png" "`fname'.gif"
-		shell explorer "`fname'.gif"
+		shell "`r(impath)'\convert.exe" -delay 10 -loop 0 "`c(pwd)'\first*.png" "`c(pwd)'\frame*.png" -delay 20 "`c(pwd)'\last*.png" "`fname'.gif"
+		shell explorer.exe "`fname'.gif"
 	}
 	
 	if "`keepfiles'" == "" {
@@ -517,21 +522,18 @@ program nwmovie_install_win
 		if _rc == 0 {
 			local impath = "`1'"
 			local imlow = lower("`impath'")
-			local st = strpos(lower("`impath'"), "windows")
-			if strpos("`imlow'", "windows") != 0 & "`impath'" == "" {
+			local st = strpos("`imlow'", "windows")
+			if (`st' != 0 & "`impath'" != ""){
 				local impath = ""
 			}
 		}
 		macro shift
 	}	
 	if "`impath'" == "" {
-		local imurl = "http://www.imagemagick.org/download/binaries/ImageMagick-6.9.0-4-Q16-x64-dll.exe"
-		if c(bit) == 32 {
-			local imurl = "http://www.imagemagick.org/download/binaries/ImageMagick-6.9.0-4-Q16-x86-dll.exe"
-		}
+		local imurl = "http://www.imagemagick.org/script/binary-releases.php#windows"
 		di "{err}ImageMagick not found."
 		di `"{err}Please install {browse "`imurl'":ImageMagick from here first} or specify option {bf:imagick()}."'
-		exit
+		error 
 	}
 	mata: st_global("r(impath)", "`impath'")
 end
@@ -553,7 +555,7 @@ program nwmovie_install_osx
 	
 	
 	if "`impath'" == "" {
-		local imurl = "http://cactuslab.com/imagemagick/assets/ImageMagick-6.9.0-0.pkg.zip"
+		local imurl = "http://cactuslab.com/imagemagick/"
 		di "{err}ImageMagick not found."
 		di `"{err}Please install {browse "`imurl'": ImageMagick from here first} or specify option {bf:imagick()}."'
 		error 6999

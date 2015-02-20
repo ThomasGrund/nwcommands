@@ -116,8 +116,8 @@ program nwinstall_menu
 	
 	window menu append separator "Network Analysis"
 	window menu append item "Network Analysis" "Declare Network Data" "db nwset"
-	window menu append item "Network Analysis" "Open Networks" "run nwuse.do"
-	window menu append item "Network Analysis" "Save Networks As..." "run nwsave.do"
+	window menu append item "Network Analysis" "Open Networks" "db nwuse"
+	window menu append item "Network Analysis" "Save Networks As..." "db nwsave"
 	window menu append separator "Network Analysis"
 	window menu append item "Network Analysis" "Import Networks" "db nwimport"
 	window menu append item "Network Analysis" "Export Networks" "db nwexport"

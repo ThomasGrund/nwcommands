@@ -38,6 +38,7 @@ program nwdyads
 		di "{hline 11}{c +}{hline 11}{c +}{hline 11}"
 		di "{res}{ralign 10:`r(_100)'}{col 12}{c |}{ralign 10:`r(_010)'}{col 24}{c |}{ralign 10:`r(_001)'}"
 		di " "
+		di "{txt}    Reciprocity: {res}`r(reciprocity)'"
 	}
 	
 	// Dyad census for undirected network
@@ -48,9 +49,12 @@ program nwdyads
 		mata: mutual = sum(censusMat) / 2
 		mata: null = rows(censusMat) * (rows(censusMat) - 1)/2 - mutual
 		mata: zero = 0
+		mata: st_rclear()
 		mata: st_numscalar("r(_001)", null)
 		mata: st_numscalar("r(_010)", zero)
 		mata: st_numscalar("r(_100)", mutual)
+		local reciprocity = `r(_100)' / `=`r(_100)' + `r(_001)''
+		mata: st_numscalar("r(reciprocity)", `reciprocity')
 		di
 		di "{txt}    Dyad census: {res} `netname'{txt}"
 		di 
@@ -58,11 +62,11 @@ program nwdyads
 		di "{hline 11}{c +}{hline 11}"
 		di "{res}{ralign 10:`r(_100)'}{col 12}{c |}{ralign 10:`r(_001)'}"
 		di " "
+		di "{txt}    Reciprocity: {res}`r(reciprocity)'"
 	}
 	mata: st_global("r(name)", "`netname'")
 	}
 	local reciprocity = `r(_100)' / `=`r(_100)' + `r(_001)''
-	mata: st_numscalar("r(reciprocity)", `reciprocity')
 end
 	
 	

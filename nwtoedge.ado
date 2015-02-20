@@ -91,7 +91,6 @@ program nwtoedge
 	}	
 	
 	qui drop _all 
-	
 	tempfile onenet_file0
 	qui set obs `n2'
 	qui gen long `fromid' = ceil(_n/`n')
@@ -105,7 +104,7 @@ program nwtoedge
 	local num_nets = wordcount("`netname'")
 
 	local directed_all = "false"
-	qui forvalues i=1/`num_nets' {
+	 forvalues i=1/`num_nets' {
 		local onenet : word `i' of `netname'
 		preserve
 		

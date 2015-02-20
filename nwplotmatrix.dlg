@@ -44,7 +44,7 @@ BEGIN
   TEXT     tx_var	10	10	100	., label("Network:") 		
   COMBOBOX cb_var	+60	@	240	., dropdownlist contents(netlist) 
   
-  TEXT tx_sort 10 40 80 ., label("Sort by:")
+  CHECKBOX cx_sort 10 40 80 ., label("Sort by:") onclickon(main.vr_sort.show) onclickoff(main.vr_sort.hide)
   VARNAME vr_sort 75 40 120 ., label("SortVar")
   
   GROUPBOX gb_lb 210 70 270 180, label("Node labels:") 
@@ -138,9 +138,6 @@ BEGIN
 		require main.vr_label
 		put " label(" main.vr_label ")"
 	}
-	if main.vr_sort {
-		put " sortby(" main.vr_sort ")"
-	}
 END
 
 PROGRAM command
@@ -148,6 +145,9 @@ BEGIN
 	put "nwplotmatrix " main.cb_var
 	put " " /program ifin_output
     beginoptions
+		if main.vr_sort {
+			put " sortby(" main.vr_sort ")"
+		}
 		if main.rb_nolabel.isneq(1) {
 			put " " /program main_outputLabels
 		}

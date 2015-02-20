@@ -79,11 +79,22 @@
 {p2col:{opt edgesizes}({it:{help netlist}})}use edge values of other networks to change width of edges; networks needs to have the right dimensions; one network per time point{p_end}
 {p2col:{opt edgecolors}({it:{help netlist}} [,{it:{help nwplot##edge_sub:edge_sub}}])}use edge values of other networks to change color of edges; networks needs to have the right dimensions; one network per time point{p_end}
 	
-		
+	
+{title:Requirements}
+
+{pstd}This commands requires the installation of the third-party software ImageMagick. Please choose the right installation for your system:
+
+{pmore}
+{bf:Windows}: {browse "http://www.imagemagick.org/script/binary-releases.php#windows"}
+	
+{pmore}
+{bf:MacOSX}: {browse "http://cactuslab.com/imagemagick/"}
+	
+	
 {title:Description}
 
 {pstd}
-This command animates a list of {it:t} networks and produces a movie in Animated-GIF format. It requires the third-party software {browse "http://www.imagemagick.org/":ImageMagick}. When
+This command animates a list of {it:t} networks and produces a movie in Animated-GIF format. It requires the third-party software ImageMagick}. When
 you run {cmd:nwmovie} for the first time you will get the appropriate download-link for your operating system.
 
 {pstd}

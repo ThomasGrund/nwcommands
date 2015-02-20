@@ -14,7 +14,7 @@
 
 {p 8 17 2}
 {cmdab: nwdyads} 
-[{it:{help netlist}}]
+[{it:{help netname}}]
 
 {title:Description}
 
