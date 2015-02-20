@@ -56,6 +56,7 @@
 {synopt:{opt undirected}}force network to be undirected{p_end}
 {synopt:{opt name}({it:{help newnetname}})}name of the new network; default = {it:network}{p_end}
 {synopt:{opt labs}({it:lab1 lab2...})}new node labels that are used for the network{p_end}
+{synopt:{opth labsfromvar(varname)}}new node labels that are used for the network{p_end}
 {synopt:{opt vars}({it:var1 var2...})}new variables that are used for the network{p_end}
 {synopt:{opt xvars}}do not generate Stata variables{p_end}
 

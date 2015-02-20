@@ -76,12 +76,16 @@ program nwload
 		local i = 1
 		foreach var in `localvars' {
 			capture drop `var'
-			qui replace _nodevar = "`var'" in `i'
+			if `i' <= `nodes' {
+				qui replace _nodevar = "`var'" in `i'
+			}
 			local i = `i' + 1 
 		}
 		local j = 1
 		foreach lab in `locallabs' {
-			qui replace _nodelab = `"`lab'"' in `j'
+			if `j' <= `nodes' {
+				qui replace _nodelab = `"`lab'"' in `j'
+			}
 			local j = `j' + 1
 		}
 		capture drop _nodeid

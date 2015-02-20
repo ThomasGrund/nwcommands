@@ -5,7 +5,7 @@
 
 capture program drop nwset	
 program nwset
-syntax [varlist (default=none)][, clear nwclear nooutput name(string) vars(string) labs(string asis) edgelabs(string asis) detail mat(string) undirected directed]
+syntax [varlist (default=none)][, clear nwclear nooutput name(string) vars(string) labs(string) labsfromvar(string) abs(string asis) edgelabs(string asis) detail mat(string) undirected directed]
 	set more off
 
 	if "`clear'" != "" {
@@ -157,6 +157,9 @@ syntax [varlist (default=none)][, clear nwclear nooutput name(string) vars(strin
 		mata: mata drop onenet
 	}
 	
+	if "`labsfromvar'" != "" {
+		nwname `name', newlabsfromvar(`labsfromvar')
+	}
 	mata: st_rclear()
 	mata: st_numscalar("r(networks)", $nwtotal)
 	mata: st_numscalar("r(max_nodes)", `max_nodes')
