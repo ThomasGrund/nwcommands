@@ -50,6 +50,8 @@ calculation of average shortest path length (unless option {bf:unconnected()} is
 The option {bf:unconnected(max)} sets the distance of non-connected nodes to the maximum distance 
 observed in the network plus 1.
 
+{pstd}
+The average shortest path length and the diameter are calculated for the largest component of the network.
 
 {title:Example}
 	
@@ -62,14 +64,14 @@ observed in the network plus 1.
 	{txt}    Nodes: {res}16
 	{txt}    Symmetrized : {res}1
 	{hline 36}
-	{txt}    Paths : {res}226
-	{txt}    Diameter: {res}5
-	{txt}    Average shortest path: {res}2.485714285714286
+	{txt}    Paths (largest component): {res}105
+	{txt}    Diameter (largest component): {res}5
+	{txt}    Average shortest path (largest component): {res}2.485714285714286
 
 	
 {pstd}
-{txt}In this example, only 210 directed paths exist. One node is disconnected from all other nodes (hence, the maximum 
-number of directed paths 16 * 15 = 240 is not reached).	The average shortest path is calculated based on the 210 existent paths.
+{txt}In this example, only 105 directed paths exist. One node is disconnected from all other nodes (hence, the maximum 
+number of undirected paths (16 * 15)/2 = 120 is not reached). The average shortest path is calculated based on the 105 existent paths.
 
 
 {title:Stored results}	
@@ -77,7 +79,7 @@ number of directed paths 16 * 15 = 240 is not reached).	The average shortest pat
 	Scalars
 	  {bf:r(nodes)}		number of nodes
 	  {bf:r(symmetrized)}	calculated on symmetrized network
-	  {bf:r(numpaths)}	number of va
+	  {bf:r(numpaths)}	number of shortest paths
 	  {bf:r(diameter)}	network diameter
 	  {bf:r(avgpath)}	average shortest path length
 		  
@@ -87,4 +89,4 @@ number of directed paths 16 * 15 = 240 is not reached).	The average shortest pat
 		  
 {title:See also}
 
-	{help nwcloseness}, {help nwreach}, {help nwpath}
+	{help nwcloseness}, {help nwreach}, {help nwpath}, {help nwcomponents}

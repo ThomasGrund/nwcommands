@@ -23,7 +23,7 @@ program nwtab1
 	}
 	local edgelabs `r(edgelabs)'
 	
-	nwtoedge `netname', full
+	qui nwtoedge `netname', full
 	qui if "`selfloop'" == "" {
 		drop if _fromid == _toid 
 	}

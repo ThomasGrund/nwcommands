@@ -12,7 +12,7 @@ program nwtoedge
 	
 	local numnets = wordcount("`netname'")
 	
-	if (`numnets' == 2){
+	qui if (`numnets' == 2){
 		local type = "full"
 		
 		local net1 = word("`netname'", 1)
@@ -104,7 +104,7 @@ program nwtoedge
 	local num_nets = wordcount("`netname'")
 
 	local directed_all = "false"
-	 forvalues i=1/`num_nets' {
+	 qui forvalues i=1/`num_nets' {
 		local onenet : word `i' of `netname'
 		preserve
 		

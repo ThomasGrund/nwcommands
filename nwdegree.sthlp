@@ -16,7 +16,7 @@
 {cmdab: nwdegree} 
 [{it:{help netlist}}]
 [{cmd:,}
-{opt generate}({it:{help varname:varname}})
+{opt generate}({it:{help varlist:varlist}})
 {opt isolates}
 {opt valued}
 {opt in}({it:{help tabulate_oneway##tabulate1_options:tabulate_opt}})
@@ -27,9 +27,8 @@
 {synoptset 25 tabbed}{...}
 {synopthdr}
 {synoptline}
-{synopt:{opt generate}({it:{help varname}})}Generate variable {bf:varname} for degree of nodes (undirected network). For directed networks, generate {bf:{it:_out}varname} for outdegree and and {bf:{it:_in}varname} for indegree; 
-default:{it: varname = _degree}{p_end}
-{synopt:{opt isolates}}Generate variable for network isolates; overwrite variable {it:_isolate}{p_end}
+{synopt:{opt generate}({it:{help varlist}})}Generate variables for degree, outdegree, indegree, isolate{p_end}
+{synopt:{opt isolates}}Generate variable for network isolates{it:_isolate}{p_end}
 {synopt:{opt valued}}Consider tie values; calculate {it:strength} instead of {it:degree}{p_end}
 {synopt:{opt in}({it:{help tabulate_oneway##tabulate1_options:tabulate_opt}})}Options used for tabulating {it:indegree}{p_end}
 {synopt:{opt out}({it:{help tabulate_oneway##tabulate1_options:tabulate_opt}})}Options used for tabulating {it:outdegree}{p_end}
@@ -41,11 +40,12 @@ default:{it: varname = _degree}{p_end}
 {title:Description}
 
 {pstd}
-{cmd:nwdegree} calculates degree centrality for each node of a network or list and tabulates the result. Generates the Stata variables {it:var1} for undirected networks and the variables {it:_outvar1} (number of outgoing ties) 
-and {it:_invar1} (number of incoming ties) for directed networks.  
+{cmd:nwdegree} calculates degree centrality for each node of a network or list of networks and tabulates the result. By  default it generates the Stata variables {it:_degree} 
+(or {it:_strength} for valued networks) for undirected networks. For directed networks, it generates the variables _out_degree and _in_degree (or _out_strength and _in_strength for valued
+networks). 
 
 {pstd}
-Option {bf:isolates} generates variable {it:var2} that indicates if a node is an isolate (not connected to any
+Option {bf:isolates} generates variable {it:_isolate} that indicates if a node is an isolate (not connected to any
 other node).
 
 {pstd}
@@ -53,9 +53,9 @@ With option {bf:valued} the command calculates node {it:_strength} (sum of tie v
 for directed networks respectively, instead of node {it:_degree}.
 
 {pstd}
-The Stata variables {it:var1, var2} are overwritten. In case, degree centrality is calculated
+In case, degree centrality is calculated
 for {it:z} networks at the same time (e.g. {bf:nwdegree glasgow1 glasgow2}), the command generates the variables
-{it:var1_z} and {it:var2_z} for each network. 
+{it:_out_degree_z} and {it:_in_degree_z} for each network. 
 
 
 {title:Examples}
@@ -85,6 +85,11 @@ In the following example, the degree distributions for in- and outdegree are sav
 	{cmd:. webnwuse glasgow}
 	{cmd:. nwdegree glasgow1, in(matcell(matindeg)) out(matcell(matoutdeg))}
 	{cmd:. mat list matindeg}
+	
+{pmore}
+The next example saves the out- and indegree centrality in the variables {it:myout} and {it:myin} and the information about isolates in {it:myisolate}.
+
+	{cmd:. nwdegree glasgow1, generate(myout myin mysiolate) isolates}
 	
 	
 {title:See also}

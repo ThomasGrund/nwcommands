@@ -89,6 +89,7 @@ real matrix smallworldsk(nodes, k, shortcuts, directed){
 		sign = J(shortcuts,1,1) :- (sign :* 2) 
 		rewires[,2] = editvalue(mod((rewires[,1] :+ (ceil(rewires[,2]:*k):*sign)), nodes),0,nodes)
 	}
+
 	
 	alreadyRewired = 0
 	for (i = 1; i<= shortcuts; i++) {
@@ -112,32 +113,29 @@ real matrix smallworldsk(nodes, k, shortcuts, directed){
 				}
 			}
 		}	
+				
+		rx_old = rewires[i,1]
+		ry_old = rewires[i,2]
 		
-		// rewire tie
-		net[rewires[i,1],rewires[i,2]] = 0
-		if (directed == 0) {
-			net[rewires[i,2],rewires[i,1]] = 0
-		}
-			
-		//find new tie
+		//reqire new tie
 		wrongPick = 1
 		while(wrongPick == 1){
 			wrongPick = 0
-			rx = ceil(runiform(1,1) :* nodes)
-			ry = editvalue(mod(rx + ceil(runiform(1,1) :* (nodes - 2 * k - 1)),nodes),0, nodes) 
-			if (net[rx,ry] != 0) {
-				wrongPick = 1
-			}
-			if (directed == 0) {
-				if (net[ry,rx] != 0) {
-					wrongPick = 1
-				}
+			ry = ceil(runiform(1,1) :* nodes)
+			if (net[rx_old,ry] != 0 & rx_old != ry & ry != ry_old){
+				wrongPick = 0
 			}
 		}
-		net[rx,ry] = 1
+		net[rx_old,ry] = 1
 		if (directed == 0) {
-			net[ry,rx] = 1
+			net[ry,rx_old] = 1
 		}
+		
+		// delete old tie
+		net[rx_old,ry_old ] = 0
+		if (directed == 0) {
+			net[ry_old ,rx_old ] = 0
+		}		
 	}
 	
 	return(net)

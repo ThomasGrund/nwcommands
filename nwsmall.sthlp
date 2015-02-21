@@ -53,7 +53,7 @@
 {title:Description}
 
 {pstd}
-{cmd:nwsmall} generates a small-world network (see Watts and Strogatz 1998). The algorithm starts
+{cmd:nwsmall} generates a small-world network using the original Watts-Strogatz model (see Watts and Strogatz 1998). The algorithm starts
 with a ring-lattice where each node has {it:k} neighbors on each side. Next, the ties of the ring-lattice 
 are rewired in one of two ways:
 

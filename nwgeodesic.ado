@@ -6,9 +6,10 @@
 capture program drop nwgeodesic
 program nwgeodesic
 	version 9
-	syntax [anything(name=netname)], [ lgc vars(string) noreplace id(string) name(string) xvars  unconnected(string) nosym]
+	syntax [anything(name=netname)], [ vars(string) noreplace id(string) name(string) xvars  unconnected(string) nosym]
 
 	_nwsyntax `netname', max(1)
+	
 	mata: nw_geo = nw_mata`id'	
 	mata: nw_geo = nw_geo :/ nw_geo
 	mata: _editmissing(nw_geo, 0)
@@ -41,21 +42,12 @@ program nwgeodesic
 	mata: distances = distances - diag(diagonal)
 	mata: unconnected = (distances :== -1)	
 
-	qui if  "`lgc'" != "" {
-		tempvar comp
-		tempvar lgc 
-		capture rename _components `comp'
-		capture rename _lgc `lgc'
-		nwcomponents `netname', lgc
-		local numcomp = `r(components)'
-		putmata lgc = _lgc if _n <= `nodes'
-		capture drop _lgc
-		capture gen _lgc = `lgc'
-		capture replace _component `comp'
-		mata: distances_lgc = select(select(distances,lgc), lgc')
-		mata: unconnected_lgc = (distances_lgc :== -1)	
-	}
-	
+	tempvar lgc
+	qui nwgen `lgc' = lgc(`netname')
+	qui putmata lgc = `lgc' if _n <= `nodes'
+	mata: distances_lgc = distances :* (distances :>= 0)	
+	mata: unconnected_lgc = (distances_lgc :== -1)
+
 	if "`vars'" == "" {
 		local vars = "_geo1"
 		capture drop _geo1
@@ -85,19 +77,12 @@ program nwgeodesic
 	mata: st_numscalar("r(nodes)", `nodes')
 	mata: st_global("r(netname)","`netname'")
 	mata: st_numscalar("r(symmetrized)", `symmetrized')
-	if "`lgc'" == "" {
-		mata: st_numscalar("r(numpaths)", sum(distances:!=-1) - rows(distances))
-	}
-	else {
-		mata: st_numscalar("r(numpaths)", sum(distances_lgc:!=-1) - rows(distances_lgc))
-	}
-	
-	if "`unconnected'" == "" |  {
-		local unconnected = "largest component only"
+	mata: st_numscalar("r(numpaths)", sum(lgc)^2 - sum(lgc))
+
+	if "`directed'" == "false" {
+		mata: st_numscalar("r(numpaths)", (`r(numpaths)' / 2))
 	}
 	
-	capture drop _lgc
-		
 	di "{hline 40}"
 	di "{txt}  Network name: {res}`netname'"
 	di "{txt}  Network of shortest paths: {res}`geonet'"
@@ -105,22 +90,14 @@ program nwgeodesic
 	di "{txt}    Nodes: {res}`r(nodes)'"
 	di "{txt}    Symmetrized : {res}`symmetrized'"
 	di "    {hline 36}"
-	di "{txt}    Paths : {res}`r(numpaths)'"
+	di "{txt}    Paths (largest component) : {res}`r(numpaths)'"
 	
-	if "`lgc'" != "" {
-		mata: st_numscalar("r(diameter)", max(distances_lgc))
-		mata: st_numscalar("r(avgpath)", (sum(distances_lgc) + sum(unconnected_lgc)) / (rows(distances_lgc)^2 - rows(distances_lgc) - sum(unconnected_lgc)))
-		mata: st_numscalar("r(lgc_nodes)", sum(lgc))
-		di "{txt}    Diameter: {res}`r(diameter)'"
-		di "{txt}    Average shortest path: {res}`r(avgpath)'"
-	}
-	else {
-		mata: st_numscalar("r(diameter)", max(distances))
-		mata: st_numscalar("r(avgpath)", (sum(distances) + sum(unconnected)) / (rows(distances)^2 - rows(distances) - sum(unconnected)))
-	
-		di "{txt}    Diameter: {res}`r(diameter)'"
-		di "{txt}    Average shortest path: {res}`r(avgpath)'"
-	}
+	mata: st_numscalar("r(diameter)", max(distances_lgc))
+	mata: st_numscalar("r(avgpath)", (sum(distances_lgc) / (sum(lgc)^2 - sum(lgc))))
+	mata: st_numscalar("r(lgc_nodes)", sum(lgc))
+	di "{txt}    Diameter (largest component): {res}`r(diameter)'"
+	di "{txt}    Average shortest path (largest component): {res}`r(avgpath)'"
+
 	//mata: distances
 	mata: mata drop nw_geo
 	mata: mata drop distances

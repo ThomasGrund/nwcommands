@@ -15,7 +15,7 @@ program nwdegree
 		local k = 1
 		local more = "`networks'"
 	}
-	
+		
 	foreach netname_temp in `netname' {
 		_nwsyntax `netname_temp'
 		local nodes_temp `nodes'
@@ -33,15 +33,25 @@ program nwdegree
 	
 	
 		local _degree : word 1 of `generate'
+		local _outdegree : word 1 of `generate'
+		local _indegree : word 2 of `generate'
+		local z : word count `generate'
+		local _isolate : word 2 of `generate'
+		if "`directed'" == "true" {
+			local _isolate : word 3 of `generate'
+		}
+		
 		if "`_degree'" == "" {
 			local _degree = cond("`valued'"=="", "_degree", "_strength") 
 		}
-		
-		local _outdegree "_out`_degree'"
-		local _indegree "_in`_degree'"
-		//local _isolates : word 2 of `generate'
-		if "`_isolates'" == "" {
-			local _isolates "_isolate"
+	
+		if (`z' < 2){
+			local _outdegree "_out`_degree'"
+			local _indegree "_in`_degree'"
+		}
+				
+		if "`_isolate'" == "" {
+			local _isolate "_isolate"
 		}
 	
 		capture drop `_degree'`k'
@@ -57,18 +67,15 @@ program nwdegree
 			nwtostata, mat(outdegree) gen(`_outdegree'`k')
 			nwtostata, mat(indegree) gen(`_indegree'`k')
 		}
-	
 		qui if "`isolates'" != "" {
-			capture drop `_isolates'`k'
+			capture drop `_isolate'`k'
 			if ("`directed'" == "true"){
-				gen `_isolates'`k' = (`_outdegree'`k' == 0) * (`_indegree'`k'==0)
-				//drop _outdegree _indegree
+				gen `_isolate'`k' = (`_outdegree'`k' == 0) * (`_indegree'`k'==0)
 			}
 			else{
-				gen `_isolates'`k' = (`_degree'`k' == 0)
-				//drop _degree
+				gen `_isolate'`k' = (`_degree'`k' == 0)
 			}
-			replace `_isolates'`k' = . if _n > `nodes_temp'
+			replace `_isolate'`k' = . if _n > `nodes_temp'
 		}
 	
 		
@@ -92,14 +99,14 @@ program nwdegree
 		if ("`directed'" == "false") {
 			mata: st_numscalar("r(dg_central)", sum(J(`nodes_temp',1,max(outdegree)) :- outdegree) / ((`nodes_temp' - 2) * (`nodes_temp' - 1)))
 			di 
-			di "{txt}   Degree centralization:: {res}`r(central)'"
+			di "{txt}   Degree centralization:: {res}`r(dg_central)'"
 		}
 		else {
 			mata: st_numscalar("r(indg_central)", sum(J(`nodes_temp',1,max(indegree)) :- indegree) / ((`nodes_temp' - 1) * (`nodes_temp' - 1))) 
 			mata: st_numscalar("r(outdg_central)", sum(J(`nodes_temp',1,max(outdegree)) :- outdegree) / ((`nodes_temp' - 1) * (`nodes_temp' - 1)))
 			di 
-			di "{txt}   Indegree centralization:: {res}`r(in_central)'"
-			di "{txt}   Outdegree centralization:: {res}`r(out_central)'"
+			di "{txt}   Indegree centralization:: {res}`r(indg_central)'"
+			di "{txt}   Outdegree centralization:: {res}`r(outdg_central)'"
 		}
 		mata: mata drop outdegree indegree degreeNet
 	}

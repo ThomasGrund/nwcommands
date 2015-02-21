@@ -13,10 +13,10 @@ program nwgenerate
 	gettoken dump opts: arg, parse(",") bind
 	if "`opts'" != "" {
 		local 0 `opts'
-		syntax [, xvars vars(string) replace]
+		syntax [, xvars vars(string) replace *]
 	}
+	local fcn_opt = "`options'"
 	local netname = trim("`netname'")
-	
 
 	// replace the network if it exists already
 	if (strpos("`options'", "replace")!=0){
@@ -105,77 +105,82 @@ program nwgenerate
 		local 0 `subopt'
 		syntax [anything(name=sub1)] [, *]
 		local sub2 `options'
-			
+		/*
+		di "netexp: `netexp'"
+		di "subopt: `subopt'"
+		di "sub1: `sub1'"
+		di "sub2: `sub2'
+		di "options: `options'"*/
 		/// NETWORK PRODUCING FUNCTIONS
 		/////////
 		
 		// nwduplicate shortcut
 		qui if "`whichjob'" == "duplicate(" {
 			noi _nwsyntax_other `sub1', max(9999) name("othername")
-			nwduplicate `sub1', `sub2' name(`netname') `oldoptions'
+			nwduplicate `sub1', `sub2' name(`netname') `fcn_opt'
 		}	
 		
 		// nwduplicate shortcut
 		qui if "`whichjob'" == "subset(" {
 			noi _nwsyntax_other `sub1', max(9999) name("othername")
-			nwsubset `sub1' `ifcond', `sub2' name(`netname') `oldoptions'
+			nwsubset `sub1' `ifcond', `sub2' name(`netname') `fcn_opt'
 		}
 
 		// nwdyadprob shortcut
 		qui if "`whichjob'" == "dyadprob(" {
 			noi _nwsyntax_other `sub1', max(9999) name("othername")
-			nwdyadprob `sub1', `sub2' name(`netname') `oldoptions'
+			nwdyadprob `sub1', `sub2' name(`netname') `fcn_opt'
 		}	
 		
 		// nwgeodesic shortcut
 		qui if "`whichjob'" == "geodesic(" {
 			noi _nwsyntax_other `sub1', max(9999) name("othername")
-			nwgeodesic `sub1', `sub2' name(`netname') `oldoptions'
+			nwgeodesic `sub1', `sub2' name(`netname') `fcn_opt'
 		}
 		// nwgeodesic shortcut
 		qui if "`whichjob'" == "homophily(" {
 			noi _nwsyntax_other `sub1', max(9999) name("othername")
-			nwhomophily `sub1', `sub2' name(`netname') `oldoptions'
+			nwhomophily `sub1', `sub2' name(`netname') `fcn_opt'
 		}
 		// nwlattice shortcut
 		qui if "`whichjob'" == "lattice(" {
-			nwlattice `sub1', `sub2'name(`netname') `oldoptions'
+			nwlattice `sub1', `sub2'name(`netname') `fcn_opt'
 		}	
 		// nwlattice shortcut
 		qui if "`whichjob'" == "path(" {
 			noi _nwsyntax_other `sub1', max(9999) name("othername")
-			nwpath `subopt', name(`netname') `oldoptions'
+			nwpath `subopt', name(`netname') `fcn_opt'
 		}
 		// nwlattice shortcut
 		qui if "`whichjob'" == "permute(" {
 			noi _nwsyntax_other `sub1', max(9999) name("othername")
-			nwpermute `sub1', `sub2' name(`netname') `oldoptions'
+			nwpermute `sub1', `sub2' name(`netname') `fcn_opt'
 		}	
 		// nwpref shortcut
 		qui if "`whichjob'" == "pref(" {
-			nwpref `sub1', `sub2' name(`netname') `oldoptions'
+			nwpref `sub1', `sub2' name(`netname') `fcn_opt'
 		}	
 		// nwrandom shortcut
 		qui if "`whichjob'" == "random(" {
-			nwrandom `sub1', `sub2' name(`netname') `oldoptions'
+			nwrandom `sub1', `sub2' name(`netname') `fcn_opt'
 		}	
 		// nwreach shortcut
 		qui if "`whichjob'" == "reach(" {
 			noi _nwsyntax_other `sub1', max(9999) name("othername")
-			nwreach `sub1', `sub2' name(`netname') `oldoptions'
+			nwreach `sub1', `sub2' name(`netname') `fcn_opt'
 		}	
 		// nwring shortcut
 		if "`whichjob'" == "ring(" {
-			nwring `sub1', `sub2' name(`netname') `oldoptions'
+			nwring `sub1', `sub2' name(`netname') `fcn_opt'
 		}	
 		// nwsmall shortcut
 		qui if "`whichjob'" == "small(" {
-			nwsmall `sub1', `sub2' name(`netname') `oldoptions'
+			nwsmall `sub1', `sub2' name(`netname') `fcn_opt'
 		}
 		// nwtranspose shortcut
 		qui if "`whichjob'" == "transpose(" {
 			noi _nwsyntax_other `sub1', max(9999) name("othername")
-			nwtranspose `sub1', `sub2' name(`netname') `oldoptions'
+			nwtranspose `sub1', `sub2' name(`netname') `fcn_opt'
 		}	
 		
 		/// VARIABLE PRODUCING FUNCTIONS
@@ -184,48 +189,48 @@ program nwgenerate
 		// nwclustering shortcuts
 		qui if "`whichjob'" == "clustering(" {
 			noi _nwsyntax_other `sub1'
-			nwclustering `subopt', gen(`netname') `options'
+			nwclustering `subopt', gen(`netname') `fcn_opt'
 		}
 		
 		// nwcloseness shortcuts
 		qui if "`whichjob'" == "closeness(" {
 			tempvar _t1 _t2
 			noi _nwsyntax_other `sub1'
-			nwcloseness `sub1', `sub2' gen(`netname' `_t1' `_t2') `options'
+			nwcloseness `sub1', `sub2' gen(`netname' `_t1' `_t2') `fcn_opt'
 		}
 		qui if "`whichjob'" == "farness(" {
 			tempvar _t1 _t2
 			noi _nwsyntax_other `sub1'
-			nwcloseness `sub1', `sub2' gen(`_t1' `netname' `_t2') `options'
+			nwcloseness `sub1', `sub2' gen(`_t1' `netname' `_t2') `fcn_opt'
 		}
 		qui if "`whichjob'" == "nearness(" {
 			tempvar _t1 _t2
 			noi _nwsyntax_other `sub1'
-			nwcloseness `sub1', `sub2' gen(`_t1' `_t2' `netname') `options'
+			nwcloseness `sub1', `sub2' gen(`_t1' `_t2' `netname') `fcn_opt'
 		}
 		
 		// nwcomponents shortcuts
 		if "`whichjob'" == "components(" {
 			noi _nwsyntax_other `sub1'	
-			qui nwcomponents `sub1', `sub2'gen(`netname') `options'
+			qui nwcomponents `sub1', `sub2'gen(`netname') `fcn_opt'
 		}
 		if "`whichjob'" == "lgc(" {
 			noi _nwsyntax_other `sub1'
-			qui nwcomponents `sub1', `sub2' gen(`netname') lgc `options'
+			qui nwcomponents `sub1', `sub2' gen(`netname') lgc `fcn_opt'
 		}
 		
 		// nwdegree shortcuts
 		qui if "`whichjob'" == "isolates(" {
 			tempvar _t1 
 			noi _nwsyntax_other `sub1'
-			nwdegree `sub1', `sub2' isolates gen(`_t1') `options'
+			nwdegree `sub1', `sub2' isolates gen(`_t1') `fcn_opt'
 			rename _isolate `netname' 
 			capture drop *`_t1'
 		}
 		qui if "`whichjob'" == "indegree(" {
 			tempvar _t1 
 			noi _nwsyntax_other `sub1'
-			nwdegree `sub1', `sub2' gen(`netname' `_t1') `options'
+			nwdegree `sub1', `sub2' gen(`netname' `_t1') `fcn_opt'
 			capture confirm variable _in`netname'
 			if _rc == 0 {
 				rename _in`netname' `netname'
@@ -235,7 +240,7 @@ program nwgenerate
 		qui if "`whichjob'" == "outdegree(" {
 			tempvar _t1
 			noi _nwsyntax_other `sub1'		
-			nwdegree `sub1', `sub2' gen(`netname' `_t1') `options'
+			nwdegree `sub1', `sub2' gen(`netname' `_t1') `fcn_opt'
 			capture confirm variable _out`netname'
 			if _rc == 0 {
 				rename _out`netname' `netname'
@@ -245,7 +250,7 @@ program nwgenerate
 		qui if "`whichjob'" == "degree(" {
 			tempvar _t1
 			noi _nwsyntax_other `sub1'
-			nwdegree `sub1', `sub2' gen(`netname' `_t1') `options'
+			nwdegree `sub1', `sub2' gen(`netname' `_t1') `fcn_opt'
 			capture confirm variable _out`netname'
 			if _rc == 0 {
 				rename _out`netname' `netname'
@@ -256,13 +261,13 @@ program nwgenerate
 		// nwbetween shortcuts
 		if "`whichjob'" == "between(" {
 			noi _nwsyntax_other `sub1'
-			nwbetween `sub1', `sub2'  generate(`netname') `options'
+			nwbetween `sub1', `sub2'  generate(`netname') `fcn_opt'
 		}
 		
 		// nwcontext shortcuts
 		if "`whichjob'" == "context(" {
 			noi _nwsyntax_other `sub1'
-			nwcontext `sub1', `sub2'  generate(`netname') `options'
+			nwcontext `sub1',   generate(`netname') `fcn_opt'
 		}
 		
 		// nwevcent shortcuts

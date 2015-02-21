@@ -97,10 +97,13 @@ of coefficients, {cmd:nwqap} calculates adjusted p-values and saves them in {it:
 {it:References}
 
 {pmore}
-Krackhardt, David. 1987. ÒQAP Partialling as a Test of Spuriousness.Ó Social Networks 9: 171-186.
+Grund, T. and Densley, J. (2012). "Ethnic Heterogeneity in the Activity and Structure of a Black Street Gang." European Journal of Criminology, Vol. 9, Issue 3, pp. 388-406.
 
 {pmore}
-Krackhardt, David. 1988. ÒPredicting with Networks: Nonparametric Multiple Regression Analysis of Dyadic Data.Ó Social Networks 10: 359-381.
+Krackhardt, David. (1987). ÒQAP Partialling as a Test of Spuriousness.Ó Social Networks 9: 171-186.
+
+{pmore}
+Krackhardt, David. (1988). ÒPredicting with Networks: Nonparametric Multiple Regression Analysis of Dyadic Data.Ó Social Networks 10: 359-381.
 
 
 {title:Examples}
