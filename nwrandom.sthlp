@@ -16,20 +16,23 @@
 {cmdab: nwrandom} 
 {it:{help int:nodes}}
 {cmd:,}
-{opth prob(float)} | {opth density(float)}
-[{opt undirected}
+[{opth prob(float)}
+{opth density(float)}
+{opt census}({help nwdyads:{it:mutual} [{it:asym null}]})
+{opt undirected}
 {opth ntimes(int)}
 {opt name}({it:{help newnetname}})
 {opt vars}({it:{help newvarlist}})
 {opt labs}({it:lab1 lab2 ...})
 {opt xvars}]
 
-{synoptset 20 tabbed}{...}
+{synoptset 30 tabbed}{...}
 {synopthdr}
 {synoptline}
 {synopt:{it:{help int:nodes}}}number of nodes{p_end}
-{synopt:{opth prob(float)}}probability for a tie to exist{p_end}
-{synopt:{opth density(float)}}exact density of the whole network{p_end}
+{synopt:{opth prob(float)}}probability for a tie{p_end}
+{synopt:{opth density(float)}}exact density of the new network{p_end}
+{synopt:{opt census}({help nwdyads:{it:mutual} [{it:asym null}]})}dyad census of the new network{p_end}
 {synopt:{opt undirected}}generate an undirected network; default = directed{p_end}
 {synopt:{opth ntimes(int)}}number of random networks to be generated; default = 1{p_end}
 {synopt:{opt name}({it:{help newnetname}})}name of the new random network; default = {it:random}{p_end}
@@ -52,7 +55,10 @@ Alternatively, the overall density of the network can be specified with
 ( = {it:density * nodes}), where each tie has the same probability to exist.
 
 {pstd}
-Either {bf:prob()} or {bf:density()} needs to be specified.
+Lastly, once can also generate a random network that has a specific {help nwdyads:dyad census} using {opt census()} 
+
+{pstd}
+Either {bf:prob()}, {bf:density()} or {bf:census()} needs to be specified.
 
 {pstd}
 The command can also be used to generate many random networks at the same time. For example, the following command
@@ -76,6 +82,9 @@ The command can also be used to generate both complete ({bf:prob(1)}) and empty 
 	{cmd:. nwrandom 20, prob(.3) ntimes(5)}
 	{cmd:. nwrandom 10, prob(.2) undirected}
 	{cmd:. nwsummarize _all}
+	
+	{cmd:. nwrandom 200, census(100 2000)}
+	{cmd:. nwdyads}
 	
 
 {title:See also}

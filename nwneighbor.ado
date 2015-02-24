@@ -69,9 +69,14 @@ program nwneighbor
 	if temp_mat[1,1] == . {
 		local temp_rows = 0
 	}
+	
+	local neighbors_list1 ""
+	local neighbors_list2 ""
 	forvalues j = 1/`temp_rows' {
 		local temp =  temp_mat[`j',1]
 		local onelab : word `temp' of `labs'
+		local neighbors_list1 "`neighbors_list1' `temp'"
+		local neighbors_list2 "`neighbors_list2' `onelab'"
 		if `uselab' == 1{
 			di "{res}`onelab'" _continue
 		}
@@ -82,6 +87,8 @@ program nwneighbor
 			di "{txt} , " _continue
 		}
 	}
+	mata: st_global("r(neighbors_list1)", "`neighbors_list1'")
+	mata: st_global("r(neighbors_list2)", "`neighbors_list2'")
 	di ""
 	
 	di "{hline 40}"

@@ -138,9 +138,12 @@ real matrix distances(real matrix nw) {
 	found = nw
 	distance = nw
 	power = nw
-	
-	i= 1	
-	while (i<= (nodes / 2) & sum(found)< nodes*nodes - nodes ) {
+
+	num_found_previous = -1
+	num_found = 0
+	i = 1
+	while ((i<= (nodes / 2)) & (num_found < (nodes*nodes - nodes))) {
+	//while ((i<= (nodes / 2)) & (num_found < (nodes*nodes - nodes))  & (num_found > num_found_previous)) {
 		i = i+1
 		power = power * nw
 		power = power:/power
@@ -149,7 +152,9 @@ real matrix distances(real matrix nw) {
 		_editvalue(temp, -1, 0)
 		temp = temp * i
 		distance = distance + temp
+		num_found_previous = num_found
 		found = distance:/distance
+		num_found = sum(found)
 		_editmissing(found, 0)	
 	}
 	_editvalue(distance, 0, -1)

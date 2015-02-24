@@ -23,8 +23,10 @@ program nwvalue
 		local alterid = substr("`netname'", `a1', `a2')
 		local netname = substr("`netname'", 1, `n1')
 	}
-		
-	nwtomata `netname', mat(onenet)
+	
+	nwtomatafast `netname'
+	mata: onenet = `r(mata)'
+	//nwtomata `netname', mat(onenet)
 	capture mata: onenet`subset'
 	if _rc != 0 {
 		di "{err}{it:nwsubset} {bf:`subset'} invalid"
