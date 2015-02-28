@@ -48,7 +48,7 @@ program nwgenerate
 	local selectjob : word 1 of `job'*/
 	
 	local selectjob : word 2 of `netexp'
-	local nwgenopt "duplicate( dyadprob( geodesic( subset( homophily( lattice( path( permute( pref( random( reach( ring( small( transpose( evcent( context( degree( outdegree( indegree( isolates( components( lgc( clustering( closeness( farness( nearness( between("
+	local nwgenopt "large( duplicate( dyadprob( geodesic( subset( homophily( lattice( path( permute( pref( random( reach( ring( small( transpose( evcent( context( degree( outdegree( indegree( isolates( components( lgc( clustering( closeness( farness( nearness( between("
 	local whichjob : list  nwgenopt & selectjob
 	local netfcn : word count `whichjob'
 	
@@ -79,7 +79,7 @@ program nwgenerate
 		}
 	
 		nwrandom `nodes', prob(0) name(`netname') `undirected' `options' xvars `vars'
-		nwreplacemat `netname', newmat(_genmat) `vars'
+		nwreplacemat `netname', newmat(_genmat) `vars' xvars 
 	
 		mata: st_rclear()
 		nwname `netname'
@@ -105,41 +105,51 @@ program nwgenerate
 		local 0 `subopt'
 		syntax [anything(name=sub1)] [, *]
 		local sub2 `options'
+		
 		/*
 		di "netexp: `netexp'"
 		di "subopt: `subopt'"
 		di "sub1: `sub1'"
-		di "sub2: `sub2'
+		di "sub2: `sub2'"
 		di "options: `options'"*/
+		
 		/// NETWORK PRODUCING FUNCTIONS
 		/////////
+		// nwduplicate shortcut
+		qui if "`whichjob'" == "large(" {
+			noi _nwsyntax_other `sub1', max(9999)
+			tempvar _lgc
+			nwgen `_lgc' = lgc(`sub1')
+			nwduplicate `sub1',  name(`netname') 
+			nwkeep `netname' if `_lgc' == 1
+		}	
 		
 		// nwduplicate shortcut
 		qui if "`whichjob'" == "duplicate(" {
-			noi _nwsyntax_other `sub1', max(9999) name("othername")
+			noi _nwsyntax_other `sub1', max(9999) 
 			nwduplicate `sub1', `sub2' name(`netname') `fcn_opt'
 		}	
 		
 		// nwduplicate shortcut
 		qui if "`whichjob'" == "subset(" {
-			noi _nwsyntax_other `sub1', max(9999) name("othername")
+			noi _nwsyntax_other `sub1', max(9999)
 			nwsubset `sub1' `ifcond', `sub2' name(`netname') `fcn_opt'
 		}
 
 		// nwdyadprob shortcut
 		qui if "`whichjob'" == "dyadprob(" {
-			noi _nwsyntax_other `sub1', max(9999) name("othername")
+			noi _nwsyntax_other `sub1', max(9999) 
 			nwdyadprob `sub1', `sub2' name(`netname') `fcn_opt'
 		}	
 		
 		// nwgeodesic shortcut
 		qui if "`whichjob'" == "geodesic(" {
-			noi _nwsyntax_other `sub1', max(9999) name("othername")
+			noi _nwsyntax_other `sub1', max(9999) 
 			nwgeodesic `sub1', `sub2' name(`netname') `fcn_opt'
 		}
 		// nwgeodesic shortcut
 		qui if "`whichjob'" == "homophily(" {
-			noi _nwsyntax_other `sub1', max(9999) name("othername")
+			noi _nwsyntax_other `sub1', max(9999) 
 			nwhomophily `sub1', `sub2' name(`netname') `fcn_opt'
 		}
 		// nwlattice shortcut
@@ -148,12 +158,12 @@ program nwgenerate
 		}	
 		// nwlattice shortcut
 		qui if "`whichjob'" == "path(" {
-			noi _nwsyntax_other `sub1', max(9999) name("othername")
+			noi _nwsyntax_other `sub1', max(9999) 
 			nwpath `subopt', name(`netname') `fcn_opt'
 		}
 		// nwlattice shortcut
 		qui if "`whichjob'" == "permute(" {
-			noi _nwsyntax_other `sub1', max(9999) name("othername")
+			noi _nwsyntax_other `sub1', max(9999) 
 			nwpermute `sub1', `sub2' name(`netname') `fcn_opt'
 		}	
 		// nwpref shortcut
@@ -166,7 +176,7 @@ program nwgenerate
 		}	
 		// nwreach shortcut
 		qui if "`whichjob'" == "reach(" {
-			noi _nwsyntax_other `sub1', max(9999) name("othername")
+			noi _nwsyntax_other `sub1', max(9999) 
 			nwreach `sub1', `sub2' name(`netname') `fcn_opt'
 		}	
 		// nwring shortcut
@@ -179,7 +189,7 @@ program nwgenerate
 		}
 		// nwtranspose shortcut
 		qui if "`whichjob'" == "transpose(" {
-			noi _nwsyntax_other `sub1', max(9999) name("othername")
+			noi _nwsyntax_other `sub1', max(9999)
 			nwtranspose `sub1', `sub2' name(`netname') `fcn_opt'
 		}	
 		

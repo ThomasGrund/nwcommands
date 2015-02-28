@@ -22,12 +22,15 @@
 {p2col:{bf:{help nwclear }}}Clear all networks and variables from memory{p_end}
 {p2col:{bf:{help nwcloseness }}}Calculate closeness centrality{p_end}
 {p2col:{bf:{help nwclustering }}}Clustering coefficient{p_end}
+{p2col:{bf:{help nwcollapse }}}Collapse a network{p_end}
 {p2col:{bf:{help nwcomponents }}}Calculate network components / largest component{p_end}
 {p2col:{bf:{help nwcompressobs }}}Compresses observations in Stata{p_end}
+{p2col:{bf:{help nwconcor }}}{err}no help file yet{txt}{p_end}
 {p2col:{bf:{help nwcontext }}}Create a context variable{p_end}
 {p2col:{bf:{help nwcorrelate }}}Correlate networks and variables{p_end}
 {p2col:{bf:{help nwcurrent }}}Report and set current network{p_end}
 {p2col:{bf:{help nwdegree }}}Degree centrality and distribution{p_end}
+{p2col:{bf:{help nwdissimilar }}}{err}no help file yet{txt}{p_end}
 {p2col:{bf:{help nwdrop }}}Drop a network (or only some nodes){p_end}
 {p2col:{bf:{help nwdropnodes }}}Drop nodes from a network{p_end}
 {p2col:{bf:{help nwds }}}List networks matching name patterns{p_end}
@@ -80,6 +83,7 @@
 {p2col:{bf:{help nwtabulate }}}{p_end}
 {p2col:{bf:{help nwtoedge }}}Convert network into edgelist{p_end}
 {p2col:{bf:{help nwtomata }}}Return adjacency matrix of network{p_end}
+{p2col:{bf:{help nwtomatafast }}}{err}no help file yet{txt}{p_end}
 {p2col:{bf:{help nwtostata }}}{err}no help file yet{txt}{p_end}
 {p2col:{bf:{help nwtranspose }}}Transpose a network{p_end}
 {p2col:{bf:{help nwtriads }}}Triad census of the network{p_end{p_end}

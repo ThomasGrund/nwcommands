@@ -54,19 +54,19 @@ each node in a network.
  
 {phang2}{opth between(netname)} [, {opt nosym}]
 {p_end}
-{pmore2}Calculates the betweenness centrality of network nodes (see {help nwbetween}).
+{pmore2}Calculate the betweenness centrality of network nodes (see {help nwbetween}).
  
 {phang2}{opth closeness(netname)} [, {opth unconnected(integer)} {opt nosym}]
 {p_end}
-{pmore2}Calculates the closeness centrality of network nodes (see {help nwcloseness}).
+{pmore2}Calculate the closeness centrality of network nodes (see {help nwcloseness}).
 
 {phang2}{opth clustering(netname)}
 {p_end}
-{pmore2}Calculates the clustering coefficient of network nodes (see {help nwclustering}).
+{pmore2}Calculate the clustering coefficient of network nodes (see {help nwclustering}).
 
 {phang2}{opth components(netname)} 
 {p_end}
-{pmore2}Returns the component membership of nodes (see {help nwcomponents}).
+{pmore2}Return the component membership of nodes (see {help nwcomponents}).
 
 {phang2}{opth context(netname)} [,
 {opt attribute}({help varname})
@@ -76,23 +76,23 @@ each node in a network.
 {opt mat}(string)
 {opt noweight}]
 {p_end}
-{pmore2}Generates a context variable based on attributes of a node's neighbors (see {help nwcontext}).
+{pmore2}Generate a context variable based on attributes of a node's neighbors (see {help nwcontext}).
 				 
 {phang2}{opth degree(netname)}
 {p_end}
-{pmore2}Calculates the degree centrality of network nodes. When the network is directed, the outdegree is returned (see {help nwdegree}).
+{pmore2}Calculate the degree centrality of network nodes. When the network is directed, the outdegree is returned (see {help nwdegree}).
 
 {phang2}{opth evcent(netname)}
 {p_end}
-{pmore2}Calculates the eigenvector centrality of network nodes (see {help nwevcent}).
+{pmore2}Calculate the eigenvector centrality of network nodes (see {help nwevcent}).
 
 {phang2}{opth farness(netname)} 
 {p_end}
-{pmore2}Calculates the farness of network nodes (see {help nwcloseness}).
+{pmore2}Calculate the farness of network nodes (see {help nwcloseness}).
 
 {phang2}{opth indegree(netname)}
 {p_end}
-{pmore2}Returns the indegree of network nodes. When the network is undirected, the degree is returned (see {help nwdegree}).
+{pmore2}Return the indegree of network nodes. When the network is undirected, the degree is returned (see {help nwdegree}).
 
 {phang2}{opth isolates(netname)}
 {p_end}
@@ -100,15 +100,15 @@ each node in a network.
 
 {phang2}{opth lgc(netname)} 
 {p_end}
-{pmore2}Calculates largest component of the network (see {help nwcomponents}).
+{pmore2}Calculate membership to largest component as variable (see {help nwcomponents}).
 
 {phang2}{opth nearness(netname)} 
 {p_end}
-{pmore2}Calculates the nearness of network nodes (see {help nwcloseness}).
+{pmore2}Calculate the nearness of network nodes (see {help nwcloseness}).
 
 {phang2}{opth outdegree(netname)}
 {p_end}
-{pmore2}Returns the outdegree of network nodes. When the network is undirected, the degree is returned (see {help nwdegree}).
+{pmore2}Return the outdegree of network nodes. When the network is undirected, the degree is returned (see {help nwdegree}).
 
 
 {pstd}
@@ -153,6 +153,10 @@ The command can also be used to generate networks. There are two ways to do this
 {phang2}{opt lattice}({it:{help int:rows cols}}) [, {opt undirected} {opt xwrap} {opt ywrap} {opt xvars}] 
 {p_end}
 {pmore2}Generate a lattice network (see {help nwlattice}).
+
+{phang2}{opth large(netname)}
+{p_end}
+{pmore2}Extract the largest component as a network.
 
 {phang2}{opth path(netname)}, {opth ego(nodeid)} {opth alter(nodeid)} [{opth length(int)} {opt sym} {opt xvars}] 
 {p_end}

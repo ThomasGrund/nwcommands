@@ -59,7 +59,7 @@ program _nwsyntax
 	
 	nwname `lastnet'
 	local netid = r(id)
-	mata: _diag(nw_mata`netid', 0)
+	//mata: _diag(nw_mata`netid', 0)
 	
 	c_local `id' "`r(id)'"		
 	c_local `netname' "`_temp'"

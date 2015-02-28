@@ -22,15 +22,21 @@ program nwsort
 		putmata `attribute',  replace
 	}
 	sort `by', `stable'
-	qui putmata permutationVec = _running, replace
+	putmata permutationVec = _running, replace
 	qui nwname `netname', newlabsfromvar(_nodelab)
 	restore
 
 	mata: nw_mata`id' =  nw_mata`id'[permutationVec,permutationVec]
 	
 	foreach oneatt in `attribute' {
+		capture confirm numeric variable `oneatt'
 		mata: `oneatt' = `oneatt'[permutationVec]
-		mata: st_store((1::`nodes'),"`oneatt'", `oneatt')
+		if _rc == 0 {
+			mata: st_store((1::`nodes'),"`oneatt'", `oneatt')
+		}
+		else {
+			mata: st_sstore((1::`nodes'),"`oneatt'", `oneatt')
+		}
 		capture mata: mata drop `oneatt'
 	}
 	

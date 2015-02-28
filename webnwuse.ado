@@ -45,6 +45,7 @@ program webnwuse
 	else {
 		nwuse `thispath'/`webname', `options'
 	}
+	nwload, labelonly
 end
 
 

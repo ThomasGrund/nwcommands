@@ -1,5 +1,5 @@
 {smcl}
-{* *! version  20feb2015}{...}
+{* *! version  28feb2015}{...}
 {phang}
 {help nwcommands:NW-2 topical} {hline 2} 
 {hline 2} Topical list of network commands
@@ -57,6 +57,7 @@
 {col 8}{hline 3}{c RT}       {it:Generators}{col 36}{c LT}{hline}
 {col 8}   {c BLC}{hline 24}{c BRC}
 {p2colset 12 35 36 2}
+{p2col:    {bf:{help nwcollapse }}}Collapse a network{p_end}
 {p2col:    {bf:{help nwduplicate }}}Duplicate a network{p_end}
 {p2col:    {bf:{help nwdyadprob }}}Generate a network based on tie probabilities{p_end}
 {p2col:    {bf:{help nwexpand }}}Expand variable to network{p_end}
@@ -95,6 +96,7 @@
 {col 8}   {c BLC}{hline 24}{c BRC}
 {p2colset 12 35 36 2}
 {p2col:    {bf:{help nwaddnodes }}}Add nodes to network{p_end}
+{p2col:    {bf:{help nwcollapse }}}Collapse a network{p_end}
 {p2col:    {bf:{help nwdrop }}}Drop a network (or only some nodes){p_end}
 {p2col:    {bf:{help nwdropnodes }}}Drop nodes from a network{p_end}
 {p2col:    {bf:{help nwkeep }}}Keep a network (or only certain nodes){p_end}
@@ -183,5 +185,8 @@
 {p2col:{bf:{help _nwsetobs }}}{err}no help file yet{txt}{p_end}
 {p2col:{bf:{help _nwsyntax_other }}}{err}no help file yet{txt}{p_end}
 {p2col:{bf:{help _opts_oneof }}}{err}no help file yet{txt}{p_end}
+{p2col:{bf:{help nwconcor }}}{err}no help file yet{txt}{p_end}
+{p2col:{bf:{help nwdissimilar }}}{err}no help file yet{txt}{p_end}
 {p2col:{bf:{help nwequiv }}}{err}no help file yet{txt}{p_end}
+{p2col:{bf:{help nwtomatafast }}}{err}no help file yet{txt}{p_end}
 {p2col:{bf:{help nwtostata }}}{err}no help file yet{txt}{p_end}

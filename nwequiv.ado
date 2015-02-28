@@ -1,12 +1,12 @@
 capture program drop nwequiv
 program nwequiv
-	syntax [anything(name=netname)] [, type(string) iter(integer 3) generate(string) mode(string) *]
+	syntax [anything(name=netname)] [, plot image type(string) iter(integer 3) generate(string) mode(string) *]
 	
 	if "`generate'" == "" {
 		local generate "_eqvclass"
 	}
 
-	local name = "equivalence"
+	local name = "_equiv"
 	nwvalidate `name'
 	local name = r(validname)
 		
@@ -63,7 +63,7 @@ program nwequiv
 		}
 		nwdrop __temp_geodesic
 	}
-	if ("`type'" == "regular"){
+	qui if ("`type'" == "regular"){
 		mata: S = regularEquivalence(onenet, `iter')
 		capture nwdrop _regEquiv
 		nwset, mat(S) name(`name')
@@ -79,11 +79,26 @@ program nwequiv
 	qui replace `comp' = -1 if `isol' == 1
 	qui egen `generate' = group(`comp')
 	label variable `generate' "`generate'"
-	tab `generate', `options'
-	
+	tab `generate'
 	capture mata: mata drop S
 	capture mata: mata drop onenet
 	capture nwdrop __equiv
+	if "`plot'" != "" {
+		nwplotmatrix `netname', group(`generate') lab
+	}
+	
+	capture nwdrop _image
+	qui nwcollapse `netname', by(`generate') name(_image)
+	
+	_nwsyntax _image
+	local labs ""
+	forvalues i = 1/ `nodes' {
+		local labs "`labs' Block_`i'"
+	}
+	nwname _image, newlabs(`labs')
+	if "`image'" != "" {
+		nwplotmatrix _image, lab
+	}
 
 end
 
@@ -191,7 +206,7 @@ real matrix getSimilarity(real matrix X,real matrix S) {
 	S_new = S
 	for(i=1; i<= rows(X);i++){
 		for(j=1;j<= rows(X);j++){
-			S_new[i,j] = getMatch(X,S_new,i,j)
+			S_new[i,j] = getMatch(X,S,i,j)
 		}
 	}
 	return(S_new)
@@ -207,7 +222,6 @@ real scalar getMatch(X,S,a,e) {
 	temp = (1::nodes)
 	
 	a_outties = (editvalue((X[a,.] - X[.,a]'),-1,0))'
-	a_outties
 	a_out = select(temp, a_outties)
 	a_inties = (editvalue((X[.,a]' - X[a,.]),-1,0))'
 	a_in = select(temp, a_inties)

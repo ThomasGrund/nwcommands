@@ -18,16 +18,18 @@
 [{it:{help if}}]
 [{cmd:,}
 {opth sortby(varname)}
+{opt group}({it:{help varname}}, [{it:{help connect_options}}])
 {it:{help nwplotmatrix##label_options:label_options}}
 {it:{help nwplotmatrix##patch_options:patch_options}}
 {it:{help twoway_options}}]
 
 
 	
-{synoptset 25}{...}
+{synoptset 35}{...}
 {p2col:{it:options}}Description{p_end}
 {p2line}
 {p2col:{opth sortby(varname)}}sort network nodes before plotting{p_end}
+{p2col:{opt group}({it:{help varname}}, [{it:{help connect_options}}])}group nodes by categorical variable{p_end}
 {p2col:{it:{help nwplotmatrix##label_options:label_options}}}display and change look of
        axis labels{p_end}
 {p2col:{it:{help nwplotmatrix##patch_options:patch_options}}}change look of patches (e.g. color, tievalue){p_end}
@@ -115,6 +117,19 @@ the legend is filled with the tie values of the network, but one can also overwr
 
 	{cmd:. nwplotmatrix flomarriage, tievalue legend(on)}	
 	{cmd:. nwplotmatrix flomarriage, tievalue legend(on order(1 "no_tie" 2 "tie"))}	
+
+{pstd}
+The option {opth group(varname)} sorts the nodes by {help varname} first and then adds lines
+to the sociomatrix to separate groups from each other. The example generates the variable seat, 
+which is one when a family had some seats in the council.
+
+	{cmd:. gen seat = (priorates != 0)}
+	{cmd:. nwplotmatrix flomarriage, group(seat)}	
+
+{pstd}
+All normal {help connect_options:options for lines} can be applied as well.
+
+	{cmd:. nwplotmatrix flomarriage, group(seat, lcolor(green))}	
 	
 {pstd}
 By default, networks are plotted dichotomized unless specified otherwise.

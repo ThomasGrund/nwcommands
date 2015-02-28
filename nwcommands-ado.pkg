@@ -2,7 +2,7 @@ v 3
 d nwcommands-ado. Social Network Analysis Using Stata
 d Thomas U. Grund, Linkoping University, www.liu.se/ias
 d email: contact@nwcommands.org
-d Distribution-Date: 20feb2015
+d Distribution-Date: 28feb2015
 f _extract_valuelabels.ado
 f _nwdeploy.ado
 f _nwdialog.ado
@@ -21,12 +21,15 @@ f nwbetween.ado
 f nwclear.ado
 f nwcloseness.ado
 f nwclustering.ado
+f nwcollapse.ado
 f nwcomponents.ado
 f nwcompressobs.ado
+f nwconcor.ado
 f nwcontext.ado
 f nwcorrelate.ado
 f nwcurrent.ado
 f nwdegree.ado
+f nwdissimilar.ado
 f nwdrop.ado
 f nwdropnodes.ado
 f nwds.ado
@@ -79,6 +82,7 @@ f nwsync.ado
 f nwtabulate.ado
 f nwtoedge.ado
 f nwtomata.ado
+f nwtomatafast.ado
 f nwtostata.ado
 f nwtranspose.ado
 f nwtriads.ado
@@ -92,6 +96,10 @@ f webnwuse.ado
 f florentine.dta
 f gang.dta
 f gang2.dta
+f glasgow.dta
+f klas12b.dta
+f plotdata.dta
+f test.dta
 f scheme-s1network.scheme
 f scheme-s2network.scheme
 f scheme-s3network.scheme

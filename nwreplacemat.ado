@@ -1,7 +1,7 @@
 capture program drop nwreplacemat
 program nwreplacemat
 	version 9.0
-	syntax anything(name=netname), newmat(string) [vars(string) labs(string) nosync netonly]
+	syntax anything(name=netname), newmat(string) [vars(string) labs(string) nosync netonly xvars]
 	_nwsyntax `netname', max(1)
 	
 	capture mat list `newmat'
@@ -38,8 +38,8 @@ program nwreplacemat
 		}
 		else {
 			nwdrop `netname', `netonly'
-			nwrandom `nodes', prob(1) name(`netname') vars(`vars') labs(`labs')
-			nwreplacemat `netname', newmat(`newmat') `nosync' 
+			nwrandom `nodes', prob(1) name(`netname') vars(`vars') labs(`labs') xvars
+			nwreplacemat `netname', newmat(`newmat') `nosync' `xvars'
 			// delete empty observations in Stata
 			nwcompressobs
 		}

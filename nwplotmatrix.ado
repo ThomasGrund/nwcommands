@@ -9,9 +9,10 @@
 
 capture program drop nwplotmatrix
 program nwplotmatrix
-	syntax [anything(name=netname)] [if] ,[ * sortby(varlist) lab label(varname) ylabel(string) xlabel(string) NODichotomize BAckground(string) labelopt(string) legendopt(string asis) COlorpalette(string) LColor(string) legend(string asis) tievalue tievalueopt(string) ]
+	syntax [anything(name=netname)] [if] ,[ * sortby(varlist) group(string) lab label(varname) ylabel(string) xlabel(string) NODichotomize BAckground(string) labelopt(string) legendopt(string asis) COlorpalette(string) LColor(string) legend(string asis) tievalue tievalueopt(string) ]
 	_nwsyntax `netname'
 
+	local onenodes `nodes'
 	gettoken temp ylabel : ylabel, parse(",")
 	gettoken temp xlabel : xlabel, parse(",")
 	if substr(`"`ylabel'"',1,1) == "," {
@@ -46,7 +47,19 @@ program nwplotmatrix
 		local netname "__temp_if"
 		drop if _n > `othernodes' 
 	}
-	
+	local oldoptions "`options'"
+		
+	local oldlcolor "`lcolor'"
+	qui if "`group'" != "" {
+		local 0 "`group'"
+		syntax anything(name=groupvar) [, lcolor(string) *]
+		local groupopt `options'
+		local sortby "`groupvar' `sortby'"
+		if "`lcolor'" == "" {
+			local lcolor `""scheme p2line""'
+		}
+	}
+
 	// deal with sorting
     qui if "`sortby'" != "" {
 		if "`lab" != "" {
@@ -54,12 +67,25 @@ program nwplotmatrix
 			local nl "_nodelab"
 		}
 		gen `originalSorting' = _n
-		list `label'
-		nwsort `netname', by(`sortby') attributes(`originalSorting' `label')
-		list `label'
+		nwsort `netname', by(`sortby') attributes(`originalSorting' `label' `groupvar')
 	}
+	local xlines ""
 
-	qui nwsociomatrix_noif `netname', `options' `lab' label(`label') `nodichotomize' background(`background') ylabel(`labelopt' `ylabel') xlabel(`labelopt' `xlabel') legendopt(`legendopt') color(`colorpalette') lcolor(`lcolor') legend(`legend') `tievalue' tievalueopt(`tievalueopt')
+	qui if "`group'" != "" {
+		local groupopt "`options'"
+		forvalues i = 2/`onenodes' {
+			if (`groupvar'[`i'] != `groupvar'[`=`i'-1']) {
+				local xlines "`xlines' `=`i'-0.5'"
+				local ylines "`ylines' `=2 - `i' - 0.5'"
+			}
+		}
+		local xlinecmd `"xline(`xlines', `groupopt' lcolor(`lcolor'))"'
+		local ylinecmd `"yline(`ylines', `groupopt' lcolor(`lcolor'))"'
+	}
+	local options "`oldoptions'"
+
+	local lcolor `"`oldlcolor'"'
+	qui nwsociomatrix_noif `netname', `xlinecmd' `ylinecmd' `lab' label(`label') `nodichotomize' background(`background') ylabel(`labelopt' `ylabel') xlabel(`labelopt' `xlabel') legendopt(`legendopt') color(`colorpalette') lcolor(`lcolor') legend(`legend') `tievalue' tievalueopt(`tievalueopt') `options'
 	
 	capture nwdrop __temp*
 	restore
@@ -69,7 +95,7 @@ end
 
 capture program drop nwsociomatrix_noif	
 program nwsociomatrix_noif
-	syntax [anything(name=netname)] [if] ,[ * sortby(varlist) lab label(varname) nodichotomize BAckground(string) ylabel(string) xlabel(string) legendopt(string asis) COlor(string) LColor(string) legend(string asis) tievalue tievalueopt(string) ]
+	syntax [anything(name=netname)] [if] ,[ gap(real 0.1) sortby(varlist) lab label(varname) nodichotomize BAckground(string) ylabel(string) xlabel(string) legendopt(string asis) COlor(string) LColor(string) legend(string asis) tievalue tievalueopt(string) * ]
 
 	_nwsyntax `netname', max(1)
 
@@ -134,7 +160,7 @@ program nwsociomatrix_noif
 	else {
 		local legend "off"
 	}
-	plotmatrix, `lab' label(`label') legend(`legend') `freq' tievalueopt(`tievalueopt') `maxticks' `split' ylabel(, angle(0) `ylabel') xlabel(, angle(90) `xlabel') aspect(1) mat(onenet) background(`background') color(`color') lcolor(`lcolor') `options'  
+	plotmatrix, gap(`gap') `lab' label(`label') legend(`legend') `freq' tievalueopt(`tievalueopt') `maxticks' `split' ylabel(, angle(0) `ylabel') xlabel(, angle(90) `xlabel') aspect(1) mat(onenet) background(`background') color(`color') lcolor(`lcolor') `options'  
 end
 
 // The following code cas been modified....
@@ -159,7 +185,7 @@ v 1.20 24Apr2014  Bug? -- skipping allcolors if the graph is null is now removed
 capture program drop plotmatrix
 prog def  plotmatrix
 version 10.1
-syntax , Mat(name) [,ifvar(varname) originalnodes(integer 0) legend(string asis) Split(numlist) lab label(varname) tievalueopt(string) background(string) Color(string) LColor(string) Upper Lower MAXTicks(integer 8) FREQ FORMATCELLS(string) *]
+syntax , Mat(name) [,ifvar(varname) gap(real 0.05) originalnodes(integer 0) legend(string asis) Split(numlist) lab label(varname) tievalueopt(string) background(string) Color(string) LColor(string) Upper Lower MAXTicks(integer 8) FREQ FORMATCELLS(string) *]
 local twoway_opt "`options'"
 set more off
 
@@ -294,7 +320,7 @@ local i 1
 			
 			capture local bcolor : word `=`i'-1' of `color'
 			if "`bcolor'" == "" {
-				local bc `""scheme p`=`i''area""'
+				local bc `""scheme p`=`i'-1'color""'
 			}
 			else {
 				local bc `"`bcolor'"'
@@ -375,9 +401,16 @@ if "`freq'"~="" {
   local txt "`txt'||(scatter newy _stack, mlab(col1) mlabcolor(black) mlabposition(0) ms(i) `tievalueopt')"
 } 
 
-//noi di `"twoway `txt', `scaleOff' legend(`legend') xlabel(`xlab', nogrid) ylabel(`ylab', nogrid) xtitle("") ytitle("") graphregion( c(white) lp(blank))  `twoway_opt'"'
+gen temp = mod(_n,5)
+replace xx = xx - `gap' if temp == 1 | temp == 4
+replace xx = xx + `gap' if temp == 2 | temp == 3
 
-twoway `txt', `scaleOff' legend(`legend') xlabel(`xlab', nogrid) ylabel(`ylab', nogrid) xtitle("") ytitle("") graphregion( c(white) lp(blank)) `twoway_opt'
+replace yy = yy + `gap' if (temp == 1 | temp == 2) 
+replace yy = yy - `gap' if (temp == 3 | temp == 4) 
+
+twoway `txt', `scaleOff' legend(`legend') xlabel(`xlab', nogrid) ylabel(`ylab', nogrid) xtitle("") ytitle("") graphregion( c(white) lp(blank)) `twoway_opt' 
+
+di `"twoway `txt', `scaleOff' legend(`legend') xlabel(`xlab', nogrid) ylabel(`ylab', nogrid) xtitle("") ytitle("") graphregion( c(white) lp(blank)) `twoway_opt' "'
 
 end
 

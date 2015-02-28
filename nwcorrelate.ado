@@ -3,11 +3,55 @@
 *! Author      : Thomas Grund, Link0ping University
 *! Email	   : contact@nwcommands.org
 
-capture program drop nwcorrelate	
+capture program drop nwcorrelate
 program nwcorrelate
-syntax [anything(name=netnames)] [,  mode(string) ATTRibute(string) PERMutations(integer 1) SAVe(string asis) *]
+	syntax [anything(name=netname)] [, ATTribute(string) * ]
+	_nwsyntax `netname', min(1) max(2)
+	
+	if "`attribute'"!= "" {
+		nwcorrelate_nets `netname', attribute(`attribute') `options'
+	}
+	if `networks' == 2 {
+		nwcorrelate_nets `netname', `options'
+	}
+	if `networks' == 1 & "`attribute'" == ""{
+		nwcorrelate_nodes `netname', `options'
+	}
+end
 
-	_nwsyntax `netnames', max(2)
+capture program drop nwcorrelate_nodes
+program nwcorrelate_nodes
+	syntax [anything(name=netname)] [, name(string) context(string)]
+	_nwsyntax `netname'
+	
+	if "`name'" == "" {
+		local name = "_corr"
+	}
+	
+	local neighborhood = 1
+	if "`context'" == "incoming" {
+		local neighborhood = 2
+	}
+	if "`context'" == "both" {
+		local neighborhood = 3
+	}
+	nwtomatafast `netname'
+	nwset, mat(correlate_nodes(`r(mata)', `neighborhood')) name("`name'")	
+	nwtomatafast
+	mata: st_numscalar("r(avg_corr)", ((sum(`r(mata)') - cols(`r(mata)')) / ( cols(`r(mata)') * (cols(`r(mata)') - 1))))
+	mata: st_global("r(name)", "`netname'")
+	di 
+	di "{txt}  Network name: {res}`r(name)'"
+	di "{hline 40}"
+	di "{txt}    Average Correlation Between Nodes: {res}`r(avg_corr)'"
+end
+
+
+capture program drop nwcorrelate_nets	
+program nwcorrelate_nets
+syntax [anything(name=netnames)] [,  context(string) mode(string) ATTRibute(string) PERMutations(integer 1) SAVe(string asis) *]
+
+	_nwsyntax `netnames', max(2) min(1)
 	local netnames `netname'
 	// Set mode.
 	if "`mode'" == "" {
@@ -38,6 +82,7 @@ syntax [anything(name=netnames)] [,  mode(string) ATTRibute(string) PERMutations
 		local net2 = word("`netnames'",2)
 	}
 	
+
 	// Check that networks exists.
 	nwname `net1'
 	local id1 = r(id)
@@ -155,8 +200,67 @@ end
 
 capture mata mata drop correlate_nets_rep()
 capture mata mata drop correlate_nets()
-
+capture mata: mata drop correlate_nodes()
 mata:
+
+real matrix correlate_nodes(real matrix net, scalar outinboth){
+
+	C = J(rows(net), cols(net), 0)
+	for(i = 1; i<= rows(net); i++){
+		for(j = 2; j<= cols(net); j++){
+			selection = J(1, cols(net), 1)
+			selection[i] = 0
+			selection[j] = 0
+			i_outvec = (select(net[i,.], selection))'
+			i_invec = (select(net[.,i]', selection))'	
+			j_outvec = (select(net[j,.], selection))'
+			j_invec = (select(net[.,j]', selection))'
+			
+			if (outinboth == 1) {
+				temp = J(rows(i_outvec), 2, 0)
+				temp[.,1] = i_outvec
+				temp[.,2] = j_outvec
+				Corr = correlation(temp)
+				
+				if (Corr[2,1]==.){
+					Corr[2,1] = (1 - 2 * (sum((i_outvec :- j_outvec):^2) / rows(i_outvec)))
+				}
+				C[i,j] = Corr[2,1]
+			}
+			if (outinboth == 2) {
+				temp = J(rows(i_invec), 2, 0)
+				temp[.,1] = i_intvec
+				temp[.,2] = j_invec
+				Corr = correlation(temp)
+				
+				if (Corr[2,1]==.){
+					Corr[2,1] = (1 - 2 * (sum((i_invec :- j_invec):^2) / rows(i_invec)))
+				}
+				C[i,j] = Corr[2,1]
+			}
+			if (outinboth == 3) {
+				num_cols = cols(i_outvec)
+				num_rows = rows(i_invec)
+				num =  nim_cols + num_rows
+				temp = J(num,2,0)
+				temp[(1::num_cols),1] = i_outvec
+				temp[((num_cols + 1)::num),1] = i_invec
+				temp[(1::num_cols),2] = j_outvec
+				temp[((num_cols + 1)::num),2] = j_invec			
+
+				Corr = correlation(temp)
+				
+				if (Corr[2,1]==.){
+					Corr[2,1] = (1 - 2 * (sum((i_invec :- j_invec):^2) / rows(i_invec)))
+				}
+				C[i,j] = Corr[2,1]
+			}
+		}
+	}
+	return(C)
+}
+
+
 real matrix correlate_nets_rep(real scalar reps, real matrix net1, real matrix net2){
 	temp_net1 = net1
 	nsize = rows(temp_net1)
@@ -170,19 +274,13 @@ real matrix correlate_nets_rep(real scalar reps, real matrix net1, real matrix n
 }
 
 real scalar correlate_nets(real matrix net1, real matrix net2){
-	net1mean = sum(net1) / ( rows(net1) * rows(net1) - rows(net1))
-	net2mean = sum(net2) / ( rows(net2) * rows(net2) - rows(net2))
-	mean1 = J(rows(net1), rows(net1), net1mean)
-	mean2 = J(rows(net2), rows(net2), net2mean)
-	_diag(mean1, J(rows(net1), 1, 0))
-	_diag(mean2, J(rows(net2), 1, 0))
-	temp1 = net1 :- mean1
-	temp2 = net2 :- mean2
-	temp1sq = temp1 :* temp1
-	temp2sq = temp2 :* temp2
-	t1t2 = ((temp1 :* temp2))
-	nominator = sum(t1t2)
-	denominator = sqrt(sum(temp1sq) * sum(temp2sq))	
-	return(nominator/denominator)
+	r = rows(net1)
+	c = cols(net1)
+	Z = J(r,c,1) - I(r,c)
+	temp = J((r * (c - 1)),2, 0)
+	temp[.,1] = select(vec(net1), vec(Z))
+	temp[.,2] = select(vec(net2), vec(Z))
+	corr = correlation(temp)
+	return(corr[2,1])
 }
 end
