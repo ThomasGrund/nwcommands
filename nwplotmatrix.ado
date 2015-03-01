@@ -50,10 +50,11 @@ program nwplotmatrix
 	local oldoptions "`options'"
 		
 	local oldlcolor "`lcolor'"
-	qui if "`group'" != "" {
+    qui if "`group'" != "" {
 		local 0 "`group'"
-		syntax anything(name=groupvar) [, lcolor(string) *]
-		local groupopt `options'
+		syntax varlist(min=1 max=1) [, lcolor(string) *]
+		local groupvar "`varlist'"
+		local groupopt "`options'"
 		local sortby "`groupvar' `sortby'"
 		if "`lcolor'" == "" {
 			local lcolor `""scheme p2line""'

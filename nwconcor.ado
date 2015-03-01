@@ -8,13 +8,14 @@ program nwconcor
 	}
 	capture drop `generate'
 	
-	nwconcor_level0 `netname',  generate(`generate') `options'
+	qui nwconcor_level0 `netname',  generate(`generate') `options'
 	
-	if `blocks' > 2 {
-	
-		tab `generate' , matcell(tabresult) matrow(tabvalue)
+	tempvar temp_eqv
+	tempname __temp_if
+	forvalues j = 3/`blocks' {
+		qui tab `generate' , matcell(tabresult) matrow(tabvalue)
 		local maxrow = 1
-		local rows = `rowsof(tabresult)'
+		local rows = rowsof(tabresult)
 		forvalues i = 1/`rows' {
 			if (tabresult[`i',1] > tabresult[`maxrow',1]){
 				local maxrow = `i'
@@ -22,20 +23,31 @@ program nwconcor
 		}
 		local maxvalue = tabvalue[`maxrow',1]
 		local ifcond "(`generate' ==  `maxvalue')"
-		
-		tempvar ifcond_var
-		gen `ifcond_var' = `ifcond' 
-		mata: st_view(ifcond=., (1::`nodes'), "`ifcond'")
+		capture drop __ifcond
+		gen __ifcond = `ifcond' 
+
+
+		nwgen `__temp_if' = `netname' if `ifcond'
+		mata: if_max = sum(ifcond)
+		local newblocks = `blocks' - 1
+	    nwconcor_level0 `__temp_if', generate(`temp_eqv') `options' 
+		_nwsyntax `netname'
+		mata: st_view(ifcond=., (1::`nodes'), "__ifcond")
 		mata: st_view(eqv=., (1::`nodes'), "`generate'")
 		mata: st_select(new_eqv=., eqv, ifcond)
-		
-		nwgen __temp_if = `netname' if `ifcond'
-		tempvar temp_eqv
-		nwconcor_level0 __temp_if, generate(`temp_eqv') blocks(2) `options'
-		mata: st_view(temp_eqv=.,(1::`nodes'), "`temp_eqv'")
-		mata: new_eqv = temp_eqv
+		mata: st_view(temp_eqv=.,(1::if_max), "`temp_eqv'")
+		mata: temp_eqv = temp_eqv:+ (`j' * 10)
+		mata: new_eqv[.,.] = temp_eqv[.,.]
+		capture nwdrop `__temp_if'
+		capture drop `temp_eqv'
+		capture drop __ifcond
+
 	}
-	
+	tempvar final
+	qui egen `final' = group(`generate')
+	qui replace `generate' = `final'
+	tab `generate'
+end
 
 
 capture program drop nwconcor_level0
@@ -64,12 +76,13 @@ program nwconcor_level0
 	forvalues i = 1/ `iter' {
 		mata: onenet = correlate_nodes(onenet, `neighborhood')
 	}
-	//mata: _editvalue(onenet, -1, 0)
 	mata: _diag(onenet,0)
 	mata: onenet = round(onenet)
 	mata: _editvalue(onenet, -1, 0)
 	nwset, mat(onenet) name(`name')
-	nwcomponents `name', generate(`generate')
+	nwgen `generate' = lgc(`name')
+	noi tab `generate'
+	//nwdrop `name'
 end
 
 

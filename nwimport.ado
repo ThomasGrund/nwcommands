@@ -46,7 +46,7 @@ program nwimport
 		 capture _nwimport_matrix `fname', `options'
 	}
 	if "`import_type'" == "compressed" {
-		 capture _nwimport_compressed `fname', `options'
+		 _nwimport_compressed `fname', `options'
 	}
 	if "`import_type'" == "edgelist" {
 		 capture _nwimport_edgelist `fname', `options'
@@ -811,7 +811,7 @@ program _nwimport_compressed
 	preserve
 	clear
 
-	import delimited `anything', delimiter(`delimiter') clear
+	import delimited `anything', delimiter(`delimiter') varnames(noname) clear
 	rename v1 ego
 	
 	reshape long v, i(ego) j(j)
@@ -819,9 +819,8 @@ program _nwimport_compressed
 
 	// needed to deal with isolates
 	replace alter = ego if alter == ""
-	
 	nwfromedge ego alter, `directed' `undirected' `xvars' name(`name')
-	restore
+	//restore
 	if "`xvars'" == "" {
 		nwload
 	}

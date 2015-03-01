@@ -38,7 +38,7 @@ program nwreplacemat
 		}
 		else {
 			nwdrop `netname', `netonly'
-			nwrandom `nodes', prob(1) name(`netname') vars(`vars') labs(`labs') xvars
+			nwrandom `nodes', prob(1) name(`netname') vars(`vars') labs(`labs') `xvars'
 			nwreplacemat `netname', newmat(`newmat') `nosync' `xvars'
 			// delete empty observations in Stata
 			nwcompressobs

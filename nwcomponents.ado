@@ -76,17 +76,17 @@ program nwcomponents, rclass
 
 		
 		qui if "`lgc'" != "" {
-			tempvar running
-			gen `running' = _n
-			tempvar compmemb
-			tempvar temp
-			gen `temp' = 1
-			bys `generate'`k' : egen `compmemb' = total(`temp')
-			sum `compmemb'
-			replace `generate'`k' = (`r(max)' == `compmemb'[_n])
-			replace `generate'`k' = . if _n > `nodes'
-			sort `running'
-			
+			tab `generate'`k', matcell(freqs) matrow(comps)
+			local freqs_max = 1
+			local freqs_all = rowsof(freqs)
+			forvalues i = 1/`freqs_all' {
+				if freqs[`freqs_max',1] < freqs[`i',1] {
+					local freqs_max = `i'
+				}
+			}
+			local comps_lgc = comps[`freqs_max',1]
+			replace `generate'`k' = 0 if `generate'`k' != `comps_lgc' & `generate'`k' != .
+			replace `generate'`k' = 1 if `generate'`k' == `comps_lgc' & `generate'`k' != .	
 		}
 		noi tab `generate'`k'
 		noi di " "
