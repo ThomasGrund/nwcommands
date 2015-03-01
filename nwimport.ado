@@ -46,7 +46,7 @@ program nwimport
 		 capture _nwimport_matrix `fname', `options'
 	}
 	if "`import_type'" == "compressed" {
-		 _nwimport_compressed `fname', `options'
+		 capture _nwimport_compressed `fname', `options'
 	}
 	if "`import_type'" == "edgelist" {
 		 capture _nwimport_edgelist `fname', `options'
