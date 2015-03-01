@@ -173,7 +173,7 @@ program _nwdeploy
 	
 	file open deploy_dlg using nwcommands-dlg.pkg, replace write
 	file write deploy_dlg "v 3" _n
-	file write deploy_dlg "d nwcommands-hlp. Social Network Analysis Using Stata - Dialog Boxes" _n
+	file write deploy_dlg "d nwcommands-dlg. Social Network Analysis Using Stata - Dialog Boxes" _n
 	file write deploy_dlg "d Thomas U. Grund, Linkoping University, www.liu.se/ias" _n
 	file write deploy_dlg "d email: contact@nwcommands.org" _n
 	local d = lower(subinstr(c(current_date)," ","",.))
