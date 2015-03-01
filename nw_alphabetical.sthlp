@@ -25,19 +25,16 @@
 {p2col:{bf:{help nwcollapse }}}Collapse a network{p_end}
 {p2col:{bf:{help nwcomponents }}}Calculate network components / largest component{p_end}
 {p2col:{bf:{help nwcompressobs }}}Compresses observations in Stata{p_end}
-{p2col:{bf:{help nwconcor }}}{err}no help file yet{txt}{p_end}
 {p2col:{bf:{help nwcontext }}}Create a context variable{p_end}
 {p2col:{bf:{help nwcorrelate }}}Correlate networks and variables{p_end}
 {p2col:{bf:{help nwcurrent }}}Report and set current network{p_end}
 {p2col:{bf:{help nwdegree }}}Degree centrality and distribution{p_end}
-{p2col:{bf:{help nwdissimilar }}}{err}no help file yet{txt}{p_end}
 {p2col:{bf:{help nwdrop }}}Drop a network (or only some nodes){p_end}
 {p2col:{bf:{help nwdropnodes }}}Drop nodes from a network{p_end}
 {p2col:{bf:{help nwds }}}List networks matching name patterns{p_end}
 {p2col:{bf:{help nwduplicate }}}Duplicate a network{p_end}
 {p2col:{bf:{help nwdyadprob }}}Generate a network based on tie probabilities{p_end}
 {p2col:{bf:{help nwdyads }}}Dyad census{p_end}
-{p2col:{bf:{help nwequiv }}}{err}no help file yet{txt}{p_end}
 {p2col:{bf:{help nwergm }}}Exponential Random Graph Model{p_end}
 {p2col:{bf:{help nwevcent }}}Calculate eigenvector centrality{p_end}
 {p2col:{bf:{help nwexpand }}}Expand variable to network{p_end}

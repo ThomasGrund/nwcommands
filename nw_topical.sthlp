@@ -1,5 +1,5 @@
 {smcl}
-{* *! version  1mar2015}{...}
+{* *! version  2mar2015}{...}
 {phang}
 {help nwcommands:NW-2 topical} {hline 2} 
 {hline 2} Topical list of network commands
@@ -185,8 +185,5 @@
 {p2col:{bf:{help _nwsetobs }}}{err}no help file yet{txt}{p_end}
 {p2col:{bf:{help _nwsyntax_other }}}{err}no help file yet{txt}{p_end}
 {p2col:{bf:{help _opts_oneof }}}{err}no help file yet{txt}{p_end}
-{p2col:{bf:{help nwconcor }}}{err}no help file yet{txt}{p_end}
-{p2col:{bf:{help nwdissimilar }}}{err}no help file yet{txt}{p_end}
-{p2col:{bf:{help nwequiv }}}{err}no help file yet{txt}{p_end}
 {p2col:{bf:{help nwtomatafast }}}{err}no help file yet{txt}{p_end}
 {p2col:{bf:{help nwtostata }}}{err}no help file yet{txt}{p_end}
