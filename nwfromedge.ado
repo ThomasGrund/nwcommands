@@ -147,9 +147,12 @@ program nwfromedge
 
 	// Set the new network
 	nwset , mat(onenet) name(`edgename') vars(`edgevars') labs(`labs') edgelabs(`edgelabs')
+	qui drop _all
 	if "`xvars'" == "" {
-		qui drop _all
 		qui nwload
+	}
+	else {
+		nwload, labelonly
 	}
 	
 	if "`directed'" == "" {

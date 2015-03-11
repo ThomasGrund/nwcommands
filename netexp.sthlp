@@ -27,7 +27,7 @@ that it works on the element-by-element level of the underlying adjacency matric
 the involved networks.
 
 {pstd}
-Network expressions accept {help netname:netnames} and almost all operators that one knows
+Network expressions accept {help netname:netnames}, {help varname:varnames} and almost all operators that one knows
 from Stata or Mata. Here, the network expression consists of the simple network {it:flomarriage} and is assigned
 it to {it:mynet1}.
 

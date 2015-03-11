@@ -1,8 +1,10 @@
 capture program drop _nwevalnetexp
 program _nwevalnetexp
-	
-	local arg = "`0'"
+	syntax [anything] [, nodes(string)]
+	local mynodes = "`nodes'"
+	local arg = "`anything'"
 	gettoken netexp result: arg, parse("%")
+	
 	// prepare result
 	local result = trim(subinstr("`result'", "%", "",.))
 	
@@ -307,11 +309,15 @@ program _nwevalnetexp
 	local matacmd "`netexp_mata'"
 	
 	//di "Mata: `matacmd'"
-	
+
 	// execute network expression in mata
 	if ("`result'" != ""){
 		capture mata: mata drop `result'
 		mata: `result' = `matacmd'
+	
+		if "`mynodes'" != "" {
+			mata: `result' = getResultWithNodes(`result', `mynodes')
+		}
 	}
 
 	
@@ -334,3 +340,23 @@ program _nwevalnetexp
 	mata: st_global("r(netexp)","`netexp_raw'")
 	
 end
+
+capture mata : mata drop getResultWithNodes()
+mata: 
+real matrix getResultWithNodes(real matrix res, scalar nodes) {
+	
+	if (nodes < rows(res)){
+		res = res[(1::nodes), (1::nodes)]
+	}
+	if (nodes > rows(res)){
+		result2 = J(nodes, nodes, 0)
+		
+		result2[(1::rows(res)), (1::cols(res))] = res
+		res = result2
+	}
+	return(res)
+}
+end
+
+
+

@@ -48,10 +48,11 @@
 {cmd:nwset, nwclear}
 
 
-{synoptset 20 tabbed}{...}
+{synoptset 25 tabbed}{...}
 {synopthdr}
 {synoptline}
 
+{synopt:{opt edgelist}}declare data in edgelist format{p_end}
 {synopt:{opt directed}}force network to be directed{p_end}
 {synopt:{opt undirected}}force network to be undirected{p_end}
 {synopt:{opt name}({it:{help newnetname}})}name of the new network; default = {it:network}{p_end}
@@ -81,11 +82,15 @@ has the dimensions {it:nodes} x {it:nodes}. The matrix cell {it:M_ij} = 0 when t
 and {it:j}. In binary networks, {it:M_ij} = 1 when there is a network relationship between nodes {it:i} and {it:j}.
 However, networks can also be valued, i.e. {it:M_ij} > 1; in undirected networks {it:M_ij = M_ji}.
 
-{pstd}
-There are two ways to explicitly declare data to be network data:
 
 {pstd}
-{bf:1.} Declare the variables in {help varlist} to represent the adjacency matrix of the network. In this case a
+There are three ways to explicitly declare data to be network data:
+
+{pstd}
+{bf:{ul:1. Declare adjacency matrix from variables}}
+
+{pstd}
+Declare the variables in {help varlist} to represent the adjacency matrix of the network. In this case a
 {help varlist} (var_1, var_2,..., var_z) needs to be given. Each variable is assumed to stand for one column in the adjacency matrix. 
 
 {pmore}
@@ -123,13 +128,51 @@ After that we can display the networks that have been set (see also {help nwsumm
 There is exactly one network. When neither {bf:name()}, {bf:vars()}, or {bf:labs()} are specified, the command comes up with 
 a suggestion to fill this meta-information.	
 
-{pstd}
-Using this method, one can basically set any data to be network data as long as it has the format of an adjacency matrix (see
-{help nwfromedge} for data in edgelist format). Programmers can use {bf:nwset} to write their own import routines for different
-network file formats.
 
 {pstd}
-{bf:2.} Set a network from a {it:nodes x nodes} Mata matrix that holds the adjacency matrix of the new network. The option
+{bf:{ul:2. Declare edgelist from variables}}
+
+{pstd}
+In this case, the command interprets the variables {help varlist} as egdelist (see {help nwfromedge}). 
+
+{pstd}
+An edgelist or arclist is a set of two (or three in the case of a valued network) variables representing
+relations. Nodes are identified by entries in the cells.  For example, the data
+
+                 {c TLC}{hline 14}{c -}{c TRC}
+                 {c |} {res} fromid  toid {txt}{c |}
+                 {c LT}{hline 14}{c -}{c RT}
+              1. {c |} {res} 1       2    {txt}{c |}
+              2. {c |} {res} 2       3    {txt}{c |}
+              3. {c |} {res} 4       2    {txt}{c |}
+                 {c BLC}{hline 14}{c -}{c BRC}
+
+{pstd}
+stores information about three {it:ties} (1=>2), (2=>3) and (4=>2) among four unique network nodes. The
+variables defining the edges can also be {help string} variables. 
+
+                 {c TLC}{hline 25}{c -}{c TRC}
+                 {c |} {res} fromid    toid     value{txt}{c |}
+                 {c LT}{hline 25}{c -}{c RT}
+              1. {c |} {res} Peter     Thomas   1    {txt}{c |}
+              2. {c |} {res} Tim       Peter    3    {txt}{c |}
+              3. {c |} {res} Mathilde  Thomas   2    {txt}{c |}
+                 {c BLC}{hline 25}{c -}{c BRC}
+
+{pstd}
+Here, there are also three relationships: (Peter => Thomas), (Tim => Peter) and (Mathilde => Thomas).
+
+{pstd}
+The following command declares such data as network data and gives the new network the name {it:mynet}:
+
+	{cmd:. nwset fromid toid value, name(mynet) edgelist}
+
+	
+{pstd}
+{bf:{ul:2. Declare adjacency matrix from Mata matrix}}
+
+{pstd}
+Set a network from a {it:nodes x nodes} Mata matrix that holds the adjacency matrix of the new network. The option
 {bf:mat()} is specified with the name of an existing Mata matrix.
 
 {pstd}
@@ -162,7 +205,10 @@ Now a network called {it:network} exists and we can interact with it. For exampl
 	3 {c |}  {res}1   1   0   0{txt}  {c |}
 	4 {c |}  {res}1   1   1   0{txt}  {c |}
           {c BLC}{hline 17}{c BRC}
-   
+ 
+ 
+{title:Remarks}
+ 
 {pstd}
 The command {bf:nwset} or {bf:nwset, detail} without a {help varlist} or {bf:mat()} option, give a list of all
 networks that do currently exist in memory. A similar overview is provided by {help nwds} (which is very similar to {help ds}).
@@ -190,6 +236,10 @@ Whenever a network is set with {bf:nwset}, it is also made the {help nwcurrent:c
 the network that has been most recently loaded or generated. Many nwcommands allow that a {help netname} or a {help netlist} is
 optional. In case no network is given, all nwcommands generally refer to the current network.
 
+{pstd}
+Programmers can use {bf:nwset} to write their own import routines  (see also {help nwimport}) for different network
+file formats that are not natively supported by the {bf:nwcommands}.All you need to do is transform your data either in
+an adjacency list or an edgelist represented by Stata variables. 
 
 {title:See also}
 

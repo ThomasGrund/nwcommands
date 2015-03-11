@@ -2,7 +2,7 @@ v 3
 d nwcommands-hlp. Social Network Analysis Using Stata - Help Files
 d Thomas U. Grund, Linkoping University, www.liu.se/ias
 d email: contact@nwcommands.org
-d Distribution-Date: 2mar2015
+d Distribution-Date: 11mar2015
 f _nwnodeid.sthlp
 f _nwnodelab.sthlp
 f _nwsyntax.sthlp
@@ -13,6 +13,7 @@ f netlist.sthlp
 f netname.sthlp
 f newnetname.sthlp
 f nodeid.sthlp
+f nw2fromedge.sthlp
 f nw_alphabetical.sthlp
 f nw_intro.sthlp
 f nw_programming.sthlp

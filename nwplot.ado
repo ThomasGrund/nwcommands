@@ -470,13 +470,13 @@ program nwplot
 	}
 	
 	restore
-
+	
 	// Label of nodes
 	qui if ("`label'" != ""){
 		capture confirm string variable `label'
 		if _rc != 0 {
 			tempvar nlabel_string
-			tostring `label', generate(`nlabel_string')
+			tostring `label', generate(`nlabel_string') force
 			mata: nlabel = st_sdata((1,`nodes'),st_varindex("`nlabel_string'"))
 		}
 		else {
@@ -487,7 +487,6 @@ program nwplot
 		mata: nlabel = J(`nodes',1,"")
 	}
 
-	
 	////////////////////
 	//
 	//   EDGE ATTRIBUTES

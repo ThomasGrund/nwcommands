@@ -1,5 +1,5 @@
 {smcl}
-{* *! version  2mar2015}{...}
+{* *! version  11mar2015}{...}
 {phang}
 {help nwcommands:NW-2 topical} {hline 2} 
 {hline 2} Topical list of network commands
@@ -43,6 +43,7 @@
 {col 8}{hline 3}{c RT}       {it:Import/Export}{col 36}{c LT}{hline}
 {col 8}   {c BLC}{hline 24}{c BRC}
 {p2colset 12 35 36 2}
+{p2col:    {bf:{help nw2fromedge }}}Import two-mode network data from edgelist{p_end}
 {p2col:    {bf:{help nwexport }}}Export network as Pajek file{p_end}
 {p2col:    {bf:{help nwfromedge }}}Imports network data from edgelist{p_end}
 {p2col:    {bf:{help nwimport }}}Import network{p_end}

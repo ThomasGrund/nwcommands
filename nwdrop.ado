@@ -63,7 +63,8 @@ program nwdrop
 				global nwname_`j' = r(name)
 				global nwsize_`j' = r(nodes)
 				global nwdirected_`j' = r(directed)			
-		
+				global nwlabs_`j' = r(labs)
+				
 				scalar movenw = "\$nw_`next'"
 				global nw_`j' `=movenw'
 				

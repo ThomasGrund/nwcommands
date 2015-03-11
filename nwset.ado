@@ -5,7 +5,7 @@
 
 capture program drop nwset	
 program nwset
-syntax [varlist (default=none)][, clear nwclear nooutput name(string) vars(string) labs(string) labsfromvar(string) abs(string asis) edgelabs(string asis) detail mat(string) undirected directed]
+syntax [varlist (default=none)][, clear nwclear nooutput edgelist name(string) vars(string) labs(string) labsfromvar(string) abs(string asis) edgelabs(string asis) detail mat(string) undirected directed]
 	set more off
 
 	if "`clear'" != "" {
@@ -21,6 +21,11 @@ syntax [varlist (default=none)][, clear nwclear nooutput name(string) vars(strin
 	mata: st_rclear()
 	local max_nodes = 0
 	local allnames ""
+	
+	if "`edgelist'" != "" {
+		nwfromedge `varlist', name(`name')
+		exit
+	}
 	
 	// display information about network
 	if ("`varlist'" == "" & "`mat'" == "") {
