@@ -16,6 +16,7 @@ f _nwsyntax.ado
 f _nwsyntax_other.ado
 f _opts_oneof.ado
 f animate.ado
+f nw2fromedge.ado
 f nwaddnodes.ado
 f nwbetween.ado
 f nwclear.ado

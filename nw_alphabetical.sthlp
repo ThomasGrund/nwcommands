@@ -17,6 +17,7 @@
 {p2col:{bf:{help _nwsyntax_other }}}{err}no help file yet{txt}{p_end}
 {p2col:{bf:{help _opts_oneof }}}{err}no help file yet{txt}{p_end}
 {p2col:{bf:{help animate }}}Animate graphs{p_end{p_end}
+{p2col:{bf:{help nw2fromedge }}}Import two-mode network data from edgelist{p_end}
 {p2col:{bf:{help nwaddnodes }}}Add nodes to network{p_end}
 {p2col:{bf:{help nwbetween }}}Calculate betweenness centrality{p_end}
 {p2col:{bf:{help nwclear }}}Clear all networks and variables from memory{p_end}
