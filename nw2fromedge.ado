@@ -71,7 +71,7 @@ program nw2fromedge
 	qui replace `generate' = 2 if `generate' != 1
 	qui drop `group1'
 	
-	 if "`project'" != ""  {
+	qui if "`project'" != ""  {
 		local newname "p1_`onename'"
 		if "`project'" == "2" {
 			replace `generate' = 3 - `generate'	
@@ -136,7 +136,7 @@ real matrix onemodeproject(matrix _net, matrix _modeid, scalar _stat) {
 			if (_stat == 5){
 				temp0 = J(2,N,.)
 				temp0[1,.] = vec_i :* vec_i0 :* vec_j0
-				temp0[2,.] = vec_j :* vec_i0 :* vec_j0	
+				temp0[2,.] = vec_j :* vec_i0 :* vec_j0
 				temp = colmin(temp0)
 			}
 			else {
@@ -164,7 +164,6 @@ real matrix onemodeproject(matrix _net, matrix _modeid, scalar _stat) {
 			}
 			// minmax
 			if (_stat == 5) {
-				temp
 				projection[i,j] = max(temp)
 			}	
 		}

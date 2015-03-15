@@ -45,18 +45,18 @@ A two-mode network consists of two sets of units (e. g. people and events) and r
 of people in social events. Some examples are: 
 
 {pmore}
-¥ Membership in institutions - people, institutions, is a member, e.g. directors and commissioners on the boards of corporations.
+- Membership in institutions - people, institutions, is a member, e.g. directors and commissioners on the boards of corporations.
 
 {pmore}
-¥ Voting for suggestions - polititians, suggestions, votes for.
+- Voting for suggestions - polititians, suggestions, votes for.
 
 {pmore}
-¥ Citation network, where first set consists of authors,
+- Citation network, where first set consists of authors,
 the second set consists of articles/papers,
 connection is a relation author cites a paper.
 
 {pmore}
-¥ Co-autorship networks - authors, papers, is a (co)author.
+- Co-autorship networks - authors, papers, is a (co)author.
 A corresponding graph is called bipartite graph Ð lines
 connect only vertices from one to vertices from another set Ð
 inside sets there are no connections.
@@ -67,20 +67,29 @@ inside sets there are no connections.
 An edgelist is a set of two (or three in the case of a valued network) variables representing
 relations. Nodes are identified by entries in the cells.  For example, the data
 
-                 {c TLC}{hline 33}{c -}{c TRC}
-                 {c |} {res} person     institution     value{txt}{c |}
-                 {c LT}{hline 33}{c -}{c RT}
-              1. {c |} {res} Peter      LiU             1    {txt}{c |}
-              2. {c |} {res} Tim        LiU             1    {txt}{c |}
-              3. {c |} {res} Thomas     LiU             1    {txt}{c |}
-              4. {c |} {res} Thomas     UdeM            2    {txt}{c |}
-              5. {c |} {res} Mathilde   UdeM            3    {txt}{c |}
-                 {c BLC}{hline 33}{c -}{c BRC}
+	{com}. use "http://nwcommands.org/data/institutions.dta", clear
+	{com}. list _all
+	{txt}
+		{c TLC}{hline 10}{c -}{hline 11}{c -}{hline 7}{c TRC}
+		{c |} {res}  person   institu~n   years {txt}{c |}
+		{c LT}{hline 10}{c -}{hline 11}{c -}{hline 7}{c RT}
+	     1. {c |} {res}  Thomas      Oxford       5 {txt}{c |}
+	     2. {c |} {res}   Peter      Oxford       7 {txt}{c |}
+	     3. {c |} {res}     Tim      Oxford       4 {txt}{c |}
+	     4. {c |} {res}   Peter         LiU       1 {txt}{c |}
+	     5. {c |} {res}     Tim         LiU       1 {txt}{c |}
+		{c LT}{hline 10}{c -}{hline 11}{c -}{hline 7}{c RT}
+	     6. {c |} {res}  Thomas         LiU       1 {txt}{c |}
+	     7. {c |} {res}Mathilde        UdeM       5 {txt}{c |}
+	     8. {c |} {res}  Thomas        UdeM       1 {txt}{c |}
+	     9. {c |} {res} Michael         ETH       3 {txt}{c |}
+	    10. {c |} {res} Michael   Groningen       5 {txt}{c |}
+		{c LT}{hline 10}{c -}{hline 11}{c -}{hline 7}{c RT}
+	    11. {c |} {res}  Thomas         ETH       1 {txt}{c |}
+		{c BLC}{hline 10}{c -}{hline 11}{c -}{hline 7}{c BRC}
 
 {pstd}
-stores information about the affiliation of individual researchers. There are five {it:ties} (Peter => LiU), (Tim => LiU), (Thomas => LiU),
-(Thomas => UdeM) and (Mathilde => UdeM) among six unique network nodes (four on level 1 and two on level 2). The
-variables defining the edges can also be {help string} variables. 
+stores information about the affiliation of individual researchers.  
 
 {pstd}
 The following command declares such data as two-mode network data:
@@ -89,7 +98,7 @@ The following command declares such data as two-mode network data:
 					
 {pstd}
 Essentially, this does exactly the same as {help nwfromedge}, but also generates a variable {it:_modeid}, which has the value 1 for persons (Peter, Tim,
-Thomas, Mathilde) and value 2 for institutions (LiU, UdeM).
+Thomas, Michael, Mathilde) and value 2 for institutions (LiU, UdeM, Oxford, ETH, Groningen).
 
 {pstd}
 For example, one can plot this two-mode network and color the two levels differently:
@@ -111,14 +120,53 @@ For example, this loads the data above as a one-mode projection on level 1 (pers
 	{cmd: nw2fromedge person institution, project(1)}
 
 {pstd}
-It generates a network with four unique actors (Peter, Tim, Thomas and Mathilde). By default, a one-mode projection on one level generates ties between nodes (on this level) when they have at least one network neighbor on the other level in common. In our case, 
-projecting to the level of persons creates ties between persons when they share at least one institution. The following undirected ties are created:
+It generates a network with five unique actors (Peter, Tim, Thomas, Michael and Mathilde). By default, a one-mode projection on one level generates ties between nodes (on this level) when they have at least one network neighbor on the other level in common. In our case, 
+projecting to the level of persons creates ties between persons when they share at least one institution. 
 
-	Peter 	<=> 	Tim
-	Peter 	<=> 	Thomas
-	Tim 	<=> 	Thomas
-	Thomas 	<=> 	Mathilde
-	
+{pstd}
+When ties are valued there are several ways how the value of projected ties is generated. Option {opt stat()} can
+be one of the following: {bf:min, max, minmax, sum, mean}. To illustrate what each one of them calculates tie values for
+the projection, let us consider the relationship between Peter and Thomas. They share two institutions: Oxford and LiU.
+
+{pmore}
+Thomas - LiU    - 1 year
+Peter  - LiU    - 1 year
+Thomas - Oxford - 5 years
+Peter  - Oxford - 7 years
+
+{pstd}
+The option {bf:stat(min)} takes the overall minimum from all these ties and generates the projection:
+
+{pmore}
+Peter - Thomas  - 1 year
+
+{pstd}
+The option {bf:stat(max)} takes the overall maximum from all these ties and generates the projection:
+
+{pmore}
+Peter - Thomas  - 7 years
+
+{pstd}
+The option {bf:stat(sum)} takes the sum over all these ties and generates the projection:
+
+{pmore}
+Peter - Thomas  - 14 years
+
+{pstd}
+The option {bf:stat(mean)} takes the sum over all these ties and generates the projection:
+
+{pmore}
+Peter - Thomas  - 3.5 years
+
+{pstd}
+The option {bf:stat(minmax)} takes for each institution Peter and Thomas share the minimum (Oxford = 5, LiU = 1) and 
+and takes the maximum out of these scores as tie value. Substantially, this corresponds to the 
+longest time that Peter and Thomas were at the same institution. This is the default option. 
+
+{pmore}
+Peter - Thomas  - 5 years
+ 
+
 {pstd}	
 In contrast, the next command generates a one-mode projection on level 2 (institutions). 
 	
@@ -129,12 +177,6 @@ This projection
 has only two nodes (LiU and UdeM). And there is exactly one undirected tie in this network (because Thomas went to both UdeM and LiU).
 	
 	LiU 	<=> 	UdeM	
-	
-{pstd}
-One can also choose a different logic for generating ties when making a one-mode projection. By default, {it: project_stat = }{bf:min}. Other possibilities are: {bf:max, mean, sum}. Notice
-that all these statistics are applied over all ties to institutions {it:X_k} that persons {it:i} and {it:j} have in common. 
-
-{pstd}
 
 	
 {title:Also see}
