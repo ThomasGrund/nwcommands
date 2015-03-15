@@ -10,7 +10,7 @@ program nw2fromedge
 	}
 	
 	if "`stat'" != "" {
-		_opts_oneof "sum mean min max" "stat" "`stat'" 6556
+		_opts_oneof "sum mean min max minmax" "stat" "`stat'" 6556
 	}
 	
 	if "`generate'" == "" {
@@ -71,7 +71,7 @@ program nw2fromedge
 	qui replace `generate' = 2 if `generate' != 1
 	qui drop `group1'
 	
-	qui if "`project'" != ""  {
+	 if "`project'" != ""  {
 		local newname "p1_`onename'"
 		if "`project'" == "2" {
 			replace `generate' = 3 - `generate'	
@@ -90,7 +90,9 @@ program nw2fromedge
 		if "`stat'" == "sum" {
 			local _stat = 4
 		}
-		
+		if "`stat'" == "minmax" {
+			local _stat = 5
+		}	
 		keep if `generate' == 1
 		mata: onenet = onemodeproject(onenet, onemodeid, `_stat')
 		mata: rows(onenet)
@@ -128,12 +130,22 @@ real matrix onemodeproject(matrix _net, matrix _modeid, scalar _stat) {
 			vec_i = _net[i,.]
 			vec_i0 = (vec_i :> 0)
 			vec_j = _net[j,.]
-			vec_j0 = (vec_j :> 0)		
-			temp = J(2, (2 * N), 0)
-			temp[1,(1..N)] = vec_i :* vec_i0 :* vec_j0
-			temp[2,((N+1)..(2*N))] = vec_j :* vec_i0 :* vec_j0
-			_editvalue(temp, 0, .)
-
+			vec_j0 = (vec_j :> 0)
+			
+			// minmax
+			if (_stat == 5){
+				temp0 = J(2,N,.)
+				temp0[1,.] = vec_i :* vec_i0 :* vec_j0
+				temp0[2,.] = vec_j :* vec_i0 :* vec_j0	
+				temp = colmin(temp0)
+			}
+			else {
+				temp = J(2, (2 * N), 0)
+				temp[1,(1..N)] = vec_i :* vec_i0 :* vec_j0
+				temp[2,((N+1)..(2*N))] = vec_j :* vec_i0 :* vec_j0
+				_editvalue(temp, 0, .)
+			}
+			
 			// minimum
 			if (_stat == 1) {
 				projection[i,j] = min(temp)
@@ -150,6 +162,11 @@ real matrix onemodeproject(matrix _net, matrix _modeid, scalar _stat) {
 			if (_stat == 4) {
 				projection[i,j] = sum(temp)
 			}
+			// minmax
+			if (_stat == 5) {
+				temp
+				projection[i,j] = max(temp)
+			}	
 		}
 	}
 	_editmissing(projection, 0)
