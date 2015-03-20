@@ -80,7 +80,7 @@ program nw2fromedge
 		nwsort `onename', by(`generate')
 		mata: onemodeid = st_data((1,`onenodes'), "`generate'")
 		nwtomata, mat(onenet)
-		local _stat = 1
+		local _stat = 5
 		if "`stat'" == "max" {
 			local _stat = 2
 		}
