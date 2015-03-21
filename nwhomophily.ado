@@ -43,14 +43,15 @@ program def nwhomophily
 	if "`stub'" == "" {
 		local stub "net"
 	}
+	
 	nwvalidate `name'
 	local assortname= r(validname)
-	
 	local gencmd "nwgenerate _tempassort ="
 	
 	tempname __temp0
 	tempname __temp
-	
+
+		
 	mata: `__temp0' = J(`nodes', `nodes', 1)
 	forvalues i = 1/`vc'{
 	
@@ -65,7 +66,7 @@ program def nwhomophily
 		mata: `__temp' = `__temp' :* `onehom'
 		mata: `__temp0' = `__temp0' :* `__temp'
 	}
-
+	mata: `__temp0'
 	nwdyadprob , mat(`__temp0') density(`density') name(`assortname') `undirected'
 end
 	

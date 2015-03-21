@@ -6,9 +6,7 @@
 capture program drop nwdyadprob
 program nwdyadprob
 	syntax [anything(name=weightnet)],  [ density(real 0) mat(string) name(string) vars(string) xvars undirected]
-	
-	_nwsyntax `weightnet', name(weightnet)
-	
+		
 	// Install gsample if needed
 	capture which gsample
 	if _rc != 0 {
