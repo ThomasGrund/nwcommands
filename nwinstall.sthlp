@@ -18,7 +18,11 @@
 {opt permanently}
 {opt remove }
 {opt help}
+<<<<<<< HEAD
 {opt all}
+=======
+{opt all}
+>>>>>>> origin/master
 {opth path(string)]
 
 
@@ -30,7 +34,11 @@
 {synopt:{opt remove}}remove the "Network Analysis" menu from your Stata{p_end}
 {synopt:{opt help}}download the help files{p_end}
 {synopt:{opt all}}download the help files and dialog boxes and install them permanently{p_end}
+<<<<<<< HEAD
 {synopt:{opth path(string)}}directory where profile.do is installed; default SYSDIR_PERSONAL{p_end}
+=======
+{synopt:{opth path(string)}}directory where profile.do is installed; default SYSDIR_PERSONAL{p_end}
+>>>>>>> origin/master
 
 
 {title:Description}
