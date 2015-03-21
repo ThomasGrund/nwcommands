@@ -66,7 +66,6 @@ program def nwhomophily
 		mata: `__temp' = `__temp' :* `onehom'
 		mata: `__temp0' = `__temp0' :* `__temp'
 	}
-	mata: `__temp0'
 	nwdyadprob , mat(`__temp0') density(`density') name(`assortname') `undirected'
 end
 	
