@@ -2,15 +2,7 @@ v 3
 d nwcommands-dlg. Social Network Analysis Using Stata - Dialog Boxes
 d Thomas U. Grund, Linkoping University, www.liu.se/ias
 d email: contact@nwcommands.org
-d Distribution-Date: 11mar2015
-f nw_edges_color.dlg
-f nw_edges_pattern.dlg
-f nw_edges_size.dlg
-f nw_nodes_color.dlg
-f nw_nodes_labels.dlg
-f nw_nodes_size.dlg
-f nw_nodes_symbol.dlg
-f nw_patches_color.dlg
+d Distribution-Date: 22mar2015
 f nwaddnodes.dlg
 f nwcensus.dlg
 f nwcentrality.dlg
@@ -18,7 +10,7 @@ f nwclustering.dlg
 f nwcomponents.dlg
 f nwcontext.dlg
 f nwcorrelate.dlg
-f nwcorrelateAttr.dlg
+f nwcorrelateattr.dlg
 f nwdrop.dlg
 f nwds.dlg
 f nwduplicate.dlg
@@ -37,8 +29,8 @@ f nworder.dlg
 f nwpath.dlg
 f nwpermute.dlg
 f nwplot.dlg
-f nwplot_color_opt.dlg
 f nwplotmatrix.dlg
+f nwplot_color_opt.dlg
 f nwpref.dlg
 f nwrandom.dlg
 f nwreach.dlg
@@ -60,6 +52,14 @@ f nwtoedge.dlg
 f nwtranspose.dlg
 f nwunsym.dlg
 f nwuse.dlg
+f nw_edges_color.dlg
+f nw_edges_pattern.dlg
+f nw_edges_size.dlg
+f nw_nodes_color.dlg
+f nw_nodes_labels.dlg
+f nw_nodes_size.dlg
+f nw_nodes_symbol.dlg
+f nw_patches_color.dlg
 f header.idlg
-f nw_newnet_opt.idlg
 f nwnewnet.idlg
+f nw_newnet_opt.idlg

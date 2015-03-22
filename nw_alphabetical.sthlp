@@ -4,19 +4,7 @@
 {help nwcommands:NW-3 alphabetical} {hline 2} Alphabetical list of network programs
  
 {col 5}{hline}
-{p2colset 5 32 34 2}{p2col:{bf:{help _extract_valuelabels }}}{err}no help file yet{txt}{p_end}
-{p2col:{bf:{help _nwdeploy }}}{err}no help file yet{txt}{p_end}
-{p2col:{bf:{help _nwdialog }}}{err}no help file yet{txt}{p_end}
-{p2col:{bf:{help _nwdialog_append }}}{err}no help file yet{txt}{p_end}
-{p2col:{bf:{help _nwdialog_lablist }}}{err}no help file yet{txt}{p_end}
-{p2col:{bf:{help _nwevalnetexp }}}{err}no help file yet{txt}{p_end}
-{p2col:{bf:{help _nwnodeid }}}Returns the nodeid of a node given its node label{p_end}
-{p2col:{bf:{help _nwnodelab }}}Returns the nodelab of a node given its nodeid{p_end}
-{p2col:{bf:{help _nwsetobs }}}{err}no help file yet{txt}{p_end}
-{p2col:{bf:{help _nwsyntax }}}Parse network syntax{p_end}
-{p2col:{bf:{help _nwsyntax_other }}}{err}no help file yet{txt}{p_end}
-{p2col:{bf:{help _opts_oneof }}}{err}no help file yet{txt}{p_end}
-{p2col:{bf:{help animate }}}Animate graphs{p_end{p_end}
+{p2colset 5 32 34 2}{p2col:{bf:{help animate }}}Animate graphs{p_end{p_end}
 {p2col:{bf:{help nw2fromedge }}}Import two-mode network data from edgelist{p_end}
 {p2col:{bf:{help nwaddnodes }}}Add nodes to network{p_end}
 {p2col:{bf:{help nwbetween }}}Calculate betweenness centrality{p_end}
@@ -92,3 +80,15 @@
 {p2col:{bf:{help nwvalidvars }}}Validate Stata variables for network{p_end}
 {p2col:{bf:{help nwvalue }}}Returns entries form the adjaceny matrix of a network{p_end}
 {p2col:{bf:{help webnwuse }}}Load network data over the web{p_end}
+{p2col:{bf:{help _extract_valuelabels }}}{err}no help file yet{txt}{p_end}
+{p2col:{bf:{help _nwdeploy }}}{err}no help file yet{txt}{p_end}
+{p2col:{bf:{help _nwdialog }}}{err}no help file yet{txt}{p_end}
+{p2col:{bf:{help _nwdialog_append }}}{err}no help file yet{txt}{p_end}
+{p2col:{bf:{help _nwdialog_lablist }}}{err}no help file yet{txt}{p_end}
+{p2col:{bf:{help _nwevalnetexp }}}{err}no help file yet{txt}{p_end}
+{p2col:{bf:{help _nwnodeid }}}Returns the nodeid of a node given its node label{p_end}
+{p2col:{bf:{help _nwnodelab }}}Returns the nodelab of a node given its nodeid{p_end}
+{p2col:{bf:{help _nwsetobs }}}{err}no help file yet{txt}{p_end}
+{p2col:{bf:{help _nwsyntax }}}Parse network syntax{p_end}
+{p2col:{bf:{help _nwsyntax_other }}}{err}no help file yet{txt}{p_end}
+{p2col:{bf:{help _opts_oneof }}}{err}no help file yet{txt}{p_end}
