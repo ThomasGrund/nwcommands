@@ -6,7 +6,7 @@
 capture program drop nwuse
 program nwuse
 	syntax anything [, nwclear clear *]
-	local webname = subinstr("`anything'", ".dta","",99)
+	local webname = subinstr(`"`anything'"', ".dta","",99)
 	
 	`clear'
 	`nwclear'
