@@ -2,7 +2,7 @@ v 3
 d nwcommands-ado. Social Network Analysis Using Stata
 d Thomas U. Grund, Linkoping University, www.liu.se/ias
 d email: contact@nwcommands.org
-d Distribution-Date: 22mar2015
+d Distribution-Date: 24mar2015
 f animate.ado
 f nw2fromedge.ado
 f nwaddnodes.ado
@@ -95,7 +95,6 @@ f florentine.dta
 f gang.dta
 f glasgow.dta
 f klas12b.dta
-f test.dta
 f scheme-s1network.scheme
 f scheme-s2network.scheme
 f scheme-s3network.scheme

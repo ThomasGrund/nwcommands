@@ -2,7 +2,7 @@ v 3
 d nwcommands-dlg. Social Network Analysis Using Stata - Dialog Boxes
 d Thomas U. Grund, Linkoping University, www.liu.se/ias
 d email: contact@nwcommands.org
-d Distribution-Date: 22mar2015
+d Distribution-Date: 24mar2015
 f nwaddnodes.dlg
 f nwcensus.dlg
 f nwcentrality.dlg
