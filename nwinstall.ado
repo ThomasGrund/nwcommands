@@ -184,7 +184,7 @@ program nwinstall_menu
 
 	window menu append submenu "Network Analysis" "Correlate Networks"
 	window menu append item "Correlate Networks" "Correlate Two Networks" "db nwcorrelate"	
-	window menu append item "Correlate Networks" "Correlate Network and Variable" "db nwcorrelateAttr"	
+	window menu append item "Correlate Networks" "Correlate Network and Variable" "db nwcorrelate_attr"	
 	
 	window menu append item "Network Analysis" "Quadratic Assignment Procedure" "help nwqap"
 	window menu append item "Network Analysis" "Exponential Random Graph Model" "help nwergm"
