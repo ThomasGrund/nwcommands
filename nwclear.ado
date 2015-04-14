@@ -12,7 +12,8 @@ program nwclear
 			capture mata: mata drop nw_mata`i'
 		}
 	}
-	capture macro drop _all
+	capture macro drop nw*
+	capture macro drop validvars
 	
 	// clear file handlers
 	capture file close expfile
