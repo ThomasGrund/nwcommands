@@ -89,7 +89,7 @@ program nwinstall
 			}
 			// write profile.do
 			else {
-				file open `fh2' using "`path'\profile.do", write
+				file open `fh2' using "`path'profile.do", write
 				file write `fh2' `"nwinstall, downloadoff"' _n
 				file close `fh2'
 			}
