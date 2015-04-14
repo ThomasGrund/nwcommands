@@ -18,7 +18,7 @@
 {opt permanently}
 {opt remove }
 {opt help}
-{opth path(string)]
+{opth path(string)}]
 
 
 

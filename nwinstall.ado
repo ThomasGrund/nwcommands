@@ -3,7 +3,7 @@ program nwinstall
 	syntax [, permanently remove downloadoff help all path(string)]
 	
 	if "`path'" == "" {
-		local path "`c(sysdir_personal)'"
+		local path "`c(pwd)'"
 	}
 	
 	tempname fh1 fh2
@@ -60,18 +60,20 @@ program nwinstall
 					shell export PATH="$PATH:`:environ PATH':`c(pwd)':`path':`c(adopath)':/usr/local/bin:/usr/bin:/opt/local/bin:/opt/ImageMagick/bin/:`imagick'/";mv `c(sysdir_stata)'profile_temp.do `existingProfile'
 				}
 				if c(os) == "Windows" {
-					di "shell rename `path'\profile_temp.do `existingProfile'"
+					di "shell rename `path'/profile_temp.do `existingProfile'"
 					shell rename `path'\profile_temp.do `existingProfile'
 				}
 			}
 
 		}
+		
+			
 		// add to profile
 		else  {
 			capture findfile "profile.do",  path("`path'")
 			if _rc == 0{
 				local alreadyInstalled = 0
-				file open `fh1' using "`path'\profile.do", read 
+				file open `fh1' using "`path'/profile.do", read 
 				file read `fh1' line
 				while r(eof) == 0 {
 					if `"`line'"' == "nwinstall, downloadoff" {
@@ -82,14 +84,14 @@ program nwinstall
 				file close `fh1'
 				
 				if `alreadyInstalled' == 0 {
-					file open `fh2' using "`path'\profile.do", write append
+					file open `fh2' using "`path'/profile.do", write append
 					file write `fh2' `"nwinstall, downloadoff"' _n
 					file close `fh2'
 				}	
 			}
 			// write profile.do
 			else {
-				file open `fh2' using "`path'profile.do", write
+				file open `fh2' using "`path'/profile.do", write
 				file write `fh2' `"nwinstall, downloadoff"' _n
 				file close `fh2'
 			}
