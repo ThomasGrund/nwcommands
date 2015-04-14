@@ -2,7 +2,19 @@ v 3
 d nwcommands-ado. Social Network Analysis Using Stata
 d Thomas U. Grund, Linkoping University, www.liu.se/ias
 d email: contact@nwcommands.org
-d Distribution-Date: 24mar2015
+d Distribution-Date: 14apr2015
+f _extract_valuelabels.ado
+f _nwdeploy.ado
+f _nwdialog.ado
+f _nwdialog_append.ado
+f _nwdialog_lablist.ado
+f _nwevalnetexp.ado
+f _nwnodeid.ado
+f _nwnodelab.ado
+f _nwsetobs.ado
+f _nwsyntax.ado
+f _nwsyntax_other.ado
+f _opts_oneof.ado
 f animate.ado
 f nw2fromedge.ado
 f nwaddnodes.ado
@@ -79,18 +91,6 @@ f nwvalidate.ado
 f nwvalidvars.ado
 f nwvalue.ado
 f webnwuse.ado
-f _extract_valuelabels.ado
-f _nwdeploy.ado
-f _nwdialog.ado
-f _nwdialog_append.ado
-f _nwdialog_lablist.ado
-f _nwevalnetexp.ado
-f _nwnodeid.ado
-f _nwnodelab.ado
-f _nwsetobs.ado
-f _nwsyntax.ado
-f _nwsyntax_other.ado
-f _opts_oneof.ado
 f florentine.dta
 f gang.dta
 f glasgow.dta
