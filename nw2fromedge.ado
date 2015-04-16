@@ -55,7 +55,7 @@ program nw2fromedge
 	qui save `dic1', replace
 	restore
 	
-	qui nwfromedge `group1' `group2' `value' `if', `options' `xvars' undirected
+	nwfromedge `group1' `group2' `value' `if', `options' `xvars' undirected
 	
 	capture drop `group1'
 	gen `group1' = _nodelab
@@ -80,6 +80,7 @@ program nw2fromedge
 		nwsort `onename', by(`generate')
 		mata: onemodeid = st_data((1,`onenodes'), "`generate'")
 		nwtomata, mat(onenet)
+
 		local _stat = 5
 		if "`stat'" == "max" {
 			local _stat = 2
@@ -95,22 +96,32 @@ program nw2fromedge
 		}	
 		keep if `generate' == 1
 		mata: onenet = onemodeproject(onenet, onemodeid, `_stat')
+		mata: onenet
+		exit
+		
 		mata: rows(onenet)
+		mata: onenet
 		nwset , mat(onenet) name(`newname')
 		nwset, detail
 		nwsummarize
-
+		di "h2"
 		nwname, newlabsfromvar(_nodelab)
 		nwdrop `onename'
 		capture mata: mata drop onenet
+		di "h3"
 		nwsym
+		di "h33"
 		drop _all
 		if "`xvars'" != "" {
+			di "h34"
 			nwload, labelonly
+			di "h35"
 		}
 		else {
+			di "h44"
 			nwload
 		}
+		di "h4"
 	}
 	nwsummarize
 end
