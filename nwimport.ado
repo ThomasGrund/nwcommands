@@ -29,8 +29,9 @@ program nwimport
 		local name = subinstr(`"`name'"',".txt", "", .)
 		local name = subinstr(`"`name'"',".csv", "", .)
 		local name = subinstr(`"`name'"',".dta", "", .)
+		local name = subinstr(`"`name'"',".xlsx", ".xls", .)
+		local name = subinstr(`"`name'"',".xls", "", .)
 		local name = subinstr(`"`name'"', char(34), "", .)
-		local name = substr(`"`name'"', 2, .)
 	}
 	
 	capture qui nwset
@@ -725,18 +726,16 @@ program _nwimport_edgelist
 	preserve
 	clear
 	
-	gettoken fname ending : anything, parse(".")
-
 	local success = 0
 	local excel = 0
 	local pot_delimiters = `""tab" ";" "," " ""'
 	local pot_delimiters_length : word count `pot_delimiters'
 	local i = 1
-	
+
 	// Excel file detected
-	if (strpos("`ending'", "xls") != 0 ){
+	if (strpos(`"`anything'"', ".xls") != 0 ){
 		local excel = 1
-		import excel "`anything'", sheet("Sheet1") clear
+		import excel `anything', clear
 		if c(k) == 1 | _rc != 0 {
 			local success = 0
 		}
@@ -744,7 +743,7 @@ program _nwimport_edgelist
 			local success = 1
 		}
 	}
-
+ 
 	local i = 1
 	while (`excel' == 0 & "`delimiter'" == "" & `success' == 0 & `i' <= `pot_delimiters_length'){
 		local use_delimiter : word `i' of `pot_delimiters'
@@ -769,9 +768,12 @@ program _nwimport_edgelist
 		}
 	}
 	
+	if `excel' != 0 {
 	// Try other delimiters
     if ("`delimiter'" != ""){
 		insheet using `"`anything'"', delimiter("`delimiter'") clear
+		
+		di `"insheet using `"`anything'"', delimiter("`delimiter'") clear"'
 		// Check for failure
 		if c(k) == 1 | _rc != 0 {
 			local success = 0
@@ -779,6 +781,7 @@ program _nwimport_edgelist
 		else {
 			local success = 1
 		}
+	}
 	}
 	
 	if `success' == 0 {
