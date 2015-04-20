@@ -26,6 +26,7 @@
 {opt mcmcoptions}({it:mcmcoptions})
 {opt detail}
 {opt keepfiles}
+{opt debug}
 {it:{help twoway_options}}]
 
 
@@ -43,7 +44,7 @@
 {synopt:{opt mcmcoptions}({it:mcmcoptions})}Options for MCMC test{p_end}
 {synopt:{opt detail}}Show details in output{p_end}
 {synopt:{opt keepfiles}}Keep all intermediary files (e.g. R script, data, results){p_end}
-
+{synopt:{opt debug}}Show debug information{p_end}
 
 
 
