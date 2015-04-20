@@ -91,8 +91,6 @@ f nwvalidate.ado
 f nwvalidvars.ado
 f nwvalue.ado
 f webnwuse.ado
-f dendtest.dta
-f distest.dta
 f florentine.dta
 f gang.dta
 f glasgow.dta

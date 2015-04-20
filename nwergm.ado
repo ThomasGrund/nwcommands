@@ -5,7 +5,7 @@
 
 capture program drop nwergm	
 program nwergm, sortpreserve
-syntax anything(name=netname), formula(string) [ ergmoptions(string) rpath(string) ergmdetail keepfiles detail gof gofoptions(string) mcmc mcmcoptions(string) * ]
+syntax anything(name=netname), formula(string) [debug ergmoptions(string) rpath(string) ergmdetail keepfiles detail gof gofoptions(string) mcmc mcmcoptions(string) * ]
 	set more off
 	_nwsyntax `netname'
 	
@@ -28,7 +28,13 @@ syntax anything(name=netname), formula(string) [ ergmoptions(string) rpath(strin
 		}
 		local rpath = "`r(rpath)'"
 	}
-	capture findfile R, path(`rpath')
+	if c(os) == "Windows" {
+		local osending = ".exe"
+	}
+	
+	di "capture findfile R`osending', path(`rpath')"
+	
+	capture findfile R`osending', path(`rpath')
 	if _rc == 0 {
 		di "{txt}...R found"
 		global rpath `rpath'/R
@@ -73,13 +79,15 @@ syntax anything(name=netname), formula(string) [ ergmoptions(string) rpath(strin
 	tempname r_ergm
 	qui file open `r_ergm' using "`rergm'", write replace
 
+	local mypwd = "`c(pwd)'"
+	local mypwd : subinstr local mypwd "\" "/", all
+	
 	// install and load necessary packages
 	file write `r_ergm' "# install and load necessary R packages" _n ///
-					`"if (!require("foreign",character.only = TRUE)) { install.packages("foreign", repos = "http://cran.rstudio.com/") } "' _n ///
-					`"if (!require("ergm",character.only = TRUE)) { install.packages("ergm", repos = "http://cran.rstudio.com/") } "' _n ///
+					`"if (!require("foreign",character.only = TRUE)) { install.packages("foreign",  repos = "http://cran.rstudio.com/") } "' _n ///
+					`"if (!require("statnet",character.only = TRUE)) { install.packages("statnet", repos = "http://cran.rstudio.com/") } "' _n ///
 					`"suppressPackageStartupMessages(library("foreign", quietly=TRUE, verbose=FALSE, warn.conflicts=FALSE))"' _n ///
-					`"suppressPackageStartupMessages(library("ergm", quietly=TRUE, verbose=FALSE, warn.conflicts=FALSE))"' _n  ///
-					`"suppressPackageStartupMessages(library("network", quietly=TRUE, verbose=FALSE, warn.conflicts=FALSE))"' _n _n ///
+					`"suppressPackageStartupMessages(library("statnet", quietly=TRUE, verbose=FALSE, warn.conflicts=FALSE))"' _n  ///
 					"# set R working directory to Stata working directory" _n ///
 					`"setwd("`rdir'")"' _n _n
 
@@ -175,16 +183,29 @@ syntax anything(name=netname), formula(string) [ ergmoptions(string) rpath(strin
 	if "`detail'" != "" {
 		local mode "--slave"
 	}
-	local Rcommand "$rpath `mode' <`rcode'"
-	di "`Rcommand'"
-	shell `Rcommand'
+	local Rcommand `""$rpath" `mode' <`rcode'"'
+	di `"`Rcommand'"'
 	
-	
+	if "`debug'" != "" {
+		capture which ashell
+		if _rc != 0 {
+			ssc install ashell
+		}
+		ashell `Rcommand'
+		forvalues i = 1/`r(no)' {
+			di `"`r(o`i')'"'
+		}
+	}
+	else {
+		shell `Rcommand'
+	}
+		
 	//capture {
 	// open R result files and prepare Stata output
 	// get general estimation statistics from ergstats.csv
 	local ergstats "ergstats.csv"
 	tempname r_ergstats
+
 	file open `r_ergstats' using "`ergstats'", read text
 	file read `r_ergstats' names
 	file read `r_ergstats' values
@@ -205,7 +226,7 @@ syntax anything(name=netname), formula(string) [ ergmoptions(string) rpath(strin
 	mata: st_numscalar("e(vertices)", `vertices')
 	mata: st_numscalar("e(edges)", `edges')
 	mata: st_numscalar("e(numcoeff)", `numcoeff')
-	mata: st_numscalar("e(iterations)", `iterations')
+	mata: st_global("e(iterations)", `"`iterations'"')
 	mata: st_numscalar("e(samplesize)", `samplesize')
 	mata: st_numscalar("e(AIC)", `aic')
 	mata: st_numscalar("e(BIC)",`bic')'
@@ -218,7 +239,6 @@ syntax anything(name=netname), formula(string) [ ergmoptions(string) rpath(strin
 	matrix sd = J(`numcoeff',1,0)
 	matrix mcmc = J(`numcoeff',1,0)
 	matrix pvalue = J(`numcoeff',1,0)
-
 	local ergcoefs "ergcoefs.csv"
 	tempname r_ergcoefs
 	file open `r_ergcoefs' using "`ergcoefs'", read text
@@ -252,7 +272,7 @@ syntax anything(name=netname), formula(string) [ ergmoptions(string) rpath(strin
 	}
 	file close `r_ergmodel'
 	mata: st_matrix("e(model)", st_matrix("model"))
-
+	
 	// get covariance matrix  from ergcov.csv
 	local ergcov "ergcov.csv"
 	tempname r_ergcov
@@ -308,14 +328,16 @@ syntax anything(name=netname), formula(string) [ ergmoptions(string) rpath(strin
 	tokenize `e(names)', parse(" ")
 	di 
 	di
-	di `"{txt}Exponential random graph analysis{col 42}Number of vertices{col 64}=  {res}`e(vertices)'"' 
-	di `"{txt}{col 42}Number of edges/arcs{col 64}={res}  `e(edges)'"'
-	di "{txt}{col 42}Directed{col 64}={res}  `e(directed)'"	
-	di `"{txt}{col 42}Estimation{col 64}={res}  `e(estimation)'"' 
-	di `"{txt}{col 42}Iterations{col 64}={res}  `e(iterations)'"' 
-	di `"{txt}{col 42}MCMC sample size{col 64}={res}  `e(samplesize)'"' 
-	di `"{txt}{col 42}AIC{col 64}={res}  `e(AIC)'"' 
-	di `"{txt}{col 42}BIC{col 64}={res}  `e(BIC)'"' 
+	di `"{txt}Exponential random graph analysis"'
+	di 
+	di `"{col 2}Number of vertices{col 24}=  {res}`e(vertices)'"' 
+	di `"{txt}{col 2}Number of edges/arcs{col 24}={res}  `e(edges)'"'
+	di "{txt}{col 2}Directed{col 24}={res}  `e(directed)'"	
+	di `"{txt}{col 2}Estimation{col 24}={res}  `e(estimation)'"' 
+	di `"{txt}{col 2}Iterations{col 24}={res}  `e(iterations)'"' 
+	di `"{txt}{col 2}MCMC sample size{col 24}={res}  `e(samplesize)'"' 
+	di `"{txt}{col 2}AIC{col 24}={res}  `e(AIC)'"' 
+	di `"{txt}{col 2}BIC{col 24}={res}  `e(BIC)'"' 
 	di 
 	di "{txt}{hline `=`max_l' + 3'}{c TT}{hline 55}"
 	di "{col 2}network{col `=`max_l' + 4'}{c |}{col `=`max_l' + 12'}Observed{col `=`max_l' + 25'}Coef. {col `=`max_l' + 34'}Std.Err.{col `=`max_l' + 45'}MCMC%{col `=`max_l' + 52'}P>|z|"
@@ -513,7 +535,7 @@ program nwergm_install_osx
 		}
 	}
 	else {
-		di ""
+		di ""o
 		di "{txt}Checking third party software:"
 		di "{txt}...ImageMagick found"
 	} */
