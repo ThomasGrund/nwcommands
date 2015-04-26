@@ -126,7 +126,7 @@ program _nwdeploy
 			"{p2colset 5 32 34 2}" 
 	set more off
 	
-	file open _pkg_ado using _pkg_hlp.txt, read
+	file open _pkg_ado using _pkg_ado.txt, read
 	file read _pkg_ado _pkg_ado_line 
 	while "`_pkg_ado_line'" != "" {
 		file write `deploy_ado' "`_pkg_ado_line'" _n
@@ -148,7 +148,7 @@ program _nwdeploy
 	
 	file close `alphabetical'
 	
-	local dtafiles : dir "`c(pwd)'" files "*.dta"
+	/*local dtafiles : dir "`c(pwd)'" files "*.dta"
 	foreach file in `dtafiles' {
 		file write `deploy_ado' "f `file'" _n
 	}
@@ -163,7 +163,8 @@ program _nwdeploy
 	local dlfiles : dir "`c(pwd)'" files "*.dat"
 	foreach file in `dlfiles' {
 		file write `deploy_ado' "f `file'" _n
-	}
+	}*/
+	
 	file close `deploy_ado'
 	
 	file open deploy_hlp using nwcommands-hlp.pkg, replace write
@@ -197,12 +198,12 @@ program _nwdeploy
 	file write deploy_ext1 "d Thomas U. Grund, Linkoping University, www.liu.se/ias" _n
 	file write deploy_ext1 "d email: contact@nwcommands.org" _n
 	local d = lower(subinstr(c(current_date)," ","",.))
-	file write deploy_ext "d Distribution-Date: `d'" _n
+	file write deploy_ext1 "d Distribution-Date: `d'" _n
 	
 	file open _pkg_ext1 using _pkg_ext1.txt, read
 	file read _pkg_ext1 _pkg_ext1_line 
 	while "`_pkg_ext1_line'" != "" {
-		file write deploy_ext1 "`_pkg_hlp_line'" _n
+		file write deploy_ext1 "`_pkg_ext1_line'" _n
 		file read _pkg_ext1 _pkg_ext1_line 
 	}
 	file close _pkg_ext1
