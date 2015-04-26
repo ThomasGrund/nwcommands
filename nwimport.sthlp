@@ -27,6 +27,9 @@
 {synopt:{opt nwclear}}clear all networks and variables{p_end}
 {synopt:{opt clear}}clear variables{p_end}
 {synopt:{opth name(newnetname)}}name of the imported network; default = {it:filename}{p_end}
+{synopt:{opt forcedirected}}force network to be directed{p_end}
+{synopt:{opt forceundirected}}force network to be undirected{p_end}
+
 
 {synoptset 20 tabbed}{...}
 {marker import_type}{...}
@@ -63,7 +66,10 @@
 {title:Description}
 
 {pstd}
-Imports networks from popular network file formats. The following network formats are supported:
+Imports networks from popular network file formats. The command automatically recognizes whether networks are directed or undirected. However, options
+{bf:forcedirected} and {bf:forceundirected} can be used to override automatic detection.
+
+The following network formats are supported:
 
 {pmore}{help nwimport##ucinet:- Ucinet}{p_end}
 {pmore}{help nwimport##pajek:- Pajek}{p_end}

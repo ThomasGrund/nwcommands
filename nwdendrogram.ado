@@ -38,7 +38,7 @@ program nwdendrogram
 		local i = `i' + 1
 	}
 	
-	//capture {
+	capture {
 	if "`label'" == "" {
 		local label = "`ord'"
 	}
@@ -55,8 +55,8 @@ program nwdendrogram
 		local cutpts "`cutpts' `=1 - `onecut'/`maxCut''" 
 	}
 	local cutpts "`cutpts' 0"
-	dendrogram_classes `mylevels', `factor' cutpoints(`cutpts') `options' label(`label') 
-	//}
+	qui dendrogram_classes `mylevels', `factor' cutpoints(`cutpts') `options' label(`label') 
+	}
 	capture drop __lev*
 	
 end

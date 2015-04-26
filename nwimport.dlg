@@ -1,6 +1,6 @@
 VERSION 10
 
-INCLUDE _std_mlarge
+INCLUDE _std_large
 INCLUDE header
 HELP hlp1, view("help nwimport")
 RESET res1
@@ -16,13 +16,17 @@ BEGIN
 	FILE fl_edge 50 90 350 ., label("File") filter("Stata .dta|*.dta|Text .txt|*.txt|Comma-separated .csv|*.csv|Excel .xlsx|*.xlsx|Excel-old .xls|*.xls|All files|*.*")	
 	FILE fl_compressed 50 90 350 ., label("File") filter("CSV files|*.csv")	
 	FILE fl_all 50 90 400 ., label("File") filter("All files|*.*")	
-	TEXT tx_name 50 140 200 ., label("New name(s) of network(s):")
-	EDIT ed_name 50 160 200 ., nomemory
-	GROUPBOX gb_direct 260 140 150 100, label("Arc/Edge detection:")		 
-	RADIO rb_automatic 270 160 220 ., first label("automatic")
-	RADIO rb_directed 270 180 220 ., middle label("force directed")
-	RADIO rb_undirected 270 200 220 ., last label("force undirected ")
-	CHECKBOX ck_nwclear 50 200 200 100, label("Replace networks in memory") 
+	TEXT tx_name 50 130 200 ., label("New name(s) of network(s):")
+	EDIT ed_name 50 150 200 ., nomemory
+	GROUPBOX gb_direct 260 130 150 100, label("Arc/Edge detection:")		 
+	RADIO rb_automatic 270 150 220 ., first label("automatic")
+	RADIO rb_directed 270 170 220 ., middle label("force directed")
+	RADIO rb_undirected 270 190 220 ., last label("force undirected ")
+	CHECKBOX ck_cols 50 180 200 100, label("Labels in first column") option(colnames) nomemory
+	CHECKBOX ck_rows 50 200 200 100, label("Labels in first row") option(rownames) nomemory	
+	TEXT tx_delim 50 230 200 ., label("Use delimiter:") 
+	EDIT ed_delim 150 230 30 ., nomemory
+	CHECKBOX ck_nwclear 50 270 200 100, label("Replace networks in memory") nomemory
 END
 
 LIST filetypes
@@ -55,12 +59,20 @@ BEGIN
 	main.fl_edge.hide
 	main.fl_compressed.hide
 	main.fl_all.hide
+	main.ck_cols.hide
+	main.ck_rows.hide
+	main.ed_delim.hide
+	main.tx_delim.hide
 END
 
 SCRIPT format_matrix
 BEGIN
 	script format_off
 	main.fl_matrix.show
+	main.ck_cols.show
+	main.ck_rows.show
+	main.ed_delim.show
+	main.tx_delim.show
 END
 
 SCRIPT format_edge
@@ -109,7 +121,17 @@ BEGIN
 	}
 	if main.cb_type.iseq("Raw Matrix") {
 		require main.fl_matrix
-		put "nwimport " main.fl_matrix ", type(matrix)"
+		put "nwimport " main.fl_matrix ", type(matrix,"
+		if main.ed_delim {
+			put " delimiter(" main.ed_delim ")"
+		}
+		if main.ck_rows {
+			put " rownames"
+		}
+		if main.ck_cols {
+			put " colnames"
+		}
+		put ")"
 	}
 	if main.cb_type.iseq("Raw Compressed Edgelist") {
 		require main.fl_compressed
@@ -128,14 +150,15 @@ BEGIN
 		put " name(" main.ed_name ")"
 	}
 	if main.rb_undirected {
-		put " undirected"
+		put " forceundirected"
 	}
 	if main.rb_directed {
-		put " directed"
+		put " forcedirected"
 	}
 	if main.ck_nwclear {
 		put " nwclear"
 	}
+
 	stata 
 	
 END

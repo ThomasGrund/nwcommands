@@ -47,7 +47,7 @@ program nwimport
 	local options `"`options_original'"'
 
 	if "`import_type'" == "matrix" {
-		  capture _nwimport_matrix `fname', `options' `typeoptions'
+		 capture _nwimport_matrix `fname', `options' `typeoptions'
 	}
 	if "`import_type'" == "compressed" {
 		 capture _nwimport_compressed `fname', `options'
@@ -77,14 +77,14 @@ program nwimport
 	if `nets_now' > `nets_before'{
 		forvalues j = `=`nets_before'+1'/`nets_now' {
 			nwname, id(`j')
-			local directed `r(directed)'	
+			local d `r(directed)'	
 
 			// check of network is undirected or not
 			nwissymmetric `r(name)'
-			if `r(issymmetric)' == 1 & "`directed'" == "true" {
+			if `r(issymmetric)' == 1 & "`d'" == "true" & "`directed'" == ""{
 				local newdirectedcmd "newdirected(false)"
 			}
-			if `r(issymmetric)' == 0 & "`directed'" == "false" {
+			if `r(issymmetric)' == 0 & "`d" == "false" & "`undirected'" == ""{
 				local newdirectedcmd "newdirected(true)"
 			}
 				
@@ -472,9 +472,6 @@ program _nwimport_matrix
 		local firstrow = "firstrow"
 		local varnames = "names"
 	}
-	
-	clear
-	//preserve
 
 	local excelfile = strpos(`"`anything'"', ".xls")
 	local excelfile = (`excelfile' != 0)
@@ -490,11 +487,10 @@ program _nwimport_matrix
 		local excel = 1
 		import excel `anything',  `firstrow' clear
 		// Drop first column
-		if "`colnames'" != "" {
+		qui if "`colnames'" != "" {
 			unab A : _all
 			local first : word 1 of `A'
 			drop `first'
-			di "`first'"
 		}
 	}
 	else {	
@@ -528,11 +524,37 @@ program _nwimport_matrix
 			else {
 				local success = 1
 			}
-			if "`colnames'" != "" {
+			qui if "`colnames'" != "" {
 				unab A : _all
 				local first : word 1 of `A'
 				drop `first'
-				di "`first'"
+			}
+		}
+		if "`delimiter'" != "" {
+			local insheet_opt = ", clear"
+			insheet using `anything' `insheet_opt' `varnames' delimiter("`delimiter'")
+			if `c(k)' == 1 {
+				split v1, parse(" ")
+				drop v1
+				foreach v of varlist _all {
+					if `v'[1] == "" {
+						noi di "`v'"
+						drop `v'
+					}
+				}
+				destring _all, replace
+			}
+			
+			if (`c(k)' == 1){
+				local success = 0
+			}
+			else {
+				local success = 1
+			}
+			qui if "`colnames'" != "" {
+				unab A : _all
+				local first : word 1 of `A'
+				drop `first'
 			}
 		}
 	}
