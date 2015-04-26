@@ -125,7 +125,16 @@ program _nwdeploy
 			"{col 5}{hline}" _n ///
 			"{p2colset 5 32 34 2}" 
 	set more off
-	foreach file in `adofiles' {
+	
+	file open _pkg_ado using _pkg_hlp.txt, read
+	file read _pkg_ado _pkg_ado_line 
+	while "`_pkg_ado_line'" != "" {
+		file write `deploy_ado' "`_pkg_ado_line'" _n
+		file read _pkg_ado _pkg_ado_line 
+	}
+	file close _pkg_ado
+	
+	/*foreach file in `adofiles' {
 		
 		// add meta to dofiles
 		// di "ado: `file'"
@@ -135,7 +144,8 @@ program _nwdeploy
 		getcmddesc `cmdname'
 		file write `deploy_ado' "f `file'" _n
 		file write `alphabetical' "{p2col:{bf:{help `cmdname' }}}`r(cmddesc)'{p_end}" _n		
-	}
+	}*/
+	
 	file close `alphabetical'
 	
 	local dtafiles : dir "`c(pwd)'" files "*.dta"
@@ -164,12 +174,39 @@ program _nwdeploy
 	local d = lower(subinstr(c(current_date)," ","",.))
 	file write deploy_hlp "d Distribution-Date: `d'" _n
 	
+	file open _pkg_hlp using _pkg_hlp.txt, read
+	file read _pkg_hlp _pkg_hlp_line 
+	while "`_pkg_hlp_line'" != "" {
+		file write deploy_hlp "`_pkg_hlp_line'" _n
+		file read _pkg_hlp _pkg_hlp_line 
+	}
+	file close _pkg_hlp
+	
+	/*
 	local hlpfiles : dir "`c(pwd)'" files "*.sthlp"
 	foreach file in `hlpfiles' {
 		file write deploy_hlp "f `file'" _n
 	}
+	*/
+	
 	file close deploy_hlp
 	
+	file open deploy_ext1 using nwcommands-ext1.pkg, replace write
+	file write deploy_ext1 "v 3" _n
+	file write deploy_ext1 "d nwcommands-hlp. Social Network Analysis Using Stata - Extension_1" _n
+	file write deploy_ext1 "d Thomas U. Grund, Linkoping University, www.liu.se/ias" _n
+	file write deploy_ext1 "d email: contact@nwcommands.org" _n
+	local d = lower(subinstr(c(current_date)," ","",.))
+	file write deploy_ext "d Distribution-Date: `d'" _n
+	
+	file open _pkg_ext1 using _pkg_ext1.txt, read
+	file read _pkg_ext1 _pkg_ext1_line 
+	while "`_pkg_ext1_line'" != "" {
+		file write deploy_ext1 "`_pkg_hlp_line'" _n
+		file read _pkg_ext1 _pkg_ext1_line 
+	}
+	file close _pkg_ext1
+	file close deploy_ext1
 	
 	file open deploy_dlg using nwcommands-dlg.pkg, replace write
 	file write deploy_dlg "v 3" _n

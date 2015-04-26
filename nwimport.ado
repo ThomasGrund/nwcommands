@@ -12,6 +12,9 @@ program nwimport
 		local nameoff = "false"
 	}
 	
+	gettoken type typeoptions : type, parse(",")
+	local typeoptions = subinstr("`typeoptions'",",","",.)
+	
 	set more off
 	qui `clear'
 	qui `nwclear'
@@ -44,7 +47,7 @@ program nwimport
 	local options `"`options_original'"'
 
 	if "`import_type'" == "matrix" {
-		 capture _nwimport_matrix `fname', `options'
+		  capture _nwimport_matrix `fname', `options' `typeoptions'
 	}
 	if "`import_type'" == "compressed" {
 		 capture _nwimport_compressed `fname', `options'
@@ -460,16 +463,22 @@ end
 
 capture program drop _nwimport_matrix
 program _nwimport_matrix
-	syntax anything, [name(string) delimiter(string) directed ] 
+	syntax anything, [name(string) delimiter(string) directed rownames colnames ] 
 	if "`name'" == "" {
 		local name "network"
 	}
 	
-	clear
-	preserve
+	if "`rownames'" != "" {
+		local firstrow = "firstrow"
+		local varnames = "names"
+	}
 	
-	gettoken fname ending : anything, parse(".")
+	clear
+	//preserve
 
+	local excelfile = strpos(`"`anything'"', ".xls")
+	local excelfile = (`excelfile' != 0)
+	
 	local success = 0
 	local excel = 0
 	local pot_delimiters = `""tab" ";" "," " ""'
@@ -477,9 +486,16 @@ program _nwimport_matrix
 	local i = 1
 	
 	// Excel file detected
-	if ((strpos("`ending'", "xls") != 0 ) | strpos("`ending'", "xlsx") != 0 ){
+	if (`excelfile' != 0){
 		local excel = 1
-		import excel "`anything'", sheet("Sheet1") clear
+		import excel `anything',  `firstrow' clear
+		// Drop first column
+		if "`colnames'" != "" {
+			unab A : _all
+			local first : word 1 of `A'
+			drop `first'
+			di "`first'"
+		}
 	}
 	else {	
 		while (`excel' == 0 & "`delimiter'" == "" & `success' == 0 & `i' <= `pot_delimiters_length'){
@@ -492,8 +508,8 @@ program _nwimport_matrix
 			else {
 				local insheet_opt = `", delimiter("`use_delimiter'") clear"'
 			}
-		
-			insheet using `anything' `insheet_opt'
+	
+			insheet using `anything' `insheet_opt' `varnames'
 			if `c(k)' == 1 {
 				split v1, parse(" ")
 				drop v1
@@ -511,6 +527,12 @@ program _nwimport_matrix
 			}
 			else {
 				local success = 1
+			}
+			if "`colnames'" != "" {
+				unab A : _all
+				local first : word 1 of `A'
+				drop `first'
+				di "`first'"
 			}
 		}
 	}

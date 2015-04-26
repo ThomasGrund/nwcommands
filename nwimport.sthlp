@@ -15,7 +15,7 @@
 {cmdab: nwimport} 
 {it:{help filename}}
 , 
-{opt type}({it:{help nwimport##import_type:import_type}})
+{opt type}({it:{help nwimport##import_type:import_type}}[, {it:{help nwimport##type_sub:type_sub}}])
 [{opth name(newnetname)}
 {opt nwclear}
 {opt clear}]
@@ -25,7 +25,7 @@
 {synopthdr}
 {synoptline}
 {synopt:{opt nwclear}}clear all networks and variables{p_end}
-{synopt:{opt undirected}}clear variables{p_end}
+{synopt:{opt clear}}clear variables{p_end}
 {synopt:{opth name(newnetname)}}name of the imported network; default = {it:filename}{p_end}
 
 {synoptset 20 tabbed}{...}
@@ -46,6 +46,18 @@
 	{p_end}
 {p2col:{cmd: graphml}}network is given in {browse "http://gephi.github.io/users/supported-graph-formats/graphml-format/":GraphML file format}
 		{p_end}
+		
+
+{synoptset 20 tabbed}{...}
+{marker type_sub}{...}
+{p2col:{it:type_sub}}Description{p_end}
+{p2line}
+{p2col:{cmd: rownames}}first row in matrix contains variable names
+		{p_end}
+{p2col:{cmd: colnames}}first column in matrix contains variable names
+		{p_end}
+{p2col:{opth delimiter(string)}}specify delimiter in matrix explicitly
+		{p_end}		
 		
 		
 {title:Description}
@@ -103,7 +115,7 @@ or the {browse "https://www.soc.umn.edu/~knoke/pages/UCINET_6_User's_Guide.doc":
 	1 0 0 0
 	1 0 0 1
 	1 0 1 0
-
+	
 {phang}
 {bf:Example 3:}{p_end}
 	dl n = 4
@@ -177,6 +189,21 @@ and/or column names can be included as well. This import option can be used to l
 	0,0,0,1
 	0,1,0,0
 
+{pstd}
+Notice that the command recognises when variable names are given in the first row. However, variable names in the
+first column are not automatically recognized. One can make this explicit with the option {bf:type(matrix, rownames colnames)}.
+
+{pstd}
+Furthermore, the raw dataset can also contain additional attributes. When there are more variables than cases, all remaining
+variables are treated as attributes. 
+
+{phang}
+{bf:Example 2:}{p_end}
+	thomas,peter,susan,kim, sex
+	0,1,1,0, male
+	1,0,0,0, male
+	0,0,0,1, female
+	0,1,0,0, male
 	
 {marker edgelist}{...}
 {title:Import raw edgelist}

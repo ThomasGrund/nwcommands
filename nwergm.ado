@@ -26,13 +26,12 @@ syntax anything(name=netname), formula(string) [debug ergmoptions(string) rpath(
 		if c(os) == "Windows" {
 			nwergm_install_win
 		}
-		local rpath = "`r(rpath)'"
+		local rpath = subinstr(`"`r(rpath)'"',"R.exe","",.)
 	}
 	if c(os) == "Windows" {
 		local osending = ".exe"
+		
 	}
-	
-	di "capture findfile R`osending', path(`rpath')"
 	
 	capture findfile R`osending', path(`rpath')
 	if _rc == 0 {

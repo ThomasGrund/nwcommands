@@ -39,7 +39,7 @@ end
 
 capture program drop nwtab2
 program nwtab2
-	syntax anything(name=something) [, unvalued plot plotoptions(string) permutations(integer 100)  *]
+	syntax anything(name=something) [, unvalued plot plotoptions(string) permutations(integer 100) poff *]
 		
 	if "`plot'" != "" {
 		capture which tabplot
@@ -222,7 +222,9 @@ program nwtab2
 		local xmin = min(`EI_index',r(min))
 		local xmax = max(`EI_index',r(max))
 		local bandwidth `= 1 / `nodes''
+		if "`poff'" == "" {
 		kdensity EI_simulated, xscale(range(`xmin' `xmax')) title("") bwidth(`bandwidth') ytitle("Density") xtitle("E-I Index") xline(`EI_index',lpattern(dash)) xlabel(#5) note(`"based on `permutations' QAP permutations of network `netname1'"') `options'	
+		}
 		mata: st_numscalar("r(EI_pvalue)", pvalue)		
 	}
 	

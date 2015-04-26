@@ -82,13 +82,21 @@ syntax [varlist (default=none)][, clear nwclear nooutput edgelist name(string) v
 	else {
 		// set network from varlist
 		if "`varlist'" != "" {
-			local size :word count `varlist'
+
 			local varscount : word count `vars'
 			local labscount : word count `labs'
 			local varlistcount: word count `varlist'
 			if (`varlistcount' > _N ) {
-				exit
+				unab A : _all
+				local newvarlist ""
+				forvalues j = 1/`=_N' {
+					local newvar : word `j' of `varlist'
+					local newvarlist "`newvarlist' `newvar'"
+				}
+				local varlist `newvarlist'
+				
 			}
+			local size: word count `varlist'
 			qui nwtomata `varlist', mat(onenet)
 			local mat = "onenet"
 			if (`varscount' != `size') unab vars: `varlist'

@@ -81,7 +81,7 @@ no correlation. In practice, rows and columns of {help netname} are reshuffled a
 coefficient is calculated again and again. Based on this distribution a {it:p-value} and a confidence
 interval is calculated. A plot is displayed and additional information is returned in the return vector. 
 
-
+{marker nodes}{...}
 {title:Nodes of one network}
 
 {pstd}

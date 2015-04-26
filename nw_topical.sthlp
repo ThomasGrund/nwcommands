@@ -1,5 +1,5 @@
 {smcl}
-{* *! version  20apr2015}{...}
+{* *! version  26apr2015}{...}
 {phang}
 {help nwcommands:NW-2 topical} {hline 2} 
 {hline 2} Topical list of network commands
@@ -59,6 +59,7 @@
 {col 8}   {c BLC}{hline 24}{c BRC}
 {p2colset 12 35 36 2}
 {p2col:    {bf:{help nwcollapse }}}Collapse a network{p_end}
+{p2col:    {bf:{help nwdissimilar }}}Generate node dissimilarities{p_end}
 {p2col:    {bf:{help nwduplicate }}}Duplicate a network{p_end}
 {p2col:    {bf:{help nwdyadprob }}}Generate a network based on tie probabilities{p_end}
 {p2col:    {bf:{help nwexpand }}}Expand variable to network{p_end}
@@ -73,6 +74,7 @@
 {p2col:    {bf:{help nwrandom }}}Generate a random network{p_end}
 {p2col:    {bf:{help nwreach }}}Calculate reachability network{p_end}
 {p2col:    {bf:{help nwring }}}Generate a ring-lattice network{p_end}
+{p2col:    {bf:{help nwsimilar }}}Generate node similarities{p_end}
 {p2col:    {bf:{help nwsmall }}}Generate a small-world network{p_end}
 {p2col:    {bf:{help nwsubset }}}Subset a network{p_end}
 {p2col:    {bf:{help nwtranspose }}}Transpose a network{p_end}
@@ -124,16 +126,19 @@
 {p2col:    {bf:{help nwcontext }}}Create a context variable{p_end}
 {p2col:    {bf:{help nwcorrelate }}}Correlate networks and variables{p_end}
 {p2col:    {bf:{help nwdegree }}}Degree centrality and distribution{p_end}
+{p2col:    {bf:{help nwdissimilar }}}Generate node dissimilarities{p_end}
 {p2col:    {bf:{help nwergm }}}Exponential Random Graph Model{p_end}
 {p2col:    {bf:{help nwevcent }}}Calculate eigenvector centrality{p_end}
 {p2col:    {bf:{help nwgen }}}Network extensions to generate{p_end}
 {p2col:    {bf:{help nwgenerate }}}{p_end}
 {p2col:    {bf:{help nwgeodesic }}}Calculate shortest paths between nodes{p_end}
+{p2col:    {bf:{help nwhierarchy }}}Hierrachical clustering of nodes{p_end}
 {p2col:    {bf:{help nwkatz }}}Calculate Katz centrality{p_end}
 {p2col:    {bf:{help nwneighbor }}}Extract the network neighbors of a node{p_end}
 {p2col:    {bf:{help nwpath }}}Calculate paths between nodes{p_end}
 {p2col:    {bf:{help nwqap }}}Multivariate QAP regression{p_end}
 {p2col:    {bf:{help nwreach }}}Calculate reachability network{p_end}
+{p2col:    {bf:{help nwsimilar }}}Generate node similarities{p_end}
 {p2col:    {bf:{help nwutility }}}Calculate utility scores according to Jackson and Wollinsky (1996){p_end}
 {p2col:    {bf:{help nwvalue }}}Returns entries form the adjaceny matrix of a network{p_end}
 {marker utilities}{...}
@@ -186,5 +191,6 @@
 {p2col:{bf:{help _nwsetobs }}}{err}no help file yet{txt}{p_end}
 {p2col:{bf:{help _nwsyntax_other }}}{err}no help file yet{txt}{p_end}
 {p2col:{bf:{help _opts_oneof }}}{err}no help file yet{txt}{p_end}
+{p2col:{bf:{help nwdendrogram }}}{err}no help file yet{txt}{p_end}
 {p2col:{bf:{help nwtomatafast }}}{err}no help file yet{txt}{p_end}
 {p2col:{bf:{help nwtostata }}}{err}no help file yet{txt}{p_end}
