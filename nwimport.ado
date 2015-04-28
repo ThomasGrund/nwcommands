@@ -486,12 +486,6 @@ program _nwimport_matrix
 	if (`excelfile' != 0){
 		local excel = 1
 		import excel `anything',  `firstrow' clear
-		// Drop first column
-		qui if "`colnames'" != "" {
-			unab A : _all
-			local first : word 1 of `A'
-			drop `first'
-		}
 	}
 	else {	
 		while (`excel' == 0 & "`delimiter'" == "" & `success' == 0 & `i' <= `pot_delimiters_length'){
@@ -524,11 +518,6 @@ program _nwimport_matrix
 			else {
 				local success = 1
 			}
-			qui if "`colnames'" != "" {
-				unab A : _all
-				local first : word 1 of `A'
-				drop `first'
-			}
 		}
 		if "`delimiter'" != "" {
 			local insheet_opt = ", clear"
@@ -551,11 +540,6 @@ program _nwimport_matrix
 			else {
 				local success = 1
 			}
-			qui if "`colnames'" != "" {
-				unab A : _all
-				local first : word 1 of `A'
-				drop `first'
-			}
 		}
 	}
 	
@@ -563,51 +547,52 @@ program _nwimport_matrix
 	ds
 	local firstvar : word 1 of `r(varlist)'
 	local secondvar : word 2 of `r(varlist)'
-	local check1 = `firstvar'[2]
-	capture confirm number `check1'
-	if _rc != 0 {
-		local rownames "true"
-	}
-	else {
-		local rownames "false"
-	}
 	
-	local check2 = `secondvar'[1]
-
-	capture confirm number `check2'
-	if _rc != 0 {
-		local colnames "true"
-	}
-	else {
-		local colnames "false"
-	}
-	
-	if "`rownames'" == "true" {
-		local labs ""
-		forvalues i = 1/`=_N' {
-			di "`firstvar'"
-			local onelabel = `firstvar'[`i']
-			if "`onelabel'" != "" {
-				local labs "`labs' `onelabel'"
-			}
+	if "`rownames'" == "" { 
+		local check1 = `secondvar'[1]
+		capture confirm number `check1'
+		if _rc != 0 {
+			local rownames "rownames"
 		}
-		drop `firstvar'
+	}
+	
+	if "`colnames'" == "" {
+		local check2 = `firstvar'[2]
+		capture confirm number `check2'
+		if _rc != 0 {
+			local colnames "colnames"
+		}
+	}
+	
+	unab varlist : _all 
+	
+	if "`colnames'" == "colnames" {
+		local labscmd " labsfromvar(`firstvar')"
+		local varlist : list varlist - firstvar
 	}	
-	if "`colnames'" == "true" {
-		if"`labs'" == ""{
-			foreach var of varlist _all {
-				local onelabel = `var'[1]
-				if "`onelabel'" != "" {
-					local labs "`labs' `onelabel'"
-				}
-			}
+	if "`rownames'" == "rownames" {
+		local newvarlist ""
+		local coladd = 0
+		if "`colnames'" != "" {
+			local coladd = 1
 		}
-		drop if _n == 1
+		local k_start = 1 + `coladd'
+		local k_end = `=_N' + `coladd'
+		
+		local k = 1
+		foreach var of varlist _all {
+			if `k' >= `k_start' & `k' <= `k_end' {
+				local newvarlist "`newvarlist' `var'"
+			}
+			local k = `k' + 1
+		}
+		local varlist "`newvarlist'"
 	}
-	destring _all, force replace
-	nwset _all, name("`name'") vars(_all) labs(`labs')
+	
+	destring `varlist', force replace
+	nwset `varlist', name("`name'") `labscmd'
+	drop `firstvar'
 end
-
 
 capture program drop _nwimport_gml
 program _nwimport_gml
