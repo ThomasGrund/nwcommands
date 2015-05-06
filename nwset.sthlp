@@ -97,8 +97,8 @@ Declare the variables in {help varlist} to represent the adjacency matrix of the
 {it:M_ij = var_i[j]}
 
 {pstd}
-When there are more observations than variables {it:z}, only the the first {it:z} observations of each variable are considered. When
-there are more variables than observations the command does not set any network.  
+When there are more observations {it:n} than variables {it:z}, only the the first {it:z} observations of each variable are considered. When
+there are more variables than observations, then only the first {it:n} variables are considered as network data.
 
 {pstd}
 In this dummy example, we create 5 new variables v1-v5 and set a network from these variables. It creates an empty network (there 

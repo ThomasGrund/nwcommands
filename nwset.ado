@@ -23,7 +23,7 @@ syntax [varlist (default=none)][, clear nwclear nooutput edgelist name(string) v
 	local allnames ""
 	
 	if "`edgelist'" != "" {
-		nwfromedge `varlist', name(`name')
+		qui nwfromedge `varlist', name(`name')
 		exit
 	}
 	

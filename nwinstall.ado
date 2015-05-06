@@ -1,6 +1,18 @@
 capture program drop nwinstall
 program nwinstall
-	syntax [, permanently remove downloadoff help all path(string)]
+	syntax [, update usermenu permanently remove downloadoff help all path(string)]
+	
+	if "`usermenu'" != "" {
+		window menu clear
+		nwinstall, downloadoff
+		exit
+	}
+	
+	if "`update'" != "" {
+		window menu clear
+		nwinstall, help usermenu
+		// ADD NEW PACKAGES HERE	
+	}
 	
 	if "`path'" == "" {
 		local path "`c(pwd)'"
@@ -180,7 +192,7 @@ program nwinstall_menu
 	window menu append separator "Network Analysis"
 	
 	window menu append submenu "Network Analysis" "Tabulate Networks"
-	window menu append item "Tabulate Networks" "Oneway-Tabulate Network" "db nwtabulate2_net"	
+	window menu append item "Tabulate Networks" "Oneway-Tabulate Network" "db nwtabulate1"	
 	window menu append item "Tabulate Networks" "Twoway-Tabulate Networks" "db nwtabulate2net"	
 	window menu append item "Tabulate Networks" "Twoway-Tabulate Network and Variable" "db nwtabulate2var"
 

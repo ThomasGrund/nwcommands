@@ -9,8 +9,8 @@ color p7 khaki
 
 color pline gs10
 color p1line gs10
-color p2line blue
-color p3line lime
+color p2line lime
+color p3line brown
 color p4line magenta
 
 symbol p circle

@@ -677,7 +677,7 @@ program nwplot
 	}*/
 	
 	
-	//local layout_gridcols "`columns'"
+	local layout_gridcols "`columns'"
 	local components = "`layout_components'"
 	
 	if ("`layout'"!="nodexy"){
@@ -791,6 +791,7 @@ program nwplot
 			local layout_gridcols = ceil(sqrt(`nodes'))
 		}
 		mata: Coord = gridlayout(rows(M), `layout_gridcols')
+		noi mata: Coord
 	}
 	if ("`layout'"=="nodexy"){
 		mata: Coord = J(rows(M),2,0)
@@ -1604,9 +1605,13 @@ real matrix function gridlayout(real scalar N,  real scalar cols)
 	Coord[.,1] = J(N,1,100) :- floor((V:-1) :/rows) :* (100 / (cols - 1))
 	
 	Coord[.,2] = mod(V, rows)
+	
 	Coord[.,2] = editvalue(Coord[.,2],0,rows)
     Coord[.,2] = J(N,1,100) :- ((Coord[.,2] :- 1) :* (100 / (rows - 1)))
 	
+	if (rows == 1) {
+		Coord[.,2] = J(cols, 1, 0.5)
+	}
 	CoordMax1 = max(Coord[.,1])
 	CoordMax2 = max(Coord[.,2])
 	Coord[.,1] = (((Coord[.,1] :/ CoordMax1)))
