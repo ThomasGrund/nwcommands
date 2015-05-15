@@ -8,6 +8,9 @@ program nwset
 syntax [varlist (default=none)][, xvars clear nwclear nooutput edgelist name(string) vars(string) labs(string) labsfromvar(string) abs(string asis) edgelabs(string asis) detail mat(string) undirected directed]
 	set more off
 
+	if "`edgelist'" != "" {
+		local labsfromvar ""
+	}
 	if "`clear'" != "" {
 		nwdrop _all, netonly
 		exit

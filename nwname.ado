@@ -54,13 +54,15 @@ program nwname
 		local thissize = "`onesize'"
 		
 		if "`newlabsfromvar'" != "" {
+			tempvar newlabsvar
+			gen `newlabsvar' = strtoname(`newlabsfromvar')
 			if _N < `onesize' {
 				di "{err}variable {it:`newlabsfromvar'} invalid
 				error
 			}
 			local newlabs ""
 			forvalues i = 1/`onesize' {
-				local onelab = `newlabsfromvar'[`i']
+				local onelab = `newlabsvar'[`i']
 				local newlabs "`newlabs' `onelab'" 
 			}
 		}

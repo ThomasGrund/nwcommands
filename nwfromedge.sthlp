@@ -24,7 +24,8 @@
 {opth vars(newvarlist)}
 {opt labs}({it:lab1 lab2 ...})
 {opt undirected}
-{opt directed}]
+{opt directed}
+{opt keeporiginal}]
 
 {synoptset 20 tabbed}{...}
 {synopthdr}
@@ -35,6 +36,7 @@
 {synopt:{opt labs}({it:lab1 lab2 ...})}overwrite node labels{p_end}
 {synopt:{opt undirected}}force the network to be undirected{p_end}
 {synopt:{opt directed}}force the network to be directed{p_end}
+{synopt:{opt keeporiginal}}keeps original id of nodes{p_end}
 
 {p2colreset}{...}
 

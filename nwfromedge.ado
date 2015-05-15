@@ -5,11 +5,14 @@
 
 capture program drop nwfromedge
 program nwfromedge
-	syntax varlist(min=2 max=3) [if] [, xvars name(string) vars(string) labs(string asis) edgelabs(string) stub(string) directed undirected ]
+	syntax varlist(min=2 max=3) [if] [, keeporiginal xvars name(string) vars(string) labs(string asis) edgelabs(string) stub(string) directed undirected ]
 
 	// obtain variable names
 	local fromvar : word 1 of `varlist'
 	local tovar : word 2 of `varlist'
+	
+	capture replace `fromvar' = strtoname(`fromvar')
+	capture replace `tovar' = strtoname(`tovar')
 	
 	capture replace `tovar' = `fromvar' if `tovar' == .
 	capture replace `tovar' = `fromvar' if `tovar' == "."
@@ -39,6 +42,8 @@ program nwfromedge
 		keep `if'
 	}
 	
+	tempfile dictionaryOriginalString
+	
 	// deal with strings as node identifiers
 	if _rc == 0 {
 		local fromStrings = 1
@@ -53,6 +58,16 @@ program nwfromedge
 		
 		sort `_nodeid'
 		keep if `_nodeid' != `_nodeid'[_n-1]
+		
+		if "`keeporiginal'" != "" {
+			gen _nodeid = `_nodeid'
+			gen _nodeoriginal = `fromvar'
+			keep _node*
+			sort _nodeid
+			save `dictionaryOriginalString', replace
+			local dictOrigString = 1
+		}
+		
 		if "`labs'" == "" {
 			forvalues k = 1/ `=_N'{
 				local labs "`labs' `=`fromvar'[`k']'"
@@ -92,6 +107,15 @@ program nwfromedge
 	collapse (mean) `_rawid', by(`_id')
 	sort `_rawid'
 	save `dictionaryConsecutive', replace
+	
+	tempfile dictionaryOriginal
+	if "`keeporiginal'" != "" {
+		gen _nodeid = _n
+		gen _nodeoriginal = `_rawid'
+		keep _nodeid _nodeoriginal
+		sort _nodeid
+		save `dictionaryOriginal', replace
+	}
 	restore
 
 	// Map raw id's with dictionary
@@ -152,11 +176,21 @@ program nwfromedge
 	// Set the new network
 	nwset , mat(onenet) name(`edgename') vars(`edgevars') labs(`labs') edgelabs(`edgelabs')
 	qui drop _all
+
 	if "`xvars'" == "" {
 		qui nwload
 	}
 	else {
 		nwload, labelonly
+	}
+	if "`keeporiginal'" != "" {
+		if "`dictOrigString'" != "" {
+			merge 1:1 _nodeid using `dictionaryOriginalString', nogenerate
+		}
+		else {
+			merge 1:1 _nodeid using `dictionaryOriginal', nogenerate
+		}
+		order _node*
 	}
 	
 	if "`directed'" == "" {
@@ -183,7 +217,6 @@ real matrix function _getAdjacency(real matrix from, real matrix to, real matrix
 	
 	onenet = J(nodes, nodes, 0)
 	for (i = 1; i <= rows(from); i++) {
-		i
 		onenet[from[i,1],to[i,1]] = value[i,1]
 	}
 	return(onenet)
