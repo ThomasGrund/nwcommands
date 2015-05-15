@@ -184,6 +184,7 @@ program nwfromedge
 		nwload, labelonly
 	}
 	if "`keeporiginal'" != "" {
+		capture drop _nodeoriginal
 		if "`dictOrigString'" != "" {
 			merge 1:1 _nodeid using `dictionaryOriginalString', nogenerate
 		}
