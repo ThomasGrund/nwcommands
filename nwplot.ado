@@ -791,7 +791,6 @@ program nwplot
 			local layout_gridcols = ceil(sqrt(`nodes'))
 		}
 		mata: Coord = gridlayout(rows(M), `layout_gridcols')
-		noi mata: Coord
 	}
 	if ("`layout'"=="nodexy"){
 		mata: Coord = J(rows(M),2,0)
@@ -1289,6 +1288,11 @@ program def _getcolorstyle
 	}
 
 
+	if "`scheme'" == "sj" & "`edgepatternpalette'" == "" {
+		local edgepatternpalette "solid dot dash"
+	}
+	
+	
 	// pattern of edge
 	if "`edgepatternpalette'" != "" {
 		local edgepatternpalette_length : word count `edgepatternpalette'
@@ -1296,7 +1300,7 @@ program def _getcolorstyle
 		local edgepattern : word `m' of `edgepatternpalette'
 	}
 	else {
-		local edgepattern = "solid"
+		local edgepattern = "solid"	
 	}
 	
 	// color of edge

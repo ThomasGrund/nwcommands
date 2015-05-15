@@ -5,7 +5,7 @@
 
 capture program drop nwset	
 program nwset
-syntax [varlist (default=none)][, clear nwclear nooutput edgelist name(string) vars(string) labs(string) labsfromvar(string) abs(string asis) edgelabs(string asis) detail mat(string) undirected directed]
+syntax [varlist (default=none)][, xvars clear nwclear nooutput edgelist name(string) vars(string) labs(string) labsfromvar(string) abs(string asis) edgelabs(string asis) detail mat(string) undirected directed]
 	set more off
 
 	if "`clear'" != "" {
@@ -22,8 +22,8 @@ syntax [varlist (default=none)][, clear nwclear nooutput edgelist name(string) v
 	local max_nodes = 0
 	local allnames ""
 	
-	if "`edgelist'" != "" {
-		qui nwfromedge `varlist', name(`name')
+	qui if "`edgelist'" != "" {
+		qui nwfromedge `varlist', name(`name') `xvars'
 		exit
 	}
 	

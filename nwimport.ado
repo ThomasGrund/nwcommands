@@ -25,7 +25,7 @@ program nwimport
 		local bslash = strpos(`"`fnamerev'"', "/")
 		local fslash = strpos(`"`fnamerev'"', "\")
 		local slash = max(`bslash', `fslash')
-		local slash = cond(`slash'== 0, length(`"`fnamerev'"'), `slash')
+		local slash = cond(`slash'== 0, length(`"`fnamerev'"'), `=`slash' - 1')
 		local name = substr(`"`fname_temp'"', `=length(`"`fname_temp'"') - `slash' + 1', .)
 		local name = subinstr(`"`name'"',".net", "", .)
 		local name = subinstr(`"`name'"',".dat", "", .)
@@ -845,14 +845,16 @@ program _nwimport_compressed
 
 	import delimited `anything', delimiter(`delimiter') varnames(noname) clear
 	rename v1 ego
+	capture replace v2 = ego if v2 == ""
+	capture replace v2 = ego if v2 == .
 	
 	reshape long v, i(ego) j(j)
+	keep if v != "" | j == 2
 	rename v alter
-
-	// needed to deal with isolates
-	replace alter = ego if alter == ""
 	nwfromedge ego alter, `directed' `undirected' `xvars' name(`name')
-	//restore
+
+	restore
+	
 	if "`xvars'" == "" {
 		nwload
 	}

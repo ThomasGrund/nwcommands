@@ -5,9 +5,15 @@
 
 capture program drop nwneighbor
 program nwneighbor
-	syntax [anything(name=netname)], ego(string) [ mode(string)]
+	syntax [anything(name=netname)], [ ego(string)  mode(string)]
 	_nwsyntax `netname', max(1)
 	nwname `netname'
+	
+	if "`alter'" == "" & "`ego'" == "" {
+		di "{err}Either alter() or ego() needs to be specified."
+		exit
+	}
+	
 	local labs "`r(labs)'"
 	local uselab = 0
 	local ego_out = "`ego'"

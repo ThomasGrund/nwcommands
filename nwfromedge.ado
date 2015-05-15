@@ -11,6 +11,11 @@ program nwfromedge
 	local fromvar : word 1 of `varlist'
 	local tovar : word 2 of `varlist'
 	
+	capture replace `tovar' = `fromvar' if `tovar' == .
+	capture replace `tovar' = `fromvar' if `tovar' == "."
+
+	capture replace `fromvar' = trim(`fromvar')	
+	capture replace `tovar' = trim(`tovar')			
 	qui{
 	
 	tempvar _value
@@ -37,14 +42,13 @@ program nwfromedge
 	// deal with strings as node identifiers
 	if _rc == 0 {
 		local fromStrings = 1
-		
 		tempvar _nodeid _fromvarid _tovarid
-			
 		preserve
 		stack `fromvar' `tovar', into(`fromvar') clear
+		sort `fromvar'
 		egen `_nodeid' = group(`fromvar')
 		gen `tovar' = `fromvar'
-		drop _stack	
+		drop _stack		
 		save `dictionaryString', replace
 		
 		sort `_nodeid'

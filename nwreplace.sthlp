@@ -90,7 +90,7 @@ more on network expressions {help netexp:here}.
 Set a subnetwork to a constant:
 
 {pmore}
-{bf:. nwreplace mynet[(1::4,1::4)] = 55}
+{bf:. nwreplace mynet[(1::4),(1::4)] = 55}
 
 {pstd}
 Tie values can also be replaced with the values found in other networks for the corresponding positions. For example, this replaces

@@ -40,7 +40,7 @@
 {p2line}
 {p2col:{cmd: outgoing}}network neighbors of node {it:ego} are all nodes {it:j} who receive a tie from {it:ego}; default
 		{p_end}
-{p2col:{cmd: incoming}}network neighbors of node{it:ego} are all nodes {it:j} who send a tie to {it:ego}
+{p2col:{cmd: incoming}}network neighbors of node {it:ego} are all nodes {it:j} who send a tie to {it:ego}
 		{p_end}
 {p2col:{cmd: both}}network neighbors of node {it:ego} are all nodes {it:j} who either send a tie to {it:ego} or receive a tie from {it:ego}
 		{p_end}
