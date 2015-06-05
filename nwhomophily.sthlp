@@ -58,10 +58,10 @@ on variables in {help varlist} (see {help nwexpand}). By default,
 value on a variable.
 
 {pstd}
-Another way to calculate {it:w_ij} would be using {bf: mode(absdiff)}
+Another way to calculate {it:w_ij} would be using {bf: mode(absdiffinv)}
 
 {pmore}
-{it:w_ij = abs(var[i] - var[j])}
+{it:w_ij = abs(1 /(var[i] - var[j]))}
 
 {pstd}
 For more information on how {it:w_ij} is calculated based on {bf:mode()} see {help nwexpand}.
@@ -70,7 +70,7 @@ For more information on how {it:w_ij} is calculated based on {bf:mode()} see {he
 The probability {it:p_ij} is defined as:
 
 {pmore}
-{it:p_ij =  ((w_ij * homophily) / (sum (w_kl * homophily))) * density * 100}
+{it:p_ij =  (exp(w_ij * homophily) / (sum_allk_alll(exp(w_kl * homophily)))}
 
 {pstd}
 The following example generates a variable {it:gender} and creates networks where ties are more likely to

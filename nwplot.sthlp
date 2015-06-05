@@ -48,8 +48,8 @@
 {marker node_options}{...}
 {p2line}
 {synopt:{opt size}({it:{help varname}} [,{it:{help nwplot##node_sub:node_sub}}])}size of the nodes{p_end}
-{p2col:{opt color}([{it:{help varname}}] [,{it:{help nwplot##node_sub:node_sub}}])}color of the nodes{p_end}
-{p2col:{opt symbol}([{it:{help varname}}] [,{it:{help nwplot##node_sub:node_sub}}])}symbol of the nodes{p_end}
+{p2col:{opt color}({it:{help varname}} [,{it:{help nwplot##node_sub:node_sub}}])}color of the nodes{p_end}
+{p2col:{opt symbol}({it:{help varname}} [,{it:{help nwplot##node_sub:node_sub}}])}symbol of the nodes{p_end}
 {p2col:{opth nodefactor(float)}}multiply all node sizes by a factor{p_end}
 
 
@@ -62,8 +62,11 @@
 {p2col:{opt forcekeys}({it:{help int}}...)}list of keys to be used in the legend{p_end}
 {p2col:{opt colorpalette}({it:{help colorstyle}}...)}list with colorstyles; change colorpalette{p_end}
 {p2col:{opt symbolpalette}({it:{help symbolstyle}}...)}list with symbolstyles; change symbolpalette{p_end}
+{p2col:{opth foreground(int...)}}values to be plotted in the foreground{p_end}
 {p2col:{opth sizebin(int)}}finetune size of nodes{p_end}
-
+{p2col:{opth mlcolor(colorstyle)}}lcolor of nodes{p_end}
+{p2col:{opth mlwidth(linewidthstyle)}}lwidth of nodes{p_end}
+{p2col:{opth nodeclash(real)}}separate overlaped node in mdsclassical{p_end}
 
 {synoptset 35 tabbed}{...}
 {p2col:{it:label_options}}Description{p_end}
@@ -109,7 +112,7 @@
 {marker arcstyle}{...}
 {p2col:{it:arcstyle}}{p_end}
 {p2line}
-{p2col:{cmd: automatic}}plots arcs as curved lines, but only when they are not reciprocated; default
+{p2col:{cmd: automatic}}plots arcs as curved lines, but only when they are reciprocated; default
 		{p_end}
 {p2col:{cmd: curved}}plots all arcs as curved lines
 		{p_end}

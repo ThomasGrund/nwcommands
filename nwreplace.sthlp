@@ -85,7 +85,7 @@ more on network expressions {help netexp:here}.
 
 
 {title:Network subsets}
-
+{marker netsub}{...}
 {pstd}
 Set a subnetwork to a constant:
 

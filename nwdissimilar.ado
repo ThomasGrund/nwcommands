@@ -1,6 +1,6 @@
 capture program drop nwdissimilar
 program nwdissimilar
-	syntax [anything(name=netname)] [, type(string) name(string) mode(string) xvars]
+	syntax [anything(name=netname)] [, type(string) labs(passthru) vars(passthru) name(string) mode(string) xvars]
 	_nwsyntax `netname'
 	
 	if "`mode'" == "" {
@@ -30,19 +30,19 @@ program nwdissimilar
 	
 	nwtomatafast `netname'
 	if "`type'" == "euclidean" {
-		nwset, mat(euclidean_dissimilarity(`r(mata)', `dtype')) name(`name')
+		nwset, mat(euclidean_dissimilarity(`r(mata)', `dtype')) name(`name') `labs' `vars'
 	}
 	if "`type'" == "manhatten" {
-		nwset, mat(manhatten_dissimilarity(`r(mata)', `dtype')) name(`name')
+		nwset, mat(manhatten_dissimilarity(`r(mata)', `dtype')) name(`name') `labs' `vars'
 	}	
 	if "`type'" == "nonmatches" {
-		nwset, mat(matches_dissimilarity(`r(mata)', `dtype')) name(`name')
+		nwset, mat(matches_dissimilarity(`r(mata)', `dtype')) name(`name') `labs' `vars'
 	}
 	if "`type'" == "jaccard" {
-		nwset, mat(jaccard_dissimilarity(`r(mata)', `dtype')) name(`name')
+		nwset, mat(jaccard_dissimilarity(`r(mata)', `dtype')) name(`name') `labs' `vars'
 	}	
 	if "`type'" == "hamming" {
-		nwset, mat(hamming_dissimilarity(`r(mata)', `dtype')) name(`name')
+		nwset, mat(hamming_dissimilarity(`r(mata)', `dtype')) name(`name') `labs' `vars'
 	}	
 	if "`xvars'" == "" {
 		nwload `name'

@@ -2,7 +2,10 @@ capture program drop nwunab
 program nwunab, rclass
 	syntax anything, [ min(passthru) max(passthru)]
 	gettoken macro_name _temp : anything, parse(":")
-	gettoken _temp netlist : _temp
+	local _temp : subinstr local _temp ":" ""
+	local _tempcount : word count `_temp'
+	local netlist `_temp'
+
 	preserve
 	drop _all
 	qui nwset

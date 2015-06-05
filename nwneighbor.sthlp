@@ -16,7 +16,7 @@
 {cmdab: nwneighbor} 
 [{it:{help netname}}],
 {opth ego(nodeid)}
-[{opth mode(nodeid)}]
+[{opt mode}({it:{help nwneighbor##context:context}})]
 
 {p 8 17 2}
 {cmdab: nwneighbor} 

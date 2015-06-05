@@ -52,7 +52,7 @@ program def nwhomophily
 	tempname __temp
 
 		
-	mata: `__temp0' = J(`nodes', `nodes', 1)
+	mata: `__temp0' = J(`nodes', `nodes', 0)
 	forvalues i = 1/`vc'{
 	
 		local onevar = word("`varlist'",`i')
@@ -64,8 +64,9 @@ program def nwhomophily
 		nwdrop _tempexpand
 		
 		mata: `__temp' = `__temp' :* `onehom'
-		mata: `__temp0' = `__temp0' :* `__temp'
+		mata: `__temp0' = `__temp0' :+ `__temp'
 	}
+	mata: `__temp0' = exp(`__temp0')
 	nwdyadprob , mat(`__temp0') density(`density') name(`assortname') `undirected'
 end
 	

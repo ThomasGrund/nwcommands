@@ -23,6 +23,7 @@ program nwkeep
 
 		foreach keepnet in `keepnets' {
 			nwname `keepnet'
+			nwload `keepnet', labelonly
 			local id = r(id)
 			local nodes = r(nodes)
 			local z = `z' + 1

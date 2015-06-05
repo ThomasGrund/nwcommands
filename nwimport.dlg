@@ -20,8 +20,8 @@ BEGIN
 	EDIT ed_name 50 150 200 ., nomemory
 	GROUPBOX gb_direct 260 130 150 100, label("Arc/Edge detection:")		 
 	RADIO rb_automatic 270 150 220 ., first label("automatic")
-	RADIO rb_directed 270 170 220 ., middle label("force directed")
-	RADIO rb_undirected 270 190 220 ., last label("force undirected ")
+	RADIO rb_directed 270 170 220 ., middle label("forcedirected")
+	RADIO rb_undirected 270 190 220 ., last label("forceundirected ")
 	CHECKBOX ck_cols 50 180 200 100, label("Labels in first column") option(colnames) nomemory
 	CHECKBOX ck_rows 50 200 200 100, label("Labels in first row") option(rownames) nomemory	
 	TEXT tx_delim 50 230 200 ., label("Use delimiter:") 

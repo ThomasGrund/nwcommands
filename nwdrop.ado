@@ -11,7 +11,8 @@ program nwdrop
 
 	local nets `networks'
 	local z = 0
-    foreach dropnet in `netname' {
+    qui foreach dropnet in `netname' {
+		nwload `dropnet', labelonly
 		nwname `dropnet'
 		local id = r(id)
 		local nodes = r(nodes)
@@ -19,6 +20,7 @@ program nwdrop
 		
 		// only drop nodes 
 		qui if ("`if'" != "" | "`in'" != ""){
+
 			tempvar keepnode
 			gen `keepnode' = 1
 		    if "`if'" != "" {

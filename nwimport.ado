@@ -53,10 +53,10 @@ program nwimport
 		 capture _nwimport_compressed `fname', `options'
 	}
 	if "`import_type'" == "edgelist" {
-		 capture _nwimport_edgelist `fname', `options'
+		 capture _nwimport_edgelist `fname', `options' `typeoptions'
 	}
 	if "`import_type'" == "pajek" {
-		 capture _nwimport_pajek `fname', `options'		 
+		  capture _nwimport_pajek `fname', `options'		 
 	}
 	if "`import_type'" == "gml" {
 		capture _nwimport_gml `fname', `options'
@@ -733,7 +733,7 @@ end
 
 capture program drop _nwimport_edgelist
 program _nwimport_edgelist
-	syntax anything, [name(string) delimiter(string) directed undirected xvars] 
+	syntax anything, [keeporiginal name(string) delimiter(string) directed undirected xvars] 
 	if "`name'" == "" {
 		local name "network"
 	}
@@ -747,7 +747,7 @@ program _nwimport_edgelist
 		local value : word 3 of `r(varlist)'
 		replace `alter' = `ego' if `alter' == .
 		drop if `ego' == .
-		nwfromedge `ego' `alter' `value', `undirected' `direcetd' `xvars' name(`name')
+		nwfromedge `ego' `alter' `value', `keeporiginal' `undirected' `direcetd' `xvars' name(`name')
 		restore
 	}
 	else {
@@ -824,7 +824,7 @@ program _nwimport_edgelist
 		restore
 		error 6704
 	}
-	nwfromedge _all, name(`name') `directed' `undirected' `xvars'
+	nwfromedge _all, name(`name') `keeporiginal' `directed' `undirected' `xvars'
 	restore
 	}
 end

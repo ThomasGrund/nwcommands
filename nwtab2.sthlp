@@ -17,8 +17,11 @@
 {it:{help netname:netname1}}
 {it:{help netname:netname2}}
 [{cmd:,}
+{opth permutations(integer)}
 {opt plot}
 {opt plotoptions}({it:{help tabplot:tabplot_options}})
+{opt eiplot}
+{opt eiplotoptions}({it:{help kdensity:kdensity_options}})
 {it:{help tabulate twoway:tabulate2_options}}]
 
   One network and one attribute
@@ -28,15 +31,19 @@
 [{it:{help netname:netname1}}]
 {it:{help varname}}
 [{cmd:,}
+{opth permutations(integer)}
 {opt plot}
 {opt plotoptions}({it:{help tabplot:tabplot_options}})
+{opt eiplot}
+{opt eiplotoptions}({it:{help kdensity:kdensity_options}})
 {it:{help tabulate twoway:tabulate2_options}}]
 
-{synoptset 20 tabbed}{...}
+{synoptset 25 tabbed}{...}
 {synopthdr}
 {synoptline}
+{synopt:{opth permutations(integer)}}QAP permutations for significance of EI-index{p_end}
 {synopt:{opt plot}}makes a tabplot{p_end}
-
+{synopt:{opt eiplot}}makes a plot for significance of EI-index{p_end}
 
 {title:Description}
 
@@ -63,7 +70,11 @@ between -1 (only within-group ties exist) and 1 (only between-group ties exist).
 {pstd}
 More intuitively, the EI-index simply calculates the number of 
 ties off the diagonal (in the table produced by the command)
-by the the total number of ties.
+by the total number of ties. By default, the command runs 100 QAP
+permutations of the network (see {help nwqap}) to obtain a p-value
+for the EI-index. Basically, the network is randomly permuted and the
+EI-index is calculated again to obtain a distribution for the EI-index
+under the condition that the network and the attribute are unrelated.
 
 {pstd}
 The command essentially generates temporary variables on the dyad-level and runs a normal {help tabulate twoway}, hence,

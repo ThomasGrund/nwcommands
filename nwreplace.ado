@@ -103,7 +103,8 @@ program nwreplace
 	
 	// evaluate expression
 	_nwevalnetexp `netexp' % _replacenet
-
+	//mata: _diag(_replacenet,0)
+	
 	if (r(nodes)==1){
 		mata: _replacenet = J(`nodes', `nodes', _replacenet[1,1]) 
 	}
@@ -157,6 +158,7 @@ program nwreplace
 		mata: mata drop _selection
 		
 	}
+	mata: _diag(_replacenet, 0)
 	
 	// check if new network is directed
 	mata: st_numscalar("r(sym)", issymmetric(_replacenet))

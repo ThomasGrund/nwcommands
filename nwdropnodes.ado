@@ -6,7 +6,7 @@
 capture program drop nwdropnodes
 program nwdropnodes 
 	version 9
-	syntax [anything(name=netname)] [, nodes(string) keepmat(string) attributes(varlist) netonly generate(string)]
+	syntax [anything(name=netname)] [, xvars nodes(string) keepmat(string) attributes(varlist) netonly generate(string)]
 	capture numlist "`nodes'"
 	if _rc == 0 {
 		local nodelist = "`r(numlist)'"
@@ -18,7 +18,7 @@ program nwdropnodes
 	_nwsyntax `netname', max(1)
 	
 	if "`generate'" != "" {
-		nwduplicate `netname', name(`generate')
+		nwduplicate `netname', name(`generate') xvars
 		_nwsyntax `generate', max(1)
 	}
 	
@@ -83,7 +83,7 @@ program nwdropnodes
 	mata: `keepnet' = select(`keepnet', `keepvector')
 	mata: `keepvector' = `keepvector''
 	mata: `keepnet' = select(`keepnet', `keepvector')
-	nwreplacemat `netname', newmat(`keepnet') `netonly' labs(`newlabs') vars(`newvars')
+	nwreplacemat `netname', newmat(`keepnet') `netonly' labs(`newlabs') vars(`newvars') `xvars'
 
 	// deal with attributes that should be synced with the smaller network
 	if "`attributes'" != "" {

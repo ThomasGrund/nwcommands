@@ -60,6 +60,7 @@
 {synopt:{opth labsfromvar(varname)}}new node labels that are used for the network{p_end}
 {synopt:{opt vars}({it:var1 var2...})}new variables that are used for the network{p_end}
 {synopt:{opt xvars}}do not generate Stata variables{p_end}
+{synopt:{opt keeporiginal}}generate variable {it:_nodeoriginal} with original node id's (when setting from an edgelist){p_end}
 
 
 {title:Description}

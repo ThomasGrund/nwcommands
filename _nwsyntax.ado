@@ -34,8 +34,8 @@ program _nwsyntax
 		nwcurrent
 		local anything = r(current)
 	}
-	
 	capture nwunab _temp : `anything', max(`max') `min'
+	
 	if _rc != 0 {
 		if _rc == 111 | _rc == 198 {
 			di "{err}network {bf:`anything'} not found"

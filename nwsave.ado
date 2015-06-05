@@ -58,6 +58,15 @@ program nwsave
 		}
 	}
 	if "`format'" == "matrix" {
+		local vars_required = 30
+		foreach onenet in `netname' {
+			nwname `onenet'
+			local vars_required = `vars_required' + `r(nodes)' + 5
+		}
+		if c(max_k_theory) < `vars_required' {
+			noi di "{err}You need to increase the maximum number of variables to `vars_required' with {bf:set maxvar `vars_required'}.{txt}"
+			exit
+		}
 		clear
 		local i = 1
 		foreach onenet in `netname' {

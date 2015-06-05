@@ -5,8 +5,21 @@
 
 capture program drop nwdyadprob
 program nwdyadprob
-	syntax [anything(name=weightnet)],  [ density(real 0) mat(string) name(string) vars(string) xvars undirected]
-		
+	syntax [anything(name=weightnet)],  [ density(string) mat(string) name(string) vars(passthru) xvars undirected]
+	
+	// Generate valid network name and valid varlist
+	if "`name'" == "" {
+		local name "dyadprob"
+	}
+	
+	if "`mat'" == "" {
+		local mat = "mat"
+	}
+
+	nwvalidate `name'
+	local dyadname = r(validname)
+
+	
 	// Install gsample if needed
 	capture which gsample
 	if _rc != 0 {
@@ -20,88 +33,98 @@ program nwdyadprob
 	
 	if "`weightnet'" != "" {
 		_nwsyntax `weightnet'
+		nwtomata `weightnet', mat(`mat')
+		mata: `mat' = transformIntoProbs(`mat')
 	}
-
 	
-	// Generate network from weight network
-	preserve
-	qui if "`mat'" != "" {
-		capture mat list `mat'
-		if _rc == 0 {
-			noi mata: `mat' = st_matrix("`mat'")
-		}
+	mata: onenet = getNetFromProbs(`mat')
+	mata: st_numscalar("r(nodes)", rows(onenet))
+	local nodes = `r(nodes)'
 	
+	if  "`density'" == ""{
 		capture mata: `mat'
-		if _rc == 0 {
-			mata: st_numscalar("r(validmata)", (rows(`mat') == cols(`mat')))
-			if `r(validmata)' == 1 {
-				mata: st_numscalar("r(nodes)", rows(`mat'))
-				local nodes = `r(nodes)'
-				local ties = `nodes' * (`nodes' -1) * `density'
-				tempname dyads
-				mata: `dyads' = colshape(`mat', 1)
-				drop _all
-				getmata `dyads'
-				rename `dyads' `mat'
-				local weightnet "`mat'"
-				gen _fromid = mod(_n,`nodes')
-				gen _toid = ceil(_n /`nodes')
-				replace _fromid = 1 if _fromid == 0
+		if _rc != 0 {
+			di "{err}Mata matrix `mat' not found.{txt}"
+			error _rc
+		}
+		else {
+			mata: st_numscalar("r(matrows)", rows(`mat'))
+			mata: st_numscalar("r(matcols)", cols(`mat'))
+			if (`r(matrows)' != `r(matcols)') {
+				di "{err}Mata matrix `mat' not square.{txt}"
+				error 6099
+			}
+			if "`undirected'" != "" {
+				mata: `mat' = lowertriangle(`mat')
+			}
+			nwset, mat(onenet) name(`dyadname') `vars' `labs' `xvars'
+			
+			if "`undirected'" != "" {
+				nwsym `dyadname'
 			}
 		}
+		
 	}
-	else {
-		qui nwtoedge `weightnet', full forcedirected
-	}
-	
-	// Generate valid network name and valid varlist
-	if "`name'" == "" {
-		local name "dyadprob"
-	}
-	if "`stub'" == "" {
-		local stub "net"
-	}
-	nwvalidate `name'
-	local homoname = r(validname)
-	local varscount : word count `vars'
-	if (`varscount' != `nodes'){
-		nwvalidvars `nodes', stub(`stub')
-		local homovars "$validvars"
-	}
-	else {
-		local homovars "`vars'"
-	}
-	
-	qui if "`undirected'" != "" {
-		replace `weightnet' = 0 if _toid <= _fromid
-	}
-	
-	qui if "`density'" != "" {
+	if "`density'" != "" {
+		// Generate network from weight network
+		preserve
+		nwset, mat(`mat') name(_tempdyad)
+		nwreplace _tempdyad = _tempdyad * 10
+		nwtoedge _tempdyad, forcedirected full
+
+		if "`undirected'" != "" {
+			replace _tempdyad = 0 if _toid <= _fromid
+		}
+
 		local ties = `nodes' * (`nodes' -1) * `density'
-		qui gen _nonzero = (`weightnet' > 0)
+		if "`undirected'" != "" {
+			local ties = `ties' / 2
+		}
+		qui gen _nonzero = (_tempdyad > 0)
 		qui sum _nonzero
 		if `r(sum)' < `ties' {
-			di "{err}Not enough non-zero weights to generate `ties' ties"
+			noi di "{err}Not enough non-zero weights to generate `ties' ties"
+			nwdrop _tempdyad
 			exit
 		}
 		qui drop if _fromid == _toid
-		gsample `ties' [aweight=`weightnet'], generate(link) wor
+		gsample `ties' [aweight=_tempdyad], generate(link) wor
+		qui nwfromedge _fromid _toid link, name(`dyadname') `vars' `labs' `xvars'
+		nwdrop _tempdyad
+		restore
 	}
-	else {
-		gen link = (`weightnet' > uniform())
-	}
-	
-	
-	qui nwfromedge _fromid _toid link, name(_tempnetwork)
-	nwset net*, name(`homoname') vars(`homovars') `xvars'
-	nwdrop _tempnetwork	
-	restore
 	
 	if "`undirected'" != "" {
-		nwsym `homoname'
+		nwsym `dyadname'
 	}
 	if "`xvars'" == "" {
-		nwload `homoname', `xvars'
+		nwload `dyadname'
 	}
+	capture mata : mata drop onenet
+	nwcurrent `name'
 end
+
+capture mata: mata drop getNetFromProbs()
+capture mata: mata drop transformIntoProbs()
+
+mata:
+real matrix getNetFromProbs(real matrix probs) {
+	net = J(rows(probs), rows(probs), 0)
+	if (rows(probs) == cols(probs)) {
+		nodes = rows(probs)
+		net = (runiform(rows(probs), cols(probs)):<= probs)	
+		_diag(net, 0)
+	}
+	return(net)
+}
+
+real matrix transformIntoProbs(real matrix net) {
+	if (max(net) > 1 | min(net) < 0) {
+		net = invlogit(net)
+		_diag(net,0)
+	}
+	return(net)
+}
+end
+
 

@@ -4,10 +4,10 @@
 
 capture program drop nwmovie
 program nwmovie
-	syntax anything(name=netname), [z(integer 1) title(string) edgecolor(string) edgesize(string) size(string) symbol(string) color(string) switchtitle(string) switchnetwork(string) switchcolor(string) switchsymbol(string) switchedgecolor(string) imagick(string) eps keepfiles width(integer 750) height(integer 500) fname(string) explosion(integer 5) labels(string) titles(string) delay(string) sizes(varlist) colors(string) symbols(varlist) edgecolors(string) edgesizes(string) frames(integer 10) *]
+	syntax anything(name=netname), [z(integer 1) title(string) edgecolor(string) edgesize(string) size(string) symbol(string) color(string) switchtitle(string) switchnetwork(string) switchcolor(string) switchsymbol(string) switchedgecolor(string) imagick(string) eps keepfiles width(integer 750) height(integer 500) fname(string) explosion(integer 5) labels(string) titles(string) delay(string) sizes(string) colors(string) symbols(varlist) edgecolors(string) edgesizes(string) frames(integer 10) *]
 
 	_nwsyntax `netname', max(999) min(2)
-	 
+	
 	if "`fname'" == "" {
 		if c(os) == "Windows" {
 			local fname "`c(pwd)'\movie"
@@ -131,10 +131,11 @@ program nwmovie
 		local impath = "`r(impath)'"
 	}
 	
-	
+	di "h2: `netname'"
 	// make movie
 	_nwsyntax `netname', max(999) min(2)
 	local all_nets "`netname'"
+	di "h3"
 	
 	local sizeCheck = 0
 	qui foreach onenet in `all_nets' {
@@ -314,6 +315,8 @@ program nwmovie
 		
 		noi di "{txt}Processing network {bf:`first'}"
 		if `i' == 1 {
+			di `"nwplot `first', ignorelgc generate(_c1_x _c1_y) `sizecmd1' `symbolcmd1' `colorcmd1'  `edgesizecmd1' `edgecolorcmd1' `titlecmd1' `options'"'
+			
 			qui nwplot `first', ignorelgc generate(_c1_x _c1_y) `sizecmd1' `symbolcmd1' `colorcmd1'  `edgesizecmd1' `edgecolorcmd1' `titlecmd1' `options'
 			capture graph export `"`c(pwd)'/first`st'.`pic'"', replace `picopt'
 			if _rc != 0 {

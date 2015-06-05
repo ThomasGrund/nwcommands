@@ -11,12 +11,23 @@ program nwplot
 	local layout = "" 
 	syntax [anything(name=netname)][if/] [in/], [ ignorelgc lab  labelopt(string) _layoutfunction(string) arrows edgesize(string) ASPECTratio(string) components(string) arcstyle(string) arcbend(string) arcsplines(integer 10) nodexy(varlist numeric min=2 max=2) edgeforeground(string) GENerate(string) colorpalette(string) edgecolorpalette(string) edgepatternpalette(string) symbolpalette(string) lineopt(string) scatteropt(string) legendopt(string) size(string) color(string) symbol(string) edgecolor(string) label(varname) nodefactor(string) sizebin(string) edgefactor(string) arrowfactor(string) arrowgap(string) arrowbarbfactor(string) layout(string) iterations(integer 1000) scheme(string) * ]
 	local twowayopt `"`options'"'
-	
-	// filter out lgc
+
+	// filter out lgc and nodeclash
 	local 0 "`layout'"
-	syntax [anything(name=something)], [ lgc *]
+	syntax [anything(name=something)], [ lgc nodeclash(string) *]
+	local nodeproximity : word 2 of `nodeclash'
+	capture confirm number `nodeproximity'
+	if _rc != 0 {
+		local nodeproximity = 0.01
+	}
+	local nodeclashchange : word 1 of `nodeclash'
+	capture confirm number `nodeclashchange'
+	if _rc != 0 {
+		local nodeclashchange= 1
+	}
+
 	tempvar lgc_var
-	
+
 	if "`ignorelgc'" != "" {
 		local lgc = ""
 	}
@@ -56,6 +67,7 @@ program nwplot
 		nwduplicate `netname', name(__temp_in)
 		nwkeep __temp_in in `in'
 		if "`edgecolor'" != "" {
+			capture nwdrop __temp_edgecolor_in
 			nwgen __temp_edgecolor_in = `edgecolor'
 			local edgecolor "__temp_edgecolor_in"
 			if "`edgecolor'" != "`netname'" {
@@ -158,7 +170,7 @@ program nwplot
 	
 	local gridcols = ceil(sqrt(`nodes'))
 	local 0 = "`layout'"
-	syntax [anything][, lgc norescale iterations(integer 1000) columns(integer `gridcols') ]
+	syntax [anything][, nodeclash(string) lgc norescale iterations(integer 1000) columns(integer `gridcols') ]
 	
 	if("`anything'"=="") {
 		if `nodes' < 50 {
@@ -225,7 +237,7 @@ program nwplot
 	// NODE ATTRIBUTES
 	//
 	///////////////////
-	
+
 	preserve
 	if "`ifmaster'" != "" {
 		keep `ifmaster'
@@ -238,7 +250,12 @@ program nwplot
 	
 	if ("`color'" != ""){
 		local 0 = "`color'"
-		syntax [varlist(default=none max=1)] [, norescale forcekeys(string) legendoff colorpalette(string) *]
+		syntax [varlist(default=none max=1)] [, foreground(string) norescale forcekeys(string) legendoff colorpalette(string) mlcolor(string) mlwidth(string) *]
+		
+		local mlcolor_color = "`mlcolor'"
+		local mlwidth_color = "`mlwidth'"
+		local colorforeground = "`foreground'"
+		
 		if "`varlist'" == "" {
 			tempvar dummy_col
 			gen `dummy_col' = 1
@@ -330,7 +347,10 @@ program nwplot
 		}
 		
 		local 0 = "`symbol'"
-		syntax [varlist(default=none max=1)] [, norescale forcekeys(string) legendoff symbolpalette(string) *]
+		syntax [varlist(default=none max=1)] [, norescale forcekeys(string) legendoff symbolpalette(string) mlcolor(string) mlwidth(string) *]
+		local mlcolor_symbol = "`mlcolor'"
+		local mlwidth_symbol = "`mlwidth'"
+		
 		if "`varlist'" == "" {
 			tempvar dummy_symb
 			gen `dummy_symb' = 1
@@ -402,7 +422,13 @@ program nwplot
 	}
 	
 	local 0 = "`size'"
-	syntax [varlist(min=0 max=1 default=none)][, norescale legendoff forcekeys(string) sizebin(integer 1) *]
+	syntax [varlist(min=0 max=1 default=none)][, norescale legendoff forcekeys(string) sizebin(integer 1) mlcolor(string) mlwidth(string) *]
+	local mlcolor_size = "`mlcolor'"
+	local mlwidth_size = "`mlwidth'"
+	if "`mlcolor_size'" == "" {
+		local mlcolor_size = "`mlcolor_color'"
+	}
+	
 	local size "`varlist'"
 	// Size of nodes
 	if ("`size'" != ""){
@@ -559,6 +585,7 @@ program nwplot
 	// Get edgecolor network data
 	if "`edgecolor'" != ""  {
 		if "`edgecolor'" == "," {
+			capture nwdrop __temp_edgecol_dummy
 			nwrandom `nodes', prob(0) name(__temp_edgecol_dummy)
 			//nwreplace __temp_egdecol_dummy = .
 			local edgecolor "__temp_edgecol_dummy,"
@@ -567,7 +594,8 @@ program nwplot
 			}
 		}
 		local 0 "`edgecolor'`edgecolor_options'"
-		capture noi syntax [anything] [, forcekeys(string) legendoff edgecolorpalette(string) edgepatternpalette(string)]
+		capture noi syntax [anything] [, foreground(string) forcekeys(string) legendoff edgecolorpalette(string) edgepatternpalette(string)]
+		local edgeforeground = "`foreground'"
 		if _rc != 0 {
 			nwdrop __temp_edgecolor_dummy
 			error 6088
@@ -755,7 +783,7 @@ program nwplot
 			mata: compM = (compmat :+ compmat') :/ (compmat :+ compmat')
 			mata: _editmissing(compM,0)
 			mata: Coord_comp = mmdslayout(compM)
-			
+			//noi mata: Coord_comp = correctCoordClash(Coord_comp, compM, (.05 * `nodeclashchange'), `nodeproximity') 
 			// Adjust coordinates for position in layout
 			// Deal with largest component
 			if `i' == 1  & `components' != 1 {
@@ -944,9 +972,11 @@ program nwplot
 		if `colorkeys_num' >= 1 {	
 			local ckey = 0
 			foreach i in `colorkeys' {
-				_getcolorstyle, i(`i') j(0) colorpalette(`colorpalette') symbolpalette(`symbolpalette') scheme(`scheme')
+				_getcolorstyle, i(`i') j(0) colorpalette(`colorpalette') symbolpalette(`symbolpalette') scheme(`scheme') mlcolor(`mlcolor_color') mlwidth(`mlwidth_color')
 				local tempcolstyle_fill = r(col_fill)
-				local ghostcmd `"`ghostcmd' || (scatter `ghost1' `ghost2' if `ghost1' !=.,  msymbol("scheme p0")  mcolor("`tempcolstyle_fill'")  msize(2) `scatteropt') "'            		
+				local tempcolstyle_line = r(col_line)
+				local tempwidth_line = r(line_width)
+				local ghostcmd `"`ghostcmd' || (scatter `ghost1' `ghost2' if `ghost1' !=.,  msymbol("scheme p0")  mfcolor("`tempcolstyle_fill'") mlwidth("`tempwidth_line'") mlcolor("`tempcolstyle_line'")   msize(2) `scatteropt') "'            		
 			}
 		}
 	}
@@ -959,9 +989,11 @@ program nwplot
 		if `symbolkeys_num' >= 1 {	
 			local skey = 0
 			foreach j in `symbolkeys' {
-				_getcolorstyle, i(0) j(`j') colorpalette(`colorpalette') symbolpalette(`symbolpalette') scheme(`scheme')
+				_getcolorstyle, i(0) j(`j') colorpalette(`colorpalette') symbolpalette(`symbolpalette') scheme(`scheme') mlcolor(`mlcolor_symbol') mlwidth(`mlwidth_symbol')
 				local tempsymbol = r(symbol)
-				local ghostcmd `"`ghostcmd' || (scatter `ghost1' `ghost2' if `ghost1' !=.,  msymbol("`tempsymbol'")  mlcolor("scheme p0") mfcolor("scheme background")  msize(2) `scatteropt') "'            		
+				local tempcolstyle_line = r(col_line)
+				local tempwidth_line = r(line_width)
+				local ghostcmd `"`ghostcmd' || (scatter `ghost1' `ghost2' if `ghost1' !=.,  msymbol("`tempsymbol'") mlwidth("`tempwidth_line'") mfcolor("scheme background") mlcolor("`tempcolstyle_line'") msize(2) `scatteropt') "'            		
 			}
 		}
 	}
@@ -972,10 +1004,13 @@ program nwplot
 	// Ghost plots of size of nodes
 	if "`size'" != "" & "`sizekeys_legendoff'" == ""{
 		local i = 0
+		_getcolorstyle, i(0) j(1) colorpalette(`colorpalette') symbolpalette(`symbolpalette') scheme(`scheme') mlcolor(`mlcolor_size') mlwidth(`mlwidth_size')
 		foreach szkey in `sizekeys' {
 			local i = `i' + 1
 			local szkey_size : word `i' of `sizekeys_size'
-			local ghostcmd `"`ghostcmd' || (scatter `ghost1' `ghost2' if `ghost1' !=.,  msymbol("scheme p0")  mlcolor("scheme p0") mfcolor("scheme p0")  msize(`szkey_size') `scatteropt') "'            		
+			local tempcolstyle_line = r(col_line)
+			local tempwidth_line = r(line_width)
+			local ghostcmd `"`ghostcmd' || (scatter `ghost1' `ghost2' if `ghost1' !=.,  msymbol("scheme p0")  mlcolor("`tempcolstyle_line'") mlwidth("`templine_width'") mfcolor("scheme p0")  msize(`szkey_size') `scatteropt') "'            		
 		}
 		local sizekeys_num : word count `sizekeys'
 	}
@@ -1021,10 +1056,12 @@ program nwplot
 	else {
 		local legendcmd `"legend(order(`colororder' `colorident' `symbolorder' `symbolident' `sizeorder' `sizeident' `edgesizeorder' `edgesizeident' `edgecolororder' `edgecolorident') `colorlabels' `symbollabels' `sizelabels' `edgesizelabels' `edgecolorlabels' `legendopt')"'
 	}
-	
+
 	// Prepare scatter commands to plot nodes
 	local scattercmd ""	
+	local scattercmdforeground ""
 	local tempsize_rows = rowsof(nsizerow)
+	
 	// Size of nodes
 	forvalues tempsiz_mat = 1/`tempsize_rows'{
 		local tempsiz = nsizerow[`tempsiz_mat',1] 
@@ -1034,15 +1071,23 @@ program nwplot
 			forvalues j = 1/`symbs'{
 				local tempcol = ncolorrow[`i', 1]
 				local tempsymb = nsymbolrow[`j',1]
-				_getcolorstyle, i(`tempcol') j(`tempsymb') colorpalette(`colorpalette') symbolpalette(`symbolpalette') scheme(`scheme')
+				_getcolorstyle, i(`tempcol') j(`tempsymb') colorpalette(`colorpalette') symbolpalette(`symbolpalette') scheme(`scheme') mlcolor(`mlcolor_color') mlwidth(`mlwidth_color')
 				local tempsiz_node = `tempsiz' * `nodefactor' * 2
 				local tempcolstyle_fill = r(col_fill)
 				local tempcolstyle_line = r(col_line)
-				local tempsymbol = r(symbol)	
+				local tempsymbol = r(symbol)
+				local tempwidth_line = r(line_width)
 				if "`label'" != "" {
 					local scatterlabel "mlabel(nlabel)"
 				}
-				local scattercmd `"`scattercmd' (scatter ny nx if ncolor == `tempcol' & nsymbol == `tempsymb' & nsize == `tempsiz',  mlabcolor("scheme label") msymbol("`tempsymbol'") mlwidth(vthin) mlcolor(`tempcolstyle_line') mfcolor("`tempcolstyle_fill'") msize(`tempsiz_node') `scatterlabel' `scatteropt') ||"' 
+				
+				local foregroundcheck : list tempcol in colorforeground		
+				if `foregroundcheck' == 0 {
+					local scattercmd `"`scattercmd' (scatter ny nx if ncolor == `tempcol' & nsymbol == `tempsymb' & nsize == `tempsiz',  mlabcolor("scheme label") msymbol("`tempsymbol'") mlwidth("`tempwidth_line'") mlcolor("`tempcolstyle_line'") mfcolor("`tempcolstyle_fill'") msize(`tempsiz_node') `scatterlabel' `scatteropt') ||"' 
+				}
+				else {
+					local scattercmdforeground `"`scattercmdforeground' (scatter ny nx if ncolor == `tempcol' & nsymbol == `tempsymb' & nsize == `tempsiz',  mlabcolor("scheme label") msymbol("`tempsymbol'") mlwidth("`tempwidth_line'") mlcolor("`tempcolstyle_line'") mfcolor("`tempcolstyle_fill'") msize(`tempsiz_node') `scatterlabel' `scatteropt') ||"' 
+				}				
 			}
 		}
 	}
@@ -1066,13 +1111,19 @@ program nwplot
 			local tempval_line = (`tempval' / 2) * `edgefactor' / 2
 			local tempval_arrow = (`tempval' + 1) * `arrowfactor' 
 			local tempval_barb = `tempval_arrow' * `arrowbarbfactor'
-			local pccmd `"`pccmd' (pcspike sy sx ey ex if value != 0 & edgesize == `tempval' & edgecolor == `tempecol', lpattern(`temppattern') lwidth(`tempval_line') lcolor("`tempcolstyle'") mfcolor("`tempcolstyle'") mcolor("`tempcolstyle'") msize(`tempval_arrow') barbsize(`tempval_barb') `lineopt') || (`pc' sy sx ey ex if value != 0 & edgesize == `tempval'  & edgecolor == `tempecol' & arrow == 1,  lpattern(`temppattern') lwidth(`tempval_line') lcolor("`tempcolstyle'") mfcolor("`tempcolstyle'") mcolor("`tempcolstyle'") msize(`tempval_arrow') barbsize(`tempval_barb') `lineopt') ||"'
+			local tempecol_orig = `tempecol' - 1
+			local foregroundcheck : list tempecol_orig in edgeforeground
+			if `foregroundcheck' == 0 {
+				local pccmd `"`pccmd' (pcspike sy sx ey ex if value != 0 & edgesize == `tempval' & edgecolor == `tempecol', lpattern(`temppattern') lwidth(`tempval_line') lcolor("`tempcolstyle'") mfcolor("`tempcolstyle'") mcolor("`tempcolstyle'") msize(`tempval_arrow') barbsize(`tempval_barb') `lineopt') || (`pc' sy sx ey ex if value != 0 & edgesize == `tempval'  & edgecolor == `tempecol' & arrow == 1,  lpattern(`temppattern') lwidth(`tempval_line') lcolor("`tempcolstyle'") mfcolor("`tempcolstyle'") mcolor("`tempcolstyle'") msize(`tempval_arrow') barbsize(`tempval_barb') `lineopt') ||"'
+			}
+			else {
+				local pccmdforeground `"`pccmdforeground' (pcspike sy sx ey ex if value != 0 & edgesize == `tempval' & edgecolor == `tempecol', lpattern(`temppattern') lwidth(`tempval_line') lcolor("`tempcolstyle'") mfcolor("`tempcolstyle'") mcolor("`tempcolstyle'") msize(`tempval_arrow') barbsize(`tempval_barb') `lineopt') || (`pc' sy sx ey ex if value != 0 & edgesize == `tempval'  & edgecolor == `tempecol' & arrow == 1,  lpattern(`temppattern') lwidth(`tempval_line') lcolor("`tempcolstyle'") mfcolor("`tempcolstyle'") mcolor("`tempcolstyle'") msize(`tempval_arrow') barbsize(`tempval_barb') `lineopt') ||"'
+			}
 		}
 	}
 	
 	local pmargin = `nodefactor' * 3
-	
-	local graphcmd `"twoway `ghostcmd' `pccmd' `scattercmd' `pccmdforeground', ylabel(, nogrid) yscale(off range(0 100)) xscale(off range(0 150)) graphregion(color("scheme plotregion")) plotregion(color("scheme plotregion") margin(`pmargin' `pmargin' `pmargin' `pmargin')) aspectratio(`aspectratio') `legendcmd' `schemetwoway' `twowayopt'"' 
+	local graphcmd `"twoway `ghostcmd' `pccmd' `scattercmd' `pccmdforeground' `scattercmdforeground' , ylabel(, nogrid) yscale(off range(0 100)) xscale(off range(0 150)) graphregion(color("scheme plotregion")) plotregion(color("scheme plotregion") margin(`pmargin' `pmargin' `pmargin' `pmargin')) aspectratio(`aspectratio') `legendcmd' `schemetwoway' `twowayopt'"' 
 
 	di "{text:Plotting network...}"
 	//di `"`graphcmd'"'
@@ -1271,7 +1322,7 @@ end
 *************************************/
 capture program drop _getcolorstyle
 program def _getcolorstyle
-	syntax [, i(string) j(string) colorpalette(string) symbolpalette(string) edgecolorpalette(string) edgepatternpalette(string) scheme(string)]
+	syntax [, i(string) j(string) mlcolor(string) mlwidth(string) colorpalette(string) symbolpalette(string) edgecolorpalette(string) edgepatternpalette(string) scheme(string)]
 
 	mata: st_rclear()
 	local i = `i' - 1
@@ -1289,9 +1340,8 @@ program def _getcolorstyle
 
 
 	if "`scheme'" == "sj" & "`edgepatternpalette'" == "" {
-		local edgepatternpalette "solid dot dash"
+		local edgepatternpalette "dash solid dot dash solid"
 	}
-	
 	
 	// pattern of edge
 	if "`edgepatternpalette'" != "" {
@@ -1327,11 +1377,20 @@ program def _getcolorstyle
 		local col_fill `"scheme p`=`i'+1'"'
 	}
 
-	// not implemented yet...
-	if "`col_line'" == "" {
+	
+	if "`mlcolor'" == "" {
 		local col_line = "`col_fill'"
 	}
-
+	else {
+		local col_line "`mlcolor'"
+	}
+	
+	if "`mlwidth'" == "" {
+		mata: st_global("r(line_width)", "vthin")
+	}
+	else {
+		mata: st_global("r(line_width)", "`mlwidth'")
+	}
 	mata: st_global("r(edgepattern)", "`edgepattern'")
 	mata: st_global("r(edgecol)", "`edgecol'")
 	mata: st_global("r(col_fill)", "`col_fill'")
@@ -1432,6 +1491,7 @@ real matrix function mmdslayout(real matrix G)
 	D = distance(G) //compute distances
 	_diag(D,0)
 	
+	/*
 	// correct for two nodes having the same distance scores to all others
 	for (i = 1; i< rows(D); i++) {
 		for (j = i;j<=rows(D); j++){
@@ -1440,16 +1500,34 @@ real matrix function mmdslayout(real matrix G)
 			thisrow[1,j] = 0
 			diff = select(D[i,.],thisrow) - select(D[j,.],thisrow)
 			if ((sum(abs(diff)) == 0) & (i != j)){
-				D_i =  D[i,.] :* ((uniform(1,cols(D)):*0.5):+0.75)
-				D[i,.] = D_i
-				D[.,i] = D_i'
+				
+				//dd_i = (J(1,i,1),J(1, (cols(D) - i),.5)) 
+				//dd_j = (J(1,j,0),J(1, (cols(D) - j),.5))
+				//D[i,j] = 3
+				//D[j,i] = 3
+				//D_i =  D[i,.] :* ((uniform(1,cols(D)):*0.5):+0.75)
+				/*
+				D[i,.] = D[i,.]:+ dd_i
+				D[.,i] = D[.,i]:+ (dd_i)'
+				D[j,.] = D[j,.]:+ dd_j
+				D[.,j] = D[.,j]:+ (dd_j)'*/
+				//D[i,j] = 3.2
+				//D[j,i] = 3.2
+				
+				//D[i,.] = D[i,.] :+ J(1,cols(D), .5)
+				//D[.,i] = D[.,i] :+ J(cols(D),1, .7)
+				//D[j,.] = D[j,.] :+ J(1,cols(D), .8)
+				//D[.,j] = D[.,j] :+ J(cols(D),1, .8)
+				//D[i,.] = D_i
+				//D[.,i] = D_i'
 			}
 		}
 	}
-
+	_diag(D,0)*/
+	
 	st_matrix("dMat",D) 	    //Distance mat to stata under tempname
 	// compute MDS coordinates in stata
-	rc = _stata( "  mdsmat dMat,  noplot method(classical)", 1)
+	rc = _stata( "  mdsmat dMat,  force noplot method(classical)", 1)
 				//" di `test_rc")
 	if (rc == 0) {
 		Coord = st_matrix("e(Y)") 
@@ -1464,6 +1542,47 @@ real matrix function mmdslayout(real matrix G)
 		Coord[.,2] = (((Coord[.,2] :/ CoordMax2)))
 	}
 	return(Coord)
+}
+end
+
+capture mata: mata drop correctCoordClash()
+mata: 
+real matrix function correctCoordClash(real matrix Coord, real matrix net, real scalar b, real scalar prox){ 
+	Coord_new = Coord
+	"h11"
+	for(i = 1 ; i <= rows(Coord); i++) {
+		for(j = (i + 1) ; j <= rows(Coord); j++) {
+			//abs(Coord[i,1] - Coord[j,1])
+			//abs(Coord[i,2] - Coord[j,2])
+			//"next"
+			if ((abs(Coord[i,1] - Coord[j,1]) <= prox) & (abs(Coord[i,2] - Coord[j,2]) <= prox)){
+				"node1"
+				i
+				"coord1"
+				Coord[i,1]
+				"node2"
+				j
+				"coord2"
+				Coord[j,1]				
+
+			//& (Coord[i,2] == Coord[j,2])) {
+				for (k = 1; k <= cols(net); k++) {
+					if (net[k,i] != 0) {
+						Ck = Coord[k,.]
+						Ci = Coord[i,.]
+						x = Ck[1,1] - Ci[1,1]
+						y = Ck[1,2] - Ci[1,2]
+						angle = atan2(y,x)
+						Coord_new[i,2] = Coord_new[i,2] - sin(angle) * b
+						Coord_new[i,1] = Coord_new[i,1] + cos(angle) * b
+						Coord_new[j,2] = Coord_new[j,2] + sin(angle) * b
+						Coord_new[j,1] = Coord_new[j,1] - cos(angle) * b
+					}
+				}
+			}
+		}
+	}
+	return(Coord_new)
 }
 end
 

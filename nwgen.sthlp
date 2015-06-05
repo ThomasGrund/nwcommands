@@ -146,7 +146,7 @@ The command can also be used to generate networks. There are two ways to do this
 {p_end}
 {pmore2}Generate a network of shortest paths between nodes (see {help nwgeodesic}).
 
-{phang2}{opth hom(varname)}, {opth homophily(float)} {opth density(float)} [...]
+{phang2}{opth homophily(varname)}, {opth homophily(float)} {opth density(float)} [...]
 {p_end}
 {pmore2}Generate a homophily network (see {help nwhomophily}).
 

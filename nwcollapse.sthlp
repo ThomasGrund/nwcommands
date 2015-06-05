@@ -1,8 +1,6 @@
 {smcl}
 {* *! version 1.0.0  11nov2014}{...}
 {marker topic}
-{helpb nw_topical##generator:[NW-2.3] Generators}
-{marker top2}
 {helpb nw_topical##manipulation:[NW-2.5] Manipulation}
 
 {title:Title}

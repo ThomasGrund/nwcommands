@@ -17,15 +17,9 @@ program nwgenerate
 	}
 	local fcn_opt = "`options'"
 	local netname = trim("`netname'")
-
-	// replace the network if it exists already
-	if (strpos("`options'", "replace")!=0){
-		capture nwdrop `netname'
-		local options ""
-	}
-		
+	
 	capture _nwsyntax_other `netname'
-	if _rc == 0 {
+	if _rc == 0 & (strpos("`options'", "replace")==0){
 		di "{err}Network {bf:`netname'} already exists. Change {it:netname} or specify option {bf:replace}.{txt}"
 		error 6099
 	}
@@ -48,7 +42,7 @@ program nwgenerate
 	local selectjob : word 1 of `job'*/
 	
 	local selectjob : word 2 of `netexp'
-	local nwgenopt "large( duplicate( dyadprob( geodesic( subset( homophily( lattice( path( permute( pref( random( reach( ring( small( transpose( evcent( context( degree( outdegree( indegree( isolates( components( lgc( clustering( closeness( farness( nearness( between("
+	local nwgenopt "large( addnodes( collapse( duplicate( dyadprob( geodesic( subset( homophily( lattice( path( permute( pref( random( reach( ring( small( sym( transpose( evcent( context( degree( outdegree( indegree( isolates( components( lgc( clustering( closeness( farness( nearness( between("
 	local whichjob : list  nwgenopt & selectjob
 	local netfcn : word count `whichjob'
 	
@@ -56,7 +50,7 @@ program nwgenerate
 	qui if `netfcn' == 0 {
 	
 		capture nwname `netname'
-		if _rc == 0 {
+		if _rc == 0 & (strpos("`options'", "replace")==0){
 			di "{err}network {it:`netname'} already defined"
 			error 6004
 		}
@@ -77,7 +71,12 @@ program nwgenerate
 		if (r(sym) == 1){
 			local undirected "undirected"
 		}
-	
+		
+		// replace the network if it exists already
+		if (strpos("`options'", "replace")!=0){
+			capture nwdrop `netname'
+			local options ""
+		}
 		nwrandom `nodes', prob(0) name(`netname') `undirected' `options' xvars `vars'
 		nwreplacemat `netname', newmat(_genmat) `vars' xvars 
 	

@@ -17,8 +17,8 @@ END
 DIALOG main, title("nwsave - Save Network Data")
 BEGIN
   FILE  fi_save	50	50	280	.,	save label("Save as")
-  RADIO rb_matrix 50 80 200 ., label("Save networks as edgelist") first
-  RADIO rb_edge 50 100 200 ., label("Save networks as matrix") last
+  RADIO rb_matrix 50 100 200 ., label("Save networks as matrix") first
+  RADIO rb_edge 50 80 200 ., label("Save networks as edgelist") last
   CHECKBOX cx_replace 50 130 200 ., label("Overwrite exiting file") option(replace) nomem
 END
 

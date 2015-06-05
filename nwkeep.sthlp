@@ -14,7 +14,7 @@
 {p 8 17 2}
 {cmdab: nwkeep} 
 [{it:{help netlist}}]
-[{ifin}]
+{ifin}
 [{cmd:,}
 {opth attr:ibutes(varlist)}
 {opt netonly}]

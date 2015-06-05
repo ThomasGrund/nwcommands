@@ -99,7 +99,7 @@ One can now use one of these new networks to represent the edgecolor when plotti
 {txt}Instead of using {help nodeid:nodeids} one can also use {help nodelab:nodelabs} to identify nodes.
 
      {cmd:. webnwuse florentine}
-     {cmd:. nwpath flobusiness, ego(medici) alter(albizzi)}
+     {cmd:. nwpath flobusiness, ego(medici) alter(peruzzi)}
      {res}
      {hline 40}
      {txt}  Network: {res}flobusiness

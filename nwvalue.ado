@@ -47,6 +47,8 @@ program nwvalue
 
 		if (`r(rows)' == 1 & `r(cols)' == 1) {
 			mata: st_rclear()
+			mata: st_numscalar("r(ego)", `egoid')
+			mata: st_numscalar("r(alter)", `alterid')			
 			mata: st_numscalar("r(value)", subnet[1,1])
 		}
 		else {

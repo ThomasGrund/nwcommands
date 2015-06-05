@@ -22,7 +22,6 @@ program nwtab1
 		local undirected = "undirected"
 	}
 	local edgelabs `r(edgelabs)'
-	
 	qui nwtoedge `netname', full
 	qui if "`selfloop'" == "" {
 		drop if _fromid == _toid 
@@ -39,7 +38,7 @@ end
 
 capture program drop nwtab2
 program nwtab2
-	syntax anything(name=something) [, unvalued plot plotoptions(string) permutations(integer 100) poff *]
+	syntax anything(name=something) [, eiplot eiplotoptions(string) unvalued plot plotoptions(string) permutations(integer 100) *]
 		
 	if "`plot'" != "" {
 		capture which tabplot
@@ -160,8 +159,6 @@ program nwtab2
 		capture label val `tabn2' elab2
 	}
 	
-	di 
-	
 	capture { 
 		tab `tabn1' `tabn2' , matcell(tableres) matcol(tablecol) matrow(tablerow) `options'
 	}
@@ -176,6 +173,7 @@ program nwtab2
 		encode `tabn2'_string, gen(`tabn2')
 		tab `tabn1' `tabn2' if _fromid != _toid, matcell(tableres) matcol(tablecol) matrow(tablerow) `options' missing
 	}
+
 	local tab_r = r(r)
 	local tab_c = r(c)
 	if "`plot'" != "" {
@@ -192,7 +190,7 @@ program nwtab2
 	mata: st_numscalar("r(EI_index)", EI_index)
 	local EI_index = `r(EI_index)'
 
-	if `permutations' > 1  {
+	qui if `permutations' > 1  {
 		nwtomata `netname1', mat(net1)
 		if "`nwtabletype'" == "variable" {
 			mata: EI_qap = rep_EIvar(`permutations', net1, attr)	
@@ -222,8 +220,8 @@ program nwtab2
 		local xmin = min(`EI_index',r(min))
 		local xmax = max(`EI_index',r(max))
 		local bandwidth `= 1 / `nodes''
-		if "`poff'" == "" {
-		kdensity EI_simulated, xscale(range(`xmin' `xmax')) title("") bwidth(`bandwidth') ytitle("Density") xtitle("E-I Index") xline(`EI_index',lpattern(dash)) xlabel(#5) note(`"based on `permutations' QAP permutations of network `netname1'"') `options'	
+		if "`eiplot'" != "" {
+			kdensity EI_simulated, xscale(range(`xmin' `xmax')) title("") bwidth(`bandwidth') ytitle("Density") xtitle("E-I Index") xline(`EI_index',lpattern(dash)) xlabel(#5) note(`"based on `permutations' QAP permutations of network `netname1'"') `eiplotoptions'	
 		}
 		mata: st_numscalar("r(EI_pvalue)", pvalue)		
 	}
@@ -236,7 +234,9 @@ program nwtab2
 	mata: st_global("r(tab2)", "`arg2'")
 	mata: st_global("r(directed)","`bothdirected'")
 	di
-	di "{txt}   E-I Index: {res}`r(EI_index)'{txt}   p-value: {res}`r(EI_pvalue)'"
+	if "`nwtabletype'" != "network" {
+		di "{txt}   E-I Index: {res}`r(EI_index)'{txt}   p-value: {res}`r(EI_pvalue)'"
+	}
 	mata: mata drop table col row
 	mata: mata drop External
 	mata: mata drop Internal

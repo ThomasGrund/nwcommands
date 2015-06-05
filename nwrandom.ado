@@ -63,11 +63,13 @@ program nwrandom
 			mata: _jumble(newmat)
 			mata: newmat=colshape(newmat, `nodes')
 			mata: newmat = (newmat:<=`ties')
-			mata: newmat = correctDiagonal(newmat,0)
+			mata: tiesdiag = sum(diagonal(newmat))
+			mata: newmat = correctDiagonal(newmat,0, tiesdiag)
 		}
 		else {
 			mata: newmat = tiesGenerator(`nodes', `ties')
-			mata: newmat = correctDiagonal(newmat, 1)
+			mata: tiesdiag = sum(diagonal(newmat))
+			mata: newmat = correctDiagonal(newmat, 1, tiesdiag)
 		}
 	}
 	if "`census'" != "" {
@@ -129,10 +131,22 @@ real matrix function dyadcensusGenerator( scalar nodes, scalar mutual, scalar as
 	X = invvech(jumble((1::temp)))
 	M = (X:<=mutual)
 	A = (X:> mutual):*(X:<= (asym + mutual))
-	M = correctDiagonal(M,1)
-	T = correctDiagonal((M :+ A),1)
+	
+	tiesdiag = sum(diagonal(M))
+	M = correctDiagonal(M,1, tiesdiag )
+	_diag(M,0)
+	
+	T = M :+ A
 	T = T :/ T
 	_editmissing(T,0)
+	_diag(T, 0)
+
+	tiesdiag = (2 * (mutual + asym) - sum(T)) / 2	
+	T = correctDiagonal(T,1, tiesdiag)
+	T = T :/ T
+	_editmissing(T,0)
+	_diag(T, 0)
+
 	A = T :- M
 	R = round(runiform(nodes, nodes))
 	
@@ -143,16 +157,15 @@ real matrix function dyadcensusGenerator( scalar nodes, scalar mutual, scalar as
 	return(M :+ A)
 }
 
-real matrix function correctDiagonal(real matrix net, scalar undirected){
+real matrix function correctDiagonal(real matrix net, scalar undirected, scalar tiesdiag){
 	nodes = rows(net)
-	tiesdiag = sum(diagonal(net))
 	for (i = 1 ; i <= tiesdiag; i++ ) {
 		found = 0
 		while (found == 0) {
 			ran = (ceil(runiform(1,2):* nodes))
 			rrow = ran[1,1]
 			rcol = ran[1,2]
-			if ((net[rrow, rcol] == 0) & rrow != rcol) {
+			if ((net[rrow, rcol] == 0) & (rrow != rcol))  {
 				found = 1
 				net[rrow, rcol] = 1
 				if (undirected == 1){

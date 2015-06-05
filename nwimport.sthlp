@@ -17,6 +17,8 @@
 , 
 {opt type}({it:{help nwimport##import_type:import_type}}[, {it:{help nwimport##type_sub:type_sub}}])
 [{opth name(newnetname)}
+{opt forcedirected}
+{opt forceundirected}
 {opt nwclear}
 {opt clear}]
 
@@ -29,7 +31,8 @@
 {synopt:{opth name(newnetname)}}name of the imported network; default = {it:filename}{p_end}
 {synopt:{opt forcedirected}}force network to be directed{p_end}
 {synopt:{opt forceundirected}}force network to be undirected{p_end}
-
+{synopt:{opt nwclear}}clear all data and networks{p_end}
+{synopt:{opt clear}}clear all data, but keep networks{p_end}
 
 {synoptset 20 tabbed}{...}
 {marker import_type}{...}
@@ -55,13 +58,14 @@
 {marker type_sub}{...}
 {p2col:{it:type_sub}}Description{p_end}
 {p2line}
-{p2col:{cmd: rownames}}first row in matrix contains variable names
+{p2col:{cmd: rownames}}matrix: first row in matrix contains variable names
 		{p_end}
-{p2col:{cmd: colnames}}first column in matrix contains variable names
+{p2col:{cmd: colnames}}matrix: first column in matrix contains variable names
 		{p_end}
-{p2col:{opth delimiter(string)}}specify delimiter in matrix explicitly
+{p2col:{opth delimiter(string)}}matrix: specify delimiter in matrix explicitly
 		{p_end}		
-		
+{p2col:{opt keeporiginal}}edgelist, compressed: keeps original nodeid's of nodes
+		{p_end}			
 		
 {title:Description}
 
