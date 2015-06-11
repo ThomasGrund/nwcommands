@@ -50,7 +50,7 @@ program nwimport
 		 capture _nwimport_matrix `fname', `options' `typeoptions'
 	}
 	if "`import_type'" == "compressed" {
-		 capture _nwimport_compressed `fname', `options'
+		 capture _nwimport_compressed `fname', `options' `typeoptions'
 	}
 	if "`import_type'" == "edgelist" {
 		 capture _nwimport_edgelist `fname', `options' `typeoptions'
@@ -308,6 +308,8 @@ program _nwimport_pajek
 		}
 		file close importfile
 
+		capture replace _fromid = trim(_fromid)
+		capture replace _toid = trim(_toid)
 		nwfromedge _fromid _toid _value, xvars name(`name') labs(`labs') `nwfromedgeopt' 
 		
 		
@@ -440,6 +442,8 @@ program _nwimport_ucinet
 		}
 		
 		if `matrix_loaded' == 0  {
+			capture replace _fromid = trim(_fromid)
+			capture replace _toid = trim(_toid)
 			qui nwfromedge _fromid _toid _value, name(`name') labs(`labs') `nwfromedgeopt'
 		}
 		restore
@@ -653,6 +657,8 @@ program _nwimport_gml
 			file read importfile line
 		}	
 		capture file close importfile
+		capture replace _fromid = trim(_fromid)
+		capture replace _toid = trim(_toid)
 		nwfromedge _fromid _toid _value, name(`name') labs(`labs') `nwfromedgeopt'
 		restore
 end
@@ -725,7 +731,9 @@ program _nwimport_gefx
 		capture encode _toid, gen(_toidnum)
 		if _rc != 0 {
 			gen _toidnum = _toid
-		}		
+		}	
+		capture replace _fromidnum = trim(_fromidnum)
+		capture replace _toidnum = trim(_toidnum)
 		nwfromedge _fromidnum _toidnum _value, name(`name') labs(`labs') `nwfromedgeopt'
 		restore
 end
@@ -842,7 +850,7 @@ program _nwimport_compressed
 	
 	preserve
 	clear
-
+	
 	import delimited `anything', delimiter(`delimiter') varnames(noname) clear
 	rename v1 ego
 	capture replace v2 = ego if v2 == ""
@@ -851,6 +859,8 @@ program _nwimport_compressed
 	reshape long v, i(ego) j(j)
 	keep if v != "" | j == 2
 	rename v alter
+	replace ego = trim(ego)
+	replace alter = trim(alter)
 	nwfromedge ego alter, `directed' `undirected' `xvars' name(`name')
 
 	restore

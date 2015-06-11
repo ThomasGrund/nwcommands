@@ -37,6 +37,7 @@
 {synopt:{opt undirected}}force the network to be undirected{p_end}
 {synopt:{opt directed}}force the network to be directed{p_end}
 {synopt:{opt keeporiginal}}keeps original id of nodes{p_end}
+{synopt:{opt noclear}}do not clear existing dataset{p_end}
 
 {p2colreset}{...}
 

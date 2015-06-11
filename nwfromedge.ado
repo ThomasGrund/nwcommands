@@ -5,20 +5,20 @@
 
 capture program drop nwfromedge
 program nwfromedge
-	syntax varlist(min=2 max=3) [if] [, keeporiginal xvars name(string) vars(string) labs(string asis) edgelabs(string) stub(string) directed undirected ]
+	syntax varlist(min=2 max=3) [if] [, noclear keeporiginal xvars name(string) vars(string) labs(string asis) edgelabs(string) stub(string) directed undirected ]
 
 	// obtain variable names
 	local fromvar : word 1 of `varlist'
 	local tovar : word 2 of `varlist'
 	
+	capture replace `fromvar' = trim(`fromvar')	
+	capture replace `tovar' = trim(`tovar')	
 	capture replace `fromvar' = strtoname(`fromvar')
 	capture replace `tovar' = strtoname(`tovar')
 	
 	capture replace `tovar' = `fromvar' if `tovar' == .
 	capture replace `tovar' = `fromvar' if `tovar' == "."
-
-	capture replace `fromvar' = trim(`fromvar')	
-	capture replace `tovar' = trim(`tovar')			
+		
 	qui{
 	
 	tempvar _value
@@ -45,6 +45,12 @@ program nwfromedge
 	tempfile dictionaryOriginalString
 	
 	// deal with strings as node identifiers
+	if _rc == 0 {
+		local rawtype "string"
+	}
+	else {
+		local rawtype "numeric"
+	}
 	if _rc == 0 {
 		local fromStrings = 1
 		tempvar _nodeid _fromvarid _tovarid
@@ -106,6 +112,14 @@ program nwfromedge
 	egen `_id' = group(`_rawid')
 	collapse (mean) `_rawid', by(`_id')
 	sort `_rawid'
+	
+	if "`rawtype'" == "numeric" {
+		if "`labs'" == "" {
+			forvalues k = 1/ `=_N'{
+				local labs "`labs' `=`_rawid'[`k']'"
+			}
+		}
+	}
 	save `dictionaryConsecutive', replace
 	
 	tempfile dictionaryOriginal
@@ -145,9 +159,10 @@ program nwfromedge
 	capture mata: mata drop mata_from 
 	capture mata: mata drop mata_to
 	
-	putmata mata_value = `_value'
-	putmata mata_from = `fromvar'
-	putmata mata_to = `tovar'
+	putmata mata_value = `_value' if `fromvar' != .
+	putmata mata_from = `fromvar' if `fromvar' != .
+	putmata mata_to = `tovar' if `fromvar' != .
+	
 	mata: onenet = _getAdjacency(mata_from, mata_to, mata_value, `maxNodes')
 	capture mata: mata drop mata_value 
 	capture mata: mata drop mata_from 
@@ -175,7 +190,9 @@ program nwfromedge
 
 	// Set the new network
 	nwset , mat(onenet) name(`edgename') vars(`edgevars') labs(`labs') edgelabs(`edgelabs')
-	qui drop _all
+	if "`clear'" == "" {
+		qui drop _all
+	}
 
 	if "`xvars'" == "" {
 		qui nwload

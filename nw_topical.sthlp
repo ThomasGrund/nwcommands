@@ -1,5 +1,5 @@
 {smcl}
-{* *! version  16may2015}{...}
+{* *! version  11jun2015}{...}
 {phang}
 {help nwcommands:NW-2 topical} {hline 2} 
 {hline 2} Topical list of network commands
@@ -58,7 +58,6 @@
 {col 8}{hline 3}{c RT}       {it:Generators}{col 36}{c LT}{hline}
 {col 8}   {c BLC}{hline 24}{c BRC}
 {p2colset 12 35 36 2}
-{p2col:    {bf:{help nwcollapse }}}Collapse a network{p_end}
 {p2col:    {bf:{help nwdissimilar }}}Generate node dissimilarities{p_end}
 {p2col:    {bf:{help nwduplicate }}}Duplicate a network{p_end}
 {p2col:    {bf:{help nwdyadprob }}}Generate a network based on tie probabilities{p_end}

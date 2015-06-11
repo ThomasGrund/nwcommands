@@ -52,7 +52,7 @@ uniformly at random.
 
 {pstd} 
 With a probability {it:1 - prob}, this new node connects to {it:m} existing nodes with a 
-probability proportonal to the (in-)degree of the node it will be connected to.
+probability proportional to their current (in-)degree.
 
 
 {title:References}
