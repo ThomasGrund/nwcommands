@@ -1,5 +1,5 @@
 {smcl}
-{* *! version  11jun2015}{...}
+{* *! version  14jun2015}{...}
 {phang}
 {help nwcommands:NW-2 topical} {hline 2} 
 {hline 2} Topical list of network commands
@@ -193,3 +193,4 @@
 {p2col:{bf:{help nwdendrogram }}}{err}no help file yet{txt}{p_end}
 {p2col:{bf:{help nwtomatafast }}}{err}no help file yet{txt}{p_end}
 {p2col:{bf:{help nwtostata }}}{err}no help file yet{txt}{p_end}
+{p2col:{bf:{help schemeinfo }}}{err}no help file yet{txt}{p_end}

@@ -1350,7 +1350,8 @@ program def _getcolorstyle
 		local edgepattern : word `m' of `edgepatternpalette'
 	}
 	else {
-		local edgepattern = "solid"	
+		//local edgepattern = "solid"	
+		local edgepattern `"scheme p`=`i'+1'linepattern"'
 	}
 	
 	// color of edge

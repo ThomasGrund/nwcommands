@@ -23,7 +23,7 @@
 {synoptset 25 tabbed}{...}
 {synopthdr}
 {synoptline}
-{synopt:{opt generate}({it:{help varname}})}variable name for betweenness centrality; default = {it:_between}{p_end}
+{synopt:{opt generate}({it:{help newvarlist}})}variable name for betweenness centrality; default = {it:_between}{p_end}
 {synopt:{opt nosym}}do not symmetrize network before calculation of shortest paths{p_end}
 {synopt:{opt standardize}}standardize centrality scores{p_end}
 

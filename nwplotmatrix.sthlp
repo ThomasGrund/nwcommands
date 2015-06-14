@@ -33,7 +33,6 @@
 {p2col:{it:{help nwplotmatrix##label_options:label_options}}}display and change look of
        axis labels{p_end}
 {p2col:{it:{help nwplotmatrix##patch_options:patch_options}}}change look of patches (e.g. color, tievalue){p_end}
-{p2col:{it:{help nwplotmatrix##legend_options:legend_options}}}change look and feel of legend (e.g. color, size){p_end}
 
 
 {synoptset 35 tabbed}{...}

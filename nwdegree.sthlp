@@ -19,6 +19,7 @@
 {opt generate}({it:{help varlist:varlist}})
 {opt isolates}
 {opt valued}
+{opt standardize}
 {opt in}({it:{help tabulate_oneway##tabulate1_options:tabulate_opt}})
 {opt out}({it:{help tabulate_oneway##tabulate1_options:tabulate_opt}})
 {it:{help tabulate_oneway##tabulate1_options:tabulate_opt}}
@@ -30,6 +31,7 @@
 {synopt:{opt generate}({it:{help varlist}})}Generate variables for degree, outdegree, indegree, isolate{p_end}
 {synopt:{opt isolates}}Generate variable for network isolates{it:_isolate}{p_end}
 {synopt:{opt valued}}Consider tie values; calculate {it:strength} instead of {it:degree}{p_end}
+{synopt:{opt standardize}}Divide centrality scores by N - 1{it:degree}{p_end}
 {synopt:{opt in}({it:{help tabulate_oneway##tabulate1_options:tabulate_opt}})}Options used for tabulating {it:indegree}{p_end}
 {synopt:{opt out}({it:{help tabulate_oneway##tabulate1_options:tabulate_opt}})}Options used for tabulating {it:outdegree}{p_end}
 {synopt:{it:{help tabulate_oneway##tabulate1_options:tabulate_opt}}}Options used for tabulating {it:degree}{p_end}
@@ -51,6 +53,10 @@ other node).
 {pstd}
 With option {bf:valued} the command calculates node {it:_strength} (sum of tie values), and {it:_out_strength/_in_strength} 
 for directed networks respectively, instead of node {it:_degree}.
+
+{pstd}
+Option {bf:standardize} divides the centrality scores by N - 1, where N = number of nodes in a network. This standardization makes sure
+that centrality scores always range from 0 to 1. 
 
 {pstd}
 In case, degree centrality is calculated

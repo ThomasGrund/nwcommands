@@ -5,13 +5,15 @@ color p3 green
 color p4 orange
 color p5 cyan
 color p6 magenta
-color p7 khaki
+color p7 yellow
 
 color pline gs10
 color p1line gs10
-color p2line lime
-color p3line brown
-color p4line magenta
+color p2line blue
+color p3line green
+color p4line red
+color p5line sand
+color p6line cyan
 
 symbol p circle
 symbol p1 circle

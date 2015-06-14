@@ -94,7 +94,7 @@
 {p2col:{opt forcekeys}({it:{help int}}...)}list of keys to be used in the legend{p_end}
 {p2col:{opt edgecolorpalette}({it:{help colorstyle}}...)}list with colorstyles; change edgecolorpalette{p_end}
 {p2col:{opt edgepatternpalette}({it:{help linepatternstyle:pattern}}...)}list with linestyles; the same network as in edgecolor is used to display different line patterns{p_end}
-
+{p2col:{opth foreground(int...)}}values to be plotted in the foreground{p_end}
 	
 {synoptset 35 tabbed}{...}
 {p2col:{it:arrow_options}}Description{p_end}

@@ -6,7 +6,7 @@
 capture program drop nwdegree
 program nwdegree
 	version 9
-	syntax [anything(name=netname)],[ isolates valued GENerate(string) in(string) outputoff out(string) *]
+	syntax [anything(name=netname)],[ standardize isolates valued GENerate(string) in(string) outputoff out(string) *]
 	_nwsyntax `netname', max(9999)
 	_nwsetobs
 	
@@ -67,6 +67,12 @@ program nwdegree
 			nwtostata, mat(outdegree) gen(`_outdegree'`k')
 			nwtostata, mat(indegree) gen(`_indegree'`k')
 		}
+		if "`standardize'" != "" {
+			capture replace `_degree'`k' = `_degree'`k' / (`nodes_temp' - 1)
+			capture replace `_outdegree'`k' = `_outdegree'`k' / (`nodes_temp' - 1)
+			capture replace `_inådegree'`k' = `_indegree'`k' / (`nodes_temp' - 1)
+		}
+		
 		qui if "`isolates'" != "" {
 			capture drop `_isolate'`k'
 			if ("`directed'" == "true"){

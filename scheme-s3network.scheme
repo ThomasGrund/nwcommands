@@ -17,18 +17,17 @@ symbol p6 smdiamond
 symbol p7 smsquare
 symbol p8 smtriangle
 
-color pline "245 175 50"
-color p1line red .7
-color p2line gold .3
-color p3line gold
-color p4line magenta
+color pline black
+color p1line red
+color p2line gold
+
 
 color plabel white
 
 color label khaki
 
-color plotregion gs12
-color background gs12
+color plotregion white
+color background white
 
 color legend black
 color legend_line black

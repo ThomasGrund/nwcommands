@@ -162,13 +162,13 @@ The command can also be used to generate networks. There are two ways to do this
 {p_end}
 {pmore2}Generate a network of paths between nodes (see {help nwpath}).
 
-{phang2}{opth permute(netname)} [, {opt xvars}]] 
+{phang2}{opth permute(netname)} [, {opt xvars}] 
 {p_end}
 {pmore2}Random permutation of a network (see {help nwpermute}).
 
 {phang2}{opt pref}({help int:nodes}) [, {opth m0(int)} {opth m(int)} {opth prob(float)} {opt undirected} {opt xvars}] 
 {p_end}
-{pmore2}Generate a preferntial attachment a network (see {help nwpref}).
+{pmore2}Generate a preferential attachment a network (see {help nwpref}).
 
 {phang2}{opt random}({help int:nodes}) [, {opth prob(float)} {opth density(float)} {opt undirected} {opt xvars}] 
 {p_end}
