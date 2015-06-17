@@ -1,5 +1,5 @@
 {smcl}
-{* *! version  14jun2015}{...}
+{* *! version  16jun2015}{...}
 {phang}
 {help nwcommands:NW-2 topical} {hline 2} 
 {hline 2} Topical list of network commands
@@ -153,6 +153,7 @@
 {p2col:    {bf:{help nworder }}}Reorder networks in dataset{p_end}
 {p2col:    {bf:{help nwsync }}}Sync network with Stata variables{p_end}
 {p2col:    {bf:{help nwtomata }}}Return adjacency matrix of network{p_end}
+{p2col:    {bf:{help nwtomatafast }}}Return link to adjacency matrix of network{p_end}
 {p2col:    {bf:{help nwunab }}}Unabbreviate network list{p_end}
 {p2col:    {bf:{help nwvalidate }}}Validate network name{p_end}
 {p2col:    {bf:{help nwvalidvars }}}Validate Stata variables for network{p_end}
@@ -191,6 +192,5 @@
 {p2col:{bf:{help _nwsyntax_other }}}{err}no help file yet{txt}{p_end}
 {p2col:{bf:{help _opts_oneof }}}{err}no help file yet{txt}{p_end}
 {p2col:{bf:{help nwdendrogram }}}{err}no help file yet{txt}{p_end}
-{p2col:{bf:{help nwtomatafast }}}{err}no help file yet{txt}{p_end}
 {p2col:{bf:{help nwtostata }}}{err}no help file yet{txt}{p_end}
 {p2col:{bf:{help schemeinfo }}}{err}no help file yet{txt}{p_end}

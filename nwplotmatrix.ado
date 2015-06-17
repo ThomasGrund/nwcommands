@@ -146,7 +146,8 @@ program nwsociomatrix_noif
 					forvalues i = 1 / `tabN' {
 						local order "`order' `i'"
 						local nextValue = `tabresult'[`i',1]
-						local legend `"`legend' label(`legendlab' `i' "`=`i'-1'")"'
+						//local legend `"`legend' label(`legendlab' `i' "`=`i'-1'")"'
+						local legend `"`legend' label(`legendlab' `i' "`nextValue'")"'
 					}
 					local legend `"`legend' order(`order')"'
 				}
@@ -302,13 +303,14 @@ local i 1
 //local colorlist "scheme p5"
 /*************** This next part is OK if allcolors is empty*****************/
     if "`lcolor'" == "" {
-		local blc = `"white"'
+		local blc = `"scheme pline"'
 	}
 	else {
 		local blc = `"`lcolor'"'
 	}
 	
 	local i = 1
+
 	foreach c of local clevels {
 		qui count if  cb==`c'
 		if r(N)>0 {

@@ -69,4 +69,4 @@ and not with a copy of it, see {help nwinternal:advanced network programming}.
 	  
 {title:See also}
 
-	{help nwtostata}, {help nwload}, {help nwsummarize}
+	{help nwtomatafast}, {help nwload}, {help nwsummarize}

@@ -27,7 +27,7 @@ program nwdyads
 		mata: st_numscalar("r(_001)", null)
 		mata: st_numscalar("r(_010)", asym)
 		mata: st_numscalar("r(_100)", mutual)
-		local reciprocity = `r(_100)' / `=`r(_100)' + `r(_001)''
+		local reciprocity = `r(_100)' / `=`r(_100)' + `r(_010)''
 		mata: st_numscalar("r(reciprocity)", `reciprocity')
 		
 		di

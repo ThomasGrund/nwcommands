@@ -13,7 +13,7 @@
 {title:Syntax}
 
 {p 8 17 2}
-{cmdab: nwcluster} 
+{cmdab: nwclustering} 
 [{it:{help netlist}}]
 [, {opt generate}({it:{help newvarname}})]
 
@@ -56,7 +56,7 @@ Lastly, the command also calculates the {it:overall clustering coefficient} as:
  
 {pstd}
 When Stata variable {it:varname} already exists, it is overwritten. In case, clustering centrality is calculated
-for {it:z} networks at the same time (e.g. {bf: nwclustering glasgow1 glasgow2}), the command generates the variables
+for {it:z} networks at the same time (e.g. {bf: nwclustering glasgow1 glasgow2}, the command generates the variables
 {it:varname_z} for each network. 
 
 

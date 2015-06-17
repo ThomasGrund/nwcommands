@@ -192,7 +192,7 @@ program _nwdeploy
 	
 	file close deploy_hlp
 	
-	file open deploy_ext1 using nwcommands-ext1.pkg, replace write
+	file open deploy_ext1 using nwcommands-ext.pkg, replace write
 	file write deploy_ext1 "v 3" _n
 	file write deploy_ext1 "d nwcommands-hlp. Social Network Analysis Using Stata - Extension_1" _n
 	file write deploy_ext1 "d Thomas U. Grund, Linkoping University, www.liu.se/ias" _n
@@ -200,7 +200,7 @@ program _nwdeploy
 	local d = lower(subinstr(c(current_date)," ","",.))
 	file write deploy_ext1 "d Distribution-Date: `d'" _n
 	
-	file open _pkg_ext1 using _pkg_ext1.txt, read
+	file open _pkg_ext1 using _pkg_ext.txt, read
 	file read _pkg_ext1 _pkg_ext1_line 
 	while "`_pkg_ext1_line'" != "" {
 		file write deploy_ext1 "`_pkg_ext1_line'" _n

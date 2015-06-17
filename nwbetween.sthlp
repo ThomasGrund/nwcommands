@@ -16,7 +16,7 @@
 {cmdab: nwbetween} 
 [{it:{help netlist}}]
 [{cmd:,}
-{opt generate}({it:{help varname}})
+{opt generate}({it:{help newvarlist}})
 {opt nosym}
 {opt standardize}]
 

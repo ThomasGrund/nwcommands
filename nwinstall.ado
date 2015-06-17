@@ -1,10 +1,10 @@
 capture program drop nwinstall
 program nwinstall
-	syntax [, update usermenu permanently remove downloadoff help all path(string)]
+	syntax [, update usermenu permanently dialog remove downloadoff help ext all path(string)]
 	
-	if "`usermenu'" != "" {
+	if "`usermenu'" != "" | "`downloadoff'" != "" {
 		window menu clear
-		nwinstall, downloadoff
+		qui nwinstall_menu
 		exit
 	}
 	
@@ -22,6 +22,8 @@ program nwinstall
 	
 	if "`all'" != "" {
 		local help = "help"
+		local ext = "ext"
+		local dialog = "dialog"
 		local permanently = "permanently"
 	}
 	
@@ -31,6 +33,20 @@ program nwinstall
 		net install "nwcommands-hlp", all
 	}
 	
+	if "`ext'" != "" {
+		capture ado uninstall "nwcommands-ext"
+		net from "http://nwcommands.org"
+		net install "nwcommands-ext", all
+	}
+	
+	
+	if "`dialog'" != "" {
+		capture ado uninstall "nwcommands-dlg"
+		net from "http://nwcommands.org"
+		net install "nwcommands-dlg", all
+	}
+	
+	
 	set more off
 	
 	if "`remove'" != "" {
@@ -39,14 +55,10 @@ program nwinstall
 		capture ado uninstall "nwcommands-dlg"
 		capture ado uninstall "nwcommands-ado"
 		capture ado uninstall "nwcommands-hlp"
+		capture ado uninstall "nwcommands-ext"
 		local permanently "permanently'"
 	}
 	else {
-		if "`downloadoff'" == "" {
-			capture ado uninstall "nwcommands-dlg"
-			net from "http://nwcommands.org"
-			net install "nwcommands-dlg", all
-		}
 		qui nwinstall_menu
 	}
 		
@@ -60,7 +72,7 @@ program nwinstall
 				file open `fh2' using "`path'\profile_temp.do", write replace
 				file read `fh1' line
 				while r(eof) == 0 {
-					if "`line'" != "run nwinstall_dlg.do" {
+					if "`line'" != "nwinstall, usermenu" {
 						file write `fh2' `"`line'"' _n
 					}
 					file read `fh1' line
@@ -88,7 +100,7 @@ program nwinstall
 				file open `fh1' using "`path'/profile.do", read 
 				file read `fh1' line
 				while r(eof) == 0 {
-					if `"`line'"' == "nwinstall, downloadoff" {
+					if `"`line'"' == "nwinstall, usermenu" {
 						local alreadyInstalled = 1
 					}
 					file read `fh1' line
@@ -104,7 +116,7 @@ program nwinstall
 			// write profile.do
 			else {
 				file open `fh2' using "`path'/profile.do", write
-				file write `fh2' `"nwinstall, downloadoff"' _n
+				file write `fh2' `"nwinstall, usermenu"' _n
 				file close `fh2'
 			}
 		}

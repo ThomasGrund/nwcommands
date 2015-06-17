@@ -50,13 +50,13 @@ program nwimport
 		 capture _nwimport_matrix `fname', `options' `typeoptions'
 	}
 	if "`import_type'" == "compressed" {
-		 capture _nwimport_compressed `fname', `options' `typeoptions'
+		  capture _nwimport_compressed `fname', `options' `typeoptions'
 	}
 	if "`import_type'" == "edgelist" {
 		 capture _nwimport_edgelist `fname', `options' `typeoptions'
 	}
 	if "`import_type'" == "pajek" {
-		  capture _nwimport_pajek `fname', `options'		 
+		 capture _nwimport_pajek `fname', `options'		 
 	}
 	if "`import_type'" == "gml" {
 		capture _nwimport_gml `fname', `options'
@@ -747,7 +747,7 @@ program _nwimport_edgelist
 	}
 
 	if (strpos(lower(`anything'), ".dta") != 0) | (strpos(lower(`anything'), ".DTA") != 0)  {
-		preserve
+		//preserve
 		use `anything', clear
 		ds
 		local ego : word 1 of `r(varlist)'
@@ -756,11 +756,11 @@ program _nwimport_edgelist
 		replace `alter' = `ego' if `alter' == .
 		drop if `ego' == .
 		nwfromedge `ego' `alter' `value', `keeporiginal' `undirected' `direcetd' `xvars' name(`name')
-		restore
+		//restore
 	}
 	else {
 	
-	preserve
+	//preserve
 	clear
 	
 	local success = 0
@@ -833,14 +833,14 @@ program _nwimport_edgelist
 		error 6704
 	}
 	nwfromedge _all, name(`name') `keeporiginal' `directed' `undirected' `xvars'
-	restore
+	//restore
 	}
 end
 
 
 capture program drop _nwimport_compressed
 program _nwimport_compressed
-	syntax anything, [name(string) delimiter(string) directed undirected xvars] 
+	syntax anything, [name(string) delimiter(string) directed undirected xvars keeporiginal] 
 	if "`name'" == "" {
 		local name "network"
 	}
@@ -848,9 +848,10 @@ program _nwimport_compressed
 		local delimiter = "comma"
 	}
 	
-	preserve
+	//preserve
 	clear
 	
+	local anyting "compressed_example.txt"
 	import delimited `anything', delimiter(`delimiter') varnames(noname) clear
 	rename v1 ego
 	capture replace v2 = ego if v2 == ""
@@ -861,9 +862,9 @@ program _nwimport_compressed
 	rename v alter
 	replace ego = trim(ego)
 	replace alter = trim(alter)
-	nwfromedge ego alter, `directed' `undirected' `xvars' name(`name')
+	nwfromedge ego alter, `directed' `undirected' `xvars' name(`name') `keeporiginal'
 
-	restore
+	//restore
 	
 	if "`xvars'" == "" {
 		nwload

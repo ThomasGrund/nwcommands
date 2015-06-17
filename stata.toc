@@ -4,3 +4,4 @@ d Program by Thomas Grund, Linkoping University, IAS
 p nwcommands-ado Social Network Analysis Using Stata - Core
 p nwcommands-hlp Social Network Analysis Using Stata - Help Files
 p nwcommands-dlg Social Network Analysis Using Stata - Dialogs
+p nwcommands-ext Social Network Analysis Using Stata - Extensions

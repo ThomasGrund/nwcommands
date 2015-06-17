@@ -22,7 +22,6 @@
 {opt id(local_macro3)} 
 {opt directed(local_macro4)} 
 {opt nodes(local_macro5)} 
-{opt nocurrent}
 
 
 {synoptline}

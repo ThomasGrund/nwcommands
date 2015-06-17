@@ -255,7 +255,7 @@ real matrix correlate_nodes(real matrix net, scalar outinboth){
 				temp[.,1] = i_outvec
 				temp[.,2] = j_outvec
 				Corr = correlation(temp)
-		
+				
 				if (Corr[2,1]==.){
 					ctemp = (sum(i_outvec), sum(j_outvec))
 					cmax = max(ctemp)
