@@ -48,15 +48,18 @@ program nwvalue
 		if (`r(rows)' == 1 & `r(cols)' == 1) {
 			mata: st_rclear()
 			mata: st_numscalar("r(ego)", `egoid')
-			mata: st_numscalar("r(alter)", `alterid')			
+			mata: st_numscalar("r(alter)", `alterid')
+			mata: subnet[1,1]
 			mata: st_numscalar("r(value)", subnet[1,1])
 		}
 		else {
 			mata: st_matrix("r(values)", subnet)
+			mata: subnet
 		}	
 	}
 	else {
 		mata: subnet = onenet
+		mata: subnet
 		mata: st_numscalar("r(rows)", rows(subnet))
 		mata: st_numscalar("r(cols)", cols(subnet))
 		mata: st_matrix("r(values)", subnet)

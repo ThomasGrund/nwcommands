@@ -1,6 +1,6 @@
 capture program drop nwhierarchy
 program nwhierarchy
-	syntax [anything(name=netname)] [, dismat(string) disnet(string) linkage(string) type(string) mode(string) clear add * ]
+	syntax [anything(name=netname)] [, dismat(string) disnet(string) linkage(string) type(string) context(string) clear add * ]
 	_nwsyntax `netname'
 	
 	if "`clear'" == "" & "`add'" == "" {
@@ -18,7 +18,7 @@ program nwhierarchy
 			mata: st_matrix("`dismat'", `r(mata)')
 		}
 		else {
-			nwdissimilar `netname', type(`type') mode(`mode') name(_temp_dissimilar)
+			nwdissimilar `netname', type(`type') context(`context') name(_temp_dissimilar)
 			nwtomatafast _temp_dissimilar
 			mata: st_matrix("`dismat'", `r(mata)')
 			nwdrop _temp_dissimilar

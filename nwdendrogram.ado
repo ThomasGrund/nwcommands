@@ -2,6 +2,7 @@ capture program drop nwdendrogram
 program nwdendrogram
 	syntax [anything(name=clus)], [ factor(passthru) label(varname) * ]
 	
+	preserve
 	cluster query
 	if "`clus'" != "" {
 		/*local found : list clus & r(names)
@@ -31,6 +32,7 @@ program nwdendrogram
 	
 	local i = 1
 	local mylevels ""
+	capture drop __lev*
 	qui foreach onelevel in `r(levels)' {
 		gen __lev`i' = _n
 		replace __lev`i' = __lev`i'[_n - 1] if `hgt'[_n - 1] <= float(`onelevel')
@@ -38,11 +40,23 @@ program nwdendrogram
 		local i = `i' + 1
 	}
 	
+	qui if "`label'" != "" {
+		capture mata: mata drop myord mylab
+		putmata myord = `ord'
+		putmata mylab = `label'
+		mata: mylab = mylab[myord]
+		capture drop __`label'
+		getmata __`label' = mylab, replace
+		capture mata: mata drop myord mylab
+		local label = "__`label'"
+	}
+	
 	capture {
 	if "`label'" == "" {
 		local label = "`ord'"
 	}
 
+	qui levelsof `hgt'
 	local maxCut = 0
 	foreach onecut in `r(levels)' {
 		if `onecut' > `maxCut' {
@@ -55,9 +69,11 @@ program nwdendrogram
 		local cutpts "`cutpts' `=1 - `onecut'/`maxCut''" 
 	}
 	local cutpts "`cutpts' 0"
+	set more off
 	qui dendrogram_classes `mylevels', `factor' cutpoints(`cutpts') `options' label(`label') 
 	}
 	capture drop __lev*
+	restore
 	
 end
 
@@ -143,7 +159,7 @@ program dendrogram_classes
 	
 	expand `=(`rings' * 2)', generate(duplicate)
 	sort `hierarchies' nlabel
-	
+
 	gen _running = _n
 	local i = 1
 	foreach var of varlist `hierarchies' {
@@ -171,7 +187,7 @@ program dendrogram_classes
 
 	gen _angle = ((_n -1 ) / (`=_N')) * 360 
 	replace _angle = _angle - 180 if _angle > 90 & _angle < 270
-
+	
 	if "`label'" != "" {	
 		forvalues i = 1/ `nodes' {
 			local oneid = (`i' - 1) * (2 * `rings') + 1
@@ -213,7 +229,7 @@ program dendrogram_classes
 			_getcolorstyle, i(`val')  symbolpalette(`symbolpalette') colorpalette(`colorpalette')
 			local onecol `r(col_fill)'
 			local onesymb `r(symbol)'
-			local scattercmd `"`scattercmd' (scatter _x _y if `firstcol' == `val'  & _bx1 != .,  mcolor("`onecol'")  msymbol"`onesymb'") `obsopt') "'
+			local scattercmd `"`scattercmd' (scatter _x _y if `firstcol' == `val'  & _bx1 != .,  mcolor("`onecol'")  msymbol("`onesymb'") `obsopt') "'
 		}
 	}
 
@@ -241,6 +257,7 @@ program dendrogram_classes
 	levelsof `onevar'
 	local onevartotal : word count `r(levels)'
 	local coltotal = `onevartotal'
+
 	foreach val in `r(levels)' {
 		_getcolorstyle, i( `val')  symbolpalette(`symbolpalette') colorpalette(`colorpalette')
 		local onecol `r(col_fill)'
@@ -251,6 +268,7 @@ program dendrogram_classes
 	local innerringcmd ""
 	local i = 2
 	gen run2 = _n
+
 	foreach var of varlist `hierarchies' {
 		//tempvar ring`i'x1 ring`i'y1 ring`i'x2 ring`i'y2 
 
@@ -396,6 +414,7 @@ program dendrogram_classes
 	}
 	
 	local corecmd "(scatter _beam`=`i'-1'x2 _beam`=`i'-1'y2, msymbol(o) mcolor(black) `coreopt')"
+	
 	twoway  `beamcmd' `outerringcmd' `innerringcmd' `scattercmd' `corecmd' , ylabel(, nogrid) yscale(`yscale') xscale(`xscale') aspect(1) legend(off)  `options'
 	}
 	restore

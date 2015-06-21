@@ -19,7 +19,8 @@
 {cmdab: nwdissimilar} 
 [{it:{help netname}}]
 {cmd:,}
-[{opt mode}({it:{help nwdissimilar##dissimilar_context:type}})
+[{opt type}({it:{help nwdissimilar##type:type}})
+{opt context}({it:{help nwdissimilar##context:context}})
 {opt name}({it:{help newnetname}})
 {opt xvars}]
 
@@ -27,7 +28,7 @@
 {synopthdr}
 {synoptline}
 {synopt:{opt type}({it:{help nwdissimilar##type:type}})}Type of dissimilarity between two nodes; default = euclidean{p_end}
-{synopt:{opt mode}({it:{help nwdissimilar##context:context}})}Context definition for dissimilarity calculation; default = both{p_end}
+{synopt:{opt context}({it:{help nwdissimilar##context:context}})}Context definition for dissimilarity calculation; default = both{p_end}
 {synopt:{opt name}({it:{help newnetname}})}Name of the new dissimilarity network; default = {it:_dissimilar}{p_end}
 {synopt:{opt xvars}}Do not generate Stata variables{p_end}
 
@@ -43,7 +44,7 @@
 
 {synoptset 15 tabbed}{...}
 {marker context}{...}
-{p2col:{it:mode}}{p_end}
+{p2col:{it:context}}{p_end}
 {p2line}
 {p2col:{cmd: both}}Calculate dissimilarity between nodes based on both in- and outgoing ties{p_end}
 {p2col:{cmd: incoming}}Calculate dissimilarity between nodes based on incoming ties only{p_end}
@@ -57,9 +58,9 @@ This command calculates the dissimilarities between all nodes {it:i} and {it:j} 
 are regarding the ties they have to other nodes (tie vectors). 
 
 {pstd}
-By default, the dissimilarity is calculated based on both incoming and outgoing ties ({bf:mode(both)}). With {bf:mode(incoming)} the dissimilarity
-between two nodes {it:i} and {it:j} is calculated only based on the ties they receive (columns). Option {bf:mode(outgoing)} only considers outgoing ties (rows) when calculating the dissimilarity
-between nodes. Practially, option {bf:mode(both)} stacks the vector of outgoing and incoming ties.
+By default, the dissimilarity is calculated based on both incoming and outgoing ties ({bf:context(both)}). With {bf:context(incoming)} the dissimilarity
+between two nodes {it:i} and {it:j} is calculated only based on the ties they receive (columns). Option {bf:context(outgoing)} only considers outgoing ties (rows) when calculating the dissimilarity
+between nodes. Practially, option {bf:context(both)} stacks the vector of outgoing and incoming ties.
 
 
 {pstd}
@@ -124,7 +125,7 @@ from these alters.
 {cmd:. webnwuse florentine}
 {cmd:. nwdissimilar flomarriage}
 
-{cmd:. nwdissimilar flomarriage, type(hamming) mode(outgoing)}
+{cmd:. nwdissimilar flomarriage, type(hamming) context(outgoing)}
 
 
 {title:See also}

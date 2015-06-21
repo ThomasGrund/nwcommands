@@ -1,17 +1,17 @@
 capture program drop nwdissimilar
 program nwdissimilar
-	syntax [anything(name=netname)] [, type(string) labs(passthru) vars(passthru) name(string) mode(string) xvars]
+	syntax [anything(name=netname)] [, type(string) labs(passthru) vars(passthru) name(string) context(string) xvars]
 	_nwsyntax `netname'
 	
-	if "`mode'" == "" {
-		local mode = "both"
+	if "`context'" == "" {
+		local context = "both"
 	}
 	if "`type'" == "" {
 		local type = "euclidean"
 	}
 
 	_opts_oneof "euclidean manhatten nonmatches jaccard hamming" "type" "`type'" 6556
-	_opts_oneof "incoming outgoing both" "mode" "`mode'" 6556
+	_opts_oneof "incoming outgoing both" "context" "`context'" 6556
 	
 	if "`name'" == "" {
 		local name = "_dissimilar"
@@ -21,10 +21,10 @@ program nwdissimilar
 	local name = "`r(validname)'"
 	
 	local dtype = 0
-	if "`mode'" == "incoming" {
+	if "`context'" == "incoming" {
 		local dtype = 1
 	}
-	if "`mode'" == "outgoing" {
+	if "`context'" == "outgoing" {
 		local dtype = 2
 	}
 	
