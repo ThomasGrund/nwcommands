@@ -1,16 +1,16 @@
 capture program drop nwinstall
 program nwinstall
-	syntax [, update usermenu permanently dialog remove downloadoff help ext all path(string)]
+	syntax [, update menu(string) usermenu permanently dialog remove downloadoff help ext all path(string)]
 	
 	if "`usermenu'" != "" | "`downloadoff'" != "" {
 		window menu clear
-		qui nwinstall_menu
+		qui nwinstall_menu, menu("`menu'")
 		exit
 	}
 	
 	if "`update'" != "" {
 		window menu clear
-		nwinstall, help usermenu
+		nwinstall, help usermenu menu("`menu'")
 		// ADD NEW PACKAGES HERE	
 	}
 	
@@ -59,7 +59,7 @@ program nwinstall
 		local permanently "permanently'"
 	}
 	else {
-		qui nwinstall_menu
+		qui nwinstall_menu, menu("`menu'")
 	}
 		
 		
@@ -126,7 +126,11 @@ end
 
 capture program drop nwinstall_menu
 program nwinstall_menu
-	window menu append submenu "stUser" "Network Analysis"
+	syntax [, menu(string)]
+	if "`menu'" == "" {
+		local menu "stUser"
+	}
+	window menu append submenu "`menu'" "Network Analysis"
 	
 	window menu append submenu "Network Analysis" "Generate Network"	
 	window menu append item "Generate Network" "Random Network" "db nwrandom"

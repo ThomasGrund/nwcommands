@@ -49,9 +49,14 @@ program nwdissimilar
 	}
 end
 
-capture mata: mata drop euclidean_dissimilarity()
+capture mata mata drop euclidean_dissimilarity()
+capture mata mata drop manhatten_dissimilarity()
+capture mata mata drop matches_dissimilarity()
+capture mata mata drop jaccard_dissimilarity()
+capture mata mata drop hamming_dissimilarity()
+
 mata:
-real matrix euclidean_dissimilarity(real matrix net ,real scalar dtype){
+real matrix euclidean_dissimilarity(real matrix net, real scalar dtype){
 	S = J(rows(net), cols(net), 0)
 	for(i = 1; i<= rows(S); i++){
 		for(j = 1; j<= cols(S); j++){
@@ -80,10 +85,7 @@ real matrix euclidean_dissimilarity(real matrix net ,real scalar dtype){
 	}
 	return(S)
 }
-end
 
-capture mata: mata drop manhatten_dissimilarity()
-mata:
 real matrix manhatten_dissimilarity(real matrix net ,real scalar dtype){
 	S = J(rows(net), cols(net), 0)
 	for(i = 1; i<= rows(S); i++){
@@ -113,10 +115,7 @@ real matrix manhatten_dissimilarity(real matrix net ,real scalar dtype){
 	}
 	return(S)
 }
-end
 
-capture mata: mata drop matches_dissimilarity()
-mata:
 real matrix matches_dissimilarity(real matrix net,real scalar dtype){
 	S = J(rows(net), cols(net), 0)
 	for(i = 1; i<= rows(S); i++){
@@ -152,10 +151,7 @@ real matrix matches_dissimilarity(real matrix net,real scalar dtype){
 	}
 	return(S)
 }
-end
 
-capture mata: mata drop jaccard_dissimilarity()
-mata:
 real matrix jaccard_dissimilarity(real matrix net,real scalar dtype){
 	S = J(rows(net), cols(net), 0)
 	for(i = 1; i<= rows(S); i++){
@@ -191,11 +187,7 @@ real matrix jaccard_dissimilarity(real matrix net,real scalar dtype){
 	}
 	return(S)
 }
-end
 
-
-capture mata: mata drop hamming_dissimilarity()
-mata:
 real matrix hamming_dissimilarity(real matrix net,real scalar dtype){
 	S = J(rows(net), cols(net), 0)
 	for(i = 1; i<= rows(S); i++){

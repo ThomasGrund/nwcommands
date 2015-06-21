@@ -19,6 +19,7 @@
 {opt remove }
 {opt help}
 {opt usermenu}
+{opt menu(string)}
 {opt all}
 {opth path(string)}]
 
@@ -31,6 +32,7 @@
 {synopt:{opt remove}}remove the "Network Analysis" menu from your Stata{p_end}
 {synopt:{opt help}}download the help files{p_end}
 {synopt:{opt usermenu}}update menu items for dialog-boxes{p_end}
+{synopt:{opth menu(string)}}install in this menu; default = "stUser"{p_end}
 {synopt:{opt all}}download the help files, dialog boxes, extensions and install them permanently{p_end}
 {synopt:{opth path(string)}}directory where profile.do is installed; default: sysdir_stata{p_end}
 
