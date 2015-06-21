@@ -163,6 +163,7 @@
 {col 8}{hline 3}{c RT}       {it:Visualization}{col 36}{c LT}{hline}
 {col 8}   {c BLC}{hline 24}{c BRC}
 {p2colset 12 35 36 2}
+{p2col:    {bf:{help nwdendrogram }}}Plot a wheel dendrogram{p_end}
 {p2col:    {bf:{help nwmovie }}}Animate a sequence of networks{p_end}
 {p2col:    {bf:{help nwplot }}}Plot a network{p_end}
 {p2col:    {bf:{help nwplotmatrix }}}Plot a network as sociomatrix{p_end}
@@ -191,6 +192,5 @@
 {p2col:{bf:{help _nwsetobs }}}{err}no help file yet{txt}{p_end}
 {p2col:{bf:{help _nwsyntax_other }}}{err}no help file yet{txt}{p_end}
 {p2col:{bf:{help _opts_oneof }}}{err}no help file yet{txt}{p_end}
-{p2col:{bf:{help nwdendrogram }}}{err}no help file yet{txt}{p_end}
 {p2col:{bf:{help nwtostata }}}{err}no help file yet{txt}{p_end}
 {p2col:{bf:{help schemeinfo }}}{err}no help file yet{txt}{p_end}
