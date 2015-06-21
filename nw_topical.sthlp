@@ -22,7 +22,7 @@
 
 {help nw_topical##utilities:{col 14}{bf:[NW-2.7]}{...}{col 31}{bf:Utilities}}
 
-{help nw_topical##visualizaion:{col 14}{bf:[NW-2.8]}{...}{col 31}{bf:Visualization}}
+{help nw_topical##visualization:{col 14}{bf:[NW-2.8]}{...}{col 31}{bf:Visualization}}
 
 {help nw_topical##programming:{col 14}{bf:[NW-2.9]}{...}{col 31}{bf:Programming}}
 
