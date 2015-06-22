@@ -50,7 +50,11 @@ program nwsimilar
 	}
 end
 
-capture mata: mata drop matches_similarity()
+capture mata mata drop matches_similarity()
+capture mata mata drop jaccard_similarity()
+capture mata mata drop hamming_similarity()
+capture mata mata drop crossproduct_similarity()
+
 mata:
 real matrix matches_similarity(real matrix net,real scalar dtype){
 	S = J(rows(net), cols(net), 0)
@@ -87,10 +91,7 @@ real matrix matches_similarity(real matrix net,real scalar dtype){
 	}
 	return(S)
 }
-end
 
-capture mata: mata drop jaccard_similarity()
-mata:
 real matrix jaccard_similarity(real matrix net,real scalar dtype){
 	S = J(rows(net), cols(net), 0)
 	for(i = 1; i<= rows(S); i++){
@@ -126,11 +127,7 @@ real matrix jaccard_similarity(real matrix net,real scalar dtype){
 	}
 	return(S)
 }
-end
 
-
-capture mata: mata drop hamming_similarity()
-mata:
 real matrix hamming_similarity(real matrix net,real scalar dtype){
 	S = J(rows(net), cols(net), 0)
 	for(i = 1; i<= rows(S); i++){
@@ -166,11 +163,7 @@ real matrix hamming_similarity(real matrix net,real scalar dtype){
 	}
 	return(S)
 }
-end
 
-
-capture mata: mata drop crossproduct_similarity()
-mata:
 real matrix crossproduct_similarity(real matrix net,real scalar dtype){
 	S = J(rows(net), cols(net), 0)
 	for(i = 1; i<= rows(S); i++){

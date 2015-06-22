@@ -131,11 +131,10 @@ program nwmovie
 		local impath = "`r(impath)'"
 	}
 	
-	di "h2: `netname'"
+
 	// make movie
 	_nwsyntax `netname', max(999) min(2)
 	local all_nets "`netname'"
-	di "h3"
 	
 	local sizeCheck = 0
 	qui foreach onenet in `all_nets' {
@@ -315,8 +314,6 @@ program nwmovie
 		
 		noi di "{txt}Processing network {bf:`first'}"
 		if `i' == 1 {
-			di `"nwplot `first', ignorelgc generate(_c1_x _c1_y) `sizecmd1' `symbolcmd1' `colorcmd1'  `edgesizecmd1' `edgecolorcmd1' `titlecmd1' `options'"'
-			
 			qui nwplot `first', ignorelgc generate(_c1_x _c1_y) `sizecmd1' `symbolcmd1' `colorcmd1'  `edgesizecmd1' `edgecolorcmd1' `titlecmd1' `options'
 			capture graph export `"`c(pwd)'/first`st'.`pic'"', replace `picopt'
 			if _rc != 0 {

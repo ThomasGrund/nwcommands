@@ -16,7 +16,7 @@
 {title:Syntax}
 
 {p 8 17 2}
-{cmdab: nwdissimilar} 
+{cmdab: nwsimilar} 
 [{it:{help netname}}]
 {cmd:,}
 [{opt mode}({it:{help nwsimilar##context:type}})
