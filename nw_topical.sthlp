@@ -1,5 +1,5 @@
 {smcl}
-{* *! version  21jun2015}{...}
+{* *! version  24jun2015}{...}
 {phang}
 {help nwcommands:NW-2 topical} {hline 2} 
 {hline 2} Topical list of network commands
@@ -110,6 +110,7 @@
 {p2col:    {bf:{help nwreplacemat }}}Replace network with Stata or Mata matrix{p_end}
 {p2col:    {bf:{help nwsort }}}Sort network nodes{p_end}
 {p2col:    {bf:{help nwsubset }}}Subset a network{p_end}
+{p2col:    {bf:{help nwsym }}}Symmetrize network{p_end}
 {p2col:    {bf:{help nwtranspose }}}Transpose a network{p_end}
 {marker analysis}{...}
 
