@@ -11,7 +11,6 @@ program nwcloseness
 	version 9
 	syntax [anything(name=netname)] [, GENerate(string) *]	
 	_nwsyntax `netname', max(9999)
-	_nwsetobs
 	
 	if `networks' > 1 {
 		local k = 1
@@ -26,7 +25,8 @@ program nwcloseness
 	
 	set more off
 	qui foreach netname_temp in `netname' {
-		qui nwgeodesic `netname_temp', name(_tempgeodesic) `options'
+		preserve
+		qui nwgeodesic `netname_temp', name(_tempgeodesic) `options' xvars
 		nwname _tempgeodesic
 		nwtomata _tempgeodesic, mat(geodesic)
 		mata: st_numscalar("r(mindistance)", min(geodesic))
@@ -35,6 +35,8 @@ program nwcloseness
 		if `r(mindistance)' < 0 {
 			mata: far = J(rows(geodesic), 1, .)
 			noi di "{txt}Warning: network {bf:`netname_temp'} not connected; specify {bf:unconnected()} to obtain results.
+			nwdrop _tempgeodesic
+			exit
 		}
 		
 		_nwsyntax_other `netname_temp'
@@ -44,7 +46,11 @@ program nwcloseness
 		local _closeness : word 1 of `generate'
 		local _farness : word 2 of `generate'
 		local _nearness : word 3 of `generate'
-	
+		nwdrop _tempgeodesic
+		restore
+		
+		_nwsetobs `netname_temp'
+		
 		qui capture drop `_closeness'`k'
 		qui gen `_closeness'`k' = .
 		qui capture drop `_farness'`k'
@@ -58,7 +64,6 @@ program nwcloseness
 	
 		local generate_all "`generate_all' `_closeness'`k' `_farness'`k' `_nearness'`k'"
 		mata: mata drop closeness far nearness geodesic
-		nwdrop _tempgeodesic
 		
 		local k = `k' + 1	
 	}

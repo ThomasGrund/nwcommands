@@ -39,7 +39,7 @@ program nwplot
 	}
 	
 	local 0 = `"`0_original'"'
-	syntax [anything(name=netname)][if/] [in/], [ lab  labelopt(string) _layoutfunction(string) arrows edgesize(string) ASPECTratio(string) components(string) arcstyle(string) arcbend(string) arcsplines(integer 10) nodexy(varlist numeric min=2 max=2) edgeforeground(string) GENerate(string) colorpalette(string) edgecolorpalette(string) edgepatternpalette(string) symbolpalette(string) lineopt(string) scatteropt(string) legendopt(string) size(string) color(string) symbol(string) edgecolor(string) label(varname) nodefactor(string) sizebin(string) edgefactor(string) arrowfactor(string) arrowgap(string) arrowbarbfactor(string) layout(string) iterations(integer 1000) scheme(string) * ]
+	syntax [anything(name=netname)][if/] [in/], [ lab  labelopt(string) _layoutfunction(string) arrows edgesize(string) ASPECTratio(string) components(string) arcstyle(string) arcbend(string) arcsplines(integer 10) nodexy(varlist numeric min=2 max=2) edgeforeground(string) GENerate(string) colorpalette(string) edgecolorpalette(string) edgepatternpalette(string) symbolpalette(string) lineopt(string) scatteropt(string) legendopt(string) size(string) color(string) symbol(string) edgecolor(string) label(varname) nodefactor(string) sizebin(string) edgefactor(string) arrowfactor(string) arrowgap(string) arrowbarbfactor(string) layout(string) iterations(integer 100) scheme(string) * ]
 	_nwsyntax `netname', max(1)
 	qui nwsummarize `netname'
 	if `r(density)' == 0 {
@@ -185,7 +185,7 @@ program nwplot
 	local layout_gridcols = "`columns'"
 	local layout_components = "`components'"
 	local layout = "`anything'"
-	_opts_oneof "mds mdsclassical grid circle nodexy _layoutfunction" "layout" "`layout'" 6556
+	_opts_oneof "mds mdsclassical frucht grid circle nodexy _layoutfunction" "layout" "`layout'" 6556
 
 
 	// Check matsize (because mds requires STATA matrix)
@@ -711,7 +711,6 @@ program nwplot
 	if ("`layout'"!="nodexy"){
 		di "{text:Calculating node coordinates...}"
 	}
-	
 	if ("`layout'"=="_layoutfunction") {
 		gettoken _layoutfcn _layoutfcnopt: _layoutfunction, parse(",")
 		mata: Coord = `_layoutfcn'(M`_layoutfcnopt')
@@ -719,6 +718,11 @@ program nwplot
 	if ("`layout'"== "mds"){
 		mata: Coord = netplotmds(M, `iterations')
 	}
+	
+	if ("`layout'"=="frucht"){
+		mata: Coord = fruchtrein(M, `iterations')
+	}
+		
     qui if ("`layout'"=="mdsclassical"  ){
 		// Coordinates matrix to be populated
 		mata: Coord = J(`nodes', 2, 0)
@@ -1244,7 +1248,7 @@ program nwplotsplines
 	replace `y2' = `ytemp' if (`llid' == 2) & (`mult1' == - 1)
 end
 
-
+capture mata: mata drop fruchtrein()
 capture mata: mata drop getTieCoordinates()
 mata:
 real matrix function getTieCoordinates(
@@ -1744,5 +1748,61 @@ real matrix function gridlayout(real scalar N,  real scalar cols)
 	
 	return(Coord)
 }
+
+
+
+real matrix function fruchtrein(real matrix M, real scalar Iter)
+{
+ real matrix Pos, Disp
+ real vector delta
+ real scalar W, L, area, V, temperature, k, r
+ W = 2
+ L = 2
+ area =  W*L
+ radius= min((W,L))/2 
+ V = rows(M)
+ Pos = runiform(V,2):-.5  
+ Pos[.,1]=floor(W):*runiform(V,1):-W/2 // Initial random position W
+ Pos[.,2]=floor(L):*runiform(V,1):-L/2 // Initial random position L
+ Disp = J(V,2,0)
+ temperature = W/3
+ k = sqrt(area/V)
+
+
+	
+ for(i=1;i<= Iter;i++){
+ 
+// calculate repulsive force
+	for(v=1;v<=V;v++){
+	  for(u=1;u<=V;u++){
+		if (v!=u) {
+		 delta = Pos[v,.] - Pos[u,.]
+		 Disp[v,.] = Disp[v,.] + (delta / norm(delta)) * ((k^2)/norm(delta))
+		 }
+	  }
+	}
+
+// calculate attractive force
+	for(e1=1;e1<=V;e1++){
+	   for(e2=e1+1;e2<=V;e2++){
+		 if (M[e1,e2]!=0){		
+		  delta = Pos[e1,.] - Pos[e2,.]
+		  Disp[e1,.] = Disp[e1,.] - (delta /norm(delta)) * ( (norm(delta)* norm(delta))/ k)
+		  Disp[e2,.] = Disp[e2,.] + (delta /norm(delta)) * ( (norm(delta)* norm(delta))/ k)		
+		 }
+	   }
+	}
+
+// Limit the maximum displacement to the temperature t
+		for(v=1;v<=V;v++){
+		   Pos[v,.]=Pos[v,.]+(Disp[v,.]/norm(Disp[v,.])*min((norm(Disp[v,.]),temperature)))
+		   if (norm(Pos[v,.])>radius) Pos[v,.]=radius*Pos[v,.]/(norm(Pos[v,.]))
+		   }
+// Reduce temperature
+    temperature = temperature - temperature/10
+ }
+return(Pos)
+}
+
 end
 

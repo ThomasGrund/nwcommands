@@ -26,6 +26,7 @@
 {p2col:{bf:{help nwcollapse }}}Collapse a network{p_end}
 {p2col:{bf:{help nwcomponents }}}Calculate network components / largest component{p_end}
 {p2col:{bf:{help nwcompressobs }}}Compresses observations in Stata{p_end}
+{p2col:{bf:{help nwconstraint }}}{err}no help file yet{txt}{p_end}
 {p2col:{bf:{help nwcontext }}}Create a context variable{p_end}
 {p2col:{bf:{help nwcorrelate }}}Correlate networks and variables{p_end}
 {p2col:{bf:{help nwcurrent }}}Report and set current network{p_end}

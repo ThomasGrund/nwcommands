@@ -134,7 +134,7 @@ program _nwdeploy
 	}
 	file close _pkg_ado
 	
-	/*foreach file in `adofiles' {
+	foreach file in `adofiles' {
 		
 		// add meta to dofiles
 		// di "ado: `file'"
@@ -142,9 +142,9 @@ program _nwdeploy
 	
 		local cmdname = substr("`file'", 1, `=(length("`file'") - 4)') 
 		getcmddesc `cmdname'
-		file write `deploy_ado' "f `file'" _n
+		//file write `deploy_ado' "f `file'" _n
 		file write `alphabetical' "{p2col:{bf:{help `cmdname' }}}`r(cmddesc)'{p_end}" _n		
-	}*/
+	}
 	
 	file close `alphabetical'
 	

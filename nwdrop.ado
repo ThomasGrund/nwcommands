@@ -54,7 +54,10 @@ program nwdrop
 				if _rc == 0 {
 					qui drop `=onenw'
 				}
-				capture drop _label	 
+				capture drop _label	
+				capture drop _nodelab
+				capture drop _nodevar
+				capture drop _nodeid
 			}
 	
 			// update all Stata/Mata macros

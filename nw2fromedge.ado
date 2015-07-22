@@ -55,7 +55,7 @@ program nw2fromedge
 	qui save `dic1', replace
 	restore
 	
-	nwfromedge `group1' `group2' `value' `if', `options' `xvars' undirected
+	qui nwfromedge `group1' `group2' `value' `if', `options' `xvars' undirected
 	
 	capture drop `group1'
 	gen `group1' = _nodelab
@@ -70,6 +70,7 @@ program nw2fromedge
 	qui generate `generate' = 1 if `temp' == 1
 	qui replace `generate' = 2 if `generate' != 1
 	qui drop `group1'
+	
 	
 	qui if "`project'" != ""  {
 		local newname "p1_`onename'"
@@ -96,32 +97,18 @@ program nw2fromedge
 		}	
 		keep if `generate' == 1
 		mata: onenet = onemodeproject(onenet, onemodeid, `_stat')
-		mata: onenet
-		exit
-		
-		mata: rows(onenet)
-		mata: onenet
 		nwset , mat(onenet) name(`newname')
-		nwset, detail
-		nwsummarize
-		di "h2"
 		nwname, newlabsfromvar(_nodelab)
 		nwdrop `onename'
 		capture mata: mata drop onenet
-		di "h3"
 		nwsym
-		di "h33"
 		drop _all
 		if "`xvars'" != "" {
-			di "h34"
 			nwload, labelonly
-			di "h35"
 		}
 		else {
-			di "h44"
 			nwload
 		}
-		di "h4"
 	}
 	nwsummarize
 end

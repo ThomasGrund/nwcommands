@@ -72,6 +72,7 @@ real matrix euclidean_dissimilarity(real matrix net, real scalar dtype){
 			j_outvec[j] = 0
 			j_invec[i] = 0
 			j_invec[j] = 0	
+
 			if (dtype == 0 ) {
 				S[i,j] = sqrt(sum((i_outvec :- j_outvec):^2)+ sum((i_invec :- j_invec):^2))
 			}
