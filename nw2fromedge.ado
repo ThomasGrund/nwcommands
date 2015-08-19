@@ -21,28 +21,20 @@ program nw2fromedge
 	local group2 : word 2 of `varlist'
 	local value : word 3 of `varlist'
 		
-	qui levelsof `group1'
-	local lev_group1 `r(levels)'
-	local num_group1 : word count `lev_group1'
-	
-	qui levelsof `group2'
-	local lev_group2 `r(levels)'
-	local num_group2 : word count `lev_group2'
-	local overlap : list lev_group1 & lev_group2
-	
-	if "`overlap'" != "" {
-		capture confirm numeric variable `group1'
+	capture confirm numeric variable `group1'
+	if _rc == 0 {
+		capture confirm numeric variable `group2'
 		if _rc == 0 {
-			tostring `group1', replace
-
+			qui sum `group1'
+			local g1min = r(min)
+			local g1max = r(max)
+			qui sum `group2'
+			local g2min = r(min)
+			local g2max = r(max)
+			if (`g1max' >= `g2min') {
+				replace `group2' = `group2' + `g1max'
+			}
 		}
-		capture confirm numeric variable `group1'
-		if _rc == 0 {
-			tostring `group1', replace
-
-		}
-		replace `group1' = "m1_" + `group1'
-		replace `group2' = "m2_" + `group2'
 	}
 	
 	preserve
@@ -51,26 +43,24 @@ program nw2fromedge
 	keep `group1'
 	gen `temp' = 1
 	collapse (mean) `temp', by(`group1')
+	capture tostring `group1', replace
 	sort `group1'
 	qui save `dic1', replace
 	restore
 	
 	qui nwfromedge `group1' `group2' `value' `if', `options' `xvars' undirected
-	
-	capture drop `group1'
-	gen `group1' = _nodelab
+	qui nwload, labelonly
+	qui gen `group1' = _nodelab
 	
 	_nwsyntax
 	local onename "`netname'"
 	local onenodes `nodes'
 	capture drop `generate'
-
-	qui merge m:n `group1' using `dic1', nogenerate
 	
+	qui merge m:n `group1' using `dic1', nogenerate
 	qui generate `generate' = 1 if `temp' == 1
 	qui replace `generate' = 2 if `generate' != 1
 	qui drop `group1'
-	
 	
 	qui if "`project'" != ""  {
 		local newname "p1_`onename'"

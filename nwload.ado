@@ -23,7 +23,7 @@ program nwload
 		exit
 	}
 	
-	if (`=`c(k)' + `nodes'' >= `c(max_k_theory)') {
+	if (`=`c(k)' + `nodes'' >= `c(max_k_theory)' & "`force'" == "" & "`labelonly'" == "") {
 		exit
 	}
 	
