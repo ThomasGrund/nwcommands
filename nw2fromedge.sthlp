@@ -57,8 +57,8 @@ connection is a relation author cites a paper.
 
 {pmore}
 - Co-autorship networks - authors, papers, is a (co)author.
-A corresponding graph is called bipartite graph Ð lines
-connect only vertices from one to vertices from another set Ð
+A corresponding graph is called bipartite graph â€“ lines
+connect only vertices from one to vertices from another set â€“
 inside sets there are no connections.
 
 
@@ -120,18 +120,46 @@ For example, this loads the data above as a one-mode projection on level 1 (pers
 	{cmd: nw2fromedge person institution, project(1)}
 
 {pstd}
-It generates a network with five unique actors (Peter, Tim, Thomas, Michael and Mathilde). By default, a one-mode projection on one level generates ties between nodes (on this level) when they have at least one network neighbor on the other level in common. In our case, 
-projecting to the level of persons creates ties between persons when they share at least one institution. 
+It generates a network with five unique actors (Peter, Tim, Thomas, Michael and Mathilde). By default, a one-mode projection
+on one level generates ties between nodes (on this level) when they have at least one network neighbor on the 
+other level in common. In our case, projecting to the level of persons creates ties between persons when they share
+at least one institution. By default, such a one-mode projection is a valued network, where the
+tie values indicate how many institutions individuals share. To illustrate this, 
+let us consider the relationship between Peter and Thomas. In this example, they share
+two institutions: Oxford and LiU.
+
+{pmore}
+Thomas - LiU
+
+{pmore}
+Peter  - LiU
+
+{pmore}
+Thomas - Oxford
+
+{pmore}
+Peter  - Oxford
 
 {pstd}
-When ties are valued there are several ways how the value of projected ties is generated. Option {opt stat()} can
+A one-mode projection to the level of persons generates a tie between Thomas and Peter with value 2, because
+they share two institutions. A one-mode projection to the level of institutions would generate a tie
+with value 2 between the institutions Oxford and LiU, because they share two persons (Peter and Thomas).
+
+{pstd}
+When ties in the original network are valued there are several ways how the value of projected ties is generated. Option {opt stat()} can
 be one of the following: {bf:min, max, minmax, sum, mean}. To illustrate what each one of them calculates tie values for
 the projection, let us consider the relationship between Peter and Thomas. They share two institutions: Oxford and LiU.
 
 {pmore}
 Thomas - LiU    - 1 year
+
+{pmore}
 Peter  - LiU    - 1 year
+
+{pmore}
 Thomas - Oxford - 5 years
+
+{pmore}
 Peter  - Oxford - 7 years
 
 {pstd}
@@ -171,13 +199,6 @@ Peter - Thomas  - 5 years
 In contrast, the next command generates a one-mode projection on level 2 (institutions). 
 	
 	{cmd: nw2fromedge person institution, project(2)}	
-
-{pstd}
-This projection
-has only two nodes (LiU and UdeM). And there is exactly one undirected tie in this network (because Thomas went to both UdeM and LiU).
-	
-	LiU 	<=> 	UdeM	
-
 	
 {title:Also see}
 	
