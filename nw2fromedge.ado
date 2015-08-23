@@ -44,23 +44,24 @@ program nw2fromedge
 	gen `temp' = 1
 	collapse (mean) `temp', by(`group1')
 	capture tostring `group1', replace
-	sort `group1'
+	rename `group1' _nodelab
+	sort _nodelab
 	qui save `dic1', replace
 	restore
 	
 	qui nwfromedge `group1' `group2' `value' `if', `options' `xvars' undirected
 	qui nwload, labelonly
-	qui gen `group1' = _nodelab
 	
 	_nwsyntax
 	local onename "`netname'"
 	local onenodes `nodes'
 	capture drop `generate'
 	
-	qui merge m:n `group1' using `dic1', nogenerate
-	qui generate `generate' = 1 if `temp' == 1
+	qui merge m:n _nodelab using `dic1'
+
+	qui generate `generate' = 1 if _merge == 3
 	qui replace `generate' = 2 if `generate' != 1
-	qui drop `group1'
+	qui drop _merge
 	
 	qui if "`project'" != ""  {
 		local newname "p1_`onename'"
@@ -68,11 +69,17 @@ program nw2fromedge
 			replace `generate' = 3 - `generate'	
 			local newname "p2_`onename'"
 		}
-		nwsort `onename', by(`generate')
+		nwsort `onename', by(`generate') attribute(_nodelab)
 		mata: onemodeid = st_data((1,`onenodes'), "`generate'")
 		nwtomata, mat(onenet)
-
+		
 		local _stat = 5
+		if "`stat'" == "" {
+			local _stat = 0
+		}
+		if "`stat'" == "min" {
+			local _stat = 1
+		}
 		if "`stat'" == "max" {
 			local _stat = 2
 		}
@@ -99,6 +106,7 @@ program nw2fromedge
 		else {
 			nwload
 		}
+		mata: mata drop onemodeid
 	}
 	nwsummarize
 end
@@ -108,11 +116,21 @@ capture mata: mata drop onemodeproject()
 mata:
 real matrix onemodeproject(matrix _net, matrix _modeid, scalar _stat) {
 	num_m1 = sum(_modeid :== 1)
-
+	
 	N = rows(_net)
 	projection = J(num_m1, num_m1, 0)
 	
-	for (i = 1 ; i < num_m1; i++) {
+	// ignore tie values for projection
+	if (_stat == 0){
+		_netbin = _net :/ _net
+		_editmissing(_netbin, 0)
+		projection = select((_netbin * _netbin), (_modeid:==1))
+		projection = select(projection, (_modeid:==1)')
+		_diag(projection,0)
+	}
+	
+	else {
+	 for (i = 1 ; i < num_m1; i++) {
 		k = i + 1
 		for (j = k ; j <= num_m1; j++) {
 			vec_i = _net[i,.]
@@ -155,6 +173,7 @@ real matrix onemodeproject(matrix _net, matrix _modeid, scalar _stat) {
 				projection[i,j] = max(temp)
 			}	
 		}
+	 }
 	}
 	_editmissing(projection, 0)
 	return(projection)
