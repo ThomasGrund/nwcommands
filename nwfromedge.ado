@@ -1,6 +1,6 @@
 *! Date        : 8dec2014
 *! Version     : 1.0.4
-*! Author      : Thomas Grund, Linköping University
+*! Author      : Thomas Grund, LinkË†ping University
 *! Email	   : contact@nwcommands.org
 
 capture program drop nwfromedge
@@ -65,6 +65,11 @@ program nwfromedge
 		sort `_nodeid'
 		keep if `_nodeid' != `_nodeid'[_n-1]
 		
+		if "`labs'" == "" {
+			forvalues k = 1/ `=_N'{
+				local labs "`labs' `=`fromvar'[`k']'"
+			}
+		}
 		if "`keeporiginal'" != "" {
 			gen _nodeid = `_nodeid'
 			gen _nodeoriginal = `fromvar'
@@ -74,11 +79,6 @@ program nwfromedge
 			local dictOrigString = 1
 		}
 		
-		if "`labs'" == "" {
-			forvalues k = 1/ `=_N'{
-				local labs "`labs' `=`fromvar'[`k']'"
-			}
-		}
 		restore
 		
 		merge m:n `fromvar' using `dictionaryString'
