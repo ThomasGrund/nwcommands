@@ -18,8 +18,8 @@
 
 
 
-		*! Date        : 23aug2015
-		*! Version     : 1.4.8
+		*! Date        : 17sept2015
+		*! Version     : 1.4.9
 		*! Authors     : Thomas U. Grund 
 		*! Contact     : thomas.u.grund@gmail.com
 		*! Web         : {browse "http://nwcommands.org"}
