@@ -30,3 +30,5 @@ program _nwnodelab
 		di "{txt}    Nodelab: {res}`onelab'"
 	}
 end
+*! v1.5.0 __ 17 Sep 2015 __ 13:09:53
+*! v1.5.1 __ 17 Sep 2015 __ 14:54:23

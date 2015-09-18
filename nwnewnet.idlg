@@ -5,3 +5,5 @@
 	TEXT tx_vars 50 250 250 ., label("New Stata variables (optional):")
 	EDIT ed_vars 50 270 340 ., label("Variables") option(vars)
 	CHECKBOX cx_xvars 50 290 300 ., label("Do not generate Stata variables") option(xvars)
+*! v1.5.0 __ 17 Sep 2015 __ 13:09:53
+*! v1.5.1 __ 17 Sep 2015 __ 14:54:23

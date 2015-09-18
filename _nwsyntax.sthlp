@@ -81,5 +81,4 @@ wants to use it nevertheless, one has to keep in mind that repeated use of _nwsy
 also overwrites the default names of the local macros. For this purpose, there exists the program {bf:_nwsyntax_other}, which is more or less the same as the 
 current command, but has different defaults for {it:local_macro1-local_macro5}. Of course, one can also just specify the options
 {bf:networks(), name(), id(), directed(), nodes()} to rectify this problem.
-	
-	
+

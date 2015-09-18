@@ -85,4 +85,3 @@ command is:
 This evaluates whatever is in {it:netexp} and generates a new mata matrix {it:matatrix} with the
 result of the network expression.
 
-

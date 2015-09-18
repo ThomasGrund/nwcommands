@@ -78,4 +78,3 @@ for {it:z} networks at the same time (e.g. {bf:nwbetween glasgow1 glasgow2}), th
 {title:See also}
 
 	{help nwpath}, {help nwgeodesic}, {help nwcloseness}, {help nwkatz}, {help nwdegree}, {help nwcloseness}, {help nwevcent}
-

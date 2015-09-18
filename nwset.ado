@@ -26,7 +26,7 @@ syntax [varlist (default=none)][, keeporiginal xvars clear nwclear nooutput edge
 	local allnames ""
 	
 	qui if "`edgelist'" != "" {
-		qui nwfromedge `varlist', name(`name') `xvars' `keeporiginal'
+		qui nwfromedge `varlist', name(`name') `xvars' `keeporiginal' `undirected'
 		exit
 	}
 	
@@ -182,3 +182,5 @@ syntax [varlist (default=none)][, keeporiginal xvars clear nwclear nooutput edge
 	mata: st_global("r(names)", "`allnames'")
 
 end
+*! v1.5.0 __ 17 Sep 2015 __ 13:09:53
+*! v1.5.1 __ 17 Sep 2015 __ 14:54:23

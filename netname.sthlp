@@ -59,4 +59,3 @@ to change the current network use {it: {help nwcurrent}}.
 {phang}{cmd:. nwset}{p_end}
 {phang}{cmd:. nwdegree flobusiness}{p_end}
 {phang}{cmd:. nwcomponents *marriage}{p_end}
-

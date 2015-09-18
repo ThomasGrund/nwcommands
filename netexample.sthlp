@@ -271,7 +271,7 @@ Snijders, T.A.B., Steglich, C.E.G., and van de Bunt, G.G. (2010). Introduction t
 http://dx.doi.org/10.1016/j.socnet.2009.02.004.
 
 {pmore}
-Steglich, Christian, and Knecht, Andrea (2009), Die statistische Analyse dynamischer Netzwerkdaten. In: Christian Stegbauer and Roger Häußling (Eds.), Handbuch der Netzwerkforschung, Wiesbaden (Verlag für Sozialwissenschaften).
+Steglich, Christian, and Knecht, Andrea (2009), Die statistische Analyse dynamischer Netzwerkdaten. In: Christian Stegbauer and Roger H√§u√üling (Eds.), Handbuch der Netzwerkforschung, Wiesbaden (Verlag f√ºr Sozialwissenschaften).
 
 
 

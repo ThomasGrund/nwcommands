@@ -44,4 +44,3 @@ Add isolate nodes to an existing networks. By default, {help netname} is replace
 	{cmd:. nwrandom 5, prob(.1)}
 	{cmd:. nwaddnodes, newnodes(2) labs(peter thomas)}
 	{cmd:. nwset, detail}
-

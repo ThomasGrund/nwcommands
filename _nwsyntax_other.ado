@@ -77,4 +77,3 @@ program _nwsyntax_other
 	c_local othername "`name'"
 	c_local otherdirected "`directed'"
 end
-

@@ -180,3 +180,5 @@ real matrix function correctDiagonal(real matrix net, scalar undirected, scalar 
 end
 
 
+*! v1.5.0 __ 17 Sep 2015 __ 13:09:53
+*! v1.5.1 __ 17 Sep 2015 __ 14:54:23

@@ -47,5 +47,3 @@ use {help _nwnodeid}.
      {txt}    Nodeid: {res}9
      {txt}    Nodelab: {res}medici
 
-
-

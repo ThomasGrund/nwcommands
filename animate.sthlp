@@ -51,4 +51,3 @@
 {cmd:        scatter le year if year <= `i', xscale(range(1900 2000)) name(le`i') }
 {cmd:  {c )-}}
 {cmd:. animate lifemovie, graphs(_all)}
-

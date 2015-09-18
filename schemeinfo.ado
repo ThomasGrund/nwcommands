@@ -123,3 +123,5 @@ program schemeinfo
 		twoway `cmd' , title("`mytitle'", color(black)) ylab(, nogrid) xscale(range(0 `epos') off) yscale(range(0 `=`labpos'+1') off) legend(nodraw) graphregion(margin(zero) fcolor(white) lcolor(white)) plotregion(fcolor(white) lcolor(white))
 	//}
 end
+*! v1.5.0 __ 17 Sep 2015 __ 13:09:53
+*! v1.5.1 __ 17 Sep 2015 __ 14:54:23

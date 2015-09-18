@@ -1,8 +1,3 @@
-*! Date        : 24aug2014
-*! Version     : 1.0
-*! Author      : Thomas Grund, Linkoping University
-*! Email	   : contact@nwcommands.org
-
 capture program drop nwload
 program nwload
 	syntax [anything(name=loadname)][, id(string) nocurrent xvars labelonly force]
@@ -18,6 +13,14 @@ program nwload
 		nwname, id("`id'")
 	}
 	local nodes = r(nodes)
+	
+	if (`nodes' > 1000 & "`force'"=="") {
+		local labelonly "labelonly"
+	}
+	
+	if (`=`c(k)' + `nodes'' >= `c(max_k_theory)'  & "`force'"=="") {
+		local labelonly "labelonly"
+	}
 	
 	if (`nodes' > 1000 & "`force'" == "" & "`labelonly'" == "") {
 		exit
@@ -97,3 +100,5 @@ program nwload
 		nwcurrent, id(`id')
 	}
 end
+*! v1.5.0 __ 17 Sep 2015 __ 13:09:53
+*! v1.5.1 __ 17 Sep 2015 __ 14:54:23

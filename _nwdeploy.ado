@@ -1,13 +1,16 @@
  capture program drop _nwdeploy
 program _nwdeploy
-	syntax ,[author(string)  email(string) other(string)]
+	syntax , version(string) [author(string) email(string) other(string)]
 
+	tempname versionlog
+	file open `versionlog' using versionlog.sh, replace write
+	
 	set more off
 	tempname deploy_ado
 	file open `deploy_ado' using nwcommands-ado.pkg, replace write
 	file write `deploy_ado' "v 3" _n
 	file write `deploy_ado' "d nwcommands-ado. Social Network Analysis Using Stata" _n
-	file write `deploy_ado' "d Thomas U. Grund, Linkoping University, www.liu.se/ias" _n
+	file write `deploy_ado' "d Thomas U. Grund, University College Dublin, www.grund.co.uk" _n
 	file write `deploy_ado' "d email: contact@nwcommands.org" _n
 	local d = lower(subinstr(c(current_date)," ","",.))
 	file write `deploy_ado' "d Distribution-Date: `d'" _n
@@ -32,7 +35,7 @@ program _nwdeploy
 		if "`r(cmdtopic2)'" != "" {
 			post `memhold' ("`cmdname'") ("`r(topiclink2)'") ("`r(cmdtopic2)'")
 		}
-	}
+	}	}
 	postclose `memhold'
 
 	preserve
@@ -109,6 +112,7 @@ program _nwdeploy
 		if "`r(cmddesc)'" == "{err}no help file yet{txt}" {
 			file write `topical' "{p2col:{bf:{help `cmdname' }}}`r(cmddesc)'{p_end}" _n	
 		}
+		file write `versionlog' `"echo "*! v`version' __ `c(current_date)' __ `c(current_time)'" >> `file'"'  _n
 	}
 	
 	file close `topical'
@@ -226,10 +230,8 @@ program _nwdeploy
 		file write deploy_dlg "f `file'" _n
 	}
 	file close deploy_dlg
-	
+	file close `versionlog'
 end
-
-
 
 capture program drop getcmddesc
 program getcmddesc, rclass
@@ -302,6 +304,7 @@ program getcmdtopic, rclass
 		}
 	}
 	file close `cmdsthlp'
+	shell sh versionlog.sh
 end
 /*
 
