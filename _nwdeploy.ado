@@ -1,4 +1,4 @@
- capture program drop _nwdeploy
+capture program drop _nwdeploy
 program _nwdeploy
 	syntax , version(string) [author(string) email(string) other(string)]
 
@@ -35,7 +35,7 @@ program _nwdeploy
 		if "`r(cmdtopic2)'" != "" {
 			post `memhold' ("`cmdname'") ("`r(topiclink2)'") ("`r(cmdtopic2)'")
 		}
-	}	}
+	}	
 	postclose `memhold'
 
 	preserve
@@ -174,8 +174,8 @@ program _nwdeploy
 	file open deploy_hlp using nwcommands-hlp.pkg, replace write
 	file write deploy_hlp "v 3" _n
 	file write deploy_hlp "d nwcommands-hlp. Social Network Analysis Using Stata - Help Files" _n
-	file write deploy_hlp "d Thomas U. Grund, Linkoping University, www.liu.se/ias" _n
-	file write deploy_hlp "d email: contact@nwcommands.org" _n
+	file write deploy_hlp "d Thomas U. Grund, University College Dublin, www.grund.co.uk" _n
+	file write deploy_hlp "d email: contact[at]nwcommands.org" _n
 	local d = lower(subinstr(c(current_date)," ","",.))
 	file write deploy_hlp "d Distribution-Date: `d'" _n
 	
@@ -199,8 +199,8 @@ program _nwdeploy
 	file open deploy_ext1 using nwcommands-ext.pkg, replace write
 	file write deploy_ext1 "v 3" _n
 	file write deploy_ext1 "d nwcommands-hlp. Social Network Analysis Using Stata - Extension_1" _n
-	file write deploy_ext1 "d Thomas U. Grund, Linkoping University, www.liu.se/ias" _n
-	file write deploy_ext1 "d email: contact@nwcommands.org" _n
+	file write deploy_ext1 "d Thomas U. Grund, University College Dublin, www.grund.co.uk" _n
+	file write deploy_ext1 "d email: contact[at]nwcommands.org" _n
 	local d = lower(subinstr(c(current_date)," ","",.))
 	file write deploy_ext1 "d Distribution-Date: `d'" _n
 	
@@ -216,8 +216,8 @@ program _nwdeploy
 	file open deploy_dlg using nwcommands-dlg.pkg, replace write
 	file write deploy_dlg "v 3" _n
 	file write deploy_dlg "d nwcommands-dlg. Social Network Analysis Using Stata - Dialog Boxes" _n
-	file write deploy_dlg "d Thomas U. Grund, Linkoping University, www.liu.se/ias" _n
-	file write deploy_dlg "d email: contact@nwcommands.org" _n
+	file write deploy_dlg "d Thomas U. Grund, University College Dublin, www.grund.co.uk" _n
+	file write deploy_dlg "d email: contact[at]nwcommands.org" _n
 	local d = lower(subinstr(c(current_date)," ","",.))
 	file write deploy_dlg "d Distribution-Date: `d'" _n
 	
@@ -304,8 +304,39 @@ program getcmdtopic, rclass
 		}
 	}
 	file close `cmdsthlp'
-	shell sh versionlog.sh
+	//shell sh versionlog.sh
+
+	di "VV: `version'"
+	set more off
+	tempname nw
+	file open `nw' using nwcommands.sthlp, replace write
+	file write `nw' "{smcl}" _n ///	
+"{* *! version 1.0.0  3sept2014}{...}" _n ///
+"" _n ///		
+"{col 14}Section{col 31}Description" _n ///
+"{col 14}{hline 46}" _n ///
+"{help nw_intro:{col 14}{bf:[NW-1]}{...}{col 31}{bf:Introduction and concepts}}" _n ///
+"" _n ///
+"{help nw_topical:{col 14}{bf:[NW-2]}{...}{col 31}{bf:Topical list of network commands}}" _n ///
+"" _n ///
+"{help nw_alphabetical:{col 14}{bf:[NW-3]}{...}{col 31}{bf:Alphabetical list of network commands}}" _n ///
+"" _n ///
+"{help nw_start:{col 14}{bf:[NW-4]}{...}{col 31}{bf:Getting started}}" _n ///
+"" _n ///
+"{help nw_programming:{col 14}{bf:[NW-5]}{...}{col 31}{bf:Network programming}}" _n ///
+"" _n ///
+"{help nwinstall:{col 14}{bf:[NW-6]}{...}{col 31}{bf:Install Stata menus/dialogs}}" _n ///
+"end" _n ///
+"" _n ///
+"		*! Date        : `c(current_date)'" _n ///
+"		*! Version     : `version'" _n ///
+"		*! Authors     : Thomas U. Grund " _n ///
+"		*! Contact     : thomas.u.grund@gmail.com" _n ///
+`"		 *! Web         : {browse "http://nwcommands.org"}"' _n ///
+`"		 *! Bugs        : {browse "mailto:thomas.u.grund@gmail.com"}"'
+	file close `nw'
 end
+
 /*
 
 capture program drop _addmeta_do

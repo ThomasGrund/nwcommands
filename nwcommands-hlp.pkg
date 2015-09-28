@@ -1,8 +1,8 @@
 v 3
 d nwcommands-hlp. Social Network Analysis Using Stata - Help Files
-d Thomas U. Grund, Linkoping University, www.liu.se/ias
-d email: contact@nwcommands.org
-d Distribution-Date: 17sep2015
+d Thomas U. Grund, University College Dublin, www.grund.co.uk
+d email: contact[at]nwcommands.org
+d Distribution-Date: 27sep2015
 f _nwnodeid.sthlp
 f _nwnodelab.sthlp
 f _nwsyntax.sthlp
