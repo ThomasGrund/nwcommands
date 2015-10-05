@@ -1,5 +1,5 @@
 {smcl}
-{* *! version 1.5.2 27sep2015}{...}
+{* *! version 1.5.2 28sep2015}{...}
 {phang}
 {help nwcommands:NW-2 topical} {hline 2} 
 {hline 2} Topical list of network commands

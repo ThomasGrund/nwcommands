@@ -2,6 +2,7 @@ capture program drop _nwdeploy
 program _nwdeploy
 	syntax , version(string) [author(string) email(string) other(string)]
 
+	_write_nwcommands, version(`version')
 	tempname versionlog
 	file open `versionlog' using versionlog.sh, replace write
 	
@@ -305,8 +306,11 @@ program getcmdtopic, rclass
 	}
 	file close `cmdsthlp'
 	//shell sh versionlog.sh
+end
 
-	di "VV: `version'"
+capture program drop _write_nwcommands
+program _write_nwcommands
+	syntax , version(string)
 	set more off
 	tempname nw
 	file open `nw' using nwcommands.sthlp, replace write
@@ -326,7 +330,7 @@ program getcmdtopic, rclass
 "{help nw_programming:{col 14}{bf:[NW-5]}{...}{col 31}{bf:Network programming}}" _n ///
 "" _n ///
 "{help nwinstall:{col 14}{bf:[NW-6]}{...}{col 31}{bf:Install Stata menus/dialogs}}" _n ///
-"end" _n ///
+"" _n ///
 "" _n ///
 "		*! Date        : `c(current_date)'" _n ///
 "		*! Version     : `version'" _n ///

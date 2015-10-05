@@ -14,9 +14,9 @@
 {help nw_programming:{col 14}{bf:[NW-5]}{...}{col 31}{bf:Network programming}}
 
 {help nwinstall:{col 14}{bf:[NW-6]}{...}{col 31}{bf:Install Stata menus/dialogs}}
-end
 
-               *! Date        : 27 Sep 2015
+
+               *! Date        : 28 Sep 2015
                *! Version     : 1.5.2
                *! Authors     : Thomas U. Grund 
                *! Contact     : thomas.u.grund@gmail.com
