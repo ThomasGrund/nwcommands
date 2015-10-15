@@ -1,17 +1,18 @@
-*! Date        : 10sept2014
-*! Version     : 1.1.0
-*! Author      : Thomas Grund, Linköping University
-*! Email	   : contact@nwcommands.org
+*! Date        : 15oct2015
+*! Version     : 2.0
+*! Author      : Thomas Grund, University College Dublin
+*! Email	   : thomas.u.grund@gmail.com
 
 capture program drop _nwsyntax
 program _nwsyntax
-	syntax [anything],[max(integer 1) min(passthru) nocurrent name(string) id(string)]
-		
-	if ("$nwtotal" == "" | "$nwtotal" == "0") {
-		noi di "{err}No network found."
-		error 6001
-	}
+	syntax [anything],[max(integer 1) min(passthru) nocurrent name(string)]
+	unw_defs
 	
+	if "`_dta[NWversion]'" == "" {
+		char _dta[NWversion] = "2"
+		mata: `nw' = nws_create()
+	}
+
 	if "`name'" == "" {
 		local name = "netname"
 	}
@@ -24,53 +25,28 @@ program _nwsyntax
 	if "`directed'" == "" {
 		local directed = "directed"
 	}
+	
 	if "`id'" == "" {
 		local id = "id"
 	}
-	local netname = "`name'"
-	local netid = "`id'"
 	
+	if "`netobj'" == "" {
+		local netobj = "netobj"
+	}
+
 	if "`anything'" == ""  & "`current'" == ""{
-		nwcurrent
-		local anything = r(current)
+		mata: st_local("_temp", `nws'.get_current_name())
+		mata: st_numscalar("r(id)",`nws'.get_index_of_current())
 	}
-	capture nwunab _temp : `anything', max(`max') `min'
-	
-	if _rc != 0 {
-		if _rc == 111 | _rc == 198 {
-			di "{err}network {bf:`anything'} not found"
-			error 6001
-		}
-		if _rc == 102 {
-			di "{err}`anything'"
-			di "too few networks specified"
-			error 6002
-		}
-		if _rc == 103 {
-			di "{err}`anything'"
-			di "too many networks specified"
-			error 6003
-		}
+	else {
+		capture nwunab _temp : `anything', max(`max') `min'
+		local networks_count : word count `_temp'
+		local lastnet : word `networks_count' of `_temp'
+		mata: st_numscalar("r(id)", first_index_match(`nws'.names, "`lastnet'"))
 	}
 
-	local networkscnt : word count `_temp'
-	local lastnet : word `networkscnt' of `_temp'
-	mata: st_rclear()
-	
-	nwname `lastnet'
-	local netid = r(id)
-	//mata: _diag(nw_mata`netid', 0)
-	
-	c_local `id' "`r(id)'"		
-	c_local `netname' "`_temp'"
-	c_local `nodes' "`r(nodes)'"
-	c_local `name' "`_temp'"
-	c_local `directed' "`r(directed)'"
-	c_local `networks' "`networkscnt'"
-	mata: st_rclear()
-	
-	
+	c_local `netobj' "`nws'.pdefs[`r(id)']"
+	c_local `id' `r(id)'
+	c_local `name' `_temp'
+	c_local `networks' `networks_count'	
 end
-
-*! v1.5.0 __ 17 Sep 2015 __ 13:09:53
-*! v1.5.1 __ 17 Sep 2015 __ 14:54:23

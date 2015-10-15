@@ -45,51 +45,8 @@ capture program drop nwinf
 program nwinf
 	version 9
 	syntax [anything(name=netname)], [id(string) mat matonly detail]
-	
-	if ("$nwtotal" == "" | "$nwtotal" == "0"){
-		exit
-	}
-	
-	if ("`netname'" == "" & "`id'" == ""){
-		local id = 1
-	}
-		
-	if "`id'" == "" {
-		local id = -1
-		forvalues i = 1/$nwtotal {
-			scalar onename = "\$nwname_`i'"
-			local localname = onename
-			if "`localname'" == "`netname'" {
-				local id = `i'
-			}
-		}
-	}
-	else {
-		scalar onename = "\$nwname_`id'"
-		local thisname = onename
-		if (`id' < 1 | `id' > $nwtotal) {
-			di "{err}Index out of bounds."
-			error 234
-		}
-	}
+	_nwsyntax `netname', max(1)
 
-
-
-	if ("`id'" == "-1") {
-		di "{err}Network {res}`netname'{err} not found."
-		exit
-	}
-	
-	scalar onename = "\$nwname_`id'"
-	local thisname = onename
-	scalar onedirected = "\$nwdirected_`id'"
-	local localdirected = onedirected
-	scalar onesize = "\$nwsize_`id'"
-	local localsize = onesize
-
-	mata: minval = min(nw_mata`id')
-	mata: maxval = max(nw_mata`id')
-	
 	if "`detail'" != "" {
 		qui nwdyads `thisname'
 		local reciprocity = `r(reciprocity)'
@@ -108,41 +65,30 @@ program nwinf
 	}
 	
 	mata: st_rclear()
-	mata: st_numscalar("r(id)", `id')
-	mata: st_global("r(name)", "`thisname'")
-	mata: st_global("r(directed)", "`localdirected'")
-	mata: st_numscalar("r(nodes)", `localsize')
-	mata: st_numscalar("r(minval)", minval)
-	mata: st_numscalar("r(maxval)", maxval)	
-	mata: nw_binary = nw_mata`id' :/ nw_mata`id'
-	mata: _diag(nw_binary, J(rows(nw_binary),1,0))
 	
+	nw_name `netname'
+	
+	mata: st_global("r(name)", "`netname'")
+	mata: st_global("r(netname)", "`netname'")
+	mata: st_numscalar("r(minval)", `netobj'->get_minimum())
+	mata: st_numscalar("r(maxval)", `netobj'->get_maximum())
+
 	if (r(directed)=="false"){
-		mata: edgecount = sum(nw_binary) / 2
-		mata: edgecountvalue = sum(nw_mata`id') / 2
-		mata: st_numscalar("r(edges)", edgecount)
-		mata: st_numscalar("r(edges_sum)", edgecountvalue)
+		mata: st_numscalar("r(edges)", `netobj'->get_edges_count())
+		mata: st_numscalar("r(edges_sum)", `netobj'->get_edges_sum())
 		mata: st_numscalar("r(dg_central)", `central')
 	}
 	else {
-		mata: arccount = sum(nw_binary) 
-		mata: arccountvalue = sum(nw_mata`id')
-		mata: st_numscalar("r(arcs)", arccount)
-		mata: st_numscalar("r(arcs_value)", arccountvalue)
+		mata: st_numscalar("r(arcs)", `netobj'->get_arcs_count())
+		mata: st_numscalar("r(arcs_value)", `netobj'->get_arcs_sum())
 		mata: st_numscalar("r(indg_central)", `incentral')
 		mata: st_numscalar("r(outdg_central)", `outcentral')
 	}
 	mata: st_numscalar("r(bw_central)", `bwcentral')
-	mata: st_numscalar("r(density)", (sum(nw_binary) / (`localsize' * (`localsize' - 1))))
+	mata: st_numscalar("r(density)", `netobj'->get_density())
 	mata: st_numscalar("r(transitivity)", `transitivity')
 	mata: st_numscalar("r(reciprocity)", `reciprocity')
 
-	
-	mata: mata drop nw_binary
-	capture mata: mata drop edgecount
-	capture mata: mata drop arccount
-	capture mata: mata drop edgecountvalue
-	capture mata: mata drop arccountvalue
 
 	if "`matonly'" == "" {
 		di "{hline 50}"
@@ -175,8 +121,6 @@ program nwinf
 	}
 	
 	if "`mat'`matonly'" !=""{
-		mata: nw_mata`id'
+		mata: `netobj'->get_edge()
 	}
 end
-*! v1.5.0 __ 17 Sep 2015 __ 13:09:53
-*! v1.5.1 __ 17 Sep 2015 __ 14:54:23

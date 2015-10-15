@@ -1,13 +1,20 @@
-*! Date        : 3sept2014
-*! Version     : 1.0.1
-*! Author      : Thomas Grund, Linkoping University
-*! Email	   : contact@nwcommands.org
+*! Date        : 13oct2015
+*! Version     : 2.0
+*! Author      : Thomas Grund, University College Dublin
+*! Email	   : thomas.u.grund@gmail.com
 
 capture program drop nwset	
 program nwset
 syntax [varlist (default=none)][, keeporiginal xvars clear nwclear nooutput edgelist name(string) vars(string) labs(string) labsfromvar(string) abs(string asis) edgelabs(string asis) detail mat(string) undirected directed]
 	set more off
-
+	unw_defs
+	
+	capture mata: `nw'
+	if "`_dta[NWversion]'" == "" | _rc != 0 {
+		char _dta[NWversion] = "2"
+		mata: `nw' = nws_create()
+	}
+	
 	if "`edgelist'" != "" {
 		local labsfromvar ""
 	}
@@ -32,55 +39,18 @@ syntax [varlist (default=none)][, keeporiginal xvars clear nwclear nooutput edge
 	
 	// display information about network
 	if ("`varlist'" == "" & "`mat'" == "") {
-		if ("$nwtotal" == "" | "$nwtotal" == "0") {
-			mata: st_numscalar("r(networks)", 0)
-			noi di "{err}No network found."
-			error 6001
-		}
-		else { 
-			if ("`output'" != "nooutput") {
-				local networks = plural($nwtotal, "network")
-				di "{txt}($nwtotal `networks')"
-				// information about networks
-				if "`detail'" == "" {
-					di "{hline 20}"
-				}			
-				forvalues i=1/`=$nwtotal'{		
-					scalar onesize = "\$nwsize_`i'"
-					local thissize `=onesize'
-					local max_nodes = max(`max_nodes', `thissize')
-					scalar onename = "\$nwname_`i'"
-					local allnames "`allnames' `=onename'"
-					scalar onenw = "\$nw_`i'"
-					scalar onelabs = "\$nwlabs_`i'"
-					local l `"`=onelabs'"'
-					scalar onedirected = "\$nwdirected_`i'"
-					scalar oneedgelabs = "\$nwedgelabs_`i'"
-					if "`detail'" != "" {
-						di 
-						di "{hline 50}"
-						if (`i' == $nwtotal){
-							di "{txt} `i') Current Network"
-						}
-						else {
-							di "{txt} `i') Stored Network"
-						}
-						di "{hline 50}"
-						di "{txt}   Network name: {res}`=onename'"
-						di "{txt}   Directed: {res}`=onedirected'"
-						di "{txt}   Nodes: {res}`=onesize'"
-						di "{txt}   Network id: {res}`i'"
-						di "{txt}   Variables: {res}`=onenw'"
-						di `"{txt}   Labels: {res}`=onelabs'"'
-						di `"{txt}   Edgelabels: {res}`=oneedgelabs'"'
-					}
-					else {
-						di "      {res}`=onename'"
-					}				
-				}
+		mata: st_local("networks", strofreal(nw.nws.get_number()))
+		mata: st_local("nets", nw.nws.get_names())
+		if  ("`output'" == "") {
+			di "{txt}(`networks' networks)"
+			di "{hline 20}"
+			forvalues  i = 1/`networks' {
+				local onename : word `i' of `nets'
+				di "      {res}`onename'"
 			}
 		}
 	}
+	
 	// set the network
 	else {
 		// set network from varlist
@@ -100,11 +70,10 @@ syntax [varlist (default=none)][, keeporiginal xvars clear nwclear nooutput edge
 				
 			}
 			local size: word count `varlist'
-			qui nwtomata `varlist', mat(onenet)
-			local mat = "onenet"
+			qui nwtomata `varlist', mat(__nwnew)
+			local mat = "__nwnew"
 			if (`varscount' != `size') unab vars: `varlist'
 			if (`labscount' != `size') local labs "`vars'"
-
 		}
 		// set network from mata matrix
 		else {
@@ -115,11 +84,7 @@ syntax [varlist (default=none)][, keeporiginal xvars clear nwclear nooutput edge
 			}
 			// mat is given
 			else {
-				/*capture mat list `mat'
-				if _rc == 0 {
-					mata: `mat' = st_matrix("`mat'")
-				}*/
-				mata: onenet = `mat' 
+				mata: __nwnew = `mat' 
 				mata: st_numscalar("msize", rows(`mat'))
 				local size = msize
 				local varscount : word count `vars'
@@ -128,7 +93,7 @@ syntax [varlist (default=none)][, keeporiginal xvars clear nwclear nooutput edge
 				if("`varscount'" != "`size'"){
 					local vars ""
 					forvalues i = 1/`size' {
-						local vars "`vars' var`i'"
+						local vars "`vars' `nwvars_def_pref'`i'"
 					}
 				}
 				// get labels
@@ -137,50 +102,48 @@ syntax [varlist (default=none)][, keeporiginal xvars clear nwclear nooutput edge
 				}
 			}
 		}
-
+		
+		mata: __nodenames = J(1,0,"")
+		forvalues i = 1 / `size' {
+			local onelab : word `i' of `labs'
+			mata: __nodenames = (__nodenames, "`onelab'")
+		}
+	
 		if "`name'" == "" {
 			local name "network"
 		}
 		
-		nwvalidate `name'
+		nw_validate `name'
+		if "`r(exists)'"=="true" {
+			di "{txt}Netname `name' changed to `r(validname)'."
+		}
 		local name = r(validname)
-			
-		if "$nwtotal" == "" {
-			global nwtotal 0
-		}
+
 		
-		local directed_new = "true"
+		local directed = "true"
 		if "`undirected'" != "" {
-			local directed_new = "false"
+			local directed = "false"
 		}
-		if"`directed'" != "" {
-			local directed_new = "true"
-		}
-
-		local new_nwtotal = $nwtotal + 1
-		mata: nw_mata`new_nwtotal' = onenet
-		global nw_`new_nwtotal' "`vars'"
-		
-		global nwlabs_`new_nwtotal' `"`labs'"'
-		global nwedgelabs_`new_nwtotal' `"`edgelabs'"'
-		global nwsize_`new_nwtotal' "`size'"
-		global nwname_`new_nwtotal' "`name'"
-		global nwdirected_`new_nwtotal' "`directed_new'"
-		
-		global nwtotal = `new_nwtotal'
-		global nwtotal_mata = $nwtotal
-
-		mata: mata drop onenet
 	}
 	
-	if "`labsfromvar'" != "" {
-		nwname `name', newlabsfromvar(`labsfromvar')
-	}
 	mata: st_rclear()
-	mata: st_numscalar("r(networks)", $nwtotal)
-	mata: st_numscalar("r(max_nodes)", `max_nodes')
-	mata: st_global("r(names)", "`allnames'")
+	mata: st_numscalar("r(networks)", `nws'.get_number())
+	mata: st_global("r(names)", `nws'.get_names())
+	//mata: st_numscalar("r(max_nodes)", `nws'.get_max_nodes())
 
+	if ("`varlist'" != "" | "`mat'" != ""){
+		mata: `nws'.add("`name'")
+		
+		mata: nodes = rows(__nwnew)
+		if "`labsfromvar'" != "" {
+			mata: __nwnodenames = st_sdata((1::nodes), "`labsfromvar'")	
+		}
+		
+		_nwsyntax `name'
+		mata: `netobj'->create_by_name(__nodenames)
+		mata: `netobj'->set_name("`name'")
+		mata: `netobj'->set_directed("`directed'")
+		mata: `netobj'->set_edge(__nwnew)
+	}
+	capture mata: mata drop __nwindex __nwnew __nwnodenames
 end
-*! v1.5.0 __ 17 Sep 2015 __ 13:09:53
-*! v1.5.1 __ 17 Sep 2015 __ 14:54:23
