@@ -7,11 +7,6 @@ capture program drop nw_syntax
 program nw_syntax
 	syntax [anything],[max(integer 1) min(passthru) nocurrent name(string)]
 	unw_defs
-	
-	if "`_dta[NWversion]'" == "" {
-		char _dta[NWversion] = "2"
-		mata: nw = nws_create()
-	}
 
 	if "`name'" == "" {
 		local name = "netname"
@@ -35,14 +30,19 @@ program nw_syntax
 	}
 
 	if "`anything'" == ""  & "`current'" == ""{
-		mata: st_local("_temp", nw.nws.get_current_name())
-		mata: st_numscalar("r(id)",nw.nws.get_index_of_current())
+		capture mata: st_local("_temp", `nws'.get_current_name())
+		capture mata: st_numscalar("r(id)",`nws'.get_index_of_current())
 	}
 	else {
 		capture nwunab _temp : `anything', max(`max') `min'
 		local networks_count : word count `_temp'
-		local lastnet : word `networks_count' of `_temp'
-		mata: st_numscalar("r(id)", first_index_match(nw.nws.names, "`lastnet'"))
+		capture local lastnet : word `networks_count' of `_temp'
+		mata: st_numscalar("r(id)", first_index_match(`nws'.names, "`lastnet'"))
+	}
+	
+	if _rc != 0 {
+		di "{err}Network not found"
+	    error `errNWsNotFound'
 	}
 
 	c_local `netobj' "`nws'.pdefs[`r(id)']"

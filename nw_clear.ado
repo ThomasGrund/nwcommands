@@ -7,5 +7,6 @@ capture program drop nw_clear
 program nw_clear
 	unw_defs
 	capture mata: mata drop `nw'
+	mata: st_rclear()
 end
 

@@ -52,17 +52,6 @@ local 	NWsdef		`vxNWsdef'
 local 	NWsder		`vxNWsder'
 local 	NWdef		`vxNWdef'
 
-/* -------------------------------------------------------------------- */
-					/* constants			*/
-local 	cDftNWpef	"network_"	//default network name pefix
-local 	cDftNodepef	"net"		//default node name prefix
-
-/* -------------------------------------------------------------------- */
-					/* Error codes			*/
-local 	errNWsCreate	480		
-local 	errNodeDupName	481	
-local 	errNWsNotFound	482		
-local 	errNWsExists	483	
 
 /* -------------------------------------------------------------------- */
 					/* Utilities			*/
@@ -73,9 +62,7 @@ mata:
 real scalar first_index_match(string vector src, string scalar t)
 {
 	real scalar i, dim
-	if (cols(src) == 0 | rows(src) == 0){
-		return(0)
-	}
+	
 	dim = rows(src)*cols(src)
 	for(i=1; i<=dim; i++){
 		if(src[i]==t) {
@@ -93,28 +80,6 @@ void error_handle(string scalar r, real scalar code){
 	exit(code)
 }
 
-/*
-	Match two string vectors
-*/
-real matrix match_xy(string matrix x, string matrix y){
-	real scalar i, j, Mdim
-	real matrix M
-	string scalar x_i
-	
-	Mdim = rows(x)
-	M = J(Mdim,2,.)
-	M[(1::rows(x)),1] = (1::rows(x))
-
-	for (i = 1; i<= rows(x);i++){
-		for (j = 1; j<= rows(y);j++){
-			if (x[i] == y[j]) {
-				M[i,2] = j
-			}
-		}
-	}
-	return(M)
-}
-
 end
 					/* End utilities		*/
 /* -------------------------------------------------------------------- */
@@ -129,8 +94,8 @@ mata:
 */
 
 class `NWs' {
-	class `NWsdef' scalar nws
-	class `NWsder' scalar nwsder
+	static class `NWsdef' scalar nws
+	static class `NWsder' scalar nwsder
 //!! methods:
 }
 
@@ -154,8 +119,6 @@ class `NWdef' {
 	string rowvector 	nodes
 	string rowvector	nodesvar
 	string rowvector 	modes
-	real colvector		match // holds information about case numbers to which nodes 1,2,3... match
-	
 	real matrix 		edge
 	`BOOL'				isdirect
 	`BOOL'				isvalued
@@ -202,40 +165,7 @@ class `NWdef' {
 	real scalar get_arcs_sum()
 	real scalar get_density()
 	real scalar get_selfloops_number()
-	real scalar get_nodesvar()
 	void update_nodesvar()
-	void update_match()
-	void data_sync()
-}
-
-void `NWdef'::data_sync(){
-	real scalar newobs
-	real scalar N, z, v
-	string colvector newnodename
-
-	z = 0
-	if (_st_varindex("`nw_nodename'") == .) {
-		v= st_addvar("str40","`nw_nodename'")
-		z = st_nobs()
-	}
-	
-	update_match()
-	newobs = sum(match[,2]:==.) - z
-	
-	N = st_nobs()
-	if (newobs > 0){
-		st_addobs(newobs)
-		newnodename = select(nodes,(match[.,2]:==.)')'
-		st_sstore(((N+1)::(N+newobs)),"`nw_nodename'", newnodename)	
-		update_match()
-	}
-}
-
-/*
-	Update matching between nodes 1,2,3... and cases in the dataset.
-*/
-void `NWdef'::update_match(){
-	match = match_xy(nodes',st_sdata(.,"`nw_nodename'"))	
 }
 
 /*
@@ -488,20 +418,15 @@ string scalar `NWdef'::get_name(){
 	Create a network with n nodes
 */
 void `NWdef'::create(real scalar n, | string scalar prefix) {
-	real scalar v
 	zap()
 	if(args() == 1) {
-		nodes = "`nwvars_def_pref'" :+ strofreal((1..n))
+		nodes = "`cDftNodepef'" :+ strofreal((1..n))
 	}
 	else {
 		nodes = prefix :+ strofreal((1..n))	
 	}
-	update_nodesvar()
+	update_nodevars()
 	init_edge()
-	
-	if (_st_varindex("`nw_nodename'") == .) {
-		v = st_addvar("str40","`nw_nodename'")
-	}
 }
 
 /*
@@ -525,16 +450,10 @@ void `NWdef'::set(string scalar networkname, string colvector nodenames, real ma
 	Create a network with n nodes by name
 */
 void `NWdef'::create_by_name(string rowvector name) {
-	real scalar v
-	
 	zap()
 	nodes = name 
 	update_nodesvar()
 	init_edge()
-	if (_st_varindex("`nw_nodename'") == .) {
-		v =	st_addvar("str40","`nw_nodename'")
-	}
-	
 }
 
 /* 
@@ -735,7 +654,6 @@ class `NWsdef' {
 	pointer(class `NWdef' scalar) scalar pcurrent
 	
 //!! methods:
-	void zap()
 	void create()	
 	void create_by_name()
 	void add()
@@ -753,40 +671,12 @@ class `NWsdef' {
 	string scalar get_current_name()
 	real scalar get_max_nodes()
 	string scalar get_valid_name()
-	void drop_current_nodesvar()
-	void generate_current_nodesvar()
 }
 
-
-void `NWsdef'::drop_current_nodesvar(){
-	real scalar i
-	for (i = 1; i<= cols(pcurrent->nodesvar); i++){
-		stata("capture drop " + pcurrent->nodesvar[i])
-	}
-}
-
-void `NWsdef'::generate_current_nodesvar(){
-	real scalar i
-	for (i = 1; i<= cols(pcurrent->nodesvar); i++){
-		stata("capture gen " + pcurrent->nodesvar[i] + " = .")
-	}
-}
-
-void `NWsdef'::zap(){
-	real scalar n
-	n = cols(names)
-	names = J(0, 0, "")
-	pdefs = NULL
-	number = 0
-}
 
 string scalar `NWsdef'::get_valid_name(string scalar s){
 	real scalar i, suffix
 	string scalar snew
-
-	if (rows(names) == 0) {
-		return(s)
-	}
 	
 	snew = s
 	suffix = 1
@@ -922,7 +812,7 @@ void `NWsdef'::update_number() {
 	Get number of networks
 */
 real scalar `NWsdef'::get_number() {
-	return(cols(names))
+	return(cols(pdefs))
 }
 
 /*
@@ -942,16 +832,13 @@ void `NWsdef'::create(real scalar n) {
 		pdefs[i] = &(`NWdef'())
 		pdefs[i]->set_name(names[i])
 	}
-	if (_st_varindex("`nw_nodename'") == .) {
-		st_addvar("str40","`nw_nodename'")
-	}
 }
 
 /*
 	Create networks by name
 */
 void `NWsdef'::create_by_name(string rowvector s) {
-	real scalar n, i, v
+	real scalar n, i 
 
 	n = cols(s)
 //!! do we need an upper limit ??
@@ -965,35 +852,21 @@ void `NWsdef'::create_by_name(string rowvector s) {
 		pdefs[i] = &(`NWdef'())
 		pdefs[i]->set_name(names[i])
 	}
-	if (_st_varindex("`nw_nodename'") == .) {
-		v= st_addvar("str40","`nw_nodename'")
-	}
 }
 
 /*
-	Add one network
+	Add one networks
 */
 void `NWsdef'::add(string scalar s) {
 
 	real scalar i, size
-	if (rows(names) > 0){
-		i = first_index_match(names, s)
-	}
-	else {
-		i = 0
-		names = s
-	}
+	
+	i = first_index_match(names, s)
 	if(i>0) {
 		error_handle("Network name already exists" , `errNWsExists')
 	}
-
-	if (rows(names) > 0){
-		names = (names, s)
-	}
-	else {
-		names = s
-	}
-
+	
+	names = (names, s)
 	pdefs = (pdefs, NULL)
 	size = cols(pdefs)
 	pdefs[size] = &(`NWdef'())

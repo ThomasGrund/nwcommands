@@ -1,104 +1,51 @@
 capture program drop nwload
 program nwload
-	syntax [anything(name=loadname)][, id(string) nocurrent xvars labelonly force]
+	syntax [anything(name=netname)][, xvars labelonly force]
+	unw_defs
+	nw_syntax `netname', max(1)
+	nwname `netname'
 
-	nwset, nooutput
-	
-	if ("`id'" == ""){
-		_nwsyntax `loadname', max(1)
-		local loadname = "`netname'"
-		nwname `loadname'
-	}
-	else {
-		nwname, id("`id'")
-	}
-	local nodes = r(nodes)
-	
-	if (`nodes' > 1000 & "`force'"=="") {
+	if (`r(nodes)' > 1000 & "`force'"=="") {
 		local labelonly "labelonly"
 	}
 	
-	if (`=`c(k)' + `nodes'' >= `c(max_k_theory)'  & "`force'"=="") {
+	if (`=`c(k)' + `r(nodes)'' >= `c(max_k_theory)'  & "`force'"=="") {
 		local labelonly "labelonly"
 	}
 	
-	if (`nodes' > 1000 & "`force'" == "" & "`labelonly'" == "") {
+	if (`r(nodes)' > 1000 & "`force'" == "" & "`labelonly'" == "") {
 		exit
 	}
 	
-	if (`=`c(k)' + `nodes'' >= `c(max_k_theory)' & "`force'" == "" & "`labelonly'" == "") {
+	if (`=`c(k)' + `r(nodes)'' >= `c(max_k_theory)' & "`force'" == "" & "`labelonly'" == "") {
 		exit
 	}
-	
-	scalar onename = "\$nwname_`id'"
-	local localname `=onename'
-	scalar onevars = "\$nw_`id'"
-	local localvars `=onevars'
-	scalar onelabs = "\$nwlabs_`id'"
-	local locallabs `"`=onelabs'"'
-	
-	if "`labelonly'" != "" {		
 
-		
-		capture drop _nodelab
-		capture drop _nodeid
-		capture drop _nodevar
-
-		if `=_N' < `nodes' {
-			set obs `nodes'
-		}
-		
-		gen _nodelab = ""
-		gen _nodevar = ""
-		gen _nodeid = _n if _n <= `nodes'
-		local j = 1
-		foreach lab in `locallabs' {
-			qui replace _nodelab = `"`lab'"' in `j'
-			local j = `j' + 1
-		}
-		local j = 1
-		foreach var in `localvars' {
-			qui replace _nodevar= `"`var'"' in `j'
-			local j = `j' + 1
-		}
-		exit
-
-	}
+	// drop the variables used for the current network
+	mata: `nws'.drop_current_nodesvar()
 	
-	qui if (("`xvars'" == "") & ("`labelonly'" == "")){
-		capture drop _nodelab
-		capture drop _nodevar
-		qui mata: st_addvar("str20", "_nodelab")
-		qui mata: st_addvar("str20", "_nodevar")
+	// make network the current network
+	mata: `nws'.make_current_from_name("`netname'")
+	nw_datasync `netname'
 	
-		
-		if _N < `nodes' {
-			set obs `nodes'
-		}
-		
-		local i = 1
-		foreach var in `localvars' {
-			capture drop `var'
-			if `i' <= `nodes' {
-				qui replace _nodevar = "`var'" in `i'
-			}
-			local i = `i' + 1 
-		}
-		local j = 1
-		foreach lab in `locallabs' {
-			if `j' <= `nodes' {
-				qui replace _nodelab = `"`lab'"' in `j'
-			}
-			local j = `j' + 1
-		}
-		capture drop _nodeid
-		gen _nodeid = _n if _n <= `nodes'
-		nwtostata, mat(nw_mata`id') gen(`localvars')
-	}
-	
-	if ("`current'" != "nocurrent") {
-		nwcurrent, id(`id')
+	if "`labelonly'" == "" {		
+		mata: `nws'.generate_current_nodesvar()
+		nw_syntax `netname'
+		mata: st_store(`netobj'->match[.,2], `netobj'->nodesvar,(`netobj'->get_edge())[(`netobj'->match[.,1]),.]) 
+		order `nw_nodename' `nwvars'
 	}
 end
-*! v1.5.0 __ 17 Sep 2015 __ 13:09:53
-*! v1.5.1 __ 17 Sep 2015 __ 14:54:23
+
+capture mata: mata drop get_string_from_vector()
+mata:
+string scalar get_string_from_vector(string rowvector v){
+	real scalar i
+	string scalar s
+	
+	for(i = 1; i<= cols(v); i++){
+		s = s + " " + v[i]
+	}
+	return(s)
+}
+end
+

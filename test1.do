@@ -6,6 +6,58 @@ do unw_core.do
 set more off
 
 nwset, mat(J(4,4,2)) name("first")
+assert `"`r(netlist)'"'  == `"first"'
+assert `"`r(networks)'"' == `"1"'
+assert         r(id) == 1
+
+nwset, mat(J(4,4,2)) name("second")
+assert `"`r(netlist)'"'  == `"second"'
+assert `"`r(networks)'"' == `"1"'
+assert         r(id) == 2
+
+nwset
+assert `"`r(nets)'"' == `" first second"'
+assert         r(networks) == 2
+
+nwclear
+nwset, mat(J(4,4,2)) name("second")
+
+nwclear
+set obs 4
+gen v1 = 0
+gen v2 = (_n == 3)
+gen v3 = (_n < 3)
+gen v4 = 0
+gen v5 = (_n < 3)
+
+nwset v*, name(netfromvar)
+assert `"`r(netlist)'"'  == `"netfromvar"'
+assert `"`r(networks)'"' == `"1"'
+assert         r(id) == 1
+
+
+
+nw_datasync first
+nw_datasync first
+
+nw_clear
+
+nwset
+
+
+mata: nw.nws.names
+
+mata: nw.nws.zap()
+mata: nw.nws.names
+
+mata: nw.nws.get_number()
+
+mata: nw.nws.pdefs[1]->data_sync()
+
+mata: nw.nws.pdefs[1]->nodes
+mata: nw.nws.pdefs[1]->update_match()
+mata: nw.nws.pdefs[1]->match
+
 nwset, mat(J(4,4,2)) name("first")
 nwset
 
