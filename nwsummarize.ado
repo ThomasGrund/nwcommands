@@ -3,7 +3,7 @@ program nwsummarize
 	version 9
 	syntax [anything(name=netname)][, mat matonly detail save(string asis) ]
 	set more off
-	_nwsyntax `netname', max(9999)
+	nw_syntax `netname', max(9999)
 
 	
 	if "`detail'" != "" {
@@ -45,7 +45,7 @@ capture program drop nwinf
 program nwinf
 	version 9
 	syntax [anything(name=netname)], [id(string) mat matonly detail]
-	_nwsyntax `netname', max(1)
+	nw_syntax `netname', max(1)
 
 	if "`detail'" != "" {
 		qui nwdyads `thisname'
@@ -96,6 +96,10 @@ program nwinf
 		di "{txt}   Network id: {res} `r(id)'"
 		di "{txt}   Directed: {res}`r(directed)'"
 		di "{txt}   Nodes: {res}`r(nodes)'"
+		di "{txt}   Selfloop: {res}`r(selfloop)'"
+		if ("`r(selfloop)'" == "true") {
+			di "{txt}    Number of selfloops: {res}`r(selfloops)'"
+		}
 		if (r(directed) == "false"){
 			di "{txt}   Edges: {res}`r(edges)'"
 		}

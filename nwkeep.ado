@@ -1,56 +1,40 @@
-*! Date        : 15sept2014
-*! Version     : 1.0
-*! Author      : Thomas Grund, Linköping University
-*! Email	   : contact@nwcommands.org
+*! Date        : 26oct2015
+*! Version     : 2.0
+*! Author      : Thomas Grund, University College Dublin
+*! Email	   : thomas.u.grund@gmail.com
 
-capture program drop nwkeep 
+capture program drop nwkeep
 program nwkeep
-	syntax [anything(name=netname)][if/] [in/],[ attributes(varlist)]
+	syntax [anything(name=netname)] [if] [in]
+	unw_defs
+	nw_syntax `netname', max(9999)
+	local keeplist `netname'
 	
-	_nwsyntax `netname', max(9999)
-	local nets `networks'
-	local keepnets = "`netname'"
-
-	_nwsyntax _all, max(9999)
-	local netname : list netname - keepnets
-
-	if "`if'" == "" & "`in'" == "" & "`netname'" != ""{
-		nwdrop `netname', attributes(`attributes')
-		nwcompressobs
-	}
-    else {
-		local netname "`keepnets'"
-
-		foreach keepnet in `keepnets' {
-			nwname `keepnet'
-			nwload `keepnet', labelonly
-			local id = r(id)
-			local nodes = r(nodes)
-			local z = `z' + 1
-		
-			if ("`if'" != "" | "`in'" != ""){
-				tempvar keepnode
-				gen `keepnode' = 0
-				if "`if'" != "" {
-					replace `keepnode' = 1 if `if'
-				}
-				if "`in'" != "" {
-					replace `keepnode' = 1 in `in'
-				}
-			
-				mata: keepnode = st_data((1,`nodes'), st_varindex("`keepnode'"))
-			
-				if (`z' != `nets') {
-					nwkeepnodes `keepnet', keepmat(keepnode) `netonly'
-				}
-				else {
-					nwkeepnodes `keepnet', keepmat(keepnode) `netonly' attributes(`attributes')
-				}
-				mata: mata drop keepnode
-			}
+	qui nwset
+	local alllist `r(nets)'
+	local droplist : list alllist - keeplist
+	
+	if "`if'" == "" & "`in'" == "" {
+		foreach netname_temp in `droplist' {
+			mata: `nws'.drop("`netname_temp'")
+		}
+		qui nwset
+		if r(networks) == 0 {
+			capture mata: mata drop `nw'
 		}
 	}
+	else {
+		nw_syntax `netname', max(1)
+		local n `nodes'
+		nw_datasync `netname'
+		
+		tempvar ifcond
+		tempname keep
+		qui gen `ifcond' = 1 `if' `in'
+		mata: `keep' = (st_data((1::`nodes'),"`ifcond'"))'
+		mata: _editmissing(`keep', 0)
+		mata: `netobj'->keep_nodes(`keep')
+		mata: mata drop `keep'
+	}
+	mata: st_rclear()
 end
-	
-*! v1.5.0 __ 17 Sep 2015 __ 13:09:53
-*! v1.5.1 __ 17 Sep 2015 __ 14:54:23

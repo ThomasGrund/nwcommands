@@ -1,4 +1,4 @@
-*! Date        : 13oct2015
+*! Date        : 25oct2015
 *! Version     : 2.0
 *! Author      : Thomas Grund, University College Dublin
 *! Email	   : thomas.u.grund@gmail.com
@@ -54,9 +54,8 @@ program nw_name
 	mata: st_numscalar("r(id)", `id')
 	mata: st_global("r(netname)", nw.nws.pdefs[`id']->get_name())
 	mata: st_numscalar("r(nodes)", nw.nws.pdefs[`id']->get_nodes())
-	mata: st_global("r(vars)", nw.nws.pdefs[`id']->get_vars())
 	mata: st_global("r(mode2)", nw.nws.pdefs[`id']->is_2mode())
-	mata: st_global("r(selflooped)", nw.nws.pdefs[`id']->is_selfloop())
+	mata: st_global("r(selfloop)", nw.nws.pdefs[`id']->is_selfloop())
 	mata: st_numscalar("r(selfloops)", nw.nws.pdefs[`id']->get_selfloops_number())
 	mata: st_global("r(directed)", nw.nws.pdefs[`id']->is_directed())
 	mata: st_global("r(valued)", nw.nws.pdefs[`id']->is_valued())
@@ -64,6 +63,6 @@ program nw_name
 	mata: st_global("r(caption)", nw.nws.pdefs[`id']->get_caption())
 	mata: st_numscalar("r(missing_edges)", nw.nws.pdefs[`id']->get_missing_edges())
 	//!! Should r(labs) have real labels?	
-	mata: st_global("r(labs)", nw.nws.pdefs[`id']->get_vars())	
+	mata: st_global("r(labs)", invtokens(nw.nws.pdefs[`id']->get_nodenames(),";"))	
 end
 

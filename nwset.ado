@@ -5,13 +5,12 @@
 
 capture program drop nwset	
 program nwset
-syntax [varlist (default=none)][, bipartite keeporiginal xvars clear nwclear nooutput edgelist name(string) vars(string) labs(string) labsfromvar(string) abs(string asis) edgelabs(string asis) detail mat(string) undirected directed]
+syntax [varlist (default=none)][, bipartite selfloop labs(string) keeporiginal xvars clear nwclear nooutput edgelist name(string) labsfromvar(string) edgelabs(string asis) detail mat(string) undirected directed]
 	set more off
 	unw_defs
-	
+
 	capture mata: `nw'
-	if ("`_dta[NWversion]'" == "" | _rc != 0) {
-		char _dta[NWversion] = "2"
+	if (_rc != 0) {
 		if ("`varlist'" != "" | "`mat'" != ""){
 			mata: `nw' = nws_create()
 		}
@@ -56,13 +55,14 @@ syntax [varlist (default=none)][, bipartite keeporiginal xvars clear nwclear noo
 		}
 		else {
 			di "{txt}(0 networks)"
-			di "{hline 20}"
 			exit
 		}
 	}
 	
 	// set a new network
 	else {
+		tempname __nwnew
+		tempname __nwnodenames
 		if "`name'" == "" {
 			local name "network"
 		}
@@ -73,65 +73,107 @@ syntax [varlist (default=none)][, bipartite keeporiginal xvars clear nwclear noo
 		}
 		local name = r(validname)
 
-		local directed = "true"
-		if "`undirected'" != "" {
-			local directed = "false"
-		}
-		
 		// set network from varlist
 		if ("`varlist'" != "") {
-			mata: __nwnew = check_bipartite(st_data(.,"`varlist'"), "`bipartite'")
+			mata: `__nwnew' = check_bipartite(st_data(.,"`varlist'"), "`bipartite'")
 		}
 		
 		// set network from mata matrix
 		if ("`mat'" != "") {
-			mata: __nwnew = check_bipartite(`mat',"`bipartite'")  
+			mata: `__nwnew' = check_bipartite(`mat',"`bipartite'")  
 		}
 		
 		// generate nodenames if not specified
-		if "`labs'" == "" {
-			mata: __nwnodenames = (J(rows(__nwnew),1,"`cDftNodepref'") + strofreal((1::rows(__nwnew))))'
+		if "`labs'" == "" & "`labsfromvar'" == "" {
+			mata: `__nwnodenames' = (J(rows(`__nwnew'),1,"`cDftNodepref'") + get_node_suffix(rows(`__nwnew')))'
 		}
-		else {
-			mata: __nwnodenames = tokens(`"`labs'"')
+		if "`labs'" != ""  {
+			mata: `__nwnodenames' = (get_nodenames_from_string(`"`labs'"', rows(`__nwnew'),"`cDftNodepref'"))'
 		}
-		
-		// increase observation number of neccessary to match network nodes
-		//if (`__nwsize' > _N){
-		//	set obs `__nwsize'
-		//}
-		/*capture confirm variable `nw_nodename'
-		mata: st_local("__nwsize", strofreal(cols(__nwnodenames)))
-		qui if _rc != 0 {
-			mata: st_addvar("str40", "`nw_nodename'")
-			mata: st_sstore((1, cols(__nwnodenames)), "`nw_nodename'", __nwnodenames')
-			order `nw_nodename', first
-
-		}*/
+		if "`labsfromvar'" != "" {
+			mata: `__nwnodenames' = (st_sdata(.,"`labsfromvar'"))'
+			if("`varlist'" != "" & "`bipartite'" != ""){
+				mata: `__nwnodenames' = (tokens("`varlist'"),`__nwnodenames')
+			}
+			if("`varlist'" != "" & "`bipartite'" == ""){
+				mata: `__nwnodenames' = `__nwnodenames'[(1::rows(`__nwnew'))] 
+			}
+			if("`mat'" != "") {
+				mata: `__nwnodenames' = (J(rows(`__nwnew'),1,"`cDftNodepref'") + get_node_suffix(rows(`__nwnew')))'
+			}
+		}
 		
 		mata: st_rclear()
 		mata: st_numscalar("r(networks)", `nws'.get_number())
 		mata: st_global("r(names)", `nws'.get_names())
-		//mata: st_numscalar("r(max_nodes)", `nws'.get_max_nodes())
-		// generate a new network and add it
 		mata: `nws'.add("`name'")
 		
 		if "`labsfromvar'" != "" {
-			capture mata: __nwnodenames = J(rows(__nwnew),0,"`cDftNodepef'") + strofreal((1::rows(__nwnew)))
+			capture mata: `__nwnodenames' = J(rows(`__nwnew'),0,"`cDftNodepef'") + strofreal((1::rows(__nwnew)))
 		}
 		
 		nw_syntax `name'
-		mata: `netobj'->create_by_name(__nwnodenames)
+		mata: `netobj'->create_by_name(`__nwnodenames')
 		mata: `netobj'->set_name("`name'")
-		mata: `netobj'->set_directed("`directed'")
-		mata: `netobj'->set_edge(__nwnew)
+		mata: `netobj'->set_directed("`undirected'" == "")
+		mata: `netobj'->set_selfloop("`selfloop'" == "selfloop")
+		mata: `netobj'->set_edge(`__nwnew')
+		nw_datasync `name'
 	}
-	capture mata: mata drop  __nwnew __nwnodenames
+	capture mata: mata drop  `__nwnew' `__nwnodenames'
 end
 
 capture mata: mata drop check_bipartite()
 capture mata: mata drop get_2mode_edge()
+capture mata: mata drop get_node_suffix()
+capture mata: mata drop get_nodenames_from_string()
+capture mata: mata drop get_nodenames_from_var()
+
 mata:
+string matrix get_nodenames_from_var(string scalar v, real scalar z, string scalar def){
+	string scalar s 
+	
+	s = invtokens(st_sdata((1,z), v))
+	return(get_nodenames_from_string(s, z, def))
+}
+
+string matrix get_nodenames_from_string(string scalar s, real scalar z, string scalar def){
+	string matrix nodenames, nodenamesrest
+	real scalar invalid, i, j
+	
+	nodenames = (tokens(s,","))'
+	nodenames = select(nodenames, (J(rows(nodenames),1, ","):!= nodenames)) 
+	invalid = 0
+	
+	// check for duplicates
+	for (i = 1; i<= (rows(nodenames)-1); i++){
+		for (j = i + 1; j <= rows(nodenames); j++){
+			if (nodenames[i] == nodenames[j]){
+				invalid = 1
+				i = rows(nodenames) + 1
+				j = rows(nodenames) + 1
+			}
+		}
+	}
+	
+	if (invalid == 1){
+		nodenames =(J(z,1,def) + get_node_suffix(z))
+		return(nodenames)
+	}
+	
+	if (rows(nodenames)< z){
+		nodenamesrest = (J(z,1,def) + get_node_suffix(z))
+		printf("{txt}Warning! Not enough node labels specified.")
+		nodenamesrest[(1::rows(nodenames))] = nodenames	
+		return(nodenamesrest)
+	}
+	if (rows(nodenames)> z){
+		printf("{txt}Warning! Too many node labels specified.")
+		return(nodenames[(1::z)])
+	}
+	return(nodenames)	
+}
+
 real matrix get_2mode_edge(real matrix edge){
 	real scalar r, c, n
 	real matrix edge2
@@ -158,5 +200,18 @@ real matrix check_bipartite(real matrix edge, string scalar bip){
 		edge = edge[(1::m),(1::m)]
 	}
 	return(edge)
+}
+
+string matrix get_node_suffix(real scalar nodes){
+	real matrix M
+	string matrix S
+	real scalar i
+	
+	M = (1::nodes)
+	S = strofreal(M)
+	for (i = 10; i <= nodes; i = i * 10) {
+		//S[(1::(i -1))] = J((i -1),1,"0") + S[(1::(i-1))]
+	}
+	return(S)
 }
 end

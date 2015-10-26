@@ -23,7 +23,7 @@ program unw_defs
 	c_local vxNWdef		nw_def
 	
 	c_local nwvars_def_pref "n"
-	c_local cDftNodepref "net"
+	c_local cDftNodepref "n"
 	
 	c_local nw_nodename "_nwnode"
 end

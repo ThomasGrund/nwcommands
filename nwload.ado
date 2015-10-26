@@ -1,3 +1,8 @@
+*! Date        : 23oct2015
+*! Version     : 2.0
+*! Author      : Thomas Grund, University College Dublin
+*! Email	   : thomas.u.grund@gmail.com
+
 capture program drop nwload
 program nwload
 	syntax [anything(name=netname)][, xvars labelonly force]
@@ -31,8 +36,8 @@ program nwload
 	if "`labelonly'" == "" {		
 		mata: `nws'.generate_current_nodesvar()
 		nw_syntax `netname'
-		mata: st_store(`netobj'->match[.,2], `netobj'->nodesvar,(`netobj'->get_edge())[(`netobj'->match[.,1]),.]) 
-		order `nw_nodename' `nwvars'
+		mata: st_store((1::(`netobj'->get_nodes())),`netobj'->nodesvar,(`netobj'->get_edge())) 
+		order `nw_nodename' 
 	}
 end
 

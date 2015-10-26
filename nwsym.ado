@@ -1,37 +1,25 @@
-*! Date        : 24aug2014
-*! Version     : 1.0
-*! Author      : Thomas Grund, Linköping University
-*! Email	   : contact@nwcommands.org
+*! Date        : 25oct2015
+*! Version     : 2.0
+*! Author      : Thomas Grund, University College Dublin
+*! Email	   : thomas.u.grund@gmail.com
 
 capture program drop nwsym
 program nwsym
 	version 9.0
 	syntax [anything(name=netname)][, check name(string) vars(string) xvars noreplace mode(string)]
-	_nwsyntax `netname', max(1)
-
-	local symname = trim("`netname'")
+	nw_syntax `netname', max(1)
 	
 	if "`check'" != "" {
-		nwtomata `symname', mat(symnet)
-		mata: st_rclear()
-		mata: st_global("r(name)","`symname'")
-		mata: st_numscalar("r(is_symmetric)", (symnet == symnet'))
-		if `r(is_symmetric)' == 1 {
-			mata: st_global("r(is_symmetric)", "true")
-		}
-		else {
-			mata: st_global("r(is_symmetric)", "false")
-		}
-		mata: mata drop symnet
+		mata: st_global("r(is_symmetric)", `netobj'->check_symmetry())
 		exit
 	}
 
-	if "`mode'" ! == "" {
+	if "`mode'" == "" {
 		local mode = "max"
 	}
-	_opts_oneof "max min sum mean" "mode" "`mode'" 6555
-
 	
+	nw_optsoneof "max min sum mean" "mode" "`mode'" 6555
+
 	if ("`replace'" != ""){
 		// generate valid network name and valid varlist
 		if "`name'" == "" {
@@ -40,44 +28,9 @@ program nwsym
 		
 		// generate a new network
 		nwduplicate `netname', name(`name')
-		local symname "`name'"
+		local netname "`r(duplicate)'"
 	}
-	
-	// get symmetry
-	nwtomata `symname', mat(symnet)
-	
-	if ("`mode'" == "sum") {
-		mata: symnet = symnet  + symnet'
-	}
-	if ("`mode'" == "mean") {
-		mata: symnet = (symnet  + symnet'):/2
-	}
-	if ("`mode'" == "max") {
-		mata: sym1 = symnet
-		mata: sym2 = symnet'
-		mata: res2 = sym2
-		mata: res2 = (sym2 :> sym1):* res2
-		mata: res1 = sym1
-		mata: res1 = (sym1 :>= sym2):* res1
-		mata: symnet = res1 + res2
-		mata: mata drop sym1 sym2 res1 res2
-	}
-	if ("`mode'" == "min") {
-		mata: sym1 = symnet
-		mata: sym2 = symnet'
-		mata: res2 = sym2
-		mata: res2 = (sym2 :< sym1):* res2
-		mata: res1 = sym1
-		mata: res1 = (sym1 :<= sym2):* res1
-		mata: symnet = res1 + res2
-		mata: mata drop sym1 sym2 res1 res2
-	}
-	
-	mata: _diag(symnet,0)
-	nwreplacemat `symname', newmat(symnet)
-	nwname `symname', newdirected(false)
-	mata: st_rclear()
-	mata: mata drop symnet
+
+	nw_syntax `netname'
+	mata: `netobj'->symmetrize("`mode'")
 end
-*! v1.5.0 __ 17 Sep 2015 __ 13:09:53
-*! v1.5.1 __ 17 Sep 2015 __ 14:54:23

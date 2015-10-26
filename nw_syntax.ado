@@ -1,4 +1,4 @@
-*! Date        : 15oct2015
+*! Date        : 26oct2015
 *! Version     : 2.0
 *! Author      : Thomas Grund, University College Dublin
 *! Email	   : thomas.u.grund@gmail.com
@@ -11,24 +11,8 @@ program nw_syntax
 	if "`name'" == "" {
 		local name = "netname"
 	}
-	if "`nodes'" == "" {
-		local nodes = "nodes"
-	}
-	if "`networks'" == "" {
-		local networks = "networks"
-	}
-	if "`directed'" == "" {
-		local directed = "directed"
-	}
 	
-	if "`id'" == "" {
-		local id = "id"
-	}
-	
-	if "`netobj'" == "" {
-		local netobj = "netobj"
-	}
-
+	local networks_count = 1
 	if "`anything'" == ""  & "`current'" == ""{
 		capture mata: st_local("_temp", `nws'.get_current_name())
 		capture mata: st_numscalar("r(id)",`nws'.get_index_of_current())
@@ -45,8 +29,12 @@ program nw_syntax
 	    error `errNWsNotFound'
 	}
 
-	c_local `netobj' "`nws'.pdefs[`r(id)']"
-	c_local `id' `r(id)'
-	c_local `name' `_temp'
-	c_local `networks' `networks_count'	
+	mata: st_local("directed", `nws'.pdefs[`r(id)']->is_directed())
+	mata: st_local("nodes", strofreal(`nws'.pdefs[`r(id)']->get_nodes()))
+	c_local nodes "`nodes'"
+	c_local directed "`directed'"
+	c_local netobj "`nws'.pdefs[`r(id)']"
+	c_local id `r(id)'
+	c_local netname `_temp'
+	c_local networks `networks_count'	
 end

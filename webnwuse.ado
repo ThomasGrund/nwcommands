@@ -1,7 +1,7 @@
-*! Date        : 3sept2014
-*! Version     : 1.0
-*! Author      : Thomas Grund, Linköping University
-*! Email	   : contact@nwcommands.org
+*! Date        : 23oct2015
+*! Version     : 2.0
+*! Author      : Thomas Grund, University College Dublin
+*! Email	   : thomas.u.grund@gmail.com
 
 capture program drop webnwuse
 program webnwuse
@@ -40,17 +40,10 @@ program webnwuse
 	
 	local webname = subinstr("`anything'", ".dta","",99)
 	if substr("`webname'",1,4) == "http" {
-		nwuse `webname', `options'
+		nwuse_old `webname', `options'
 	}
 	else {
-		nwuse `thispath'/`webname', `options'
+		nwuse_old `thispath'/`webname', `options'
 	}
 	qui nwload, labelonly
 end
-
-
-
-	
-
-*! v1.5.0 __ 17 Sep 2015 __ 13:09:53
-*! v1.5.1 __ 17 Sep 2015 __ 14:54:23

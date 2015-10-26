@@ -1,76 +1,36 @@
-*! Date        : 24aug2014
-*! Version     : 1.0
-*! Author      : Thomas Grund, Linkoping University
-*! Email	   : contact@nwcommands.org
+*! Date        : 23oct2015
+*! Version     : 2.0
+*! Author      : Thomas Grund, University College Dublin
+*! Email	   : thomas.u.grund@gmail.com
 
 capture program drop nwrandom
 program nwrandom
-	syntax anything(name=nodes), [ntimes(integer 1) arcs(integer -1) Census(numlist integer min=1 max=3) Density(string) Prob(string) vars(string) labs(string) stub(string) name(string) undirected xvars noreplace * ]
-	version 9.0
+	syntax anything(name=nodes), [selfloop ntimes(integer 1) Census(numlist integer min=1 max=3) Density(string) Prob(string) labs(string) name(string) undirected xvars noreplace * ]
+	unw_defs
 	
-	set more off
-	// Check if this is the first network in this Stata session
-	if "$nwtotal" == "" {
-		global nwtotal = 0
-	}
-
 	// Generate valid network name and valid varlist
 	if "`name'" == "" {
 		local name "random"
 	}
-	if "`stub'" == "" {
-		local stub "net"
-	}
-	nwvalidate `name'
-	local randomname = r(validname)
-	local varscount : word count `vars'
-	if (`varscount' != `nodes'){
-		nwvalidvars `nodes', stub(`stub')
-		local randomvars "$validvars"
-	}
-	else {
-		local randomvars "`vars'"
-	}
-	
+
 	if `ntimes' != 1 {
 		di in smcl as txt "{p}"
 		forvalues i = 1/`ntimes'{
 			if mod(`i', 25) == 0 {
 				di in smcl as txt "...`i'"
 			}
-			nwrandom `nodes', census(`census') name(`name'_`i') density(`density') prob(`prob') stub(`stub') `xvars' `undirected' labs(`labs')
+			nwrandom `nodes', census(`census') name(`name'_`i') density(`density') prob(`prob') `selfloop' `xvars' `undirected' labs(`labs')
 		}
 		exit
 	}
 	
-	// Generate probability network as Mata matrix
+	tempname __nwnew
+	
 	if ("`prob'" != "") {
-		mata: newmat = J(`nodes', `nodes', 0)
-		if "`undirected'" == "" {
-			mata: newmat = floor(uniform(`nodes',`nodes') :+ `prob')
-		}	
-		else {
-			mata: newmat = makesymmetric(floor(uniform(`nodes',`nodes') :+ `prob'))
-		}
-		mata: for (i=1; i<=`nodes'; i++) newmat[i,i] = 0
-		mata: mata drop i
+		mata: `__nwnew' = get_random_prob(`nodes', `prob', ("`undirected'" != ""), "`selfloop'" != "")
 	}
 	if ("`density'" != "") {
-		local ties = floor((`nodes' * (`nodes' -1)) * `density')
-		local n2 = `nodes'*`nodes'
-		if ("`undirected'" == ""){
-			mata: newmat=(1::`n2')
-			mata: _jumble(newmat)
-			mata: newmat=colshape(newmat, `nodes')
-			mata: newmat = (newmat:<=`ties')
-			mata: tiesdiag = sum(diagonal(newmat))
-			mata: newmat = correctDiagonal(newmat,0, tiesdiag)
-		}
-		else {
-			mata: newmat = tiesGenerator(`nodes', `ties')
-			mata: tiesdiag = sum(diagonal(newmat))
-			mata: newmat = correctDiagonal(newmat, 1, tiesdiag)
-		}
+		mata: `__nwnew' = get_random_density(`nodes', `density', ("`undirected'" != ""), "`selfloop'" != "")
 	}
 	if "`census'" != "" {
 		local mutual : word 1 of `census'
@@ -83,7 +43,7 @@ program nwrandom
 			di "{err}Too manny dyads requested,"
 			exit
 		}
-		mata: newmat = dyadcensusGenerator(`nodes', `mutual', `asym')
+		mata: `__nwnew' = dyadcensusGenerator(`nodes', `mutual', `asym')
 	
 	}
 	
@@ -92,29 +52,67 @@ program nwrandom
 		exit
 	}
 
-	//mata: `tiesDiag'
 	mata: st_rclear()
-	nwset, mat(newmat) vars(`randomvars') name(`randomname') `undirected'
+	nwset, mat(`__nwnew') name(`randomname') labs(`labs') `undirected' `selfloop'
 
-	local wc : word count `labs'
-	if `wc' == `nodes' {
-		nwname `randomname', newlabs(`labs')
-	}
-	
 	if "`xvars'" == "" {
 		nwload `randomname'
 	}
-	mata: mata drop newmat
+	capture mata: mata drop newmat
 end
 
 
 capture mata: mata drop tiesGenerator()
 capture mata: mata drop correctDiagonal()
 capture mata: mata drop dyadcensusGenerator()
+capture mata: mata drop get_random_prob()
+capture mata: mata drop get_random_density()
+
 mata:
+real matrix get_random_prob(real scalar nodes, real scalar prob, real scalar undirected, real scalar selfloop){
+	real matrix adj 
+	
+	adj = floor(uniform(nodes,nodes) :+ prob)
+	if (undirected == 1) {
+		_makesymmetric(adj)
+	}
+	if (selfloop == 0){
+		_diag(adj,0)
+	}
+	return(adj)
+}
+
+real matrix get_random_density(real scalar nodes, real scalar density, real scalar undirected, real scalar selfloop){
+	real scalar ties, n2, tiesdiag
+	real matrix adj
+	
+	ties = floor((nodes * (nodes -(1 - selfloop)) * density))
+	n2 = nodes * nodes
+		
+	if (undirected == 0){
+		adj=(1::n2)
+		_jumble(adj)
+		adj=colshape(adj, nodes)
+		adj = (adj:<=ties)
+		tiesdiag = sum(diagonal(adj))
+		if (selfloop == 0){
+			adj = correctDiagonal(adj,0, tiesdiag)
+		}
+	}
+	else {
+		adj = tiesGenerator(nodes, ties)
+		tiesdiag = sum(diagonal(adj))
+		if (selfloop == 0){
+			adj = correctDiagonal(adj,1, tiesdiag)
+		}
+	}
+	return(adj)
+}
+
 real matrix function tiesGenerator(real scalar nodes, real scalar ties)
 {
 	real matrix X
+	real scalar temp
 	
 	ties = ties / 2
 	temp = ((nodes * (nodes-1) / 2) + nodes)
@@ -126,6 +124,8 @@ real matrix function tiesGenerator(real scalar nodes, real scalar ties)
 real matrix function dyadcensusGenerator( scalar nodes, scalar mutual, scalar asym)
 {
 	real matrix X
+	real scalar temp, ties, M, A, tiesdiag, T, R, Rlower, Rupper, Rboth
+	
 	ties = ties / 2
 	temp = ((nodes * (nodes-1) / 2) + nodes)
 	X = invvech(jumble((1::temp)))
@@ -158,6 +158,8 @@ real matrix function dyadcensusGenerator( scalar nodes, scalar mutual, scalar as
 }
 
 real matrix function correctDiagonal(real matrix net, scalar undirected, scalar tiesdiag){
+	real scalar nodes, i, found, ran, rrow, rcol
+	
 	nodes = rows(net)
 	for (i = 1 ; i <= tiesdiag; i++ ) {
 		found = 0
@@ -179,6 +181,3 @@ real matrix function correctDiagonal(real matrix net, scalar undirected, scalar 
 }
 end
 
-
-*! v1.5.0 __ 17 Sep 2015 __ 13:09:53
-*! v1.5.1 __ 17 Sep 2015 __ 14:54:23

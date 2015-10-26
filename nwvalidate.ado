@@ -12,7 +12,10 @@ program nwvalidate
 	local p = 1
 	
 	mata: st_global("r(tryname)", "`netname'")
-	mata: st_global("r(validname)", `nws'.get_valid_name("`netname'"))
+	capture mata: st_global("r(validname)", `nws'.get_valid_name("`netname'"))
+	if _rc != 0 {
+		mata: st_global("r(validname)","`netname'")
+	}
 	
 	if r(tryname) != r(validname) {
 		mata: st_global("r(exists)", "true")

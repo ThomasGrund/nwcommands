@@ -1,12 +1,13 @@
-*! Date        : 8dec2014
-*! Version     : 1.0.4
-*! Author      : Thomas Grund, Linkˆping University
-*! Email	   : contact@nwcommands.org
+*! Date        : 25oct2015
+*! Version     : 2.0
+*! Author      : Thomas Grund, University College Dublin
+*! Email	   : thomas.u.grund@gmail.com
 
 capture program drop nwfromedge
 program nwfromedge
-	syntax varlist(min=2 max=3) [if] [, noclear keeporiginal xvars name(string) vars(string) labs(string asis) edgelabs(string) stub(string) directed undirected ]
-
+	syntax varlist(min=2 max=3) [if] [, prefix(string) noclear xvars name(string) labs(string asis) directed undirected ]
+	unw_defs
+	
 	// obtain variable names
 	local fromvar : word 1 of `varlist'
 	local tovar : word 2 of `varlist'
@@ -67,7 +68,7 @@ program nwfromedge
 		
 		if "`labs'" == "" {
 			forvalues k = 1/ `=_N'{
-				local labs "`labs' `=`fromvar'[`k']'"
+				local labs "`labs' `=`fromvar'[`k']',"
 			}
 		}
 		if "`keeporiginal'" != "" {
@@ -116,7 +117,7 @@ program nwfromedge
 	if "`rawtype'" == "numeric" {
 		if "`labs'" == "" {
 			forvalues k = 1/ `=_N'{
-				local labs "`labs' `=`_rawid'[`k']'"
+				local labs "`labs' `prefix'`=`_rawid'[`k']',"
 			}
 		}
 	}
@@ -189,7 +190,7 @@ program nwfromedge
 	}
 
 	// Set the new network
-	nwset , mat(onenet) name(`edgename') vars(`edgevars') labs(`labs') edgelabs(`edgelabs')
+	nwset , mat(onenet) name(`edgename')  labs(`labs')
 	if "`clear'" == "" {
 		qui drop _all
 	}
@@ -232,6 +233,8 @@ end
 capture mata : mata drop _getAdjacency()
 mata:
 real matrix function _getAdjacency(real matrix from, real matrix to, real matrix value, real scalar nodes) {
+	real matrix onenet
+	real scalar i
 	
 	onenet = J(nodes, nodes, 0)
 	for (i = 1; i <= rows(from); i++) {
@@ -240,6 +243,3 @@ real matrix function _getAdjacency(real matrix from, real matrix to, real matrix
 	return(onenet)
 }
 end
-
-*! v1.5.0 __ 17 Sep 2015 __ 13:09:53
-*! v1.5.1 __ 17 Sep 2015 __ 14:54:23

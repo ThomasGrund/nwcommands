@@ -1,99 +1,38 @@
-*! Date        : 24aug2014
-*! Version     : 1.0
-*! Author      : Thomas Grund, Linköping University
-*! Email	   : contact@nwcommands.org
+*! Date        : 26oct2015
+*! Version     : 2.0
+*! Author      : Thomas Grund, University College Dublin
+*! Email	   : thomas.u.grund@gmail.com
 
 capture program drop nwdrop
 program nwdrop
 	version 9
-	syntax [anything(name=netname)] [if/] [in/], [netonly ATTRibutes(varlist) reverseif]
-	_nwsyntax `netname', max(9999)
+	syntax [anything(name=netname)] [if] [in]
+	unw_defs
+	nw_syntax `netname', max(9999)
 
-	local nets `networks'
-	local z = 0
-    qui foreach dropnet in `netname' {
-		nwload `dropnet', labelonly
-		nwname `dropnet'
-		local id = r(id)
-		local nodes = r(nodes)
-		local z = `z' + 1
-		
-		// only drop nodes 
-		qui if ("`if'" != "" | "`in'" != ""){
-
-			tempvar keepnode
-			gen `keepnode' = 1
-		    if "`if'" != "" {
-				replace `keepnode' = 0 if `if'
-				tab `keepnode'
-				//if ("`reverseif'"!= ""){
-				//	recode `keepnode' (0=1) (1=0)
-				//}
-			}
-			if "`in'" != "" {
-				replace `keepnode' = 0 in `in'
-			}
-		
-			mata: keepnode = st_data((1,`nodes'), st_varindex("`keepnode'"))
-			
-			if (`z' != `nets') {
-			 nwdropnodes `dropnet', keepmat(keepnode) `netonly'
-			}
-			else {
-				 nwdropnodes `dropnet', keepmat(keepnode) `netonly' attributes(`attributes')
-			}
-			mata: mata drop keepnode
+	if "`if'" == "" & "`in'" == "" {
+		foreach netname_temp in `netname' {
+			mata: `nws'.drop("`netname_temp'")
 		}
-		
-		// drop the whole network
-		else {
-			// delete Stata variables if needed
-			scalar onenw = "\$nw_`id'"
-			if "`netonly'" == "" {
-				capture confirm variable `=onenw'
-				if _rc == 0 {
-					qui drop `=onenw'
-				}
-				capture drop _label	
-				capture drop _nodelab
-				capture drop _nodevar
-				capture drop _nodeid
-			}
-	
-			// update all Stata/Mata macros
-			local k 	= $nwtotal - 1
-			forvalues j = `id'/`k' {
-				local next = `j' + 1
-				nwname, id(`next')
-				global nwname_`j' = r(name)
-				global nwsize_`j' = r(nodes)
-				global nwdirected_`j' = r(directed)			
-				global nwlabs_`j' = r(labs)
-				
-				scalar movenw = "\$nw_`next'"
-				global nw_`j' `=movenw'
-				
-				mata: mata drop nw_mata`j'
-				mata: nw_mata`j' = nw_mata`next'
-			}
-			
-			// clean-up
-			macro drop nw_$nwtotal
-			macro drop nwsize_$nwtotal
-			macro drop nwname_$nwtotal
-			macro drop nwdirected_$nwtotal
-			macro drop nwlabs_$nwtotal
-			macro drop nwedgelabs_$nwtotal
-			mata: mata drop nw_mata$nwtotal
-			global nwtotal `=$nwtotal - 1'
-			global nwtotal_mata = `=$nwtotal_mata - 1'
+		qui nwset
+		if r(networks) == 0 {
+			capture mata: mata drop `nw'
 		}
 	}
-	nwcompressobs
+	else {
+		nw_syntax `netname', max(1)
+		local n `nodes'
+		nw_datasync `netname'
+		
+		tempvar ifcond
+		tempname drop
+		qui gen `ifcond' = 1 `if' `in'
+		mata: `drop' = (st_data((1::`nodes'),"`ifcond'"))'
+		mata: _editmissing(`drop', 0)
+		mata: `netobj'->drop_nodes(`drop')
+		mata: mata drop `drop'
+	}
 	mata: st_rclear()
 end
-	
-	
-	
-*! v1.5.0 __ 17 Sep 2015 __ 13:09:53
-*! v1.5.1 __ 17 Sep 2015 __ 14:54:23
+
+

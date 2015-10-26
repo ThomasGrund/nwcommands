@@ -143,7 +143,7 @@ class `NWs' {
 		modes:		mode of nodes
 		edge:		edge matrix
 		isdirect:	if is direct graph
-		ismode:		if node has modes
+		is2mode:	if network is two-mode
 TODO:
 	modes is not handled yet 
 */
@@ -159,39 +159,37 @@ class `NWdef' {
 	real matrix 		edge
 	`BOOL'				isdirect
 	`BOOL'				isvalued
-	`BOOL'		 		ismode
+	`BOOL'		 		is2mode
 	`BOOL'				isselfloop
 	
 //!! how edge matrix is stored	
 	real scalar 		edgetype  
 //!! methods:
 
+	void symmetrize()
 	void create() 
 	void create_by_name()
 	void init_edge()
-	void set_name()
+
 	string scalar get_name()
-	void set()
-	void set_edge()
-	void set_nodes_from_string()
 	real scalar get_nodes()
+	string matrix get_nodenames()
 	real matrix get_edge()
+	real matrix get_edge_unvalued()
+	real matrix get_outdegree()
+	real matrix get_indegree()
 	pointer(real matrix) get_edge_original()
-	void set_directed()
+
 	string scalar is_selfloop()
 	string scalar is_valued()
 	string scalar is_directed()
 	string scalar is_2mode()
+	real scalar get_selfloop_boolean()
+	real scalar get_valued_boolean()
+	real scalar get_directed_boolean()
+	real scalar get_2mode_boolean()
 	string scalar get_label()
 	string scalar get_caption()
-	void set_label()
-	void set_caption()
-	void set_nodes()
-	void set_selfloop()
-	void connect_edge()
-	void add_node()
-	void zap()
-	void dumper()
 	string scalar get_vars()
 	real scalar get_maximum()
 	real scalar get_minimum()
@@ -202,12 +200,145 @@ class `NWdef' {
 	real scalar get_arcs_sum()
 	real scalar get_density()
 	real scalar get_selfloops_number()
-	real scalar get_nodesvar()
+	
+	void set()
+	void set_name()
+	void set_nodenames()
+	void set_nodes_from_string()
+	void set_edge()
+	void set_label()
+	void set_caption()
+	void set_nodes()
+	void set_selfloop()
+	void set_directed()
+	void set_valued()
+	void set_2mode()
+	
+	void connect_edge()
+	void add_node()
+	void zap()
+	void dumper()
 	void update_nodesvar()
 	void update_match()
 	void data_sync()
+	string scalar check_symmetry()
+	void keep_nodes()
+	void drop_nodes()
 }
 
+void `NWdef'::drop_nodes(rowvector d){
+	keep_nodes(d:==0)
+}
+
+void `NWdef'::keep_nodes(rowvector k){
+	real matrix edge_new
+	string matrix modes_new, nodesvar_new, nodes_new
+
+	if (cols(k) == cols(nodes)){
+		nodes_new = select(nodes,k)
+		nodesvar_new = select(nodesvar,k)
+		if (is2mode == 1){
+			modes_new = select(modes,k)
+		}
+		edge_new = select(edge,k)
+		edge_new = select(edge_new,k')
+		nodes = nodes_new
+		nodesvar = nodesvar_new
+		modes = modes_new
+		edge = edge_new
+	}
+}
+
+real scalar `NWdef'::get_selfloop_boolean(){
+	return(isselfloop)
+}
+
+real scalar `NWdef'::get_valued_boolean(){
+	return(isvalued)
+}
+
+real scalar `NWdef'::get_directed_boolean(){
+	return(isdirect)
+}
+
+real scalar `NWdef'::get_2mode_boolean(){
+	return(is2mode)
+}
+	
+void `NWdef'::set_valued(real scalar d){
+	isvalued = d
+}
+
+void `NWdef'::set_2mode(real scalar d){
+	is2mode = d
+}
+
+string scalar `NWdef'::check_symmetry(){
+//!! TODO - change when network not saved as matrix edge
+	if (edge :== edge'){
+		return("true")
+	}
+	return("false")
+}
+
+void `NWdef'::symmetrize(string scalar mode){
+//!! TODO - change when network not saved as matrix edge	
+	real matrix d, res1, res2
+	d = diagonal(edge)
+	
+	if (mode == "sum") {
+		edge = edge  + edge'
+	}
+	if (mode == "mean") {
+		edge = (edge  + edge'):/2
+	}
+	if (mode == "max") {
+		res2 = (edge')
+		res2 = ((edge') :> edge):* res2
+		res1 = edge
+		res1 = (edge :>= (edge')):* res1
+		edge = res1 + res2
+	}
+	if (mode == "min") {
+		res2 = (edge')
+		res2 = ((edge') :< edge):* res2
+		res1 = edge
+		res1 = (edge :<= (edge')):* res1
+		edge = res1 + res2
+	}
+	_diag(edge,d)
+	set_directed(0)
+}
+
+real matrix `NWdef'::get_indegree(real scalar valued){
+	real matrix e 
+	if (valued == 0){
+		e = get_edge()
+	}
+	else {
+		e = get_edge_unvalued()
+	}
+	return(colsum(e)')
+}
+
+real matrix `NWdef'::get_outdegree(real scalar valued){
+	real matrix e 
+	if (valued == 0){
+		e = get_edge()
+	}
+	else {
+		e = get_edge_unvalued()
+	}
+	return(rowsum(e))
+}
+
+string matrix `NWdef'::get_nodenames(){
+	return(nodes)
+}
+
+/*
+	Sync network with dataset
+*/
 void `NWdef'::data_sync(){
 	real scalar newobs
 	real scalar N, z, v
@@ -290,10 +421,10 @@ real scalar `NWdef'::get_density(){
 		possnodes = possnodes - cols(e)
 	}
 
-	if (ismode == 0) {
+	if (is2mode == 0) {
 		return(sum(e) / possnodes)
 	}
-	if (ismode == 1){
+	if (is2mode == 1){
 //!! TODO implement two- and multi-modes		
 		return(sum(e)/ possnodes)
 	}
@@ -307,7 +438,7 @@ real scalar `NWdef'::get_edges_count(){
 	real matrix e
 	
 	e = get_edge()
-	return(sum(e:==. & e:==0)/2)
+	return(sum(e:!=. :& e:!=0)/2)
 }
 
 /*
@@ -391,8 +522,12 @@ void `NWdef'::set_nodes(rowvector n){
 	nodes = n
 }
 
+void `NWdef'::set_nodenames(rowvector n){
+	nodes = n
+}
+
 void `NWdef'::set_nodes_from_string(string scalar s){
-	nodes = s
+	nodes = tokens(s,";")
 }
 
 /*
@@ -437,7 +572,7 @@ string scalar `NWdef'::is_selfloop(){
 	Return true/false string if network is two-mode
 */
 string scalar `NWdef'::is_2mode(){
-	if (ismode == 1) {
+	if (is2mode == 1) {
 		return("true")
 	}
 	else {
@@ -547,25 +682,15 @@ void `NWdef'::set_name(string scalar s) {
 /* 
 	Set isselfloop property
 */
-void `NWdef'::set_selfloop(string scalar d) {
-	if(ustrlower(d) == "true") {
-		isselfloop = `True'
-	}
-	else {
-		isselfloop = `False'	
-	}
+void `NWdef'::set_selfloop(real scalar d) {
+	isselfloop = d
 }
 
 /* 
 	Set isdirect property
 */
-void `NWdef'::set_directed(string scalar d) {
-	if(ustrlower(d) != "true") {
-		isdirect = `True'
-	}
-	else {
-		isdirect = `False'	
-	}
+void `NWdef'::set_directed(real scalar d) {
+	isdirect = d
 }
 
 /*
@@ -590,8 +715,29 @@ void `NWdef'::set_edge(real matrix edge1) {
 */
 real matrix `NWdef'::get_edge() {
 //!! generate edge matrix based on edgetype
+	real matrix e
+	e = edge
+	
+	if (isselfloop == 0){
+		_diag(e,.)
+		return(e)
+	}
+	else {
+		return(edge)
+	}
 	return(edge)
 }
+
+/*
+	Get unvalued edge matrix
+*/
+real matrix `NWdef'::get_edge_unvalued() {
+//!! generate edge matrix based on edgetype
+	real matrix e
+	e = edge:!= 0
+	return(e)
+}
+
 
 /*
 	Get pointer to edge matrix
@@ -622,7 +768,7 @@ void `NWdef'::add_node(string scalar s) {
 	}
 	size = cols(nodes)
 	nodes = (nodes, s)
-	if(ismode) {
+	if(is2mode) {
 		modes = (modes, "")
 	}
 	edge = (edge, J(size, 1, 0)\J(1, size+1, 0)) 
@@ -639,7 +785,7 @@ void `NWdef'::zap() {
 	modes = J(0, 0, "")
 	edge  = J(0, 0, 0)
 	isdirect = `False'
-	ismode   = `False'
+	is2mode   = `False'
 }
 
 /*
@@ -671,8 +817,8 @@ void `NWdef'::dumper(string scalar prefix) {
 	printf(prefix)
 	printf("size: %g\n", size)
 	
-	// ismode
-	if(ismode) {
+	// is2mode
+	if(is2mode) {
 		s = "true"
 	}
 	else {
@@ -681,7 +827,7 @@ void `NWdef'::dumper(string scalar prefix) {
 	printf(prefix)
 	printf("mode: %s\n", s)
 
-	if(ismode) {
+	if(is2mode) {
 		printf(prefix)
 		printf("mode:")
 		for(i=1; i<cols(modes); i++) {
@@ -755,6 +901,8 @@ class `NWsdef' {
 	string scalar get_valid_name()
 	void drop_current_nodesvar()
 	void generate_current_nodesvar()
+	void duplicate()
+	void drop()
 }
 
 
@@ -767,6 +915,7 @@ void `NWsdef'::drop_current_nodesvar(){
 
 void `NWsdef'::generate_current_nodesvar(){
 	real scalar i
+
 	for (i = 1; i<= cols(pcurrent->nodesvar); i++){
 		stata("capture gen " + pcurrent->nodesvar[i] + " = .")
 	}
@@ -999,6 +1148,48 @@ void `NWsdef'::add(string scalar s) {
 	pdefs[size] = &(`NWdef'())
 	pdefs[size]->set_name(names[size])
 	pcurrent = pdefs[size]
+}
+
+/*
+	Drop a network
+*/
+void `NWsdef'::drop(string scalar netname){
+	real scalar i, size
+	real matrix k
+	
+	i = first_index_match(names, netname)
+	size = cols(names)
+	
+	if (i <= size) {
+		k = J(1, size, 1)
+		k[1,i] = 0
+		names = select(names, k)
+		pdefs = select(pdefs, k)
+	}
+}
+	
+/* 
+	Add a duplicate of a network
+*/
+void `NWsdef'::duplicate(string scalar netname, string scalar new_netname){
+	real scalar i, size
+	
+	names = (names, new_netname)
+	i = first_index_match(names, netname)
+	pdefs = (pdefs, NULL)
+	size = cols(pdefs)
+	pdefs[size] = &(`NWdef'())
+	pdefs[size]->set_name(new_netname)
+	pdefs[size]->set_edge(pdefs[i]->get_edge())
+	pdefs[size]->set_nodenames(pdefs[i]->get_nodenames())
+	
+	pdefs[size]->set_directed(pdefs[i]->get_directed_boolean())
+	pdefs[size]->set_valued(pdefs[i]->get_valued_boolean())
+	pdefs[size]->set_2mode(pdefs[i]->get_2mode_boolean())
+
+	pdefs[size]->set_label(pdefs[i]->get_label())
+	pdefs[size]->set_caption(pdefs[i]->get_caption())
+
 }
 
 /*
