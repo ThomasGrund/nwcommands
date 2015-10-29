@@ -5,7 +5,7 @@
 
 capture program drop nwset	
 program nwset
-syntax [varlist (default=none)][, bipartite selfloop labs(string) keeporiginal xvars clear nwclear nooutput edgelist name(string) labsfromvar(string) edgelabs(string asis) detail mat(string) undirected directed]
+syntax [varlist (default=none)][, overwrite bipartite selfloop labs(string) keeporiginal xvars clear nwclear nooutput edgelist name(string) labsfromvar(string) edgelabs(string asis) detail mat(string) undirected directed]
 	set more off
 	unw_defs
 
@@ -55,6 +55,8 @@ syntax [varlist (default=none)][, bipartite selfloop labs(string) keeporiginal x
 		}
 		else {
 			di "{txt}(0 networks)"
+			mata: st_numscalar("r(networks)", 0)
+			mata: st_global("r(nets)", "")	
 			exit
 		}
 	}
@@ -118,9 +120,17 @@ syntax [varlist (default=none)][, bipartite selfloop labs(string) keeporiginal x
 		mata: `netobj'->set_directed("`undirected'" == "")
 		mata: `netobj'->set_selfloop("`selfloop'" == "selfloop")
 		mata: `netobj'->set_edge(`__nwnew')
-		nw_datasync `name'
+		mata: st_numscalar("foundselfloops", (sum(diagonal(`__nwnew'))>0))
+		if (foundselfloops == 1){
+			mata: `netobj'->set_selfloop(1)
+		}
+		
+		if "`undirected'" != "" {
+			nwsym `name'
+		}
 	}
-	capture mata: mata drop  `__nwnew' `__nwnodenames'
+	capture mata: mata drop `__nwnew' 
+	capture mata: mata drop `__nwnodenames'
 end
 
 capture mata: mata drop check_bipartite()

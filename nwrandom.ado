@@ -58,7 +58,7 @@ program nwrandom
 	if "`xvars'" == "" {
 		nwload `randomname'
 	}
-	capture mata: mata drop newmat
+	capture mata: mata drop `__nwnew'
 end
 
 

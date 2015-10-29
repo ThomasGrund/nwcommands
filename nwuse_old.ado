@@ -1,11 +1,13 @@
-*! Date        : 11sept2014
-*! Version     : 1.0.1
-*! Author      : Thomas Grund, Linkˆping University
-*! Email	   : contact@nwcommands.org
+*! Date        : 28oct2015
+*! Version     : 2.0
+*! Author      : Thomas Grund, University College Dublin
+*! Email	   : thomas.u.grund@gmail.com
 
-capture program drop nwuse
-program nwuse
+capture program drop nwuse_old
+program nwuse_old
 	syntax anything [, nwclear clear *]
+	unw_defs
+	
 	local webname = subinstr(`"`anything'"', ".dta","",99)
 	
 	`clear'
@@ -60,13 +62,11 @@ program nwuse
 		local size = _size[`i']
 		local directed = _directed[`i']
 		local edgelabs = _edgelabs[`i']
-		local vars ""
 		local labs ""
 		forvalues j = 1 / `size' {
 			local nextvar = _nodevar`i'[`j'] 
 			local nextlab = _nodelab`i'[`j']
-			local labs "`labs' `nextlab'"
-			local vars "`vars' `nextvar'"
+			local labs "`labs', `nextlab'"
 		}
 	
 		if "`directed'" == "false" {
@@ -82,35 +82,20 @@ program nwuse
 		local nname "_`name'"
 		if "`frmat'" == "edgelist"{
 			keep _fromid _toid `nname'
-			qui nwfromedge _fromid _toid `nname' if `nname' != . , name(`name') labs(`labs') `undirected' `directed'
+			qui nwfromedge _fromid _toid `nname' if `nname' != . , overwrite name(`name') labs(`labs') `undirected' `directed' 
 		
 		}
 		if "`frmat'" == "matrix"{
 			local _netstub `vars'
-			qui nwset `_netstub', name(`name') labs(`labs') `undirected'
+			qui nwset `_netstub', overwrite name(`name') labs(`labs') `undirected'
 		}
 		restore
 	}
 	
 	capture drop _*
 	capture drop `allnets'
-	
-	di 
-	di "{txt}{it:Loading successful}"
-	nwset
-	qui drop if _n > r(max_nodes)
-	qui if "`reloadExisting'" != "" {
-		gen _running=_n
-		merge m:m _running using `existing', nogenerate
-		drop _running
-		
-	}
-	//nwload
+	nw_datasync, overwrite
+	qui drop if `nw_nodename' == ""
+	order `nw_nodename'
 end
 
-
-
-	
-
-*! v1.5.0 __ 17 Sep 2015 __ 13:09:53
-*! v1.5.1 __ 17 Sep 2015 __ 14:54:23

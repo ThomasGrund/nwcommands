@@ -5,7 +5,7 @@
 
 capture program drop nwfromedge
 program nwfromedge
-	syntax varlist(min=2 max=3) [if] [, prefix(string) noclear xvars name(string) labs(string asis) directed undirected ]
+	syntax varlist(min=2 max=3) [if] [, overwrite prefix(string) noclear xvars name(string) labs(string asis) directed undirected ]
 	unw_defs
 	
 	// obtain variable names
@@ -71,15 +71,6 @@ program nwfromedge
 				local labs "`labs' `=`fromvar'[`k']',"
 			}
 		}
-		if "`keeporiginal'" != "" {
-			gen _nodeid = `_nodeid'
-			gen _nodeoriginal = `fromvar'
-			keep _node*
-			sort _nodeid
-			save `dictionaryOriginalString', replace
-			local dictOrigString = 1
-		}
-		
 		restore
 		
 		merge m:n `fromvar' using `dictionaryString'
@@ -149,67 +140,38 @@ program nwfromedge
 	drop _merge
 	replace `tovar' = `_id' 
 	
-	
 	sum `fromvar'
 	local maxNodes = r(max)
 	sum `tovar'
 	if r(max) > `maxNodes' {
 		local maxNodes = r(max)
 	}
-	capture mata: mata drop mata_value 
-	capture mata: mata drop mata_from 
-	capture mata: mata drop mata_to
+	capture mata: mata drop __nwvalue 
+	capture mata: mata drop __nwego 
+	capture mata: mata drop __nwalter
 	
-	putmata mata_value = `_value' if `fromvar' != .
-	putmata mata_from = `fromvar' if `fromvar' != .
-	putmata mata_to = `tovar' if `fromvar' != .
+	putmata __nwvalue = `_value' if `fromvar' != .
+	putmata __nwego = `fromvar' if `fromvar' != .
+	putmata __nwalter = `tovar' if `fromvar' != .
+	mata: __nwmat = make_matrix(__nwego, __nwalter, __nwvalue, `maxNodes')
 	
-	mata: onenet = _getAdjacency(mata_from, mata_to, mata_value, `maxNodes')
-	capture mata: mata drop mata_value 
-	capture mata: mata drop mata_from 
-	capture mata: mata drop mata_to
-
+	capture mata: mata drop __nwvalue 
+	capture mata: mata drop __nwego 
+	capture mata: mata drop __nwalter
+	
 	// Generate valid network name and valid varlist
 	if "`name'" == "" {
 		local name "network"
 	}
-	if "`stub'" == "" {
-		local stub "net"
-	}
-	
+
 	nwvalidate `name'
 	local edgename = r(validname)
-	local varscount : word count `vars'
-	if (`varscount' != `maxNodes'){
-		nwvalidvars `maxNodes', stub(`stub')
-		local edgevars "$validvars"
-		
-	}
-	else {
-		local edgevars "`vars'"
-	}
 
 	// Set the new network
-	nwset , mat(onenet) name(`edgename')  labs(`labs')
+	nwset , mat(__nwmat) name(`edgename') labs(`labs') `overwrite'
+	
 	if "`clear'" == "" {
 		qui drop _all
-	}
-
-	if "`xvars'" == "" {
-		qui nwload
-	}
-	else {
-		nwload, labelonly
-	}
-	if "`keeporiginal'" != "" {
-		capture drop _nodeoriginal
-		if "`dictOrigString'" != "" {
-			merge 1:1 _nodeid using `dictionaryOriginalString', nogenerate
-		}
-		else {
-			merge 1:1 _nodeid using `dictionaryOriginal', nogenerate
-		}
-		order _node*
 	}
 	
 	if "`directed'" == "" {
@@ -223,23 +185,30 @@ program nwfromedge
 		nwsym
 	}
 	
+	if "`xvars'" == "" {
+		qui nwload, `overwrite'
+	}
+	else {
+		nwload, labelonly `overwrite'
 	}
 	
-	di 
-	di "{txt}{it:Loading successful}"
+	}
+	
+	capture mata: mata drop __nwmat
 	nwsummarize
 end
 
-capture mata : mata drop _getAdjacency()
+capture mata : mata drop make_matrix()
 mata:
-real matrix function _getAdjacency(real matrix from, real matrix to, real matrix value, real scalar nodes) {
-	real matrix onenet
+real matrix function make_matrix(real matrix from, real matrix to, real matrix value, real scalar nodes) {
+	real matrix mat
 	real scalar i
 	
-	onenet = J(nodes, nodes, 0)
+	mat = J(nodes, nodes, 0)
 	for (i = 1; i <= rows(from); i++) {
-		onenet[from[i,1],to[i,1]] = value[i,1]
+		mat[from[i,1],to[i,1]] = value[i,1]
 	}
-	return(onenet)
+	mat
+	return(mat)
 }
 end

@@ -5,7 +5,7 @@
 
 capture program drop nwload
 program nwload
-	syntax [anything(name=netname)][, xvars labelonly force]
+	syntax [anything(name=netname)][, overwrite xvars labelonly force]
 	unw_defs
 	nw_syntax `netname', max(1)
 	nwname `netname'
@@ -31,12 +31,12 @@ program nwload
 	
 	// make network the current network
 	mata: `nws'.make_current_from_name("`netname'")
-	nw_datasync `netname'
+	nw_datasync `netname', `overwrite'
 	
 	if "`labelonly'" == "" {		
 		mata: `nws'.generate_current_nodesvar()
 		nw_syntax `netname'
-		mata: st_store((1::(`netobj'->get_nodes())),`netobj'->nodesvar,(`netobj'->get_edge())) 
+		mata: st_store((1::(`netobj'->get_nodes())),`netobj'->nodesvar,(`netobj'->get_matrix())) 
 		order `nw_nodename' 
 	}
 end

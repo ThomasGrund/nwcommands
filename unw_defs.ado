@@ -26,4 +26,5 @@ program unw_defs
 	c_local cDftNodepref "n"
 	
 	c_local nw_nodename "_nwnode"
+	c_local missing2 "-999999"
 end

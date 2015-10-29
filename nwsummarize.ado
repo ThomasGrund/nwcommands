@@ -125,6 +125,6 @@ program nwinf
 	}
 	
 	if "`mat'`matonly'" !=""{
-		mata: `netobj'->get_edge()
+		mata: `netobj'->get_matrix()
 	}
 end

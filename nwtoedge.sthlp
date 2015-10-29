@@ -6,7 +6,7 @@
 {title:Title}
 
 {p2colset 9 18 22 2}{...}
-{p2col :nwtoedge {hline 2} Convert network into edgelist}
+{p2col :nwtoedge {hline 2} Convert networks to edgelist}
 {p2colreset}{...}
 
 
@@ -14,40 +14,21 @@
 
 {p 8 17 2}
 {cmdab: nwtoedge} 
-[{it:{help netname}}]
+[{it:{help netlist}}]
 [{cmd:,}
-{opth fromvars(varlist)}
-{opth tovars(varlist)}
-{opth fromid(newvarname)}
-{opth toid(newvarname)}
-{opth link(newvarname)}
-{opt forceundirected}
-{opt forcedirected}
-{opt full}]
-
-
-{p 8 17 2}
-{cmdab: nwtoedge} 
-{it:{help netname:netname1}} 
-{it:{help netname:netname2}}
-[{cmd:,}
-{opth fromvars(varlist)}
-{opth tovars(varlist)}
-{opth fromid(newvarname)}
-{opth toid(newvarname)}
-{opth link(newvarname)}
-{opt forceundirected}
-{opt forcedirected}]
-
+{opth egovars(varlist)}
+{opth altervars(varlist)}
+{opth ego(newvarname)}
+{opth alter(newvarname)}
+{opt compress}]
 		
 {synoptset 20 tabbed}{...}
 {synopthdr}
 {synoptline}
-{synopt:{opth fr:omvars(varlist)}}converts attributes of sending nodes{p_end}
-{synopt:{opth to:vars(varlist)}}converts attributes of receiving nodes {p_end}
-{synopt:{opth fromid(newvarname)}}new variable name specifying {it: fromid}; default = {it:_fromid}{p_end}
-{synopt:{opth toid(newvarname)}}new variable name specifying {it: toid}; default = {it:_toid}{p_end}
-{synopt:{opth link(newvarname)}}new variable name specifying link; default = {it:netname} {p_end}
+{synopt:{opth egovars(varlist)}}keeps attributes of sending nodes{p_end}
+{synopt:{opth altervars(varlist)}}keeps attributes of receiving nodes {p_end}
+{synopt:{opth ego(newvarname)}}sender of ties; default = {it:_nwego}{p_end}
+{synopt:{opth alter(newvarname)}}receiver of ties; default = {it:_nwalter}{p_end}
 
 {p2colreset}{...}
 
@@ -55,29 +36,28 @@
 {title:Description}
 
 {pstd}
-{cmd:nwtoedge} makes an edgelist out of a network. 
+{cmd:nwtoedge} makes an edgelist out of a network or a list of networks. 
 
 {pstd}
-An edgelist produced by {cmd:nwtoedge} is a set of three  variables representing
-the relations in a network {help netname}. The first variable ({it:_fromid}) gives the {help nodeid}
-of the sending node {it:i} of a relationship; the second variable ({it:_toid}) gives the {help nodeid} of the 
-receiving node {it:j}. Lastly, a variable {it:netname} (unless {opt link()} is specified) saves information about the 
-dyad pair ({it:i},{it:j}).
+An edgelist of a single network {help netname} produced by {cmd:nwtoedge} is a set of three variables representing
+the relations in the network. The first variable ({it:_nwego}) gives the {help nodelab}
+of the sending node {it:i} of a relationship; the second variable ({it:_nwalter}) gives the {help nodelab} of the 
+receiving node {it:j}. Lastly, a variable {it:netname} saves information about the 
+dyad pair ({it:i},{it:j}) in the network {it:netname}.
 
 {pstd}
-The command produces a dataset of dyads. For undirected networks with {it:n} nodes, {it:(n x (n-1)) / 2 + n} entries are generated. For
-directed networks (or when option {opt forcedirected} is used, the command produces {it:(n x n)} entries.
+When the command is used with a {help netlist}, it generates one new variable for each network {it:netname} in the list.
 
 {pstd}
-One can also specify which attribute variables should be included in the new dataset. Option {opt fromvars()} 
-generates new variables that match the attributes of the sender of a tie; option {opt tovars()} 
+One can also specify which attribute variables should be included in the new dataset. Option {opt egovars()} 
+generates new variables that match the attributes of the sender of a tie; option {opt altervars()} 
 generates new variables that match the attributes of the receiver of a tie.
 
 {pstd}
 For example, 
 
 	{cmd:. webnwuse glasgow1}
-	{com}. nwtoedge glasgow1, fromvars(sport1) full
+	{com}. nwtoedge glasgow1, egovars(sport1)
 	{com}. list
 {txt}
       {c TLC}{hline 9}{c -}{hline 7}{c -}{hline 10}{c -}{hline 13}{c TRC}

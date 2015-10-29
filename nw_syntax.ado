@@ -31,6 +31,9 @@ program nw_syntax
 
 	mata: st_local("directed", `nws'.pdefs[`r(id)']->is_directed())
 	mata: st_local("nodes", strofreal(`nws'.pdefs[`r(id)']->get_nodes()))
+	mata: st_local("selfloops", `nws'.pdefs[`r(id)']->is_selfloop())
+	
+	c_local selfloops "`selfloops'"
 	c_local nodes "`nodes'"
 	c_local directed "`directed'"
 	c_local netobj "`nws'.pdefs[`r(id)']"

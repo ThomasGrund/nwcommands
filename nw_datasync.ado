@@ -1,13 +1,20 @@
 capture program drop nw_datasync
 program nw_datasync
-	syntax [anything(name=netname)] [, generate(string)]
+	syntax [anything(name=netname)] [, overwrite generate(string)]
 	unw_defs
 	nw_syntax `netname'
-
 	set more off
 	tempfile f
 	tempname __nwnodename
 	tempname __nwindex
+	
+	if "`overwrite'" != "" {
+		capture drop `nw_nodename'
+		mata: `__nwnodename' = (`netobj'->get_nodenames())'
+		qui getmata `nw_nodename' = `__nwnodename', force replace
+		exit
+	}
+
 	preserve
 	drop _all
 	mata: `__nwnodename' = (`netobj'->get_nodenames())'
@@ -30,4 +37,7 @@ program nw_datasync
 		capture drop `generate'
 		gen `generate' = (`current'==1)
 	}
+	
+	capture mata: mata drop `__nwnodename'
+	capture mata: mata drop `__nwindex'
 end

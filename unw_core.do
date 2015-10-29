@@ -174,11 +174,12 @@ class `NWdef' {
 	string scalar get_name()
 	real scalar get_nodes()
 	string matrix get_nodenames()
-	real matrix get_edge()
-	real matrix get_edge_unvalued()
+	real matrix get_matrix()
+	real matrix get_matrix_unvalued()
+	string matrix get_edgelist()
 	real matrix get_outdegree()
 	real matrix get_indegree()
-	pointer(real matrix) get_edge_original()
+	pointer(real matrix) get_matrix_original()
 
 	string scalar is_selfloop()
 	string scalar is_valued()
@@ -224,6 +225,27 @@ class `NWdef' {
 	string scalar check_symmetry()
 	void keep_nodes()
 	void drop_nodes()
+}
+
+string matrix `NWdef'::get_edgelist(real scalar undirected){
+	string matrix sender, receiver
+	real scalar i, size
+	real matrix e, z
+	
+	e = get_matrix()
+	if (undirected == 1) {
+		z = (J(rows(e), cols(e), 1) :- uppertriangle(J(rows(e), cols(e),1))) * (`missing2')
+		e = e:* uppertriangle(J(rows(e), cols(e),1)) +  z 
+	}
+	size = rows(e)
+	sender = nodes'
+	receiver = J(size, 1, nodes[1])
+	
+	for(i = 2; i<= size; i++){
+		sender = (sender \ nodes')
+		receiver = (receiver \(J(size, 1, nodes[i])))
+	}
+	return((sender, receiver, strofreal(vec(e))))
 }
 
 void `NWdef'::drop_nodes(rowvector d){
@@ -275,7 +297,7 @@ void `NWdef'::set_2mode(real scalar d){
 
 string scalar `NWdef'::check_symmetry(){
 //!! TODO - change when network not saved as matrix edge
-	if (edge :== edge'){
+	if (edge == edge'){
 		return("true")
 	}
 	return("false")
@@ -313,10 +335,10 @@ void `NWdef'::symmetrize(string scalar mode){
 real matrix `NWdef'::get_indegree(real scalar valued){
 	real matrix e 
 	if (valued == 0){
-		e = get_edge()
+		e = get_matrix()
 	}
 	else {
-		e = get_edge_unvalued()
+		e = get_matrix_unvalued()
 	}
 	return(colsum(e)')
 }
@@ -324,10 +346,10 @@ real matrix `NWdef'::get_indegree(real scalar valued){
 real matrix `NWdef'::get_outdegree(real scalar valued){
 	real matrix e 
 	if (valued == 0){
-		e = get_edge()
+		e = get_matrix()
 	}
 	else {
-		e = get_edge_unvalued()
+		e = get_matrix_unvalued()
 	}
 	return(rowsum(e))
 }
@@ -396,7 +418,7 @@ real scalar `NWdef'::get_selfloops_number(){
 	real matrix e
 	
 	if (isselfloop == 1) { 
-		e = diagonal(get_edge())
+		e = diagonal(get_matrix())
 		return(sum(e :/ e))	
 	}
 	else {
@@ -411,7 +433,7 @@ real scalar `NWdef'::get_density(){
 	real matrix e
 	real scalar possnodes
 	
-	e = get_edge()
+	e = get_matrix()
 	
 	e = e:/e
 	possnodes = (cols(e) * cols(e) )
@@ -437,7 +459,7 @@ real scalar `NWdef'::get_density(){
 real scalar `NWdef'::get_edges_count(){
 	real matrix e
 	
-	e = get_edge()
+	e = get_matrix()
 	return(sum(e:!=. :& e:!=0)/2)
 }
 
@@ -447,7 +469,7 @@ real scalar `NWdef'::get_edges_count(){
 real scalar `NWdef'::get_edges_sum(){
 	real matrix e
 	
-	e = get_edge()
+	e = get_matrix()
 	return(sum(e)/2)
 }
 
@@ -457,7 +479,7 @@ real scalar `NWdef'::get_edges_sum(){
 real scalar `NWdef'::get_arcs_count(){
 	real matrix e
 	
-	e = get_edge()
+	e = get_matrix()
 	return(sum(e:!=. :& e:!=0))
 }
 
@@ -467,7 +489,7 @@ real scalar `NWdef'::get_arcs_count(){
 real scalar `NWdef'::get_arcs_sum(){
 	real matrix e
 	
-	e = get_edge()
+	e = get_matrix()
 	return(sum(e))
 }
 
@@ -477,7 +499,7 @@ real scalar `NWdef'::get_arcs_sum(){
 real scalar `NWdef'::get_missing_edges(){
 	real matrix e
 	
-	e = get_edge()
+	e = get_matrix()
 	return(sum(e:==.))
 }
 
@@ -487,7 +509,7 @@ real scalar `NWdef'::get_missing_edges(){
 real scalar `NWdef'::get_minimum(){
 	real matrix e
 	
-	e = get_edge()
+	e = get_matrix()
 	return(min(e))
 }
 
@@ -497,7 +519,7 @@ real scalar `NWdef'::get_minimum(){
 real scalar `NWdef'::get_maximum(){
 	real matrix e
 	
-	e = get_edge()
+	e = get_matrix()
 	return(max(e))
 }
 
@@ -713,7 +735,7 @@ void `NWdef'::set_edge(real matrix edge1) {
 /*
 	Get edge matrix
 */
-real matrix `NWdef'::get_edge() {
+real matrix `NWdef'::get_matrix() {
 //!! generate edge matrix based on edgetype
 	real matrix e
 	e = edge
@@ -731,7 +753,7 @@ real matrix `NWdef'::get_edge() {
 /*
 	Get unvalued edge matrix
 */
-real matrix `NWdef'::get_edge_unvalued() {
+real matrix `NWdef'::get_matrix_unvalued() {
 //!! generate edge matrix based on edgetype
 	real matrix e
 	e = edge:!= 0
@@ -742,7 +764,7 @@ real matrix `NWdef'::get_edge_unvalued() {
 /*
 	Get pointer to edge matrix
 */
-pointer(real matrix) `NWdef'::get_edge_original(){
+pointer(real matrix) `NWdef'::get_matrix_original(){
 	return(&edge)
 }
 
@@ -1180,7 +1202,7 @@ void `NWsdef'::duplicate(string scalar netname, string scalar new_netname){
 	size = cols(pdefs)
 	pdefs[size] = &(`NWdef'())
 	pdefs[size]->set_name(new_netname)
-	pdefs[size]->set_edge(pdefs[i]->get_edge())
+	pdefs[size]->set_edge(pdefs[i]->get_matrix())
 	pdefs[size]->set_nodenames(pdefs[i]->get_nodenames())
 	
 	pdefs[size]->set_directed(pdefs[i]->get_directed_boolean())

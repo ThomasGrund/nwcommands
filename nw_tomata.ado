@@ -14,10 +14,10 @@ syntax [anything(name=netname)], mat(string) [ master]
 	capture _nwsyntax `netname', max(1)
 	if (_rc == 0){
 		if "`master'" != "" {
-			mata: `mat' = (nw.nws.pdefs[`id']->get_edge_original())
+			mata: `mat' = (nw.nws.pdefs[`id']->get_matrix_original())
 		}
 		else{
-			mata: `mat' = nw.nws.pdefs[`id']->get_edge()
+			mata: `mat' = nw.nws.pdefs[`id']->get_matrix()
 		}
 	}
  end

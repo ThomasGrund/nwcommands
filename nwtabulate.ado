@@ -1,12 +1,22 @@
+*! Date        : 29oct2015
+*! Version     : 2.0
+*! Author      : Thomas Grund, University College Dublin
+*! Email	   : thomas.u.grund@gmail.com
+
 capture program drop nwtabulate
 program nwtabulate
-	syntax [anything(name=something)] [, twoway  *]
-	capture _nwsyntax `something'
-	if _rc == 0 & "`twoway'" == "" {
-		nwtab1 `something', `options'
+	syntax [anything(name=netname)] [, *]
+	nw_syntax `netname', max(2)
+
+	if `networks' == 1 {
+		nwtab1 `netname', `options'
 	}
-	else {
-		nwtab2 `something', `options'
+	if `networks' == 2 {
+		nwtab2 `netname', `options'
+	}
+	if `networks' > 2 {
+		di "{err}Maximum two networks allowed.{txt}"
+		exit
 	}
 end
 
@@ -14,21 +24,20 @@ capture program drop nwtab1
 program nwtab1
 	
 	syntax [anything] , [selfloop *]
-	_nwsyntax `anything'
-	
 	preserve
-	nwname `netname'
-	if "`r(directed)'" == "false" {
-		local undirected = "undirected"
+	
+	nw_syntax `anything'
+	if "`directed'" == "false" {
+		local upper = "upper"
 	}
-	local edgelabs `r(edgelabs)'
-	qui nwtoedge `netname', full
-	qui if "`selfloop'" == "" {
-		drop if _fromid == _toid 
-	}
+	nw_edgelabs `anything'
+	local edgelabs r(edgelabs)
+	
+	nwtoedge `netname', `upper'
 	local ident = length("`netname'") + 20
 	di
-	di "{txt}   Network:  {res}`netname'{txt}{col `ident'}Directed: {res}`directed'{txt}"
+	di "{txt}   Network:  {res}`netname'{txt}{col `ident'}Directed : {res}`directed'{txt}"
+	di "{txt}                           {txt}{col `ident'}Selfloops: {res}`selfloops'{txt}"
 	capture label def elab `edgelabs'
 	capture label val `netname' elab
 	tab `netname', `options'
@@ -38,7 +47,7 @@ end
 
 capture program drop nwtab2
 program nwtab2
-	syntax anything(name=something) [, eiplot eiplotoptions(string) unvalued plot plotoptions(string) permutations(integer 100) *]
+	syntax anything(name=netname) [, eiplot eiplotoptions(string) unvalued plot plotoptions(string) permutations(integer 100) *]
 		
 	if "`plot'" != "" {
 		capture which tabplot
@@ -47,169 +56,84 @@ program nwtab2
 		}
 	}
 	
-	capture _nwsyntax `something', max(9999) name(something)
-	// two networks
-	if _rc == 0 {
-		local nwtabletype = "network"
-		local netname1 : word 1 of `something'
-		local directed1 = "`directed'"
-		local undirected_all = ("`directed'" == "false")
-		local nodes1 = "`nodes'"
-		qui nwname `netname1'
-		local edgelabs1 `r(edgelabs)'
-	
-		local num : word count `something'
-		if `num' < 2 {
-			nwcurrent
-			local netname2 = r(current)
-		}
-		else {
-			local netname2 : word 2 of `something'
-		}
-		_nwsyntax `netname2'
-		local netname2 = "`netname'"
-		local directed2 = "`directed'"
-		if "`directed2'" == "true" {
-			local undirected_all = 0
-		}
-		qui nwname `netname2'
-		local edgelabs2 `r(edgelabs)'
-		
-		if `undirected_all' == 1 {
-			local undirected = "forcedirected"
-		}
-	}
-	// check for network and variable
-	
-	else {
-		local nwtabletype = "variable"
-		foreach entry in `something' {
-			capture _nwsyntax `entry'
-			if _rc == 0 {
-				local netname1 = "`netname'"
-			}
-			else {
-				unab entry : `entry'
-			}
-			capture confirm variable `entry'
-			if _rc == 0 {
-				local attribute1 = "`entry'"
-			}
-			if "`netname1'" == "" {
-				nwcurrent
-				local netname1 = r(current)
-			}
-			nwname `netname1'
-			local directed1 = "`directed'"
-			local undirected = "" 
-			if ("`directed'" == "false") {
-				local undirected = "forcedirected"
-			}
-			local nodes1 = "`nodes'"
+	local netname0 `netname'
+	nw_syntax `netname', max(2) min(2)
+	local upper = "upper"
+	foreach net in `netname' {
+		nw_syntax `net'
+		if "`directed'" == "true" {
+			local upper = ""
 		}
 	}
 	
 	preserve
-	if "`nwtabletype'" == "variable" {
-		local attrlab : value label `attribute1'
-		_nwsyntax `netname1'
-		mata: attr = st_data((1::`nodes'), "`attribute1'")
-		keep if _n <= `nodes'
-		qui nwtoedge `netname1', fromvars(`attribute1') tovars(`attribute1') full `undirected'
-		qui keep if `netname1' > 0 
-		local tabn1 = "from_`attribute1'"
-		local tabn2 = "to_`attribute1'"
-		capture label val `tabn1' `attrlab'
-		capture label val `tabn2' `attrlab'
-		
-		di
-		local ident = max(length("`netname1'"), length("`attribute1'")) + 20
-		di "{txt}   Network:  {res}`netname1'{txt}{col `ident'}Directed: {res}`directed1'{txt}"
-		di "{txt}   Attribute:  {res}`attribute1'{txt}"
-		
-		if "`undirected'" != "" {
-			//qui keep if _fromid <= _toid
-			di
-			di"{txt}       The network is undirected."
-			di"{txt}       The table shows two entries for each edge."
-		}
-	}
-	if "`nwtabletype'" == "network" {
-		qui nwtoedge `netname1' `netname2', full `undirected'
+	nwtoedge `netname0', `upper'
 	
-		local tabn1 = "`netname1'"
-		local tabn2 = "`netname2'"
-		local bothdirected = "true"
-		if ("`directed1'" == "false" & "`directed2'" == "false") {
-			local bothdirected = "false"
-		}
-		di 
-		local ident = max(length("`netname1'"), length("`netname2'")) + 20
-		di "{txt}   Network 1:  {res}`netname1'{txt}{col `ident'}Directed: {res}`directed1'{txt}"
-		di "{txt}   Network 2:  {res}`netname2'{txt}{col `ident'}Directed: {res}`directed2'{txt}"
-		
-		if "`undirected'" != "" {
-			qui keep if _fromid <= _toid
-		}
-		local stubw = length("`tabn1'") + 4	
-		capture label def elab1 `edgelabs1'
-		capture label def elab2 `edgelabs2'
+	local net1: word 1 of `netname0'
+	nw_edgelabs `net1'
+	capture label def elab1 `r(edgelabs)'
+	capture label val `net1' elab1
 	
-		capture label val `tabn1' elab1
-		capture label val `tabn2' elab2
-	}
-	
-	capture { 
-		tab `tabn1' `tabn2' , matcell(tableres) matcol(tablecol) matrow(tablerow) `options'
-	}
-	if (_rc == 0) {
-		tab `tabn1' `tabn2' if _fromid != _toid, matcell(tableres) matcol(tablecol) matrow(tablerow) `options' missing
-	}
-	if (_rc == 198){
-		di 
-		rename `tabn1' `tabn1'_string
-		encode `tabn1'_string, gen(`tabn1')
-		rename `tabn2' `tabn2'_string
-		encode `tabn2'_string, gen(`tabn2')
-		tab `tabn1' `tabn2' if _fromid != _toid, matcell(tableres) matcol(tablecol) matrow(tablerow) `options' missing
-	}
+	local net2: word 2 of `netname0'
+	nw_edgelabs `net2'
+	capture label def elab2 `r(edgelabs)'
+	capture label val `net2' elab2
 
-	local tab_r = r(r)
-	local tab_c = r(c)
+	local ident = length("`netname'") + 20
+	di
+	nw_syntax `net1'
+	local netobj1 `netobj'
+	di "{txt}   Network1:  {res}`net1'{txt}{col `ident'}Directed : {res}`directed'{txt}"
+	di "{txt}                           {txt}{col `ident'}Selfloops: {res}`selfloops'{txt}"
+	nw_syntax `net2'
+	local netobj2 `netobj'
+	di "{txt}   Network2:  {res}`net2'{txt}{col `ident'}Directed : {res}`directed'{txt}"
+	di "{txt}                           {txt}{col `ident'}Selfloops: {res}`selfloops'{txt}"
+
+	tempname tableres tablecol tablerow
+	tabulate `netname0', matcell(`tableres') matcol(`tablecol') matrow(`tablerow') `options'
+	
 	if "`plot'" != "" {
-		tabplot `tabn1' `tabn2', horizontal plotregion(margin(b = 0)) `plotoptions'
+		tabplot `net1' `net2', horizontal plotregion(margin(b = 0)) `plotoptions'
 	}
 	
-	mata: table = st_matrix("tableres")
-	mata: col = st_matrix("tablecol")
-	mata: row = st_matrix("tablerow")
-	mata: Internal = sum(diagonal(table))
-	mata: External = sum(table) - Internal
-	mata: EI_index = (External - Internal) / (External + Internal)
-		
-	mata: st_numscalar("r(EI_index)", EI_index)
+	tempname __nwtable __nwcol __nwrow __nwinternal __nwexternal __nwei_index 
+	mata: `__nwtable' = st_matrix("`tableres'")
+	mata: `__nwcol' = st_matrix("`tablecol'")
+	mata: `__nwrow' = st_matrix("`tablerow'")
+	mata: `__nwinternal' = sum(diagonal(`__nwtable'))
+	mata: `__nwexternal' = sum(`__nwtable') - `__nwinternal'
+	mata: `__nwei_index' = (`__nwexternal' - `__nwinternal') / (`__nwexternal' + `__nwinternal')
+	
+	mata: st_global("r(netname1)", "`net1'")
+	mata: st_global("r(netname2)", "`net2'")
+	mata: st_numscalar("r(EI_index)", `__nwei_index')
+	mata: st_matrix("r(table)", `__nwtable')
+	mata: st_matrix("r(col)", `__nwcol')
+	mata: st_matrix("r(row)", `__nwrow')
+	
+	capture mata: mata drop `__nwtable', `__nwcol', `__nwrow', `__nwinternal', `__nwexternal', `__nwei_index' 
+
 	local EI_index = `r(EI_index)'
 
+	tempname EI_qap out pvalue
+	capture _return drop res1
+	_return hold res1
+	
 	qui if `permutations' > 1  {
-		nwtomata `netname1', mat(net1)
-		if "`nwtabletype'" == "variable" {
-			mata: EI_qap = rep_EIvar(`permutations', net1, attr)	
-		}
-		if "`nwtabletype'" == "network" {
-			nwtomata `netname2', mat(net2)
-			mata: EI_qap = rep_EInet(`permutations', net1, net2)
-		}
+
+		mata: `EI_qap' = rep_EInet(`permutations', `netobj1'->get_matrix(), `netobj2'->get_matrix())
 		if `EI_index' > 0 {
-			mata: out = sum(EI_qap :>= `EI_index')
+			mata: `out' = sum(`EI_qap' :>= `EI_index')
 		}
 		else {
-			mata: out = sum(EI_qap :<= `EI_index')	
+			mata: `out' = sum(`EI_qap' :<= `EI_index')	
 		}
-		mata: pvalue = out / `permutations'
-		mata: mata drop out
+		mata: `pvalue' = `out' / `permutations'
+		mata: mata drop `out'
 		
 		drop _all
-		nwtostata, mat(EI_qap) gen(EI_simulated)
+		getmata EI_simulated = `EI_qap'
 		gen EI_observed = `EI_index'
 		if "`save'"!= "" {
 			di "QAP results saved as: `save'" 
@@ -221,59 +145,27 @@ program nwtab2
 		local xmax = max(`EI_index',r(max))
 		local bandwidth `= 1 / `nodes''
 		if "`eiplot'" != "" {
-			kdensity EI_simulated, xscale(range(`xmin' `xmax')) title("") bwidth(`bandwidth') ytitle("Density") xtitle("E-I Index") xline(`EI_index',lpattern(dash)) xlabel(#5) note(`"based on `permutations' QAP permutations of network `netname1'"') `eiplotoptions'	
-		}
-		mata: st_numscalar("r(EI_pvalue)", pvalue)		
+			kdensity EI_simulated, xscale(range(`xmin' `xmax')) title("") bwidth(`bandwidth') ytitle("Density") xtitle("E-I Index") xline(`EI_index',lpattern(dash)) xlabel(#5) note(`"based on `permutations' QAP permutations of network `net1'"') `eiplotoptions'	
+		}		
 	}
+	_return restore res1
+	capture mata: st_numscalar("r(EI_pvalue)", `pvalue')
 	
-	mata: st_numscalar("r(EI_index)", EI_index)
-	mata: st_matrix("r(table)", table)
-	mata: st_matrix("r(col)", col)
-	mata: st_matrix("r(row)", row)
-	mata: st_global("r(tab1)", "`netname1'")
-	mata: st_global("r(tab2)", "`arg2'")
-	mata: st_global("r(directed)","`bothdirected'")
-	di
-	if "`nwtabletype'" != "network" {
-		di "{txt}   E-I Index: {res}`r(EI_index)'{txt}   p-value: {res}`r(EI_pvalue)'"
-	}
-	mata: mata drop table col row
-	mata: mata drop External
-	mata: mata drop Internal
-	mata: mata drop EI_index
-	mata: mata drop net1
-	mata: mata drop EI_qap
-	capture mata: mata drop attr
-	capture mata: mata drop net2
+	capture mata: mata drop `EI_out' `pvalue' `out'
+	
+	di "{txt}   E-I Index: {res}`=round(`r(EI_index)',0.001)'{txt}   p-value: {res}`=round(`r(EI_pvalue)',0.001)'"
+
 	restore
+
 end
 
 capture mata : mata drop rep_EInet()
-capture mata : mata drop rep_EIvar()
 
 mata:
-real matrix rep_EIvar(real scalar reps, real matrix net1, real matrix attr){
-	nsize = cols(net1)
-	attrMat = J(nsize, nsize,1) :* attr
-	attrMatTr = attrMat'
-	same = (attrMat:== attrMatTr)
-	net1 = (net1:!=0)
-	
-	total = J(reps, 1, sum(net1))
-	intern = J(reps, 1, 0)
-	extern = J(reps, 1, 0)
-	
-	for (i = 1; i <= reps; i ++) {
-		permutationVec = unorder(nsize)
-		perm_net = net1[permutationVec, permutationVec]
-		intern[i] = sum(perm_net :* same)
-	}
-	extern = total :- intern
-	EI = (extern - intern) :/ (extern + intern)
-	return(EI)
-}
-
 real matrix rep_EInet(real scalar reps, real matrix net1, real matrix net2) {
+	real scalar nsize, total, EI, i
+	real matrix intern, extern, permutationVec, perm_net
+	
 	net1 = (net1:!=0)
 	nsize = cols(net1)
 	
@@ -290,7 +182,6 @@ real matrix rep_EInet(real scalar reps, real matrix net1, real matrix net2) {
 	EI = (extern :- intern) :/ (extern :+ intern)
 	return(EI)
 }
+
 end
 
-*! v1.5.0 __ 17 Sep 2015 __ 13:09:53
-*! v1.5.1 __ 17 Sep 2015 __ 14:54:23
