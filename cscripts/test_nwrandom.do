@@ -6,7 +6,7 @@ set more off
 
 nwclear
 nwrandom 20, prob(1)
-mata: z = nw.nws.pdefs[1]->get_edge()[1,1]
+mata: z = nw.nws.pdefs[1]->get_matrix()[1,1]
 mata: st_numscalar("z", z)
 assert z == .
 nwsummarize
@@ -14,7 +14,7 @@ assert r(arcs) == 380
 
 nwclear
 nwrandom 20, prob(1) selfloop
-mata: z = nw.nws.pdefs[1]->get_edge()[1,1]
+mata: z = nw.nws.pdefs[1]->get_matrix()[1,1]
 mata: st_numscalar("z", z)
 assert z == 1
 nwsummarize
@@ -29,7 +29,6 @@ nwclear
 nwrandom 10, density(.1)
 nwsummarize
 
-nwset
 
 
 
