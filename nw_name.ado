@@ -53,6 +53,7 @@ program nw_name
 	
 	mata: st_numscalar("r(id)", `id')
 	mata: st_global("r(netname)", nw.nws.pdefs[`id']->get_name())
+	mata: st_global("r(vars)", nw.nws.pdefs[`id']->get_nodesvar())
 	mata: st_numscalar("r(nodes)", nw.nws.pdefs[`id']->get_nodes())
 	mata: st_global("r(mode2)", nw.nws.pdefs[`id']->is_2mode())
 	mata: st_global("r(selfloop)", nw.nws.pdefs[`id']->is_selfloop())
@@ -63,6 +64,6 @@ program nw_name
 	mata: st_global("r(caption)", nw.nws.pdefs[`id']->get_caption())
 	mata: st_numscalar("r(missing_edges)", nw.nws.pdefs[`id']->get_missing_edges())
 	//!! Should r(labs) have real labels?	
-	mata: st_global("r(labs)", invtokens(nw.nws.pdefs[`id']->get_nodenames(),";"))	
+	mata: st_global("r(labs)", invtokens(nw.nws.pdefs[`id']->get_nodenames(),","))	
 end
 

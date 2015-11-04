@@ -34,6 +34,9 @@ program nwtab1
 	local edgelabs r(edgelabs)
 	
 	nwtoedge `netname', `upper'
+	mata: mata desc
+	exit
+	
 	local ident = length("`netname'") + 20
 	di
 	di "{txt}   Network:  {res}`netname'{txt}{col `ident'}Directed : {res}`directed'{txt}"
@@ -107,13 +110,13 @@ program nwtab2
 	
 	mata: st_global("r(netname1)", "`net1'")
 	mata: st_global("r(netname2)", "`net2'")
-	mata: st_numscalar("r(EI_index)", `__nwei_index')
+	mata: st_numscalar("r(EI_index)", floatround(`__nwei_index'))
 	mata: st_matrix("r(table)", `__nwtable')
 	mata: st_matrix("r(col)", `__nwcol')
 	mata: st_matrix("r(row)", `__nwrow')
 	
 	capture mata: mata drop `__nwtable', `__nwcol', `__nwrow', `__nwinternal', `__nwexternal', `__nwei_index' 
-
+	
 	local EI_index = `r(EI_index)'
 
 	tempname EI_qap out pvalue
@@ -149,11 +152,13 @@ program nwtab2
 		}		
 	}
 	_return restore res1
-	capture mata: st_numscalar("r(EI_pvalue)", `pvalue')
-	
+	capture mata: st_numscalar("r(EI_pvalue)", floatround(`pvalue'))
+
 	capture mata: mata drop `EI_out' `pvalue' `out'
-	
-	di "{txt}   E-I Index: {res}`=round(`r(EI_index)',0.001)'{txt}   p-value: {res}`=round(`r(EI_pvalue)',0.001)'"
+	di "{txt}   E-I Index: {res}" _continue
+	di round(float(`r(EI_index)'),0.001) _continue
+	di "{txt} p-value: {res}" _continue
+	di round(float(`r(EI_pvalue)'),0.001)
 
 	restore
 

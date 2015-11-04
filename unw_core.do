@@ -174,6 +174,7 @@ class `NWdef' {
 	string scalar get_name()
 	real scalar get_nodes()
 	string matrix get_nodenames()
+	string scalar get_nodesvar()
 	real matrix get_matrix()
 	real matrix get_matrix_unvalued()
 	string matrix get_edgelist()
@@ -227,12 +228,17 @@ class `NWdef' {
 	void drop_nodes()
 }
 
-string matrix `NWdef'::get_edgelist(real scalar undirected){
+string scalar `NWdef'::get_nodesvar(){
+	return(invtokens(nodesvar," "))
+}
+
+string matrix `NWdef'::get_edgelist(real scalar undirected, real scalar isolates0){
 	string matrix sender, receiver
 	real scalar i, size
 	real matrix e, z
 	
 	e = get_matrix()
+	if is_
 	if (undirected == 1) {
 		z = (J(rows(e), cols(e), 1) :- uppertriangle(J(rows(e), cols(e),1))) * (`missing2')
 		e = e:* uppertriangle(J(rows(e), cols(e),1)) +  z 

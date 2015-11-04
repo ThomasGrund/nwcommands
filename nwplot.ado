@@ -1,6 +1,6 @@
 *! Date        : 24aug2014
 *! Version     : 1.0
-*! Author      : Thomas Grund, Linköping University
+*! Author      : Thomas Grund, LinkË†ping University
 *! Email	   : contact@nwcommands.org
 
 capture program drop nwplot
@@ -167,6 +167,8 @@ program nwplot
 		local arcbend = 1
 	}
 	local arcbend = `arcbend' * 2
+	
+	nw_syntax `netname'
 	
 	local gridcols = ceil(sqrt(`nodes'))
 	local 0 = "`layout'"
@@ -1255,7 +1257,7 @@ real matrix function getTieCoordinates(
 	real matrix Coord, real matrix size, real matrix List, real matrix EColMat, real matrix ESizMat, real scalar sizefactor, real scalar doarrows, real scalar arrowgap)
 {
 	real matrix 	TC
-	real scalar 	i, radius, x1, y1, x2, y2, x3, y3, An, Op, Hy, cos_theta, sin_theta
+	real scalar 	rad, i, radius, x1, y1, x2, y2, x3, y3, An, Op, Hy, cos_theta, sin_theta
 	
 	radius = ((size):* sizefactor) :+ arrowgap
 	Coord = Coord :*100
@@ -1293,32 +1295,6 @@ real matrix function getTieCoordinates(
 	}
 	return(TC)	
 }	
-end
-
-capture mata: mata drop NumElist()
-mata
-real matrix NumElist(matrix onenet){
-	nodes = rows(onenet)
-	id = range(1,nodes,1)
-	full = J(nodes, nodes, 1)
-	c1=colshape(full:* id,1)
-	c2=colshape(full:*(id'),1)
-	value=colshape(onenet,1)
-	c3 = value:/value
-	_editmissing(c3,0)
-	
-	from = select(c1,c3)
-	to = select(c2,c3)
-	res = J(rows(from),4,0)
-	res[.,1] = from
-	res[.,2] = to
-	res[.,3] = select(value, c3)
-	
-	for (i = 1; i <= rows(from); i++) {
-		res[i,4] = onenet[res[i,1], res[i,2]] != 0 & onenet[res[i,2], res[i,1]] != 0
-	} 
-	return(res)
-}
 end
 
 /*************************************
@@ -1408,13 +1384,41 @@ end
 *	Network layouts functions (Mata)
 *************************************/
 
+capture mata: mata drop NumElist()
+mata:
+real matrix NumElist(matrix onenet){
+	real scalar nodes, i
+	real matrix id, full, c1, c2, value, c3, from, to, res
+	nodes = rows(onenet)
+	id = range(1,nodes,1)
+	full = J(nodes, nodes, 1)
+	c1=colshape(full:* id,1)
+	c2=colshape(full:*(id'),1)
+	value=colshape(onenet,1)
+	c3 = value:/value
+	_editmissing(c3,0)
+	
+	from = select(c1,c3)
+	to = select(c2,c3)
+	res = J(rows(from),4,0)
+	res[.,1] = from
+	res[.,2] = to
+	res[.,3] = select(value, c3)
+	
+	for (i = 1; i <= rows(from); i++) {
+		res[i,4] = onenet[res[i,1], res[i,2]] != 0 & onenet[res[i,2], res[i,1]] != 0
+	} 
+	return(res)
+}
+end
+
 // Attempt to implement spring embedder... but sth does not work yet :-(
 capture mata: mata drop fruchtreinlayout()
 mata:
 real matrix function fruchtreinlayout(real matrix M, real scalar Iter)
 {
-	real matrix Pos, Pos_up
-	real scalar W, L, area, V, temperature, k ,v_pos ,e1_pos, e2_pos, delta
+	real matrix Pos, Pos_up, v_disp
+	real scalar F_repulsion, F_attraction, e1,e2, i, u, v, W, L, area, V, temperature, k ,v_pos ,e1_pos, e2_pos, delta
 	
 	W = 1
 	L = 1
@@ -1483,7 +1487,7 @@ real matrix function mmdslayout(real matrix G)
 {
 	real matrix 	D, sCoord, Coord
 	string scalar 	dMat, sMat
-	real scalar ScaleFactor, rc 
+	real scalar ScaleFactor, rc, CoordMin1, CoordMin2, CoordMax1, CoordMax2
 
 	Coord  =  circlelayout(rows(G))
 	if (rows(G) == 2) {
@@ -1553,21 +1557,16 @@ end
 capture mata: mata drop correctCoordClash()
 mata: 
 real matrix function correctCoordClash(real matrix Coord, real matrix net, real scalar b, real scalar prox){ 
+	real matrix Coord_new, Ck, Ci
+	real scalar i,j,k,x,y, angle
 	Coord_new = Coord
-	"h11"
 	for(i = 1 ; i <= rows(Coord); i++) {
 		for(j = (i + 1) ; j <= rows(Coord); j++) {
 			//abs(Coord[i,1] - Coord[j,1])
 			//abs(Coord[i,2] - Coord[j,2])
 			//"next"
 			if ((abs(Coord[i,1] - Coord[j,1]) <= prox) & (abs(Coord[i,2] - Coord[j,2]) <= prox)){
-				"node1"
-				i
-				"coord1"
 				Coord[i,1]
-				"node2"
-				j
-				"coord2"
 				Coord[j,1]				
 
 			//& (Coord[i,2] == Coord[j,2])) {
@@ -1597,7 +1596,7 @@ real matrix function netplotmds(real matrix G, real scalar MaxIt)
 {
         real matrix     D, sCoord, Coord
         string scalar   dMat, sMat
-        real scalar ScaleFactor, rc 
+        real scalar ScaleFactor, rc, maxSX, maxSY, maxX, minX, maxY, minY, num_isol, maxYY, k,i, nonisolates 
         
 		G = (G + G') :/ (G + G')
 		_editmissing(G, 0)
@@ -1663,7 +1662,7 @@ capture mata: mata drop distance()
 mata:
 real matrix function distance(real matrix Net, | real scalar MaxDist)
 {
-	real scalar 	ready,counter, maxcounter
+	real scalar 	maxdist, ready,counter, maxcounter
 	real matrix 	N1,Dist,Ntemp
 	
 	if (args()==2) 
@@ -1700,7 +1699,7 @@ real matrix function circlelayout(real scalar N)
 {
 	real colvector 	V
 	real matrix 	Coord
-	real scalar 	xmax, ymax
+	real scalar 	xmax, ymax, CoordMax1, CoordMax2
 
 	xmax = 100
 	ymax = 100
@@ -1725,6 +1724,7 @@ real matrix function gridlayout(real scalar N,  real scalar cols)
 {
 	real colvector 	V, C
 	real matrix 	Coord
+	real scalar CoordMax1, CoordMax2, rows
 
 	V= (1::N)
 	rows = ceil(N / cols)
@@ -1755,7 +1755,7 @@ real matrix function fruchtrein(real matrix M, real scalar Iter)
 {
  real matrix Pos, Disp
  real vector delta
- real scalar W, L, area, V, temperature, k, r
+ real scalar radius, i, v,u,e1,e2,W, L, area, V, temperature, k, r
  W = 2
  L = 2
  area =  W*L
@@ -1805,6 +1805,3 @@ return(Pos)
 }
 
 end
-
-*! v1.5.0 __ 17 Sep 2015 __ 13:09:53
-*! v1.5.1 __ 17 Sep 2015 __ 14:54:23

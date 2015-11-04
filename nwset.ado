@@ -86,6 +86,13 @@ syntax [varlist (default=none)][, overwrite bipartite selfloop labs(string) keep
 		}
 		
 		// generate nodenames if not specified
+		if "`varlist'" != "" {
+			local labs = ""
+			foreach var of varlist `varlist' {
+				local labs = "`labs'`var',"
+			}
+		}
+		
 		if "`labs'" == "" & "`labsfromvar'" == "" {
 			mata: `__nwnodenames' = (J(rows(`__nwnew'),1,"`cDftNodepref'") + get_node_suffix(rows(`__nwnew')))'
 		}

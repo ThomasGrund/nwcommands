@@ -1,3 +1,8 @@
+*! Date        : 13oct2015
+*! Version     : 2.0
+*! Author      : Thomas Grund, University College Dublin
+*! Email	   : thomas.u.grund@gmail.com
+
 capture program drop nwrename
 program nwrename
 	
@@ -5,7 +10,7 @@ program nwrename
 	
 	preserve
 	drop _all
-	_nwsyntax _all, max(9999)
+	nw_syntax _all, max(9999)
 	foreach onenet in `netname' {
 		gen `onenet' = .
 	}
@@ -21,5 +26,3 @@ program nwrename
 	}
 end
 
-*! v1.5.0 __ 17 Sep 2015 __ 13:09:53
-*! v1.5.1 __ 17 Sep 2015 __ 14:54:23

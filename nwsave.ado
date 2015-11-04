@@ -1,14 +1,14 @@
-*! Date        : 3sept2014
-*! Version     : 1.0
-*! Author      : Thomas Grund, Linkoping University
-*! Email	   : contact@nwcommands.org
+*! Date        : 29oct2015
+*! Version     : 2.0
+*! Author      : Thomas Grund, University College Dublin
+*! Email	   : thomas.u.grund@gmail.com
 
-capture program drop nwsave
-program nwsave
+capture program drop nwsave_old
+program nwsave_old
 	syntax anything [, old * format(string)]
 	local webname = subinstr("`anything'", ".dta","",.)
 
-	_nwsyntax _all, max(99999)
+	nw_syntax _all, max(99999)
 	local nets : word count `netname'
 
 	
@@ -19,7 +19,7 @@ program nwsave
 		local format = "edgelist" 
 	}
 	
-	_opts_oneof "matrix edgelist" "format" "`format'" 6556
+	nw_optsoneof "matrix edgelist" "format" "`format'" 6556
 		
 	preserve	
 	 qui {
@@ -140,9 +140,3 @@ program nwsave
 	restore
 end
 
-
-
-	
-
-*! v1.5.0 __ 17 Sep 2015 __ 13:09:53
-*! v1.5.1 __ 17 Sep 2015 __ 14:54:23

@@ -6,7 +6,7 @@
 capture program drop nwtoedge
 program nwtoedge
 	version 9
-	syntax [anything(name=netname)][, compress upper egovars(varlist) altervars(varlist)  ///
+	syntax [anything(name=netname)][, isolates0 compress upper egovars(varlist) altervars(varlist)  ///
 	ego(name) alter(name) full] 
 
 	unw_defs
