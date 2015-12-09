@@ -1,6 +1,6 @@
 *! Date        : 24aug2014
 *! Version     : 1.0
-*! Author      : Thomas Grund, Linköping University
+*! Author      : Thomas Grund, LinkË†ping University
 *! Email	   : contact@nwcommands.org
 
 capture program drop nwplot
@@ -9,7 +9,7 @@ program nwplot
 	set more off
 	local 0_original = `"`0'"'
 	local layout = "" 
-	syntax [anything(name=netname)][if/] [in/], [ ignorelgc lab  labelopt(string) _layoutfunction(string) arrows edgesize(string) ASPECTratio(string) components(string) arcstyle(string) arcbend(string) arcsplines(integer 10) nodexy(varlist numeric min=2 max=2) edgeforeground(string) GENerate(string) colorpalette(string) edgecolorpalette(string) edgepatternpalette(string) symbolpalette(string) lineopt(string) scatteropt(string) legendopt(string) size(string) color(string) symbol(string) edgecolor(string) label(varname) nodefactor(string) sizebin(string) edgefactor(string) arrowfactor(string) arrowgap(string) arrowbarbfactor(string) layout(string) iterations(integer 1000) scheme(string) * ]
+	syntax [anything(name=netname)][if/] [in/], [ ignorelgc lab  labelopt(string) _layoutfunction(string) arrows edgesize(string) ASPECTratio(string) components(string) arcstyle(string) arcbend(string) arcsplines(integer 10) nodexy(varlist numeric min=2 max=2) edgeforeground(string) GENerate(string) colorpalette(string) edgecolorpalette(string) edgepatternpalette(string) symbolpalette(string) lineopt(string) scatteropt(string) legendopt(string) size(string) color(string) symbol(string) edgecolor(string) label(varname) nodefactor(string) sizebin(string) edgefactor(real 1) arrowfactor(string) arrowgap(string) arrowbarbfactor(string) layout(string) iterations(integer 1000) scheme(string) * ]
 	local twowayopt `"`options'"'
 
 	// filter out lgc and nodeclash
@@ -57,6 +57,18 @@ program nwplot
 	gettoken edgesize_original edgesize_options : edgesize, parse(",")
 	local edgecolor `edgecolor_original'
 	local edgesize `edgesize_original'
+	
+	if "`edgesize'" != "" {
+		/*capture nwdrop __edgesize__0
+		nwgen __edgesize__0 = round(`edgesize' * 100)	
+		if "`edgefactor'" != "" {
+			local edgefactor = `edgefactor' * 0.01 
+		}
+		else {
+			local edgefactor = 0.01
+		}
+		local edgesize = "__edgesize__0"*/
+	}
 	
 	if "`labelopt'" != "" {
 		local scatteropt "`scatteropt' `labelopt'"
@@ -853,8 +865,8 @@ program nwplot
 	qui gen ey = .
 	qui gen value = .
 	qui gen recip = .
-	qui gen edgecolor = .
-	qui gen edgesize = .
+	qui gen float edgecolor = .
+	qui gen float edgesize = .
 	
 	mata: st_numscalar("r(ties)", rows(TC))
 	if `r(ties)' > 0 {
@@ -1101,6 +1113,7 @@ program nwplot
 	local pccmdforeground ""
 
 	qui tab edgesize, matrow(valuerow)
+
 	local tempvalue_rows = rowsof(valuerow)
 	qui tab edgecolor, matrow(edgecolorrow)
 	local tempecol_rows = rowsof(edgecolorrow)
@@ -1111,7 +1124,7 @@ program nwplot
 		local temppattern = r(edgepattern)
 		local tempcolstyle = r(edgecol)
 		forvalues tempval_mat = 1/`tempvalue_rows'{
-			local tempval = valuerow[`tempval_mat',1]			
+			local tempval = valuerow[`tempval_mat',1]
 			local tempval_line = (`tempval' / 2) * `edgefactor' / 2
 			local tempval_arrow = (`tempval' + 1) * `arrowfactor' 
 			local tempval_barb = `tempval_arrow' * `arrowbarbfactor'
@@ -1161,7 +1174,7 @@ program nwplot
 	capture mata: mata drop Coord_comp compM comp_freq comp_id comp_freqid compmat comp_share comp_nonisol
 	capture mata: mata drop TC M nsymbol
 	capture nwdrop __temp* 
-	
+	capture nwdrop __edgesize__0
 	capture mat drop edgecolorrow
 	capture mat drop valuerow
 	capture mat drop nsymbolrow
@@ -1170,6 +1183,7 @@ program nwplot
 	capture mat drop nsymblrow
 	capture mat drop colorkeysmap
 	capture mata drop symbolkeysmap
+	
 
 	//qui nwload `masternetname', labelonly
 end

@@ -18,15 +18,17 @@
 {p2col:{bf:{help _opts_oneof }}}{err}no help file yet{txt}{p_end}
 {p2col:{bf:{help animate }}}Animate graphs{p_end{p_end}
 {p2col:{bf:{help nw2fromedge }}}Import two-mode network data from edgelist{p_end}
+{p2col:{bf:{help nw2set }}}Declare data to be two-mode network data{p_end}
 {p2col:{bf:{help nwaddnodes }}}Add nodes to network{p_end}
 {p2col:{bf:{help nwbetween }}}Calculate betweenness centrality{p_end}
+{p2col:{bf:{help nwbridge }}}Calculate global and local bridges{p_end}
+{p2col:{bf:{help nwburt }}}Calculate Burt structural hole measures{p_end}
 {p2col:{bf:{help nwclear }}}Clear all networks and variables from memory{p_end}
 {p2col:{bf:{help nwcloseness }}}Calculate closeness centrality{p_end}
 {p2col:{bf:{help nwclustering }}}Clustering coefficient{p_end}
 {p2col:{bf:{help nwcollapse }}}Collapse a network{p_end}
 {p2col:{bf:{help nwcomponents }}}Calculate network components / largest component{p_end}
 {p2col:{bf:{help nwcompressobs }}}Compresses observations in Stata{p_end}
-{p2col:{bf:{help nwconstraint }}}{err}no help file yet{txt}{p_end}
 {p2col:{bf:{help nwcontext }}}Create a context variable{p_end}
 {p2col:{bf:{help nwcorrelate }}}Correlate networks and variables{p_end}
 {p2col:{bf:{help nwcurrent }}}Report and set current network{p_end}
@@ -77,6 +79,7 @@
 {p2col:{bf:{help nwsave }}}Save network data in file{p_end}
 {p2col:{bf:{help nwset }}}Declare data to be network data{p_end}
 {p2col:{bf:{help nwsimilar }}}Generate node similarities{p_end}
+{p2col:{bf:{help nwsimmelian }}}Calculate Simmelian ties{p_end}
 {p2col:{bf:{help nwsmall }}}Generate a small-world network{p_end}
 {p2col:{bf:{help nwsort }}}Sort network nodes{p_end}
 {p2col:{bf:{help nwsubset }}}Subset a network{p_end}

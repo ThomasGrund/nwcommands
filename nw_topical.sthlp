@@ -1,5 +1,5 @@
 {smcl}
-{* *! version 1.5.2 27sep2015}{...}
+{* *! version 1.6.1 9dec2015}{...}
 {phang}
 {help nwcommands:NW-2 topical} {hline 2} 
 {hline 2} Topical list of network commands
@@ -44,6 +44,7 @@
 {col 8}   {c BLC}{hline 24}{c BRC}
 {p2colset 12 35 36 2}
 {p2col:    {bf:{help nw2fromedge }}}Import two-mode network data from edgelist{p_end}
+{p2col:    {bf:{help nw2set }}}Declare data to be two-mode network data{p_end}
 {p2col:    {bf:{help nwexport }}}Export network as Pajek file{p_end}
 {p2col:    {bf:{help nwfromedge }}}Imports network data from edgelist{p_end}
 {p2col:    {bf:{help nwimport }}}Import network{p_end}
@@ -118,9 +119,9 @@
 {col 8}{hline 3}{c RT}       {it:Analysis}{col 36}{c LT}{hline}
 {col 8}   {c BLC}{hline 24}{c BRC}
 {p2colset 12 35 36 2}
-{p2col:    {bf:{help .!2045!nwqap }}}Multivariate QAP regression{p_end}
-{p2col:    {bf:{help .!2050!nwqap }}}Multivariate QAP regression{p_end}
 {p2col:    {bf:{help nwbetween }}}Calculate betweenness centrality{p_end}
+{p2col:    {bf:{help nwbridge }}}Calculate global and local bridges{p_end}
+{p2col:    {bf:{help nwburt }}}Calculate Burt structural hole measures{p_end}
 {p2col:    {bf:{help nwcentrality }}}Node centrality measures{p_end}
 {p2col:    {bf:{help nwcloseness }}}Calculate closeness centrality{p_end}
 {p2col:    {bf:{help nwclustering }}}Clustering coefficient{p_end}
@@ -141,6 +142,7 @@
 {p2col:    {bf:{help nwqap }}}Multivariate QAP regression{p_end}
 {p2col:    {bf:{help nwreach }}}Calculate reachability network{p_end}
 {p2col:    {bf:{help nwsimilar }}}Generate node similarities{p_end}
+{p2col:    {bf:{help nwsimmelian }}}Calculate Simmelian ties{p_end}
 {p2col:    {bf:{help nwutility }}}Calculate utility scores according to Jackson and Wollinsky (1996){p_end}
 {p2col:    {bf:{help nwvalue }}}Returns entries form the adjaceny matrix of a network{p_end}
 {marker utilities}{...}
@@ -195,6 +197,5 @@
 {p2col:{bf:{help _nwsetobs }}}{err}no help file yet{txt}{p_end}
 {p2col:{bf:{help _nwsyntax_other }}}{err}no help file yet{txt}{p_end}
 {p2col:{bf:{help _opts_oneof }}}{err}no help file yet{txt}{p_end}
-{p2col:{bf:{help nwconstraint }}}{err}no help file yet{txt}{p_end}
 {p2col:{bf:{help nwtostata }}}{err}no help file yet{txt}{p_end}
 {p2col:{bf:{help schemeinfo }}}{err}no help file yet{txt}{p_end}

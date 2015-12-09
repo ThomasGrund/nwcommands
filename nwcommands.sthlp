@@ -16,8 +16,8 @@
 {help nwinstall:{col 14}{bf:[NW-6]}{...}{col 31}{bf:Install Stata menus/dialogs}}
 end
 
-               *! Date        : 27 Sep 2015
-               *! Version     : 1.5.2
+               *! Date        :  9 Dec 2015
+               *! Version     : 
                *! Authors     : Thomas U. Grund 
                *! Contact     : thomas.u.grund@gmail.com
                *! Web         : {browse "http://nwcommands.org"}

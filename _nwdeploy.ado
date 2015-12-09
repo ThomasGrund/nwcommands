@@ -22,7 +22,9 @@ program _nwdeploy
 	tempname memhold
 	tempfile topics
 	postfile `memhold' str30 cmdname str40 link str30 topic using `topics'
+	set more off
 	foreach file in `sthlpfiles' {
+		di "`file'"
 		// add sthlp meta info
 		//di "sthlp: `file'"
 		//qui _addmeta_hlp `file', date(`d') version(`version')
@@ -40,7 +42,8 @@ program _nwdeploy
 
 	preserve
 	use `topics', clear
-
+	exit
+	
 	sort topic cmdname
 	
 	tempname topical
@@ -112,7 +115,7 @@ program _nwdeploy
 		if "`r(cmddesc)'" == "{err}no help file yet{txt}" {
 			file write `topical' "{p2col:{bf:{help `cmdname' }}}`r(cmddesc)'{p_end}" _n	
 		}
-		file write `versionlog' `"echo "*! v`version' __ `c(current_date)' __ `c(current_time)'" >> `file'"'  _n
+		//file write `versionlog' `"echo "*! v`version' __ `c(current_date)' __ `c(current_time)'" >> `file'"'  _n
 	}
 	
 	file close `topical'

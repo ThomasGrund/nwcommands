@@ -4,3 +4,11 @@ f nwhierarchy.ado
 f nwhierarchy.sthlp
 f nwdendrogram.ado
 f nwdendrogram.sthlp
+f nw2set.ado
+f nw2set.sthlp
+f nwburt.ado
+f nwburt.sthlp
+f nwbridge.ado
+f nwbridge.sthlp
+f nwsimmelian.ado
+f nwsimmelian.sthlp
