@@ -122,19 +122,24 @@ program nwmovie
 
 
 	if c(os) == "MacOSX" {
-		nwmovie_install_osx
-		local impath2 = "`r(impath)'"
+		if "`imagick'"== "" {
+			nwmovie_install_osx
+			local impath2 = "`r(impath)'"
+		}
 	}
 	
 	if c(os) == "Windows" {
-		nwmovie_install_win
-		local impath2 = "`r(impath)'"
+		if "`imagick'" == "" {
+			nwmovie_install_win
+			local impath2 = "`r(impath)'"
+		}
 	}
 	
 	if "`imagick'" != "" {
 		local impath2 = "`imagick'"
+		di "{txt}ImageMagick path: `impath2'"
 	}
-
+	
 	// make movie
 	_nwsyntax `netname', max(999) min(2)
 	local all_nets "`netname'"
@@ -536,6 +541,9 @@ program nwmovie_install_win
 		di `"{err}Please install {browse "`imurl'":ImageMagick from here first} or specify option {bf:imagick()}."'
 		error 
 	}
+	else{
+		di "{txt}ImageMagick found: `impath'"
+	}
 	mata: st_global("r(impath)", "`impath'")
 end
 
@@ -560,6 +568,9 @@ program nwmovie_install_osx
 		di "{err}ImageMagick not found."
 		di `"{err}Please install {browse "`imurl'": ImageMagick from here first} or specify option {bf:imagick()}."'
 		error 6999
+	}
+	else {
+		di "{txt}ImageMagick found: `impath'"
 	}
 	
 	/*
