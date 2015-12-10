@@ -18,6 +18,7 @@
 {p2col:{bf:{help _opts_oneof }}}{err}no help file yet{txt}{p_end}
 {p2col:{bf:{help animate }}}Animate graphs{p_end{p_end}
 {p2col:{bf:{help nw2fromedge }}}Import two-mode network data from edgelist{p_end}
+{p2col:{bf:{help nw2project }}}Make one-mode projection{p_end}
 {p2col:{bf:{help nw2set }}}Declare data to be two-mode network data{p_end}
 {p2col:{bf:{help nwaddnodes }}}Add nodes to network{p_end}
 {p2col:{bf:{help nwbetween }}}Calculate betweenness centrality{p_end}
@@ -49,7 +50,7 @@
 {p2col:{bf:{help nwgen }}}Network extensions to generate{p_end}
 {p2col:{bf:{help nwgenerate }}}{p_end}
 {p2col:{bf:{help nwgeodesic }}}Calculate shortest paths between nodes{p_end}
-{p2col:{bf:{help nwhierarchy }}}Hierrachical clustering of nodes{p_end}
+{p2col:{bf:{help nwhierarchy }}}Hierarchical clustering of nodes{p_end}
 {p2col:{bf:{help nwhomophily }}}Generate a homophily network{p_end}
 {p2col:{bf:{help nwimport }}}Import network{p_end}
 {p2col:{bf:{help nwinstall }}}Install Stata menu/dialogs{p_end}

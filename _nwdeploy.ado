@@ -23,7 +23,7 @@ program _nwdeploy
 "{help nw_programming:{col 14}{bf:[NW-5]}{...}{col 31}{bf:Network programming}}" _n ///
 "" _n ///
 "{help nwinstall:{col 14}{bf:[NW-6]}{...}{col 31}{bf:Install Stata menus/dialogs}}" _n ///
-"end" _n ///
+"" _n ///
 "" _n ///
 "		*! Date        : `c(current_date)'" _n ///
 "		*! Version     : `version'" _n ///
@@ -33,8 +33,8 @@ program _nwdeploy
 `"		 *! Bugs        : {browse "mailto:thomas.u.grund@gmail.com"}"'
 	file close `nw'
 	
-	tempname versionlog
-	file open `versionlog' using versionlog.sh, replace write
+	//tempname versionlog
+	//file open `versionlog' using versionlog.sh, replace write
 	
 	set more off
 	tempname deploy_ado
@@ -74,9 +74,7 @@ program _nwdeploy
 	postclose `memhold'
 
 	preserve
-	use `topics', clear
-	exit
-	
+	use `topics', clear	
 	sort topic cmdname
 	
 	tempname topical
@@ -183,7 +181,8 @@ program _nwdeploy
 	
 		local cmdname = substr("`file'", 1, `=(length("`file'") - 4)') 
 		getcmddesc `cmdname'
-		file write `deploy_ado' "f `file'" _n
+		//file write `deploy_ado' "f `file'" _n
+		//di "`file'"
 		file write `alphabetical' "{p2col:{bf:{help `cmdname' }}}`r(cmddesc)'{p_end}" _n		
 	}
 	
@@ -267,7 +266,7 @@ program _nwdeploy
 		file write deploy_dlg "f `file'" _n
 	}
 	file close deploy_dlg
-	file close `versionlog'
+	//file close `versionlog'
 end
 
 capture program drop getcmddesc

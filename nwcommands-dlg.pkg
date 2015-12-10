@@ -2,7 +2,7 @@ v 3
 d nwcommands-dlg. Social Network Analysis Using Stata - Dialog Boxes
 d Thomas U. Grund, University College Dublin, www.grund.co.uk
 d email: contact[at]nwcommands.org
-d Distribution-Date: 9dec2015
+d Distribution-Date: 10dec2015
 f nw_edges_color.dlg
 f nw_edges_pattern.dlg
 f nw_edges_size.dlg

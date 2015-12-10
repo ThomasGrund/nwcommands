@@ -14,7 +14,7 @@
 {help nw_programming:{col 14}{bf:[NW-5]}{...}{col 31}{bf:Network programming}}
 
 {help nwinstall:{col 14}{bf:[NW-6]}{...}{col 31}{bf:Install Stata menus/dialogs}}
-end
+
 
                *! Date        : 10 Dec 2015
                *! Version     : 1.6.3

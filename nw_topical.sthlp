@@ -1,5 +1,5 @@
 {smcl}
-{* *! version 1.6.1 9dec2015}{...}
+{* *! version 1.6.3 10dec2015}{...}
 {phang}
 {help nwcommands:NW-2 topical} {hline 2} 
 {hline 2} Topical list of network commands
@@ -98,6 +98,7 @@
 {col 8}{hline 3}{c RT}       {it:Manipulation}{col 36}{c LT}{hline}
 {col 8}   {c BLC}{hline 24}{c BRC}
 {p2colset 12 35 36 2}
+{p2col:    {bf:{help nw2project }}}Make one-mode projection{p_end}
 {p2col:    {bf:{help nwaddnodes }}}Add nodes to network{p_end}
 {p2col:    {bf:{help nwcollapse }}}Collapse a network{p_end}
 {p2col:    {bf:{help nwdrop }}}Drop a network (or only some nodes){p_end}
@@ -135,7 +136,7 @@
 {p2col:    {bf:{help nwgen }}}Network extensions to generate{p_end}
 {p2col:    {bf:{help nwgenerate }}}{p_end}
 {p2col:    {bf:{help nwgeodesic }}}Calculate shortest paths between nodes{p_end}
-{p2col:    {bf:{help nwhierarchy }}}Hierrachical clustering of nodes{p_end}
+{p2col:    {bf:{help nwhierarchy }}}Hierarchical clustering of nodes{p_end}
 {p2col:    {bf:{help nwkatz }}}Calculate Katz centrality{p_end}
 {p2col:    {bf:{help nwneighbor }}}Extract the network neighbors of a node{p_end}
 {p2col:    {bf:{help nwpath }}}Calculate paths between nodes{p_end}
