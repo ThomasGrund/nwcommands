@@ -7,7 +7,7 @@
 {title:Title}
 
 {p2colset 9 18 22 2}{...}
-{p2col :nwhierarchy {hline 2} Hierrachical clustering of nodes}
+{p2col :nwhierarchy {hline 2} Hierarchical clustering of nodes}
 {p2colreset}{...}
 
 
@@ -47,11 +47,11 @@
 {marker type}{...}
 {p2col:{it:type}}{p_end}
 {p2line}
-{p2col:{cmd: pearson}}Calculate Pearson correlation for tie vectors of two nodes{p_end}
+{p2col:{cmd: euclidean}}Calculate Euclidean distance between the tie vectors of two nodes{p_end}
+{p2col:{cmd: manhatten}}Calculate Manhatten distance between the tie vectors of two nodes{p_end}
 {p2col:{cmd: hamming}}Calculate Hamming distance between the tie vectors of two nodes{p_end}
 {p2col:{cmd: jaccard}}Calculate Jaccard distance between the tie vectors of two nodes{p_end}
-{p2col:{cmd: matches}}Calculate percentage of matches in tie vectors of two nodes{p_end}
-{p2col:{cmd: crossproduct}}Calculate the cross-product of the tie vectors of two nodes{p_end}
+{p2col:{cmd: nonmatches}}Calculate percentage of non-matches in tie vectors of two nodes{p_end}
 
 {synoptset 15 tabbed}{...}
 {marker context}{...}
@@ -65,8 +65,9 @@
 
 {title:Description}
 
-{pstd}
-This command performs hierarchical clustering based on similarities between all nodes {it:i} and {it:j} and returns a clustering object.
+{pstd} 
+This command performs hierarchical clustering based on dissimilarities between all nodes {it:i} and {it:j} and returns a clustering
+object. Essentially, the command calculates a dissimilarity matrix with {help nwdissimilar} and then performs a normal cluster analysis using {help cluster linkage}.
 
 {pstd}
 By default, the similarity is calculated based on both incoming and outgoing ties ({bf:context(both)}). With {bf:context(incoming)} the similarity
@@ -76,9 +77,14 @@ between nodes. Practially, option {bf:context(both)} stacks the vector of outgoi
 
 {title:Example}
 
-{cmd:. webnwuse florentine, nwclear}
-{cmd:. nwhierarchy flomarriage}
+	{cmd:. webnwuse florentine, nwclear}
+	{cmd:. nwhierarchy flomarriage}
 
-{cmd:. clustder dendrogram _clus_1}
-{cmd:. nwdendrogram _clus_1, label(_nodelab)}
+	{cmd:. clustder dendrogram _clus_1}
+	{cmd:. nwdendrogram _clus_1, label(_nodelab)}
+
+
+{title:See also}
+
+	{help nwdissimilar}, {help cluster linkage}
 

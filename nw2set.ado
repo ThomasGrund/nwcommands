@@ -38,7 +38,9 @@ program nw2set
 		local rows ""
 		forvalues i=1/`=_N' {
 			if "`rownames'" != "" {
-				local rows "`rows' `=`rownames'[`i']'"
+				local new = "`=`rownames'[`i']'"
+				local new = strtoname("`new'")
+				local rows "`rows' `new'"
 			}
 			else {
 				local rows "`rows' n`i'"
@@ -50,8 +52,9 @@ program nw2set
 		local l "`labs'"
 	}
 	local mode1 : word count `varlist'
-	qui nwset, mat(M) labs(`l') name(`name') undirected `xvars'
+	qui nwset, mat(M) labs(`l') vars(`l') name(`name') undirected `xvars'
 	qui nwload, labelonly
+	capture drop `rownames'
 	capture drop `generate'
 	capture drop `varlist'
 	generate `generate' = 2 - (_n <= `mode1')

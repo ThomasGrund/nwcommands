@@ -1,6 +1,6 @@
 *! Date        : 11sept2014
 *! Version     : 1.0.1
-*! Author      : Thomas Grund, Linköping University
+*! Author      : Thomas Grund, LinkË†ping University
 *! Email	   : contact@nwcommands.org
 
 capture program drop nwuse
@@ -105,12 +105,7 @@ program nwuse
 		drop _running
 		
 	}
+	capture rename modeid _modeid
 	//nwload
 end
 
-
-
-	
-
-*! v1.5.0 __ 17 Sep 2015 __ 13:09:53
-*! v1.5.1 __ 17 Sep 2015 __ 14:54:23

@@ -2,6 +2,37 @@ capture program drop _nwdeploy
 program _nwdeploy
 	syntax , version(string) [author(string) email(string) other(string)]
 
+	di "Version_deploy: `version'"
+	set more off
+	tempname nw
+	//di "Writing... nwcommands.sthlp"
+	file open `nw' using nwcommands.sthlp, replace write
+	file write `nw' "{smcl}" _n ///	
+"{* *! version 1.0.0  3sept2014}{...}" _n ///
+"" _n ///		
+"{col 14}Section{col 31}Description" _n ///
+"{col 14}{hline 46}" _n ///
+"{help nw_intro:{col 14}{bf:[NW-1]}{...}{col 31}{bf:Introduction and concepts}}" _n ///
+"" _n ///
+"{help nw_topical:{col 14}{bf:[NW-2]}{...}{col 31}{bf:Topical list of network commands}}" _n ///
+"" _n ///
+"{help nw_alphabetical:{col 14}{bf:[NW-3]}{...}{col 31}{bf:Alphabetical list of network commands}}" _n ///
+"" _n ///
+"{help nw_start:{col 14}{bf:[NW-4]}{...}{col 31}{bf:Getting started}}" _n ///
+"" _n ///
+"{help nw_programming:{col 14}{bf:[NW-5]}{...}{col 31}{bf:Network programming}}" _n ///
+"" _n ///
+"{help nwinstall:{col 14}{bf:[NW-6]}{...}{col 31}{bf:Install Stata menus/dialogs}}" _n ///
+"end" _n ///
+"" _n ///
+"		*! Date        : `c(current_date)'" _n ///
+"		*! Version     : `version'" _n ///
+"		*! Authors     : Thomas U. Grund " _n ///
+"		*! Contact     : thomas.u.grund@gmail.com" _n ///
+`"		 *! Web         : {browse "http://nwcommands.org"}"' _n ///
+`"		 *! Bugs        : {browse "mailto:thomas.u.grund@gmail.com"}"'
+	file close `nw'
+	
 	tempname versionlog
 	file open `versionlog' using versionlog.sh, replace write
 	
@@ -23,8 +54,9 @@ program _nwdeploy
 	tempfile topics
 	postfile `memhold' str30 cmdname str40 link str30 topic using `topics'
 	set more off
+	//di "Collecting topic categories..."
 	foreach file in `sthlpfiles' {
-		di "`file'"
+		if (strpos("`file'", "!") == 0){
 		// add sthlp meta info
 		//di "sthlp: `file'"
 		//qui _addmeta_hlp `file', date(`d') version(`version')
@@ -37,6 +69,7 @@ program _nwdeploy
 		if "`r(cmdtopic2)'" != "" {
 			post `memhold' ("`cmdname'") ("`r(topiclink2)'") ("`r(cmdtopic2)'")
 		}
+		}
 	}	
 	postclose `memhold'
 
@@ -48,6 +81,7 @@ program _nwdeploy
 	
 	tempname topical
 	file open `topical' using nw_topical.sthlp, replace write
+	//di "Writing... help files"
 	file write `topical' "{smcl}" _n ///	
 			"{* *! version `version' `d'}{...}"  _n ///
 		    "{phang}" _n ///
@@ -149,7 +183,7 @@ program _nwdeploy
 	
 		local cmdname = substr("`file'", 1, `=(length("`file'") - 4)') 
 		getcmddesc `cmdname'
-		//file write `deploy_ado' "f `file'" _n
+		file write `deploy_ado' "f `file'" _n
 		file write `alphabetical' "{p2col:{bf:{help `cmdname' }}}`r(cmddesc)'{p_end}" _n		
 	}
 	
@@ -266,7 +300,7 @@ end
 
 capture program drop getcmdtopic
 program getcmdtopic, rclass
-	syntax anything(name=cmd)
+	syntax anything(name=cmd) [, version(string)]
 	capture findfile `cmd'.sthlp
 	if _rc != 0 {
 		return local cmdtopic = "Uncategorized"
@@ -308,36 +342,6 @@ program getcmdtopic, rclass
 	}
 	file close `cmdsthlp'
 	//shell sh versionlog.sh
-
-	di "VV: `version'"
-	set more off
-	tempname nw
-	file open `nw' using nwcommands.sthlp, replace write
-	file write `nw' "{smcl}" _n ///	
-"{* *! version 1.0.0  3sept2014}{...}" _n ///
-"" _n ///		
-"{col 14}Section{col 31}Description" _n ///
-"{col 14}{hline 46}" _n ///
-"{help nw_intro:{col 14}{bf:[NW-1]}{...}{col 31}{bf:Introduction and concepts}}" _n ///
-"" _n ///
-"{help nw_topical:{col 14}{bf:[NW-2]}{...}{col 31}{bf:Topical list of network commands}}" _n ///
-"" _n ///
-"{help nw_alphabetical:{col 14}{bf:[NW-3]}{...}{col 31}{bf:Alphabetical list of network commands}}" _n ///
-"" _n ///
-"{help nw_start:{col 14}{bf:[NW-4]}{...}{col 31}{bf:Getting started}}" _n ///
-"" _n ///
-"{help nw_programming:{col 14}{bf:[NW-5]}{...}{col 31}{bf:Network programming}}" _n ///
-"" _n ///
-"{help nwinstall:{col 14}{bf:[NW-6]}{...}{col 31}{bf:Install Stata menus/dialogs}}" _n ///
-"end" _n ///
-"" _n ///
-"		*! Date        : `c(current_date)'" _n ///
-"		*! Version     : `version'" _n ///
-"		*! Authors     : Thomas U. Grund " _n ///
-"		*! Contact     : thomas.u.grund@gmail.com" _n ///
-`"		 *! Web         : {browse "http://nwcommands.org"}"' _n ///
-`"		 *! Bugs        : {browse "mailto:thomas.u.grund@gmail.com"}"'
-	file close `nw'
 end
 
 /*

@@ -123,14 +123,17 @@ program nwmovie
 
 	if c(os) == "MacOSX" {
 		nwmovie_install_osx
-		local impath = "`r(impath)'"
+		local impath2 = "`r(impath)'"
 	}
 	
 	if c(os) == "Windows" {
 		nwmovie_install_win
-		local impath = "`r(impath)'"
+		local impath2 = "`r(impath)'"
 	}
 	
+	if "`imagick'" != "" {
+		local impath2 = "`imagick'"
+	}
 
 	// make movie
 	_nwsyntax `netname', max(999) min(2)
@@ -482,17 +485,15 @@ program nwmovie
 
 
 	local lastdelay = `delay' * `frames'
-	local shellcmd `""`impath'/convert" -delay `delay' -loop 0 "`c(pwd)'/first*.`pic'" "`c(pwd)'/frame*.`pic'" -delay `lastdelay' "`c(pwd)'/last*.`pic'" "`fname'.gif""'
-
 	
 	if c(os) == "MacOSX" {
-		shell export PATH="$PATH:`:environ PATH':/usr/local/bin:/usr/bin:/opt/local/bin:/opt/ImageMagick/bin/:`imagick'/";`shellcmd'
+		local shellcmd `""`impath2'/convert" -delay `delay' -loop 0 "`c(pwd)'/first*.`pic'" "`c(pwd)'/frame*.`pic'" -delay `lastdelay' "`c(pwd)'/last*.`pic'" "`fname'.gif""'
+		shell export PATH="$PATH:`:environ PATH':/usr/local/bin:/usr/bin:/opt/local/bin:/opt/ImageMagick/bin/:`impath2'/";`shellcmd'
 		shell open "`fname'.gif" -a /Applications/Safari.app/ 
 	}
 	
 	if c(os) == "Windows" {
-		nwmovie_install_win
-		shell "`r(impath)'\convert.exe" -delay 10 -loop 0 "`c(pwd)'\first*.png" "`c(pwd)'\frame*.png" -delay 20 "`c(pwd)'\last*.png" "`fname'.gif"
+		shell "`impath2'\convert.exe" -delay 10 -loop 0 "`c(pwd)'\first*.png" "`c(pwd)'\frame*.png" -delay 20 "`c(pwd)'\last*.png" "`fname'.gif"
 		shell explorer.exe "`fname'.gif"
 	}
 	
@@ -609,10 +610,3 @@ program nwmovie_install_osx
 	
 	mata: st_global("r(impath)", "`impath'")
 end
-
-
-		
-		
-	
-*! v1.5.0 __ 17 Sep 2015 __ 13:09:53
-*! v1.5.1 __ 17 Sep 2015 __ 14:54:23

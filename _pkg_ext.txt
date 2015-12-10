@@ -12,3 +12,5 @@ f nwbridge.ado
 f nwbridge.sthlp
 f nwsimmelian.ado
 f nwsimmelian.sthlp
+f nw2project.ado
+f nw2project.sthlp

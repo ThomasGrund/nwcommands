@@ -125,6 +125,10 @@ Notice that the normal, time-invariant options from {help nwplot} can be used as
 	
 	{cmd:. nwmovie klas12b_wave1 klas12b_wave1, color(sex)}
 
+{pstd}
+When the command cannot find ImageMagick, try and install ImageMagick manually, locate the convert.exe (Windows)
+or convert executible (OSX) and your computer and note the path, e.g. "/users/opt/ImageMagick/bin". You can
+manually specify this path in the {bf:imagick()} option.
 	
 {title:See also}
 

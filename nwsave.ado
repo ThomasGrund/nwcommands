@@ -28,6 +28,7 @@ program nwsave
 	local i = 1
 
 	tempfile attributes
+	capture rename _modeid modeid
 	capture drop _*
 	gen _running = _n
 	foreach onenet in `netname' {

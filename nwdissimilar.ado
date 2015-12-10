@@ -176,7 +176,10 @@ real matrix jaccard_dissimilarity(real matrix net,real scalar dtype){
 			j_invec = (j_invec :!= 0)
 			
 			if (dtype == 0 ) {
-				S[i,j] = 1 - (sum((i_outvec :== j_outvec) :* (i_outvec :!= 0)) + sum((i_invec :== j_invec) :* (i_invec :!= 0))) / ((sum(i_outvec:!=0)) + (sum(i_invec:!=0)))
+				S[i,j] = 1 - (sum((i_outvec :== j_outvec) :* (i_outvec :!= 0) :* (j_outvec:!= 0)) + sum((i_invec :== j_invec) :* (i_invec :!= 0) :* (j_invec:!=0))) / ((sum((i_outvec + j_outvec):!=0)) + (sum((i_invec + j_invec):!=0)))
+				if (i == 4 & j == 5) {
+					
+				}
 			}
 			if (dtype == 1 ) {
 				S[i,j] = 1 - (sum((i_invec :== j_invec) :* (i_invec:!=0))) / (sum((i_invec :+ j_invec) :!=0))
@@ -225,9 +228,3 @@ real matrix hamming_dissimilarity(real matrix net,real scalar dtype){
 	return(S)
 }
 end
-
-
-
-
-*! v1.5.0 __ 17 Sep 2015 __ 13:09:53
-*! v1.5.1 __ 17 Sep 2015 __ 14:54:23

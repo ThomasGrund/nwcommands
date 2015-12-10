@@ -1,6 +1,6 @@
 capture program drop nwbridge
 program nwbridge
-	syntax [anything(name=netname)] [, xvars generate(string) local global]
+	syntax [anything(name=netname)] [, xvars generate(string) detail local global]
 	_nwsyntax `netname'
 	
 	nwname `netname'
@@ -15,7 +15,7 @@ program nwbridge
 	mata: lcbridge = bridges
 	mata: _editvalue(lcbridge, 2, -1)
 	mata: glbridge = (bridges :== -1)
-	mata: num_lcbridges = sum(lcbridge:>==3)
+	mata: num_lcbridges = sum(lcbridge:>=3)
 
 	if "`undirected'" != "" {
 		mata: st_numscalar("r(bridges)", num_bridges / 2)
@@ -28,11 +28,12 @@ program nwbridge
 	mata: st_global("r(name)", "`netname'")
 	mata: st_global("r(directed)", "`directed'")
 	di ""
+	di "{hline 30}"
 	di "{txt}    Network      : {res}`netname'"
 	di "{txt}    Directed     : {res}`directed'"
 	di "{txt}    Bridges      : {res}`r(bridges)'"
 	di "{txt}    Local bridges: {res}`r(local_bridges)'"
-
+	di "{hline 30}"
 	if "`generate'" != "" {
 		if "`local'" == "" {
 			nwset, name("`generate'") `xvars' mat(glbridge) `undirected'
@@ -41,7 +42,52 @@ program nwbridge
 			nwset, name("`generate'") `xvars' mat(lcbridge) `undirected'
 		}
 	}
-		
+	if "`detail'" != "" {
+		preserve
+		nwname `netname'
+		local labs "`r(labs)'"
+		tempname bridgetemp
+		if "`generate'" == "" {
+			if "`local'" == "" {
+				nwset, name("`bridgetemp'") `xvars' labs("`labs'") mat(glbridge) `undirected'
+			}
+			else {
+				nwset, name("`bridgetemp'") `xvars' labs("`labs'") mat(lcbridge) `undirected'
+			}
+		}
+		nwtoedge 
+		qui keep if `bridgetemp' > 0
+		di ""
+		di "{txt}       Detailed bridges" _continue
+		if "`local'" == "" {
+			di " (global):"
+		}
+		else {
+			di " (local):"
+			di "       Span in parenthesis"
+		}
+		di ""
+		forvalues i = 1/`=_N' {
+			local fromid = _fromid[`i']
+			local toid = _toid[`i']
+			local fromlab : word `fromid' of `labs'
+			local tolab : word `toid' of `labs'
+			local val = `bridgetemp'[`i'] 
+			local sign "<=>"
+			if "`directed'" == "true" {
+				local sign "=>"
+			}
+			di "{res}        (`fromlab' `sign' `tolab')" _continue
+			if "`local'" != "" {
+				di"{res} (`val')"
+			}
+			else {
+				di ""
+			}
+		}
+		restore
+		capture nwdrop `bridgetemp'
+	}
 	mata: mata drop bridges glbridge lcbridge num_bridges
 	
 end

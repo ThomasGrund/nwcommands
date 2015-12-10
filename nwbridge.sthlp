@@ -17,14 +17,15 @@
 [{it:{help netname}}]
 [{cmd:,}
 {opth generate(newnetname)}
-{opt local}]
+{opt local}
+{opt detail}]
 
 {synoptset 25 tabbed}{...}
 {synopthdr}
 {synoptline}
 {synopt:{opth generate(newnetname)}}Save bridges as new network{p_end}
 {synopt:{opt local}}Calculate local bridges{p_end}
-
+{synopt:{opt detail}}Display labels for bridges{p_end}
 
 {title:Description}
 
