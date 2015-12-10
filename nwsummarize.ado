@@ -7,7 +7,7 @@ program nwsummarize
 
 	
 	if "`detail'" != "" {
-		local add "indg_central outdg_central dg_central transitivity reciprocity"
+		local add "indgcentral outdgcentral dgcentral transitivity reciprocity"
 	}
 	tempname memhold
 	if "`save'" != "" {
